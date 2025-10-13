@@ -1,0 +1,288 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Nav } from '@/components/nav';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+
+interface AffiliateData {
+  id: string;
+  display_name: string;
+  slug: string;
+  commission_type: string;
+  commission_value: number;
+  is_active: boolean;
+}
+
+interface AffiliateStats {
+  totalClicks: number;
+  totalConversions: number;
+  totalRevenue: number;
+  pendingCommissions: number;
+  approvedCommissions: number;
+  paidCommissions: number;
+  epc: number;
+}
+
+export default function AffiliateDashboardPage() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const [affiliate, setAffiliate] = useState<AffiliateData | null>(null);
+  const [stats, setStats] = useState<AffiliateStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (user) {
+      loadAffiliateData();
+    }
+  }, [user]);
+
+  const loadAffiliateData = async () => {
+    try {
+      // TODO: In production, get affiliates filtered by user ID
+      // For now, we'll need to implement an endpoint that gets affiliate by user_id
+      const response = await fetch(`/api/affiliates?user_id=${user?.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.affiliates && data.affiliates.length > 0) {
+          const affiliateData = data.affiliates[0];
+          setAffiliate(affiliateData);
+
+          // Load stats
+          const statsResponse = await fetch(`/api/affiliates/${affiliateData.id}/stats`);
+          if (statsResponse.ok) {
+            const statsData = await statsResponse.json();
+            setStats(statsData.stats);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load affiliate data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyAffiliateLink = async () => {
+    if (affiliate) {
+      const link = `${window.location.origin}/a/${affiliate.slug}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (error) {
+        console.error('Failed to copy:', error);
+      }
+    }
+  };
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-muted-foreground font-bold">Loading affiliate dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!affiliate) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Nav />
+        <div className="pt-32 pb-20 px-4">
+          <div className="container mx-auto max-w-4xl">
+            <Card className="bg-purple border-2 border-accent shadow-lg">
+              <CardContent className="pt-6 text-center py-12">
+                <div className="text-6xl mb-4">🚀</div>
+                <h2 className="heading-lg mb-4">NOT AN AFFILIATE YET</h2>
+                <p className="text-lg font-bold text-muted-foreground mb-6">
+                  You're not registered as an affiliate partner. Contact support to join our affiliate program!
+                </p>
+                <Button
+                  onClick={() => router.push('/support')}
+                  className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-8 py-6"
+                >
+                  CONTACT SUPPORT
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const affiliateLink = `${typeof window !== 'undefined' ? window.location.origin : ''}/a/${affiliate.slug}`;
+  const conversionRate = stats && stats.totalClicks > 0 ? ((stats.totalConversions / stats.totalClicks) * 100).toFixed(2) : '0.00';
+
+  return (
+    <div className="min-h-screen bg-white">
+      <Nav />
+
+      <div className="pt-32 pb-20 px-4">
+        <div className="container mx-auto max-w-6xl">
+          {/* Header */}
+          <div className="mb-12 animate-slide-up">
+            <h1 className="heading-xl mb-4">AFFILIATE DASHBOARD</h1>
+            <p className="text-lg font-bold text-muted-foreground">
+              Welcome back, {affiliate.display_name}
+            </p>
+          </div>
+
+          {/* Affiliate Link */}
+          <div className="mb-12 animate-slide-up" style={{animationDelay: '0.1s'}}>
+            <Card className="bg-purple border-4 border-accent shadow-xl">
+              <CardHeader>
+                <CardTitle className="heading-md">YOUR AFFILIATE LINK</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-white rounded-xl p-4 mb-4">
+                  <div className="flex gap-2">
+                    <div className="flex-1 px-4 py-3 bg-mint rounded-lg font-mono text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                      {affiliateLink}
+                    </div>
+                    <Button
+                      onClick={copyAffiliateLink}
+                      className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-6 touch-ripple"
+                    >
+                      {copied ? '✓ COPIED' : 'COPY'}
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-white rounded-xl">
+                    <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Your Slug</p>
+                    <p className="font-black text-lg">{affiliate.slug}</p>
+                  </div>
+                  <div className="p-4 bg-white rounded-xl">
+                    <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Commission Rate</p>
+                    <p className="font-black text-lg">
+                      {affiliate.commission_type === 'PERCENT'
+                        ? `${affiliate.commission_value}%`
+                        : `$${affiliate.commission_value.toFixed(2)}`}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Stats Grid */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <Card className="bg-mint border-4 border-primary shadow-xl hover-lift">
+                <CardContent className="pt-6">
+                  <div className="text-5xl font-black text-foreground mb-2">
+                    {stats.totalClicks}
+                  </div>
+                  <div className="font-black uppercase text-sm text-muted-foreground">
+                    Total Clicks
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-yellow border-4 border-secondary shadow-xl hover-lift">
+                <CardContent className="pt-6">
+                  <div className="text-5xl font-black text-foreground mb-2">
+                    {stats.totalConversions}
+                  </div>
+                  <div className="font-black uppercase text-sm text-muted-foreground">
+                    Conversions
+                  </div>
+                  <div className="text-xs font-bold text-muted-foreground mt-2">
+                    {conversionRate}% conversion rate
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-cyan border-4 border-primary shadow-xl hover-lift">
+                <CardContent className="pt-6">
+                  <div className="text-5xl font-black text-foreground mb-2">
+                    ${(stats.epc / 100).toFixed(2)}
+                  </div>
+                  <div className="font-black uppercase text-sm text-muted-foreground">
+                    EPC (Earnings Per Click)
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Commission Breakdown */}
+          {stats && (
+            <div className="animate-slide-up" style={{animationDelay: '0.3s'}}>
+              <Card className="bg-white border-2 border-foreground/10 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="heading-md">EARNINGS BREAKDOWN</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-mint rounded-xl">
+                      <p className="font-black uppercase text-xs text-muted-foreground mb-2">
+                        Pending
+                      </p>
+                      <p className="text-4xl font-black text-primary">
+                        ${(stats.pendingCommissions / 100).toFixed(2)}
+                      </p>
+                      <p className="text-xs font-bold text-muted-foreground mt-2">
+                        Subject to 14-day refund window
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-yellow rounded-xl">
+                      <p className="font-black uppercase text-xs text-muted-foreground mb-2">
+                        Approved
+                      </p>
+                      <p className="text-4xl font-black text-primary">
+                        ${(stats.approvedCommissions / 100).toFixed(2)}
+                      </p>
+                      <p className="text-xs font-bold text-muted-foreground mt-2">
+                        Ready for payout
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-cyan rounded-xl">
+                      <p className="font-black uppercase text-xs text-muted-foreground mb-2">
+                        Paid
+                      </p>
+                      <p className="text-4xl font-black">
+                        ${(stats.paidCommissions / 100).toFixed(2)}
+                      </p>
+                      <p className="text-xs font-bold text-muted-foreground mt-2">
+                        Lifetime earnings
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 p-6 bg-purple rounded-xl">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-black uppercase text-sm text-muted-foreground mb-1">
+                          Total Revenue Generated
+                        </p>
+                        <p className="text-5xl font-black">
+                          ${(stats.totalRevenue / 100).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

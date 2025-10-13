@@ -1,102 +1,341 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { supabase } from '@/lib/db';
+import { PlanCard } from '@/components/plan-card';
+import { LocationBanner } from '@/components/location-banner';
+import { Nav } from '@/components/nav';
+import { headers } from 'next/headers';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+async function getPopularPlans() {
+  const { data: plans } = await supabase
+    .from('plans')
+    .select('*')
+    .eq('is_active', true)
+    .limit(3);
+
+  return plans || [];
+}
+
+export default async function Home() {
+  const plans = await getPopularPlans();
+  const headersList = await headers();
+  const userAgent = headersList.get('user-agent') || '';
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <Nav />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Hero Section */}
+      <section className="relative pt-40 pb-32 px-4 overflow-hidden bg-white">
+        {/* Decorative Blobs */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan/10 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto text-center relative z-10">
+          <div className="inline-block mb-6 animate-zoom-in">
+            <span className="inline-block px-8 py-3 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-primary shadow-lg backdrop-blur-sm">
+              ⚡ Instant eSIM Delivery
+            </span>
+          </div>
+
+          <h1 className="heading-xl mb-8 max-w-5xl mx-auto animate-slide-up" style={{animationDelay: '0.1s'}}>
+            <span className="inline-block">ESIMS THAT JUST WORK.</span><br/>
+            <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
+          </h1>
+
+          <p className="text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto animate-slide-up" style={{animationDelay: '0.2s'}}>
+            Get connected in <span className="text-primary">190+ countries</span>.<br/>
+            No physical SIM card needed. Instant activation.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <Link href="/plans" className="group">
+              <Button className="bg-primary text-foreground hover:bg-primary/90 text-xl px-14 py-8 rounded-xl font-black shadow-2xl hover:scale-105 transition-transform">
+                <span className="flex items-center gap-3">
+                  GET STARTED
+                  <span className="inline-block group-hover:translate-x-2 transition-transform duration-300">→</span>
+                </span>
+              </Button>
+            </Link>
+            <Link href="/how-it-works" className="group">
+              <Button className="bg-white text-foreground hover:bg-foreground/5 text-xl px-14 py-8 rounded-xl border-4 border-foreground font-black shadow-2xl hover:scale-105 transition-transform">
+                <span className="flex items-center gap-3">
+                  HOW IT WORKS
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">↗</span>
+                </span>
+              </Button>
+            </Link>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="mt-16 flex flex-wrap justify-center gap-8 items-center opacity-60 animate-fade-in" style={{animationDelay: '0.5s'}}>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">⭐</div>
+              <span className="font-bold text-sm">5.0 Rating</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">🔒</div>
+              <span className="font-bold text-sm">Secure Checkout</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">🚀</div>
+              <span className="font-bold text-sm">Instant Delivery</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">🌍</div>
+              <span className="font-bold text-sm">190+ Countries</span>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-32 px-4 bg-light-mint relative overflow-hidden">
+        <div className="container mx-auto relative z-10">
+          <div className="grid md:grid-cols-3 gap-10 text-center max-w-7xl mx-auto">
+            <div className="p-12 bg-yellow rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift">
+              <div className="text-8xl font-black mb-6 text-foreground">190+</div>
+              <div className="text-3xl font-black uppercase tracking-tight mb-2">Countries</div>
+              <div className="text-base font-bold mt-3 text-foreground/70">Global Coverage ✓</div>
+            </div>
+            <div className="p-12 bg-cyan rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.1s'}}>
+              <div className="text-8xl font-black mb-6 text-foreground">5 MIN</div>
+              <div className="text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
+              <div className="text-base font-bold mt-3 text-foreground/70">Super Fast ⚡</div>
+            </div>
+            <div className="p-12 bg-purple rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.2s'}}>
+              <div className="text-8xl font-black mb-6 text-foreground">24/7</div>
+              <div className="text-3xl font-black uppercase tracking-tight mb-2">Support</div>
+              <div className="text-base font-bold mt-3 text-foreground/70">Always Here 💬</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="relative py-32 px-4 bg-white overflow-hidden">
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-20 animate-fade-in">
+            <div className="inline-block mb-4">
+              <span className="px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
+                Simple Process
+              </span>
+            </div>
+            <h2 className="heading-lg mb-4">
+              HOW IT WORKS
+            </h2>
+            <p className="text-xl font-bold opacity-70">Three steps to global connectivity</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+            <div className="group text-center animate-slide-up" style={{animationDelay: '0.1s'}}>
+              <div className="relative inline-block mb-8">
+                <div className="w-28 h-28 bg-primary rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+                  1
+                </div>
+              </div>
+              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">PICK YOUR PLAN</h3>
+              <p className="text-lg font-bold opacity-70">
+                Choose the perfect data plan for your destination
+              </p>
+            </div>
+
+            <div className="group text-center animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <div className="relative inline-block mb-8">
+                <div className="w-28 h-28 bg-yellow rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+                  2
+                </div>
+              </div>
+              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">PAY INSTANTLY</h3>
+              <p className="text-lg font-bold opacity-70">
+                Checkout with Apple Pay, Google Pay, or card
+              </p>
+            </div>
+
+            <div className="group text-center animate-slide-up" style={{animationDelay: '0.3s'}}>
+              <div className="relative inline-block mb-8">
+                <div className="w-28 h-28 bg-cyan rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+                  3
+                </div>
+              </div>
+              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">GET CONNECTED</h3>
+              <p className="text-lg font-bold opacity-70">
+                Scan QR code or tap to activate. Done in seconds.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-16">
+            <Link href="/how-it-works">
+              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-12 py-6 rounded-xl hover-lift">
+                LEARN MORE
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Plans */}
+      <section className="relative py-32 px-4 bg-mint">
+        <div className="container mx-auto">
+          <div className="text-center mb-16 animate-fade-in">
+            <div className="inline-block mb-4">
+              <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
+                🌍 Most Popular
+              </span>
+            </div>
+            <h2 className="heading-lg mb-4">
+              POPULAR DESTINATIONS
+            </h2>
+            <p className="text-xl font-bold opacity-70 max-w-2xl mx-auto">
+              Get instant connectivity in the world's most visited locations
+            </p>
+          </div>
+
+          {/* Location-Based Banner */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <LocationBanner />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+            {plans.map((plan, index) => (
+              <div key={plan.id} className="animate-slide-up" style={{animationDelay: `${index * 0.1}s`}}>
+                <PlanCard plan={plan} />
+              </div>
+            ))}
+          </div>
+          <div className="text-center animate-scale-in">
+            <Link href="/plans">
+              <Button className="bg-yellow text-foreground hover:bg-yellow/90 font-black text-lg px-14 py-7 rounded-xl hover-lift shadow-xl">
+                <span className="relative">VIEW ALL PLANS</span>
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="relative py-32 px-4 bg-white overflow-hidden">
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-20 animate-fade-in">
+            <h2 className="heading-lg mb-4">
+              WHY CHOOSE LUMBUS?
+            </h2>
+            <p className="text-xl font-bold opacity-70">Experience the difference</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+            <Card className="bg-mint border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden">
+              <CardContent className="p-10 text-center">
+                <div className="text-6xl mb-6">⚡</div>
+                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">INSTANT</h3>
+                <p className="font-bold opacity-70">Activate in seconds, not hours</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.1s'}}>
+              <CardContent className="p-10 text-center">
+                <div className="text-6xl mb-6">🌍</div>
+                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">GLOBAL</h3>
+                <p className="font-bold opacity-70">Works in 190+ countries</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.2s'}}>
+              <CardContent className="p-10 text-center">
+                <div className="text-6xl mb-6">💳</div>
+                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SIMPLE</h3>
+                <p className="font-bold opacity-70">No contracts, no commitments</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-purple border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.3s'}}>
+              <CardContent className="p-10 text-center">
+                <div className="text-6xl mb-6">🔒</div>
+                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SECURE</h3>
+                <p className="font-bold opacity-70">Bank-level encryption</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative py-40 px-4 bg-primary overflow-hidden">
+        <div className="container mx-auto text-center relative z-10">
+          <div className="animate-scale-in">
+            <div className="inline-block mb-8">
+              <span className="px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
+                🚀 Join 10,000+ Happy Travelers
+              </span>
+            </div>
+            <h2 className="heading-xl mb-8 text-foreground">
+              READY TO GET<br/>CONNECTED?
+            </h2>
+            <p className="text-3xl font-black mb-16 text-foreground/80 max-w-3xl mx-auto">
+              Join thousands of travelers staying connected worldwide
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Link href="/plans">
+                <Button className="bg-foreground text-white hover:bg-foreground/90 hover:scale-105 text-xl px-16 py-8 rounded-xl shadow-2xl font-black transition-transform">
+                  <span className="relative z-10">BROWSE PLANS</span>
+                </Button>
+              </Link>
+              <Link href="/help">
+                <Button className="bg-white text-foreground border-4 border-white hover:bg-white/90 hover:scale-105 text-xl px-16 py-8 rounded-xl font-black transition-transform">
+                  GET HELP
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-foreground text-white py-12 px-4">
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="font-black text-2xl mb-4">LUMBUS</h3>
+              <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Pages</h4>
+              <div className="space-y-2">
+                <Link href="/destinations" className="block text-gray-400 hover:text-white">
+                  Destinations
+                </Link>
+                <Link href="/device" className="block text-gray-400 hover:text-white">
+                  Device
+                </Link>
+                <Link href="/how-it-works" className="block text-gray-400 hover:text-white">
+                  How it works
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Support</h4>
+              <div className="space-y-2">
+                <Link href="/help" className="block text-gray-400 hover:text-white">
+                  Help Center
+                </Link>
+                <Link href="/plans" className="block text-gray-400 hover:text-white">
+                  Plans
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Powered By</h4>
+              <p className="text-gray-400">1GLOBAL eSIM Network</p>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+            <p>&copy; {new Date().getFullYear()} Lumbus. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
