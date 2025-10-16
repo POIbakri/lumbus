@@ -35,7 +35,7 @@ let stripe: Stripe | null = null;
 
 function getStripeClient() {
   if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY;
+    const apiKey = process.env.STRIPE_SECRET_KEY?.replace(/\s+/g, '');
     if (!apiKey) {
       throw new Error('STRIPE_SECRET_KEY is not configured');
     }
@@ -185,7 +185,7 @@ async function checkStripe(): Promise<ServiceHealth> {
 async function checkEmail(): Promise<ServiceHealth> {
   const start = Date.now();
   try {
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = process.env.RESEND_API_KEY?.replace(/\s+/g, '');
 
     if (!apiKey) {
       return {

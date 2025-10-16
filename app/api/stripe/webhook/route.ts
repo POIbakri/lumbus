@@ -13,7 +13,7 @@ let stripe: Stripe | null = null;
 
 function getStripeClient() {
   if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY;
+    const apiKey = process.env.STRIPE_SECRET_KEY?.replace(/\s+/g, '');
     if (!apiKey) {
       throw new Error('STRIPE_SECRET_KEY is not configured');
     }
@@ -24,7 +24,7 @@ function getStripeClient() {
   return stripe;
 }
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+const webhookSecret = (process.env.STRIPE_WEBHOOK_SECRET || '').replace(/\s+/g, '');
 
 export async function POST(req: NextRequest) {
   try {

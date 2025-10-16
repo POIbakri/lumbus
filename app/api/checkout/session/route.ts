@@ -10,7 +10,7 @@ let stripe: Stripe | null = null;
 
 function getStripeClient() {
   if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY;
+    const apiKey = process.env.STRIPE_SECRET_KEY?.replace(/\s+/g, '');
     if (!apiKey) {
       throw new Error('STRIPE_SECRET_KEY is not configured');
     }
