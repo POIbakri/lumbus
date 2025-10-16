@@ -30,9 +30,21 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-09-30.clover',
-});
+// Lazy initialization - only create instance when needed
+let stripe: Stripe | null = null;
+
+function getStripeClient() {
+  if (!stripe) {
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new Error('STRIPE_SECRET_KEY is not configured');
+    }
+    stripe = new Stripe(apiKey, {
+      apiVersion: '2025-09-30.clover',
+    });
+  }
+  return stripe;
+}
 
 interface ServiceHealth {
   status: 'up' | 'down' | 'degraded';
@@ -144,7 +156,7 @@ async function checkStripe(): Promise<ServiceHealth> {
     }
 
     // Try to retrieve account balance as a health check
-    await stripe.balance.retrieve();
+    await getStripeClient().balance.retrieve();
 
     return {
       status: 'up',

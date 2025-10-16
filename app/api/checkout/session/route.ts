@@ -4,9 +4,21 @@ import { supabase } from '@/lib/db';
 import { ensureUserProfile } from '@/lib/referral';
 import { z } from 'zod';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-09-30.clover',
-});
+// Lazy initialization - only create instance when needed
+let stripe: Stripe | null = null;
+
+function getStripeClient() {
+  if (!stripe) {
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new Error('STRIPE_SECRET_KEY is not configured');
+    }
+    stripe = new Stripe(apiKey, {
+      apiVersion: '2025-09-30.clover',
+    });
+  }
+  return stripe;
+}
 
 const checkoutSchema = z.object({
   planId: z.string().uuid(),
@@ -153,7 +165,7 @@ export async function POST(req: NextRequest) {
       ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
       : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripeClient().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
