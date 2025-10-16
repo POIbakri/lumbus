@@ -1,6 +1,18 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization - only create instance when needed
+let resend: Resend | null = null;
+
+function getResendClient() {
+  if (!resend) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    resend = new Resend(apiKey);
+  }
+  return resend;
+}
 
 export interface SendOrderConfirmationParams {
   to: string;
@@ -53,7 +65,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
   const { to, orderDetails, activationDetails, installUrl } = params;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your Lumbus eSIM is ready! - ${orderDetails.planName}`,
@@ -237,7 +249,7 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
   const alertLevel = isUrgent ? 'Urgent' : isWarning ? 'Warning' : 'Notice';
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `${alertLevel}: ${usagePercent.toFixed(0)}% of your data used - ${planName}`,
@@ -434,7 +446,7 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
   const { to, planName, daysRemaining, expiryDate } = params;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your eSIM plan expires soon - ${planName}`,
@@ -579,7 +591,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
   const { to, referredUserEmail, rewardAmount, referralCode } = params;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `You earned a reward! 🎉 - ${rewardAmount}`,
@@ -722,7 +734,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
   const { to, planName, dataAdded, validityDays, iccid } = params;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your eSIM top-up is complete! - ${dataAdded}GB added`,
