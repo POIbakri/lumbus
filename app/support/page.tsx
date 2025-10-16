@@ -12,19 +12,19 @@ export default function SupportPage() {
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-16">
-              <h1 className="heading-xl mb-6">
+            <div className="text-center mb-12 sm:mb-16 px-4">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
                 SUPPORT & FAQS
               </h1>
-              <p className="text-xl font-bold">
+              <p className="text-base sm:text-lg md:text-xl font-bold">
                 Everything you need to know about using Lumbus eSIMs
               </p>
             </div>
 
             {/* Device Compatibility */}
-            <Card className="bg-purple border-2 border-accent shadow-lg mb-8">
+            <Card className="bg-purple border-2 border-accent shadow-lg mb-6 sm:mb-8">
               <CardHeader>
-                <CardTitle className="heading-md">IS MY PHONE COMPATIBLE?</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">IS MY PHONE COMPATIBLE?</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
@@ -68,9 +68,9 @@ export default function SupportPage() {
             </Card>
 
             {/* Installation Instructions */}
-            <Card className="bg-mint border-2 border-primary shadow-lg mb-8">
+            <Card className="bg-mint border-2 border-primary shadow-lg mb-6 sm:mb-8">
               <CardHeader>
-                <CardTitle className="heading-md">HOW TO INSTALL YOUR ESIM</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">HOW TO INSTALL YOUR ESIM</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
@@ -114,9 +114,9 @@ export default function SupportPage() {
             </Card>
 
             {/* FAQs */}
-            <Card className="bg-yellow border-2 border-secondary shadow-lg mb-8">
+            <Card className="bg-yellow border-2 border-secondary shadow-lg mb-6 sm:mb-8">
               <CardHeader>
-                <CardTitle className="heading-md">FREQUENTLY ASKED QUESTIONS</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">FREQUENTLY ASKED QUESTIONS</CardTitle>
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
@@ -193,14 +193,14 @@ export default function SupportPage() {
 
             {/* Contact */}
             <Card className="bg-cyan border-2 border-primary shadow-lg text-center">
-              <CardContent className="pt-6 pb-6">
-                <h3 className="font-black uppercase text-2xl mb-3">STILL NEED HELP?</h3>
-                <p className="font-bold mb-6">
+              <CardContent className="pt-6 pb-6 px-4">
+                <h3 className="font-black uppercase text-xl sm:text-2xl mb-3">STILL NEED HELP?</h3>
+                <p className="font-bold mb-6 text-sm sm:text-base">
                   Check your order confirmation email for specific activation details
                 </p>
                 <Link
                   href="/plans"
-                  className="inline-block btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-8 py-4"
+                  className="inline-block btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base"
                 >
                   BROWSE PLANS →
                 </Link>

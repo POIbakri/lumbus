@@ -39,17 +39,17 @@ export default function DevicePage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-4 bg-cyan">
+      <section className="pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 bg-cyan">
         <div className="container mx-auto text-center">
-          <div className="inline-block mb-6">
-            <span className="px-6 py-2 rounded-full bg-white/30 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
+          <div className="inline-block mb-4 sm:mb-6">
+            <span className="px-4 sm:px-6 py-2 rounded-full bg-white/30 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
               📱 eSIM Compatible
             </span>
           </div>
-          <h1 className="heading-xl mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
             IS MY DEVICE<br/>COMPATIBLE?
           </h1>
-          <p className="text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
+          <p className="text-base sm:text-lg md:text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
             Check if your device supports eSIM technology.<br/>
             Most modern smartphones and tablets are compatible.
           </p>
@@ -57,18 +57,18 @@ export default function DevicePage() {
       </section>
 
       {/* Quick Check Section */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-12 sm:py-20 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               QUICK COMPATIBILITY CHECK
             </h2>
-            <p className="text-xl font-bold text-foreground/70">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground/70">
               Follow these simple steps to check if your device supports eSIM
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* iPhone Check */}
             <Card className="bg-mint border-2 border-foreground/10 hover-lift">
               <CardContent className="p-8">
@@ -138,7 +138,7 @@ export default function DevicePage() {
       <section className="py-20 px-4 bg-light-mint">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               COMPATIBLE DEVICES
             </h2>
             <p className="text-xl font-bold text-foreground/70">
@@ -207,7 +207,7 @@ export default function DevicePage() {
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               WHAT YOU NEED
             </h2>
           </div>
@@ -261,7 +261,7 @@ export default function DevicePage() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-primary">
         <div className="container mx-auto text-center">
-          <h2 className="heading-lg mb-8 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
             READY TO GET STARTED?
           </h2>
           <p className="text-2xl font-black mb-12 text-foreground/80 max-w-3xl mx-auto">
@@ -306,7 +306,7 @@ export default function DevicePage() {
             </div>
             <div>
               <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">1GLOBAL eSIM Network</p>
+              <p className="text-gray-400">eSIM Access Network</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

@@ -5,19 +5,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
+import { requireUserAuth } from '@/lib/server-auth';
 
 /**
- * GET /api/rewards/wallet?user_id=xxx
+ * GET /api/rewards/wallet
  * Get user's data wallet balance and pending rewards
  */
 export async function GET(req: NextRequest) {
   try {
-    const searchParams = req.nextUrl.searchParams;
-    const userId = searchParams.get('user_id');
-
-    if (!userId) {
-      return NextResponse.json({ error: 'user_id is required' }, { status: 400 });
+    // Require authentication
+    const auth = await requireUserAuth(req);
+    if (auth.error) {
+      return auth.error;
     }
+
+    const userId = auth.user.id;
 
     // Get wallet balance
     const { data: wallet } = await supabase

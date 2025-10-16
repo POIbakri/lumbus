@@ -47,9 +47,12 @@ export function InstallPanel({
   return (
     <Tabs defaultValue={defaultTab} className="w-full">
       <TabsList className="grid w-full grid-cols-3 bg-mint border-2 border-primary p-1">
-        <TabsTrigger value="ios" className="font-bold uppercase data-[state=active]:bg-primary data-[state=active]:text-foreground">iPhone / iPad</TabsTrigger>
-        <TabsTrigger value="android" className="font-bold uppercase data-[state=active]:bg-secondary data-[state=active]:text-foreground">Android</TabsTrigger>
-        <TabsTrigger value="desktop" className="font-bold uppercase data-[state=active]:bg-accent data-[state=active]:text-foreground">Desktop</TabsTrigger>
+        <TabsTrigger value="ios" className="font-bold uppercase text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-foreground px-2 sm:px-3">
+          <span className="hidden sm:inline">iPhone / iPad</span>
+          <span className="sm:hidden">iOS</span>
+        </TabsTrigger>
+        <TabsTrigger value="android" className="font-bold uppercase text-xs sm:text-sm data-[state=active]:bg-secondary data-[state=active]:text-foreground px-2 sm:px-3">Android</TabsTrigger>
+        <TabsTrigger value="desktop" className="font-bold uppercase text-xs sm:text-sm data-[state=active]:bg-accent data-[state=active]:text-foreground px-2 sm:px-3">Desktop</TabsTrigger>
       </TabsList>
 
       <TabsContent value="ios" className="space-y-4">
@@ -73,17 +76,17 @@ export function InstallPanel({
             )}
 
             <div className="text-center mb-4">
-              <h3 className="font-black uppercase text-xl mb-4">OR SCAN QR CODE</h3>
-              <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
+              <h3 className="font-black uppercase text-lg sm:text-xl mb-4">OR SCAN QR CODE</h3>
+              <div className="bg-white p-4 sm:p-6 rounded-xl inline-block shadow-lg">
                 <Image
                   src={qrUrl}
                   alt="eSIM QR Code"
-                  width={300}
-                  height={300}
-                  className="mx-auto"
+                  width={250}
+                  height={250}
+                  className="mx-auto w-full max-w-[250px] sm:max-w-[300px] h-auto"
                 />
               </div>
-              <p className="font-bold uppercase text-sm mt-4">
+              <p className="font-bold uppercase text-xs sm:text-sm mt-4 px-2">
                 Long-press QR → Add eSIM
               </p>
             </div>
@@ -151,17 +154,17 @@ export function InstallPanel({
         <Card className="bg-yellow border-2 border-secondary shadow-lg">
           <CardContent className="pt-6">
             <div className="text-center mb-6">
-              <h3 className="font-black uppercase text-xl mb-4">SCAN QR CODE</h3>
-              <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
+              <h3 className="font-black uppercase text-lg sm:text-xl mb-4">SCAN QR CODE</h3>
+              <div className="bg-white p-4 sm:p-6 rounded-xl inline-block shadow-lg">
                 <Image
                   src={qrUrl}
                   alt="eSIM QR Code"
-                  width={300}
-                  height={300}
-                  className="mx-auto"
+                  width={250}
+                  height={250}
+                  className="mx-auto w-full max-w-[250px] sm:max-w-[300px] h-auto"
                 />
               </div>
-              <p className="font-bold uppercase text-sm mt-4">
+              <p className="font-bold uppercase text-xs sm:text-sm mt-4 px-2">
                 Settings → Network & Internet → SIMs → Add eSIM → Scan QR code
               </p>
             </div>
@@ -226,18 +229,18 @@ export function InstallPanel({
         <Card className="bg-cyan border-2 border-primary shadow-lg">
           <CardContent className="pt-6 text-center">
             <div className="mb-6">
-              <h3 className="font-black uppercase text-xl mb-4">SCAN WITH YOUR PHONE</h3>
-              <div className="bg-white p-6 rounded-xl inline-block shadow-lg">
+              <h3 className="font-black uppercase text-lg sm:text-xl mb-4">SCAN WITH YOUR PHONE</h3>
+              <div className="bg-white p-4 sm:p-6 rounded-xl inline-block shadow-lg">
                 <Image
                   src={qrUrl}
                   alt="eSIM QR Code"
-                  width={300}
-                  height={300}
-                  className="mx-auto"
+                  width={250}
+                  height={250}
+                  className="mx-auto w-full max-w-[250px] sm:max-w-[300px] h-auto"
                 />
               </div>
             </div>
-            <p className="font-bold uppercase text-sm">
+            <p className="font-bold uppercase text-xs sm:text-sm px-2">
               Use your phone's camera to scan this QR code
             </p>
           </CardContent>

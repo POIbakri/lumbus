@@ -125,7 +125,14 @@ export async function approvePendingCommissions(
     return 0;
   }
 
-  return orderIds.length;
+  // Get actual count of approved commissions (not just order count)
+  const { count } = await supabase
+    .from('affiliate_commissions')
+    .select('*', { count: 'exact', head: true })
+    .in('order_id', orderIds)
+    .eq('status', 'APPROVED');
+
+  return count || 0;
 }
 
 /**
@@ -414,8 +421,9 @@ export async function processOrderAttribution(
 
 /**
  * Get system config values
+ * Note: Using unknown because config values can be strings, numbers, booleans, etc.
  */
-export async function getSystemConfig(): Promise<Record<string, any>> {
+export async function getSystemConfig(): Promise<Record<string, unknown>> {
   const { data } = await supabase
     .from('system_config')
     .select('key, value');
@@ -427,5 +435,5 @@ export async function getSystemConfig(): Promise<Record<string, any>> {
   return data.reduce((acc, row) => {
     acc[row.key] = row.value;
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, unknown>);
 }

@@ -6,7 +6,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_KEY || 'eyJhbGciOiJIUzI1NiIsInR
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Database types
-export type OrderStatus = 'pending' | 'paid' | 'provisioning' | 'completed' | 'failed';
+export type OrderStatus = 'pending' | 'paid' | 'provisioning' | 'completed' | 'active' | 'depleted' | 'expired' | 'cancelled' | 'revoked' | 'failed';
 export type CommissionStatus = 'PENDING' | 'APPROVED' | 'PAID' | 'VOID';
 export type RewardStatus = 'PENDING' | 'APPLIED' | 'EXPIRED' | 'VOID';
 export type PayoutStatus = 'CREATED' | 'PROCESSING' | 'PAID' | 'FAILED';
@@ -52,6 +52,12 @@ export interface Order {
   qr_url: string | null;
   smdp: string | null;
   activation_code: string | null;
+  iccid: string | null;
+  esim_tran_no: string | null;
+  data_usage_bytes: number | null;
+  data_remaining_bytes: number | null;
+  last_usage_update: string | null;
+  activated_at: string | null;
   amount_cents?: number;
   currency?: string;
   paid_at?: string | null;
@@ -158,7 +164,7 @@ export interface WebhookEvent {
   id: string;
   provider: string;
   event_type: string;
-  payload_json: any;
+  payload_json: Record<string, unknown>;
   created_at: string;
   processed_at: string | null;
 }

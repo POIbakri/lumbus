@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
-import { createOneGlobalOrder } from '@/lib/1global';
+import { assignEsim, topUpEsim } from '@/lib/esimaccess';
 import { resolveAttribution, saveOrderAttribution } from '@/lib/referral';
 import { processOrderAttribution, voidCommission, voidReferralReward } from '@/lib/commission';
 import { runFraudChecks } from '@/lib/fraud';
+import { sendReferralRewardEmail, sendTopUpConfirmationEmail } from '@/lib/email';
 import type { AttributionCookies } from '@/lib/referral';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -62,6 +63,8 @@ export async function POST(req: NextRequest) {
       const sessionId = session.metadata?.sessionId;
       const ipAddress = session.metadata?.ipAddress;
       const userAgent = session.metadata?.userAgent;
+      const isTopUp = session.metadata?.isTopUp === 'true';
+      const iccid = session.metadata?.iccid;
 
       if (!orderId) {
         console.error('No orderId in session metadata');
@@ -120,6 +123,36 @@ export async function POST(req: NextRequest) {
 
         if (result.reward) {
           console.log(`Created reward ${result.reward.id} for referrer ${savedAttribution.referrer_user_id}`);
+
+          // Send email notification to referrer about their reward
+          try {
+            // Get referrer user details
+            const { data: referrerUser } = await supabase
+              .from('users')
+              .select('email, referral_code')
+              .eq('id', savedAttribution.referrer_user_id)
+              .single();
+
+            // Get referred user email
+            const referredUserEmail = order.users?.email || (Array.isArray(order.users) ? order.users[0]?.email : null);
+
+            if (referrerUser && referrerUser.email && referredUserEmail) {
+              const rewardMB = result.reward.reward_value;
+              const rewardGB = (rewardMB / 1024).toFixed(1);
+
+              await sendReferralRewardEmail({
+                to: referrerUser.email,
+                referredUserEmail: referredUserEmail,
+                rewardAmount: `${rewardGB} GB`,
+                referralCode: referrerUser.referral_code || '',
+              });
+
+              console.log(`Referral reward email sent to ${referrerUser.email}`);
+            }
+          } catch (emailError) {
+            console.error('Failed to send referral reward email:', emailError);
+            // Don't throw - webhook should still succeed even if email fails
+          }
         }
 
         // Run fraud checks
@@ -135,36 +168,76 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        // Create 1GLOBAL order
-        const oneGlobalResponse = await createOneGlobalOrder({
-          sku: order.plans.supplier_sku,
-          email: order.users.email,
-          reference: orderId,
-        });
+        // Get plan and user data (handle Supabase join format)
+        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+        const user = Array.isArray(order.users) ? order.users[0] : order.users;
 
-        // Update order with 1GLOBAL details and set status to provisioning
-        await supabase
-          .from('orders')
-          .update({
-            status: 'provisioning',
-            connect_order_id: oneGlobalResponse.orderId,
-            qr_url: oneGlobalResponse.qrCode || null,
-            smdp: oneGlobalResponse.smdpAddress || null,
-            activation_code: oneGlobalResponse.activationCode || null,
-          })
-          .eq('id', orderId);
+        if (!plan || !user) {
+          throw new Error('Plan or user data missing from order');
+        }
 
-        console.log('1GLOBAL order created:', oneGlobalResponse.orderId);
+        if (isTopUp && iccid) {
+          // Top-up existing eSIM
+          console.log('Processing top-up for ICCID:', iccid);
 
-        // If we have immediate activation details, mark as completed
-        if (oneGlobalResponse.smdpAddress && oneGlobalResponse.activationCode) {
+          const topUpResponse = await topUpEsim(iccid, plan.supplier_sku);
+
+          if (topUpResponse.success) {
+            // Update order as completed for top-ups
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                connect_order_id: topUpResponse.orderNo || null,
+              })
+              .eq('id', orderId);
+
+            console.log('eSIM topped up successfully:', iccid);
+            console.log('Top-up order ID:', topUpResponse.orderNo);
+
+            // Send top-up confirmation email
+            try {
+              await sendTopUpConfirmationEmail({
+                to: user.email,
+                planName: plan.name,
+                dataAdded: plan.data_gb,
+                validityDays: plan.validity_days,
+                iccid: iccid,
+              });
+              console.log('Top-up confirmation email sent to:', user.email);
+            } catch (emailError) {
+              console.error('Failed to send top-up confirmation email:', emailError);
+              // Don't throw - webhook should still succeed even if email fails
+            }
+          } else {
+            throw new Error('Top-up failed');
+          }
+        } else {
+          // Assign new eSIM via eSIM Access API
+          const esimResponse = await assignEsim({
+            packageId: plan.supplier_sku,
+            email: user.email,
+            reference: orderId,
+          });
+
+          // Update order with initial eSIM details
+          // Status is 'provisioning' until we get activation details from ORDER_STATUS webhook
           await supabase
             .from('orders')
-            .update({ status: 'completed' })
+            .update({
+              status: 'provisioning',
+              connect_order_id: esimResponse.orderId,
+              iccid: esimResponse.iccid || null,
+            })
             .eq('id', orderId);
+
+          console.log('eSIM Access order created:', esimResponse.orderId);
+          console.log('Waiting for ORDER_STATUS webhook with activation details...');
+
+          // Note: Email will be sent by eSIM Access webhook handler when ORDER_STATUS arrives
         }
       } catch (error) {
-        console.error('Failed to create 1GLOBAL order:', error);
+        console.error(isTopUp ? 'Failed to top up eSIM:' : 'Failed to assign eSIM:', error);
         // Mark order as failed
         await supabase
           .from('orders')

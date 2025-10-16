@@ -24,8 +24,8 @@ export async function GET(
       return NextResponse.json({ error: 'Activation details not ready' }, { status: 404 });
     }
 
-    // If 1GLOBAL provided a QR URL, redirect to it (or proxy it)
-    // For security, generate our own QR code instead of exposing 1GLOBAL URLs
+    // Generate our own QR code for security
+    // Build LPA string from eSIM activation details
     const lpaString = buildLPAString(order.smdp, order.activation_code);
 
     // Generate QR code as PNG buffer
@@ -35,7 +35,8 @@ export async function GET(
       errorCorrectionLevel: 'M',
     });
 
-    return new NextResponse(qrBuffer as any, {
+    // Convert Buffer to Uint8Array for NextResponse
+    return new NextResponse(new Uint8Array(qrBuffer), {
       headers: {
         'Content-Type': 'image/png',
         'Cache-Control': 'private, max-age=300', // 5 minutes

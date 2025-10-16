@@ -10,13 +10,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 const checkoutSchema = z.object({
   planId: z.string().uuid(),
-  email: z.string().email(),
+  email: z.string().email().optional(),
+  isTopUp: z.boolean().optional(),
+  existingOrderId: z.string().uuid().optional(),
+  iccid: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { planId, email } = checkoutSchema.parse(body);
+    const { planId, email, isTopUp, existingOrderId, iccid } = checkoutSchema.parse(body);
 
     // Get cookies for attribution
     const cookies = req.cookies;
@@ -41,52 +44,78 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
     }
 
-    // Get or create user
+    // Get or create user (for top-ups, get from existing order)
     let user;
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (existingUser) {
-      user = existingUser;
-    } else {
-      const { data: newUser, error: userError } = await supabase
-        .from('users')
-        .insert({ email })
-        .select()
+    if (isTopUp && existingOrderId) {
+      // For top-ups, get user from existing order
+      const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('user_id, users(*)')
+        .eq('id', existingOrderId)
         .single();
 
-      if (userError || !newUser) {
-        return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+      if (!existingOrder) {
+        return NextResponse.json({ error: 'Existing order not found' }, { status: 404 });
       }
-      user = newUser;
+
+      user = Array.isArray(existingOrder.users) ? existingOrder.users[0] : existingOrder.users;
+    } else {
+      // Regular flow: Get or create user by email
+      if (!email) {
+        return NextResponse.json({ error: 'Email is required for new orders' }, { status: 400 });
+      }
+
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+      if (existingUser) {
+        user = existingUser;
+      } else {
+        const { data: newUser, error: userError } = await supabase
+          .from('users')
+          .insert({ email })
+          .select()
+          .single();
+
+        if (userError || !newUser) {
+          return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+        }
+        user = newUser;
+      }
+
+      // Ensure user profile exists (creates ref_code if new user)
+      await ensureUserProfile(user.id);
     }
 
-    // Ensure user profile exists (creates ref_code if new user)
-    await ensureUserProfile(user.id);
-
     // Check if user was referred and is eligible for 10% discount (first order only)
-    const { data: userProfile } = await supabase
-      .from('user_profiles')
-      .select('referred_by_code')
-      .eq('id', user.id)
-      .single();
+    // Top-ups never get discounts
+    let applyDiscount = false;
+    let discountPercent = 0;
 
-    const { count: orderCount } = await supabase
-      .from('orders')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .in('status', ['paid', 'completed']);
+    if (!isTopUp) {
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('referred_by_code')
+        .eq('id', user.id)
+        .single();
 
-    const isFirstOrder = (orderCount || 0) === 0;
-    const hasReferral = userProfile?.referred_by_code !== null && userProfile?.referred_by_code !== undefined;
-    const applyDiscount = isFirstOrder && hasReferral;
+      const { count: orderCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .in('status', ['paid', 'completed']);
+
+      const isFirstOrder = (orderCount || 0) === 0;
+      const hasReferral = userProfile?.referred_by_code !== null && userProfile?.referred_by_code !== undefined;
+      applyDiscount = isFirstOrder && hasReferral;
+      discountPercent = applyDiscount ? 10 : 0;
+    }
 
     // Calculate price with discount if applicable
     const basePrice = plan.retail_price;
-    const discountPercent = applyDiscount ? 10 : 0;
     const finalPrice = applyDiscount ? basePrice * 0.9 : basePrice; // 10% off
 
     // Create pending order
@@ -105,13 +134,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Create Stripe Checkout Session
+    const orderType = isTopUp ? 'Top-up' : 'New eSIM';
     const lineItems = [
       {
         price_data: {
           currency: plan.currency.toLowerCase(),
           product_data: {
-            name: plan.name,
-            description: `${plan.data_gb}GB eSIM - Valid for ${plan.validity_days} days${applyDiscount ? ' (10% Referral Discount Applied)' : ''}`,
+            name: isTopUp ? `${plan.name} (Top-up)` : plan.name,
+            description: `${orderType}: ${plan.data_gb}GB eSIM - Valid for ${plan.validity_days} days${applyDiscount ? ' (10% Referral Discount Applied)' : ''}`,
           },
           unit_amount: Math.round(finalPrice * 100), // Convert to cents
         },
@@ -119,13 +149,19 @@ export async function POST(req: NextRequest) {
       },
     ];
 
+    const successUrl = isTopUp
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
+      : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`;
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/plans?canceled=true`,
-      customer_email: email,
+      success_url: successUrl,
+      cancel_url: isTopUp
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/topup/${existingOrderId}?canceled=true`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/plans?canceled=true`,
+      customer_email: user.email,
       metadata: {
         orderId: order.id,
         planId: planId,
@@ -137,10 +173,14 @@ export async function POST(req: NextRequest) {
         userAgent: userAgent || '',
         discountApplied: applyDiscount ? 'true' : 'false',
         discountPercent: discountPercent.toString(),
+        isTopUp: isTopUp ? 'true' : 'false',
+        existingOrderId: existingOrderId || '',
+        iccid: iccid || '',
       },
       payment_intent_data: {
         metadata: {
           orderId: order.id,
+          isTopUp: isTopUp ? 'true' : 'false',
         },
       },
       // Enable Apple Pay / Google Pay via Payment Request Button

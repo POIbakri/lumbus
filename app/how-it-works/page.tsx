@@ -11,17 +11,17 @@ export default function HowItWorksPage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-4 bg-yellow">
+      <section className="pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 bg-yellow">
         <div className="container mx-auto text-center">
-          <div className="inline-block mb-6">
-            <span className="px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
+          <div className="inline-block mb-4 sm:mb-6">
+            <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
               ⚡ Super Simple
             </span>
           </div>
-          <h1 className="heading-xl mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
             HOW LUMBUS<br/>WORKS
           </h1>
-          <p className="text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
+          <p className="text-base sm:text-lg md:text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
             Get connected in 3 easy steps.<br/>
             No physical SIM card needed. Setup takes less than 5 minutes.
           </p>
@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Main Steps */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-12 sm:py-20 px-4 bg-white">
         <div className="container mx-auto max-w-5xl">
           {/* Step 1 */}
           <div className="flex flex-col md:flex-row gap-12 items-center mb-20">
@@ -39,8 +39,8 @@ export default function HowItWorksPage() {
                   <span className="text-4xl font-black">1</span>
                 </div>
               </div>
-              <h2 className="heading-md mb-6">CHOOSE YOUR PLAN</h2>
-              <p className="text-xl font-bold text-foreground/70 mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">CHOOSE YOUR PLAN</h2>
+              <p className="text-base sm:text-lg md:text-xl font-bold text-foreground/70 mb-6">
                 Select the perfect data plan for your destination. We offer plans for 190+ countries with flexible data options and durations.
               </p>
               <ul className="space-y-3">
@@ -93,7 +93,7 @@ export default function HowItWorksPage() {
                   <span className="text-4xl font-black">2</span>
                 </div>
               </div>
-              <h2 className="heading-md mb-6">PAY INSTANTLY</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">PAY INSTANTLY</h2>
               <p className="text-xl font-bold text-foreground/70 mb-6">
                 Complete your purchase with Apple Pay, Google Pay, or any major credit card. Secure checkout powered by Stripe.
               </p>
@@ -153,7 +153,7 @@ export default function HowItWorksPage() {
                   <span className="text-4xl font-black">3</span>
                 </div>
               </div>
-              <h2 className="heading-md mb-6">GET CONNECTED</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">GET CONNECTED</h2>
               <p className="text-xl font-bold text-foreground/70 mb-6">
                 Receive your eSIM instantly. Activate it by scanning the QR code or using the one-tap installation on iOS 17.4+.
               </p>
@@ -196,7 +196,7 @@ export default function HowItWorksPage() {
       <section className="py-20 px-4 bg-light-mint">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               INSTALLATION METHODS
             </h2>
             <p className="text-xl font-bold text-foreground/70">
@@ -251,7 +251,7 @@ export default function HowItWorksPage() {
       <section className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               COMMON QUESTIONS
             </h2>
           </div>
@@ -299,7 +299,7 @@ export default function HowItWorksPage() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-primary">
         <div className="container mx-auto text-center">
-          <h2 className="heading-lg mb-8 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
             READY TO TRY IT?
           </h2>
           <p className="text-2xl font-black mb-12 text-foreground/80 max-w-3xl mx-auto">
@@ -344,7 +344,7 @@ export default function HowItWorksPage() {
             </div>
             <div>
               <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">1GLOBAL eSIM Network</p>
+              <p className="text-gray-400">eSIM Access Network</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

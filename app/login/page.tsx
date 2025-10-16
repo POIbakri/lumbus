@@ -70,11 +70,11 @@ export default function LoginPage() {
       {/* Login Form */}
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-md relative z-10">
-          <div className="text-center mb-8 animate-slide-up">
-            <h1 className="heading-xl mb-4">
+          <div className="text-center mb-6 sm:mb-8 animate-slide-up">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
               WELCOME BACK
             </h1>
-            <p className="text-lg font-bold text-muted-foreground">
+            <p className="text-base sm:text-lg font-bold text-muted-foreground">
               Sign in to manage your eSIMs
             </p>
           </div>
@@ -84,16 +84,16 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-white/20 opacity-50 pointer-events-none"></div>
 
             <CardHeader className="relative z-10">
-              <CardTitle className="heading-md text-center">SIGN IN</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center">SIGN IN</CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-6 relative z-10">
+            <CardContent className="space-y-4 sm:space-y-6 relative z-10">
               {/* Social Login */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={handleGoogleLogin}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-base py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export default function LoginPage() {
                 <Button
                   onClick={handleAppleLogin}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -172,14 +172,14 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-lg py-6 shadow-xl touch-ripple elastic-bounce pulse-glow"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg py-4 sm:py-6 shadow-xl touch-ripple elastic-bounce pulse-glow"
                 >
                   {loading ? 'SIGNING IN...' : 'SIGN IN'}
                 </Button>
               </form>
 
               <div className="text-center">
-                <Link href="/reset-password" className="text-sm font-bold text-primary hover:underline">
+                <Link href="/reset-password" className="text-xs sm:text-sm font-bold text-primary hover:underline">
                   Forgot password?
                 </Link>
               </div>

@@ -32,6 +32,12 @@ function checkRateLimit(ip: string, limit = 50, windowMs = 60000): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // Cookie security settings - use secure flag if production OR HTTPS
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isHttps = request.url?.startsWith('https://') || false;
+    const useSecureCookies = isProduction || isHttps;
+    const cookieSameSite = isProduction ? 'strict' : 'lax';
+
     // Get IP for rate limiting
     const forwarded = request.headers.get('x-forwarded-for');
     const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown';
@@ -92,8 +98,8 @@ export async function POST(request: NextRequest) {
     // Set session cookie
     response.cookies.set('sid', sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: useSecureCookies,
+      sameSite: cookieSameSite,
       maxAge: 90 * 24 * 60 * 60, // 90 days
       path: '/',
     });
@@ -102,8 +108,8 @@ export async function POST(request: NextRequest) {
     if (click && click.affiliate_id) {
       response.cookies.set('afid', click.id.toString(), {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: useSecureCookies,
+        sameSite: cookieSameSite,
         maxAge: 90 * 24 * 60 * 60, // 90 days
         path: '/',
       });
@@ -113,8 +119,8 @@ export async function POST(request: NextRequest) {
     if (ref_code) {
       response.cookies.set('rfcd', ref_code, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: useSecureCookies,
+        sameSite: cookieSameSite,
         maxAge: 90 * 24 * 60 * 60, // 90 days
         path: '/',
       });

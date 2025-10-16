@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { triggerHaptic } from '@/lib/device-detection';
@@ -17,11 +17,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string>('');
 
-  useEffect(() => {
-    loadReferralInfo();
-  }, [userId]);
-
-  const loadReferralInfo = async () => {
+  const loadReferralInfo = useCallback(async () => {
     try {
       const response = await fetch(`/api/referrals/me?user_id=${userId}`);
       if (!response.ok) {
@@ -37,7 +33,11 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    loadReferralInfo();
+  }, [loadReferralInfo]);
 
   const copyLink = async () => {
     try {

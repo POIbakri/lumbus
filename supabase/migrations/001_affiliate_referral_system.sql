@@ -2,6 +2,15 @@
 -- LUMBUS AFFILIATE & REFERRAL SYSTEM
 -- Migration: 001 - Core Tables
 -- =====================================================
+-- ⚠️ WARNING: This migration is REDUNDANT!
+-- All tables defined here are already included in migration 000_complete_lumbus_schema.sql
+-- This file is kept for reference only. DO NOT RUN THIS MIGRATION.
+-- Only run migrations in this order: 000, then 002
+-- =====================================================
+
+-- ⚠️ DO NOT RUN - Already in 000_complete_lumbus_schema.sql ⚠️
+
+/*
 
 -- Extension for better random generation
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -10,10 +19,10 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- 1. EXTEND USERS WITH REFERRAL CODE
 -- =====================================================
 
--- Add referral columns to existing auth.users metadata
--- Since we're using Supabase Auth, we'll create a profiles table
+-- Add referral columns to existing public.users
+-- Fixed: Changed auth.users to public.users for consistency
 CREATE TABLE IF NOT EXISTS public.user_profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
   ref_code TEXT UNIQUE NOT NULL,
   referred_by_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -30,7 +39,7 @@ CREATE INDEX idx_user_profiles_referred_by ON public.user_profiles(referred_by_c
 
 CREATE TABLE IF NOT EXISTS public.affiliates (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
   display_name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   commission_type TEXT NOT NULL CHECK (commission_type IN ('PERCENT','FIXED')),
@@ -400,4 +409,12 @@ ON CONFLICT (key) DO NOTHING;
 -- 1. Connect to your Supabase project
 -- 2. Run this SQL in the SQL Editor
 -- 3. Verify all tables created: \dt public.*
+-- =====================================================
+
+*/
+
+-- =====================================================
+-- MIGRATION 001 IS DISABLED
+-- All functionality is already in migration 000
+-- Only run migrations: 000, then 002
 -- =====================================================

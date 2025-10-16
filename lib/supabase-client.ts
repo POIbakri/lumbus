@@ -117,7 +117,8 @@ export const auth = {
 
 /**
  * Subscribe to auth state changes
+ * Using unknown for session type to be compatible with Supabase's Session type
  */
-export function onAuthStateChange(callback: (event: string, session: any) => void) {
-  return supabaseClient.auth.onAuthStateChange(callback);
+export function onAuthStateChange(callback: (event: string, session: unknown) => void) {
+  return supabaseClient.auth.onAuthStateChange(callback as (event: string, session: any) => void);
 }

@@ -63,11 +63,11 @@ export default function AdminPage() {
     <div className="min-h-screen bg-white">
       <Nav />
 
-      <div className="pt-32 pb-20 px-8">
+      <div className="pt-32 pb-20 px-4 sm:px-8">
         <div className="container mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Lumbus Admin</h1>
-            <p className="text-muted-foreground">Manage orders and view analytics</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2">Lumbus Admin</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">Manage orders and view analytics</p>
           </div>
 
         <Card className="card-lumbus">
@@ -78,20 +78,20 @@ export default function AdminPage() {
             {orders.length === 0 ? (
               <p className="text-muted-foreground">No orders yet</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {orders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3 sm:gap-0"
                   >
-                    <div>
-                      <p className="font-semibold">{order.plan_name}</p>
-                      <p className="text-sm text-muted-foreground">{order.user_email}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm sm:text-base truncate">{order.plan_name}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{order.user_email}</p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(order.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="flex items-center gap-2 sm:text-right w-full sm:w-auto">
                       <Badge
                         variant={
                           order.status === 'completed'
@@ -100,10 +100,11 @@ export default function AdminPage() {
                             ? 'destructive'
                             : 'secondary'
                         }
+                        className="text-xs"
                       >
                         {order.status}
                       </Badge>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground">
                         {order.id.substring(0, 8)}
                       </p>
                     </div>

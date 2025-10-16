@@ -5,10 +5,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
+import { requireUserAuth } from '@/lib/server-auth';
 import { z } from 'zod';
 
 const redeemSchema = z.object({
-  userId: z.string().uuid(),
   rewardId: z.string().uuid(),
 });
 
@@ -18,8 +18,16 @@ const redeemSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    // Require authentication
+    const auth = await requireUserAuth(req);
+    if (auth.error) {
+      return auth.error;
+    }
+
+    const userId = auth.user.id;
+
     const body = await req.json();
-    const { userId, rewardId } = redeemSchema.parse(body);
+    const { rewardId } = redeemSchema.parse(body);
 
     // Get the reward
     const { data: reward, error: rewardError } = await supabase

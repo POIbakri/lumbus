@@ -167,8 +167,9 @@ export async function checkGeoMismatch(
 
   // Count country distribution
   const countries: Record<string, number> = {};
-  attributions.forEach((attr: any) => {
-    const code = attr.orders?.country_code;
+  attributions.forEach((attr: { order_id: string; orders: { country_code?: string | null }[] }) => {
+    // Supabase returns joined tables as arrays
+    const code = attr.orders?.[0]?.country_code;
     if (code) {
       countries[code] = (countries[code] || 0) + 1;
     }

@@ -81,13 +81,13 @@ export default function SignUpPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center animate-slide-up">
-          <div className="inline-block p-8 bg-primary rounded-full mb-6 animate-bounce-subtle">
-            <div className="text-6xl">✓</div>
+          <div className="inline-block p-6 sm:p-8 bg-primary rounded-full mb-6 animate-bounce-subtle">
+            <div className="text-5xl sm:text-6xl">✓</div>
           </div>
-          <h1 className="heading-xl mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
             WELCOME TO LUMBUS!
           </h1>
-          <p className="text-xl font-bold text-muted-foreground">
+          <p className="text-base sm:text-lg md:text-xl font-bold text-muted-foreground">
             Check your email to verify your account
           </p>
         </div>
@@ -107,11 +107,11 @@ export default function SignUpPage() {
       {/* Sign Up Form */}
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-md relative z-10">
-          <div className="text-center mb-8 animate-slide-up">
-            <h1 className="heading-xl mb-4">
+          <div className="text-center mb-6 sm:mb-8 animate-slide-up">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
               GET STARTED
             </h1>
-            <p className="text-lg font-bold text-muted-foreground">
+            <p className="text-base sm:text-lg font-bold text-muted-foreground">
               Create your account and stay connected worldwide
             </p>
           </div>
@@ -121,16 +121,16 @@ export default function SignUpPage() {
             <div className="absolute inset-0 bg-white/20 opacity-50 pointer-events-none"></div>
 
             <CardHeader className="relative z-10">
-              <CardTitle className="heading-md text-center">CREATE ACCOUNT</CardTitle>
+              <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center">CREATE ACCOUNT</CardTitle>
             </CardHeader>
 
-            <CardContent className="space-y-6 relative z-10">
+            <CardContent className="space-y-4 sm:space-y-6 relative z-10">
               {/* Social Sign Up */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={handleGoogleSignUp}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-base py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -146,7 +146,7 @@ export default function SignUpPage() {
                 <Button
                   onClick={handleAppleSignUp}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -228,13 +228,13 @@ export default function SignUpPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-lg py-6 shadow-xl touch-ripple elastic-bounce pulse-glow"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg py-4 sm:py-6 shadow-xl touch-ripple elastic-bounce pulse-glow"
                 >
                   {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                 </Button>
               </form>
 
-              <p className="text-xs font-bold text-center text-muted-foreground">
+              <p className="text-xs sm:text-sm font-bold text-center text-muted-foreground px-2">
                 By signing up, you agree to our Terms of Service and Privacy Policy
               </p>
 

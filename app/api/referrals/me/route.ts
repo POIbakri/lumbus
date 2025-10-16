@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { getUserReferralStats } from '@/lib/referral';
+import { requireUserAuth } from '@/lib/server-auth';
 
 /**
  * GET /api/referrals/me
@@ -13,17 +14,13 @@ import { getUserReferralStats } from '@/lib/referral';
  */
 export async function GET(req: NextRequest) {
   try {
-    // TODO: Add authentication to get current user ID
-    // For now, we'll require userId as a query parameter
-    const searchParams = req.nextUrl.searchParams;
-    const userId = searchParams.get('user_id');
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Missing user_id parameter' },
-        { status: 400 }
-      );
+    // Require authentication
+    const auth = await requireUserAuth(req);
+    if (auth.error) {
+      return auth.error;
     }
+
+    const userId = auth.user.id;
 
     // Get user profile with referral code
     const { data: profile, error: profileError } = await supabase

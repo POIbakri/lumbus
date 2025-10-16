@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,11 +18,7 @@ export default function PlanDetailPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadPlan();
-  }, [params.planId]);
-
-  const loadPlan = async () => {
+  const loadPlan = useCallback(async () => {
     // Mock data - in production, fetch from API
     const mockPlans: Plan[] = [
       {
@@ -31,7 +27,7 @@ export default function PlanDetailPage() {
         region_code: 'JP',
         data_gb: 5,
         validity_days: 30,
-        supplier_sku: '1GLOBAL_JP_5GB_30D',
+        supplier_sku: 'ESIMACCESS_JP_5GB_30D',
         retail_price: 19.99,
         currency: 'USD',
         is_active: true,
@@ -42,7 +38,7 @@ export default function PlanDetailPage() {
         region_code: 'EU',
         data_gb: 10,
         validity_days: 30,
-        supplier_sku: '1GLOBAL_EU_10GB_30D',
+        supplier_sku: 'ESIMACCESS_EU_10GB_30D',
         retail_price: 29.99,
         currency: 'USD',
         is_active: true,
@@ -53,7 +49,7 @@ export default function PlanDetailPage() {
         region_code: 'US',
         data_gb: 5,
         validity_days: 30,
-        supplier_sku: '1GLOBAL_US_5GB_30D',
+        supplier_sku: 'ESIMACCESS_US_5GB_30D',
         retail_price: 24.99,
         currency: 'USD',
         is_active: true,
@@ -64,7 +60,7 @@ export default function PlanDetailPage() {
         region_code: 'GLOBAL',
         data_gb: 3,
         validity_days: 7,
-        supplier_sku: '1GLOBAL_GLOBAL_3GB_7D',
+        supplier_sku: 'ESIMACCESS_GLOBAL_3GB_7D',
         retail_price: 14.99,
         currency: 'USD',
         is_active: true,
@@ -73,7 +69,11 @@ export default function PlanDetailPage() {
 
     const foundPlan = mockPlans.find((p) => p.id === params.planId);
     setPlan(foundPlan || null);
-  };
+  }, [params.planId]);
+
+  useEffect(() => {
+    loadPlan();
+  }, [loadPlan]);
 
   const handleCheckout = async () => {
     if (!email || !email.includes('@')) {
@@ -150,12 +150,12 @@ export default function PlanDetailPage() {
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-cyan/10 rounded-tr-full"></div>
 
               <CardHeader className="pb-6 relative z-10">
-                <div className="flex justify-between items-start mb-6">
-                  <Badge className="bg-foreground text-white font-black uppercase text-sm px-5 py-2 rounded-full shadow-xl transform hover:scale-110 transition-transform duration-300">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <Badge className="bg-foreground text-white font-black uppercase text-xs sm:text-sm px-4 sm:px-5 py-2 rounded-full shadow-xl transform hover:scale-110 transition-transform duration-300">
                     {plan.region_code}
                   </Badge>
-                  <div className="text-right">
-                    <div className="text-5xl font-black text-foreground">
+                  <div className="text-left sm:text-right">
+                    <div className="text-4xl sm:text-5xl font-black text-foreground">
                       ${plan.retail_price}
                     </div>
                     <div className="text-xs font-black uppercase text-muted-foreground mt-1">
@@ -163,17 +163,17 @@ export default function PlanDetailPage() {
                     </div>
                   </div>
                 </div>
-                <CardTitle className="text-4xl font-black uppercase leading-tight">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase leading-tight">{plan.name}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-8 relative z-10">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="group/stat p-8 bg-yellow rounded-2xl border-4 border-foreground/5 hover-lift shadow-lg">
+              <CardContent className="space-y-6 sm:space-y-8 relative z-10">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
+                  <div className="group/stat p-4 sm:p-6 md:p-8 bg-yellow rounded-2xl border-4 border-foreground/5 hover-lift shadow-lg">
                     <div className="text-xs font-black uppercase text-muted-foreground mb-2">Data</div>
-                    <div className="text-5xl font-black text-foreground">{plan.data_gb} GB</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground">{plan.data_gb} GB</div>
                   </div>
-                  <div className="group/stat p-8 bg-cyan rounded-2xl border-4 border-foreground/5 hover-lift shadow-lg">
+                  <div className="group/stat p-4 sm:p-6 md:p-8 bg-cyan rounded-2xl border-4 border-foreground/5 hover-lift shadow-lg">
                     <div className="text-xs font-black uppercase text-muted-foreground mb-2">Valid for</div>
-                    <div className="text-5xl font-black text-foreground">{plan.validity_days} days</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground">{plan.validity_days} days</div>
                   </div>
                 </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InstallPanel } from '@/components/install-panel';
@@ -35,11 +35,30 @@ export default function InstallPage() {
   const [showReferralModal, setShowReferralModal] = useState(false);
   const deviceInfo = useDeviceDetection();
 
+  const loadOrder = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/orders/${params.orderId}`);
+      if (!response.ok) {
+        throw new Error('Order not found');
+      }
+      const data = await response.json();
+      setOrder(data);
+
+      // Stop polling once we have activation details
+      if (data.hasActivationDetails) {
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('Failed to load order. Please check your email for activation details.');
+      setLoading(false);
+    }
+  }, [params.orderId]);
+
   useEffect(() => {
     loadOrder();
     const interval = setInterval(loadOrder, 2000); // Poll every 2 seconds
     return () => clearInterval(interval);
-  }, [params.orderId]);
+  }, [loadOrder]);
 
   // Auto-trigger deep link for iOS 17.4+ when activation details are ready
   useEffect(() => {
@@ -65,25 +84,6 @@ export default function InstallPage() {
       return () => clearTimeout(timer);
     }
   }, [order, user, showReferralModal]);
-
-  const loadOrder = async () => {
-    try {
-      const response = await fetch(`/api/orders/${params.orderId}`);
-      if (!response.ok) {
-        throw new Error('Order not found');
-      }
-      const data = await response.json();
-      setOrder(data);
-
-      // Stop polling once we have activation details
-      if (data.hasActivationDetails) {
-        setLoading(false);
-      }
-    } catch (err) {
-      setError('Failed to load order. Please check your email for activation details.');
-      setLoading(false);
-    }
-  };
 
   if (error) {
     return (
@@ -147,14 +147,14 @@ export default function InstallPage() {
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 animate-slide-up">
+          <div className="text-center mb-8 sm:mb-12 animate-slide-up px-4">
             {/* Success Animation with Planet and Signal */}
             <SuccessAnimation />
 
-            <h1 className="heading-xl mb-4 animate-slide-up" style={{animationDelay: '0.2s'}}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 animate-slide-up leading-tight" style={{animationDelay: '0.2s'}}>
               YOUR ESIM IS READY!
             </h1>
-            <p className="text-xl font-bold animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <p className="text-base sm:text-lg md:text-xl font-bold animate-slide-up" style={{animationDelay: '0.3s'}}>
               Connected via Lumbus — Expires in {order.plan.validityDays} days
             </p>
 
@@ -178,24 +178,24 @@ export default function InstallPage() {
 
           <Card className="bg-mint border-2 border-primary shadow-xl mb-8">
             <CardHeader>
-              <CardTitle className="heading-md">PLAN DETAILS</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase">PLAN DETAILS</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-6">
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Plan</p>
-                <p className="font-black text-lg">{order.plan.name}</p>
+                <p className="font-black text-base sm:text-lg">{order.plan.name}</p>
               </div>
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Region</p>
-                <p className="font-black text-lg">{order.plan.region}</p>
+                <p className="font-black text-base sm:text-lg">{order.plan.region}</p>
               </div>
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Data</p>
-                <p className="font-black text-lg">{order.plan.dataGb} GB</p>
+                <p className="font-black text-base sm:text-lg">{order.plan.dataGb} GB</p>
               </div>
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Valid for</p>
-                <p className="font-black text-lg">{order.plan.validityDays} days</p>
+                <p className="font-black text-base sm:text-lg">{order.plan.validityDays} days</p>
               </div>
             </CardContent>
           </Card>

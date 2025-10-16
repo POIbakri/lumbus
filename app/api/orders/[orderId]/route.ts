@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/db';
+import { supabase, type Plan } from '@/lib/db';
 
 export async function GET(
   req: NextRequest,
@@ -19,7 +19,9 @@ export async function GET(
     }
 
     // Sanitize response (never expose internal IDs, secrets, or full URLs)
-    const plan: any = order.plans;
+    // Supabase returns plans as an array when using select with relations
+    const planArray = order.plans as Plan[];
+    const plan = planArray?.[0] || null;
     return NextResponse.json({
       id: order.id,
       status: order.status,

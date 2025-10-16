@@ -1,13 +1,14 @@
 /**
  * Affiliate Management API
- * GET /api/affiliates - List all affiliates (admin only)
+ * GET /api/affiliates - List all affiliates (admin only) or get own affiliate (authenticated users)
  * POST /api/affiliates - Create new affiliate (admin only)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { z } from 'zod';
-import { requireAuth } from '@/lib/admin-auth';
+import { requireAuth, checkAdminAuth } from '@/lib/admin-auth';
+import { requireUserAuth } from '@/lib/server-auth';
 
 const createAffiliateSchema = z.object({
   user_id: z.string().uuid().optional(),
@@ -20,15 +21,54 @@ const createAffiliateSchema = z.object({
 
 /**
  * GET /api/affiliates
- * List all affiliates (admin only)
+ * List all affiliates (admin) or get own affiliate (authenticated users)
  */
 export async function GET(req: NextRequest) {
-  // Check authentication
-  const authError = requireAuth(req);
-  if (authError) return authError;
-
   try {
     const searchParams = req.nextUrl.searchParams;
+    const userId = searchParams.get('user_id');
+
+    // If user_id is provided, verify the requester is authenticated and requesting their own data
+    if (userId) {
+      // Check if admin
+      const isAdmin = checkAdminAuth(req);
+
+      if (!isAdmin) {
+        // If not admin, require user auth and verify they're requesting their own data
+        const auth = await requireUserAuth(req);
+        if (auth.error) {
+          return auth.error;
+        }
+
+        if (auth.user.id !== userId) {
+          return NextResponse.json(
+            { error: 'Forbidden: You can only view your own affiliate data' },
+            { status: 403 }
+          );
+        }
+      }
+
+      const { data, error } = await supabase
+        .from('affiliates')
+        .select('*')
+        .eq('user_id', userId)
+        .limit(1);
+
+      if (error) {
+        console.error('Failed to get affiliate by user_id:', error);
+        return NextResponse.json({ error: 'Failed to get affiliate' }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        affiliates: data || [],
+        total: data?.length || 0,
+      });
+    }
+
+    // For listing all affiliates, require admin authentication
+    const authError = requireAuth(req);
+    if (authError) return authError;
+
     const isActive = searchParams.get('is_active');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);

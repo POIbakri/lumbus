@@ -66,23 +66,23 @@ export default function AffiliateReferencePage() {
     <div className="min-h-screen bg-white">
       <Nav />
 
-      <div className="relative pt-40 pb-32 px-4 bg-mint overflow-hidden">
+      <div className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 bg-mint overflow-hidden">
         {/* Floating Background Elements */}
-        <div className="absolute top-20 right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-cyan/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto relative z-10">
           <div className="max-w-2xl mx-auto text-center">
             {status === 'tracking' && (
               <div className="animate-fade-in">
-                <div className="relative inline-block mb-8">
-                  <div className="w-24 h-24 border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <div className="relative inline-block mb-6 sm:mb-8">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-4xl animate-pulse-slow">✨</div>
+                    <div className="text-3xl sm:text-4xl animate-pulse-slow">✨</div>
                   </div>
                 </div>
-                <h1 className="heading-xl mb-6">WELCOME!</h1>
-                <p className="text-2xl font-bold opacity-70">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">WELCOME!</h1>
+                <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70">
                   Tracking your affiliate link...
                 </p>
               </div>
@@ -90,9 +90,9 @@ export default function AffiliateReferencePage() {
 
             {status === 'redirecting' && (
               <div className="animate-scale-in">
-                <div className="text-6xl mb-8 animate-bounce-slow">🎉</div>
-                <h1 className="heading-xl mb-6">ALL SET!</h1>
-                <p className="text-2xl font-bold opacity-70">
+                <div className="text-5xl sm:text-6xl mb-6 sm:mb-8 animate-bounce-slow">🎉</div>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">ALL SET!</h1>
+                <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70">
                   Redirecting you to our plans...
                 </p>
               </div>
@@ -100,12 +100,12 @@ export default function AffiliateReferencePage() {
 
             {status === 'error' && (
               <div className="animate-fade-in">
-                <div className="text-6xl mb-8">⚠️</div>
-                <h1 className="heading-xl mb-6">OOPS!</h1>
-                <p className="text-2xl font-bold opacity-70 mb-4">
+                <div className="text-5xl sm:text-6xl mb-6 sm:mb-8">⚠️</div>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">OOPS!</h1>
+                <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70 mb-4">
                   Something went wrong tracking your link
                 </p>
-                <p className="text-lg font-bold opacity-60">
+                <p className="text-sm sm:text-base md:text-lg font-bold opacity-60">
                   Don't worry, redirecting you anyway...
                 </p>
               </div>

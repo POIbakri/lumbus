@@ -42,28 +42,28 @@ export default async function Home() {
             </span>
           </div>
 
-          <h1 className="heading-xl mb-8 max-w-5xl mx-auto animate-slide-up" style={{animationDelay: '0.1s'}}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto animate-slide-up leading-tight" style={{animationDelay: '0.1s'}}>
             <span className="inline-block">ESIMS THAT JUST WORK.</span><br/>
             <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
           </h1>
 
-          <p className="text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto animate-slide-up" style={{animationDelay: '0.2s'}}>
-            Get connected in <span className="text-primary">190+ countries</span>.<br/>
-            No physical SIM card needed. Instant activation.
+          <p className="text-lg sm:text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto animate-slide-up px-4" style={{animationDelay: '0.2s'}}>
+            Get connected in <span className="text-primary">190+ countries</span>.<br className="hidden sm:block"/>
+            <span className="sm:hidden"> </span>No physical SIM card needed. Instant activation.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center animate-slide-up" style={{animationDelay: '0.3s'}}>
-            <Link href="/plans" className="group">
-              <Button className="bg-primary text-foreground hover:bg-primary/90 text-xl px-14 py-8 rounded-xl font-black shadow-2xl hover:scale-105 transition-transform">
-                <span className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center animate-slide-up px-4" style={{animationDelay: '0.3s'}}>
+            <Link href="/plans" className="group w-full sm:w-auto">
+              <Button className="w-full bg-primary text-foreground hover:bg-primary/90 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl font-black shadow-2xl hover:scale-105 transition-transform">
+                <span className="flex items-center justify-center gap-3">
                   GET STARTED
                   <span className="inline-block group-hover:translate-x-2 transition-transform duration-300">→</span>
                 </span>
               </Button>
             </Link>
-            <Link href="/how-it-works" className="group">
-              <Button className="bg-white text-foreground hover:bg-foreground/5 text-xl px-14 py-8 rounded-xl border-4 border-foreground font-black shadow-2xl hover:scale-105 transition-transform">
-                <span className="flex items-center gap-3">
+            <Link href="/how-it-works" className="group w-full sm:w-auto">
+              <Button className="w-full bg-white text-foreground hover:bg-foreground/5 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl border-4 border-foreground font-black shadow-2xl hover:scale-105 transition-transform">
+                <span className="flex items-center justify-center gap-3">
                   HOW IT WORKS
                   <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">↗</span>
                 </span>
@@ -96,21 +96,21 @@ export default async function Home() {
       {/* Stats Section */}
       <section className="py-32 px-4 bg-light-mint relative overflow-hidden">
         <div className="container mx-auto relative z-10">
-          <div className="grid md:grid-cols-3 gap-10 text-center max-w-7xl mx-auto">
-            <div className="p-12 bg-yellow rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift">
-              <div className="text-8xl font-black mb-6 text-foreground">190+</div>
-              <div className="text-3xl font-black uppercase tracking-tight mb-2">Countries</div>
-              <div className="text-base font-bold mt-3 text-foreground/70">Global Coverage ✓</div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 text-center max-w-7xl mx-auto">
+            <div className="p-8 sm:p-10 md:p-12 bg-yellow rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift">
+              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">190+</div>
+              <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Countries</div>
+              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Global Coverage ✓</div>
             </div>
-            <div className="p-12 bg-cyan rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.1s'}}>
-              <div className="text-8xl font-black mb-6 text-foreground">5 MIN</div>
-              <div className="text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
-              <div className="text-base font-bold mt-3 text-foreground/70">Super Fast ⚡</div>
+            <div className="p-8 sm:p-10 md:p-12 bg-cyan rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.1s'}}>
+              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">5 MIN</div>
+              <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
+              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Super Fast ⚡</div>
             </div>
-            <div className="p-12 bg-purple rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.2s'}}>
-              <div className="text-8xl font-black mb-6 text-foreground">24/7</div>
-              <div className="text-3xl font-black uppercase tracking-tight mb-2">Support</div>
-              <div className="text-base font-bold mt-3 text-foreground/70">Always Here 💬</div>
+            <div className="p-8 sm:p-10 md:p-12 bg-purple rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
+              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">24/7</div>
+              <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Support</div>
+              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Always Here 💬</div>
             </div>
           </div>
         </div>
@@ -125,45 +125,45 @@ export default async function Home() {
                 Simple Process
               </span>
             </div>
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               HOW IT WORKS
             </h2>
             <p className="text-xl font-bold opacity-70">Three steps to global connectivity</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 max-w-6xl mx-auto">
             <div className="group text-center animate-slide-up" style={{animationDelay: '0.1s'}}>
-              <div className="relative inline-block mb-8">
-                <div className="w-28 h-28 bg-primary rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+              <div className="relative inline-block mb-6 sm:mb-8">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-primary rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
                   1
                 </div>
               </div>
-              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">PICK YOUR PLAN</h3>
-              <p className="text-lg font-bold opacity-70">
+              <h3 className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4 tracking-tight">PICK YOUR PLAN</h3>
+              <p className="text-base sm:text-lg font-bold opacity-70">
                 Choose the perfect data plan for your destination
               </p>
             </div>
 
             <div className="group text-center animate-slide-up" style={{animationDelay: '0.2s'}}>
-              <div className="relative inline-block mb-8">
-                <div className="w-28 h-28 bg-yellow rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+              <div className="relative inline-block mb-6 sm:mb-8">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-yellow rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
                   2
                 </div>
               </div>
-              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">PAY INSTANTLY</h3>
-              <p className="text-lg font-bold opacity-70">
+              <h3 className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4 tracking-tight">PAY INSTANTLY</h3>
+              <p className="text-base sm:text-lg font-bold opacity-70">
                 Checkout with Apple Pay, Google Pay, or card
               </p>
             </div>
 
-            <div className="group text-center animate-slide-up" style={{animationDelay: '0.3s'}}>
-              <div className="relative inline-block mb-8">
-                <div className="w-28 h-28 bg-cyan rounded-3xl flex items-center justify-center text-5xl font-black mx-auto shadow-2xl hover-lift">
+            <div className="group text-center animate-slide-up sm:col-span-2 md:col-span-1" style={{animationDelay: '0.3s'}}>
+              <div className="relative inline-block mb-6 sm:mb-8">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-cyan rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
                   3
                 </div>
               </div>
-              <h3 className="text-3xl font-black uppercase mb-4 tracking-tight">GET CONNECTED</h3>
-              <p className="text-lg font-bold opacity-70">
+              <h3 className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4 tracking-tight">GET CONNECTED</h3>
+              <p className="text-base sm:text-lg font-bold opacity-70">
                 Scan QR code or tap to activate. Done in seconds.
               </p>
             </div>
@@ -188,7 +188,7 @@ export default async function Home() {
                 🌍 Most Popular
               </span>
             </div>
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               POPULAR DESTINATIONS
             </h2>
             <p className="text-xl font-bold opacity-70 max-w-2xl mx-auto">
@@ -222,7 +222,7 @@ export default async function Home() {
       <section className="relative py-32 px-4 bg-white overflow-hidden">
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-20 animate-fade-in">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               WHY CHOOSE LUMBUS?
             </h2>
             <p className="text-xl font-bold opacity-70">Experience the difference</p>
@@ -272,20 +272,20 @@ export default async function Home() {
                 🚀 Join 10,000+ Happy Travelers
               </span>
             </div>
-            <h2 className="heading-xl mb-8 text-foreground">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
               READY TO GET<br/>CONNECTED?
             </h2>
             <p className="text-3xl font-black mb-16 text-foreground/80 max-w-3xl mx-auto">
               Join thousands of travelers staying connected worldwide
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/plans">
-                <Button className="bg-foreground text-white hover:bg-foreground/90 hover:scale-105 text-xl px-16 py-8 rounded-xl shadow-2xl font-black transition-transform">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center px-4">
+              <Link href="/plans" className="w-full sm:w-auto">
+                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 hover:scale-105 text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black transition-transform">
                   <span className="relative z-10">BROWSE PLANS</span>
                 </Button>
               </Link>
-              <Link href="/help">
-                <Button className="bg-white text-foreground border-4 border-white hover:bg-white/90 hover:scale-105 text-xl px-16 py-8 rounded-xl font-black transition-transform">
+              <Link href="/help" className="w-full sm:w-auto">
+                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90 hover:scale-105 text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl font-black transition-transform">
                   GET HELP
                 </Button>
               </Link>
@@ -329,7 +329,7 @@ export default async function Home() {
             </div>
             <div>
               <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">1GLOBAL eSIM Network</p>
+              <p className="text-gray-400">eSIM Access Network</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

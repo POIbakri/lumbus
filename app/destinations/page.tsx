@@ -59,17 +59,17 @@ export default function DestinationsPage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-4 bg-mint">
+      <section className="pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 bg-mint">
         <div className="container mx-auto text-center">
-          <div className="inline-block mb-6">
-            <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
+          <div className="inline-block mb-4 sm:mb-6">
+            <span className="px-4 sm:px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
               🌍 190+ Countries
             </span>
           </div>
-          <h1 className="heading-xl mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
             WHERE WILL YOU<br/>GO NEXT?
           </h1>
-          <p className="text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
+          <p className="text-base sm:text-lg md:text-2xl font-bold max-w-3xl mx-auto text-foreground/70">
             Get instant connectivity in 190+ countries worldwide.<br/>
             No SIM card needed. Activate in seconds.
           </p>
@@ -77,13 +77,13 @@ export default function DestinationsPage() {
       </section>
 
       {/* Popular Destinations */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-12 sm:py-20 px-4 bg-white">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               POPULAR DESTINATIONS
             </h2>
-            <p className="text-xl font-bold text-foreground/70">
+            <p className="text-base sm:text-lg md:text-xl font-bold text-foreground/70">
               Our most frequently visited countries
             </p>
           </div>
@@ -113,7 +113,7 @@ export default function DestinationsPage() {
       <section className="py-20 px-4 bg-light-mint">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="heading-lg mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               COVERAGE BY REGION
             </h2>
             <p className="text-xl font-bold text-foreground/70">
@@ -180,7 +180,7 @@ export default function DestinationsPage() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-primary">
         <div className="container mx-auto text-center">
-          <h2 className="heading-lg mb-8 text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
             READY TO GET CONNECTED?
           </h2>
           <p className="text-2xl font-black mb-12 text-foreground/80 max-w-3xl mx-auto">
@@ -218,7 +218,7 @@ export default function DestinationsPage() {
             </div>
             <div>
               <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">1GLOBAL eSIM Network</p>
+              <p className="text-gray-400">eSIM Access Network</p>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
