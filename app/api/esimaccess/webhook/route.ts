@@ -22,6 +22,28 @@ import { sendOrderConfirmationEmail, sendDataUsageAlert, sendPlanExpiryAlert } f
  * - 18.136.19.137
  */
 
+/**
+ * Safely extract SM-DP+ address from confirmation code
+ * Format: LPA:1$smdp.address$activation-code
+ */
+function extractSmdpAddress(confirmationCode: string | null | undefined): string {
+  if (!confirmationCode) return '';
+
+  const parts = confirmationCode.split('$');
+  if (parts.length < 2) return '';
+
+  return parts[1] || '';
+}
+
+/**
+ * Build LPA string defensively
+ * Format: LPA:1$smdp.address$activation-code
+ */
+function buildLpaString(smdpAddress: string, activationCode: string): string {
+  if (!smdpAddress || !activationCode) return '';
+  return `LPA:1$${smdpAddress}$${activationCode}`;
+}
+
 interface WebhookPayload {
   notifyType: 'CHECK_HEALTH' | 'ORDER_STATUS' | 'SMDP_EVENT' | 'ESIM_STATUS' | 'DATA_USAGE' | 'VALIDITY_USAGE';
   eventGenerateTime?: string;
@@ -44,8 +66,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Optional: IP whitelist verification
-    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    // IP whitelist verification (handle comma-separated x-forwarded-for)
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIP = forwardedFor
+      ? forwardedFor.split(',')[0].trim()
+      : req.headers.get('x-real-ip');
     const allowedIPs = ['3.1.131.226', '54.254.74.88', '18.136.190.97', '18.136.60.197', '18.136.19.137'];
     // Note: In production, uncomment this if you want strict IP filtering
     // if (clientIP && !allowedIPs.includes(clientIP)) {
@@ -53,16 +78,37 @@ export async function POST(req: NextRequest) {
     //   return NextResponse.json({ error: 'Unauthorized IP' }, { status: 403 });
     // }
 
-    // Log webhook event for idempotency and debugging
+    // Idempotency check: Prevent duplicate processing using notifyId
+    if (payload.notifyId) {
+      const { data: existingWebhook } = await supabase
+        .from('webhook_events')
+        .select('id')
+        .eq('provider', 'esimaccess')
+        .eq('notify_id', payload.notifyId)
+        .single();
+
+      if (existingWebhook) {
+        console.log(`Duplicate webhook detected (notifyId: ${payload.notifyId}), skipping processing`);
+        return NextResponse.json({ success: true, message: 'Duplicate webhook ignored' });
+      }
+    }
+
+    // Log webhook event for debugging and idempotency
     const { error: logError } = await supabase.from('webhook_events').insert({
       provider: 'esimaccess',
       event_type: payload.notifyType,
+      notify_id: payload.notifyId || null,
       payload_json: payload,
       processed_at: new Date().toISOString(),
     });
 
     if (logError) {
       console.error('Failed to log webhook event:', logError);
+      // If this is a duplicate key error, it means another instance already processed it
+      if (logError.code === '23505') {
+        console.log('Duplicate webhook detected via unique constraint');
+        return NextResponse.json({ success: true, message: 'Duplicate webhook ignored' });
+      }
     }
 
     // Handle different webhook types
@@ -115,7 +161,7 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
   // Find order by connect_order_id (which stores the eSIM Access orderNo)
   const { data: order } = await supabase
     .from('orders')
-    .select('*, plans(*), users(*)')
+    .select('*')
     .eq('connect_order_id', content.orderNo)
     .single();
 
@@ -135,6 +181,9 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
 
     const firstProfile = orderDetails.detailList[0];
 
+    // Extract SM-DP+ address safely
+    const smdpAddress = extractSmdpAddress(firstProfile.confirmationCode);
+
     // Update order with activation details
     await supabase
       .from('orders')
@@ -142,7 +191,7 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         status: 'completed',
         iccid: firstProfile.iccid,
         esim_tran_no: firstProfile.esimTranNo,
-        smdp: firstProfile.confirmationCode?.split('$')[1] || '', // Extract SM-DP+ from confirmation code
+        smdp: smdpAddress,
         activation_code: firstProfile.activationCode,
         qr_url: firstProfile.qrUrl || null,
       })
@@ -151,14 +200,22 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     console.log('eSIM order updated with activation details:', content.orderNo);
 
     // Send confirmation email
-    if (firstProfile.activationCode && firstProfile.confirmationCode) {
-      const smdpAddress = firstProfile.confirmationCode.split('$')[1] || '';
-      const lpaString = generateQrCodeData(smdpAddress, firstProfile.activationCode);
+    if (firstProfile.activationCode && smdpAddress) {
+      const lpaString = buildLpaString(smdpAddress, firstProfile.activationCode);
       const installUrl = `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}`;
 
-      // Get plan and user data (handle Supabase join format)
-      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-      const user = Array.isArray(order.users) ? order.users[0] : order.users;
+      // Get plan and user data separately (avoid joins)
+      const { data: plan } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('id', order.plan_id)
+        .single();
+
+      const { data: user } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', order.user_id)
+        .single();
 
       if (plan && user) {
         await sendOrderConfirmationEmail({
@@ -274,10 +331,10 @@ async function handleDataUsage(content: {
     `Data usage alert: ${usagePercent.toFixed(0)}% consumed for ICCID: ${content.iccid}`
   );
 
-  // Get order and user details
+  // Get order details (avoid joins)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .select('id, user_id, plans(name, data_gb), users(email)')
+    .select('*')
     .eq('iccid', content.iccid)
     .single();
 
@@ -286,12 +343,13 @@ async function handleDataUsage(content: {
     return;
   }
 
-  // Update usage data in database
+  // Update usage data in database (use totalVolume from webhook)
   const { error } = await supabase
     .from('orders')
     .update({
       data_usage_bytes: content.orderUsage,
       data_remaining_bytes: content.remain,
+      total_bytes: content.totalVolume, // Store provider's totalVolume
       last_usage_update: content.lastUpdateTime,
     })
     .eq('iccid', content.iccid);
@@ -302,11 +360,23 @@ async function handleDataUsage(content: {
 
   // Send email notification to user about data usage
   try {
-    const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-    const user = Array.isArray(order.users) ? order.users[0] : order.users;
+    // Get plan and user data separately (avoid joins)
+    const { data: plan } = await supabase
+      .from('plans')
+      .select('*')
+      .eq('id', order.plan_id)
+      .single();
+
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', order.user_id)
+      .single();
 
     if (plan && user && user.email) {
-      const totalDataBytes = (plan.data_gb || 0) * 1024 * 1024 * 1024;
+      // Use totalVolume from webhook instead of plan.data_gb
+      const totalDataBytes = content.totalVolume;
+      const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
       const dataUsedGB = content.orderUsage / (1024 * 1024 * 1024);
       const dataRemainingGB = content.remain / (1024 * 1024 * 1024);
 
@@ -316,7 +386,7 @@ async function handleDataUsage(content: {
         usagePercent: usagePercent,
         dataUsedGB: dataUsedGB,
         dataRemainingGB: dataRemainingGB,
-        totalDataGB: plan.data_gb || 0,
+        totalDataGB: totalDataGB,
       });
 
       console.log(`Data usage alert email sent to ${user.email} (${usagePercent.toFixed(0)}% used)`);
@@ -342,10 +412,10 @@ async function handleValidityUsage(content: {
 }) {
   console.log(`Validity expiring soon for ICCID: ${content.iccid} (${content.remain} days remaining)`);
 
-  // Get order and user details
+  // Get order details (avoid joins)
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .select('id, user_id, plans(name, validity_days), users(email)')
+    .select('*')
     .eq('iccid', content.iccid)
     .single();
 
@@ -356,8 +426,18 @@ async function handleValidityUsage(content: {
 
   // Send email notification to user about expiring plan
   try {
-    const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-    const user = Array.isArray(order.users) ? order.users[0] : order.users;
+    // Get plan and user data separately (avoid joins)
+    const { data: plan } = await supabase
+      .from('plans')
+      .select('*')
+      .eq('id', order.plan_id)
+      .single();
+
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', order.user_id)
+      .single();
 
     if (plan && user && user.email) {
       // Format expiry date
