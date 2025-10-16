@@ -10,7 +10,17 @@ export async function GET(req: NextRequest) {
   try {
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('id, status, created_at, stripe_session_id, users(email), plans(name)')
+      .select(`
+        id,
+        status,
+        created_at,
+        stripe_session_id,
+        data_usage_bytes,
+        data_remaining_bytes,
+        iccid,
+        users(email),
+        plans(name, region_code, data_gb, validity_days, retail_price)
+      `)
       .order('created_at', { ascending: false })
       .limit(50);
 
@@ -23,15 +33,27 @@ export async function GET(req: NextRequest) {
       status: string;
       created_at: string;
       stripe_session_id: string | null;
+      data_usage_bytes: number | null;
+      data_remaining_bytes: number | null;
+      iccid: string | null;
       users: { email: string }[];
-      plans: { name: string }[];
+      plans: {
+        name: string;
+        region_code: string;
+        data_gb: number;
+        validity_days: number;
+        retail_price: number;
+      }[];
     }) => ({
       id: order.id,
       status: order.status,
       created_at: order.created_at,
       stripe_session_id: order.stripe_session_id,
+      data_usage_bytes: order.data_usage_bytes,
+      data_remaining_bytes: order.data_remaining_bytes,
+      iccid: order.iccid,
       user_email: order.users?.[0]?.email,
-      plan_name: order.plans?.[0]?.name,
+      plan: order.plans?.[0] || null,
     }));
 
     return NextResponse.json(formattedOrders || []);

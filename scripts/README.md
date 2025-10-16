@@ -4,7 +4,63 @@ This directory contains utility scripts to help with database verification, heal
 
 ## Available Scripts
 
-### 1. Database Verification (`verify-database.ts`)
+### 1. Import eSIM Plans (`import-plans.ts`)
+
+Imports eSIM Access pricing data from CSV files into your Supabase database. **You don't need to manually configure Stripe products** - the checkout flow automatically creates Stripe sessions using the plan's retail price.
+
+**Usage:**
+```bash
+npx tsx scripts/import-plans.ts path/to/your-plans.csv
+```
+
+**CSV Format Required:**
+```csv
+name,region_code,data_gb,validity_days,supplier_sku,retail_price,currency
+USA 5GB - 7 Days,US,5,7,USA-5GB-7D,9.99,USD
+Europe 10GB - 15 Days,EU,10,15,EU-10GB-15D,24.99,EUR
+```
+
+**Required Columns:**
+- `name` - Plan display name
+- `region_code` - Country/region code (e.g., "US", "EU", "GB")
+- `data_gb` - Data allowance in GB
+- `validity_days` - How many days the plan is valid
+- `supplier_sku` - eSIM Access package ID (MUST match their API exactly)
+- `retail_price` - Your selling price
+- `currency` - Currency code (USD, EUR, GBP)
+
+**When to use:**
+- Initial setup: Import all your eSIM Access plans
+- Adding new plans: Add new rows to CSV and re-run
+- Price updates: Update CSV and re-import (skips duplicates)
+
+**How Stripe Works (No Manual Setup Needed):**
+
+The checkout API automatically creates Stripe sessions with dynamic pricing:
+1. User selects a plan from your database
+2. Checkout API reads the `retail_price` from the plan
+3. Creates Stripe session using `price_data` (no product creation needed)
+4. After payment, webhook provisions eSIM using `supplier_sku`
+
+**Example output:**
+```
+Parsed 50 plans from CSV
+
+Importing 50 plans to Supabase...
+✅ Imported USA-5GB-7D - USA 5GB - 7 Days
+✅ Imported USA-10GB-15D - USA 10GB - 15 Days
+⏭️  Skipping EU-3GB-7D - already exists
+
+=== Import Summary ===
+✅ Imported: 48
+⏭️  Skipped (already exists): 2
+❌ Errors: 0
+📊 Total processed: 50
+```
+
+---
+
+### 2. Database Verification (`verify-database.ts`)
 
 Verifies that your Supabase database has all required tables and columns for the Lumbus eSIM marketplace.
 
@@ -39,7 +95,7 @@ All required tables and columns are present.
 
 ---
 
-### 2. Pre-Deployment Check (`pre-deployment-check.ts`)
+### 3. Pre-Deployment Check (`pre-deployment-check.ts`)
 
 Comprehensive checklist that verifies environment variables and provides a manual deployment checklist.
 
@@ -96,7 +152,7 @@ LUMBUS eSIM MARKETPLACE - PRE-DEPLOYMENT CHECKLIST
 
 ---
 
-### 3. Health Check Endpoint
+### 4. Health Check Endpoint
 
 **Endpoint:** `GET /api/health`
 
@@ -169,6 +225,7 @@ Alert Conditions: Non-200 status code
 
 | Command | Description | When to Use |
 |---------|-------------|-------------|
+| `npx tsx scripts/import-plans.ts plans.csv` | Import eSIM plans from CSV | Initial setup, adding/updating plans |
 | `npm run db:verify` | Verify database schema | After migrations, before deploy |
 | `npm run deploy:check` | Pre-deployment checklist | Before every deployment |
 | `npm run health` | Check service health | Debugging connectivity issues |

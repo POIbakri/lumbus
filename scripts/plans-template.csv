@@ -1,0 +1,5 @@
+name,region_code,data_gb,validity_days,supplier_sku,retail_price,currency
+USA 5GB - 7 Days,US,5,7,USA-5GB-7D,9.99,USD
+USA 10GB - 15 Days,US,10,15,USA-10GB-15D,19.99,USD
+Europe 3GB - 7 Days,EU,3,7,EU-3GB-7D,12.99,EUR
+Asia 5GB - 10 Days,AS,5,10,AS-5GB-10D,14.99,USD

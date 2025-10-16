@@ -11,6 +11,7 @@ import { useAuth } from '@/lib/auth-context';
 import { supabaseClient } from '@/lib/supabase-client';
 import { Order, Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
+import { getCountryInfo } from '@/lib/countries';
 
 interface OrderWithPlan extends Order {
   plan: Plan;
@@ -227,23 +228,23 @@ export default function DashboardPage() {
       <Nav />
 
       {/* Dashboard Content */}
-      <div className="pt-32 pb-20 px-4">
+      <div className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="mb-8 sm:mb-12 animate-slide-up">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
+          <div className="mb-6 sm:mb-8 md:mb-12 animate-slide-up">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-2 sm:mb-4 leading-tight">
               YOUR DASHBOARD
             </h1>
-            <p className="text-base sm:text-lg font-bold text-muted-foreground">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-muted-foreground truncate">
               Welcome back, {user?.email}
             </p>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-slide-up" style={{animationDelay: '0.1s'}}>
-            <Card className="bg-mint border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
-              <CardContent className="pt-6">
-                <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12 animate-slide-up" style={{animationDelay: '0.1s'}}>
+            <Card className="bg-mint border-2 sm:border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
+              <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {activeOrders.length}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -252,9 +253,9 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-yellow border-4 border-secondary shadow-xl hover-lift card-stack touch-ripple">
-              <CardContent className="pt-6">
-                <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
+            <Card className="bg-yellow border-2 sm:border-4 border-secondary shadow-xl hover-lift card-stack touch-ripple">
+              <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {orders.length}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -263,9 +264,9 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-cyan border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
-              <CardContent className="pt-6">
-                <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
+            <Card className="bg-cyan border-2 sm:border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
+              <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
+                <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {activeOrders.reduce((sum, o) => sum + (o.plan?.data_gb || 0), 0)} GB
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -277,10 +278,10 @@ export default function DashboardPage() {
 
           {/* Referral Section */}
           {referralStats && (
-            <div className="mb-8 sm:mb-12 animate-slide-up" style={{animationDelay: '0.2s'}}>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">REFER & EARN</h2>
-              <Card className="bg-purple border-4 border-accent shadow-xl">
-                <CardContent className="pt-6">
+            <div className="mb-6 sm:mb-8 md:mb-12 animate-slide-up" style={{animationDelay: '0.2s'}}>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">REFER & EARN</h2>
+              <Card className="bg-purple border-2 sm:border-4 border-accent shadow-xl">
+                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
                   <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
                     {/* Left: Share Section */}
                     <div>
@@ -394,11 +395,11 @@ export default function DashboardPage() {
           )}
 
           {/* Active eSIMs */}
-          <div className="mb-8 sm:mb-12">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">ACTIVE ESIMS</h2>
+          <div className="mb-6 sm:mb-8 md:mb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE ESIMS</h2>
               <Link href="/plans" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black touch-ripple elastic-bounce pulse-glow text-sm sm:text-base px-4 sm:px-6">
+                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black touch-ripple elastic-bounce pulse-glow text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
                   + BUY NEW ESIM
                 </Button>
               </Link>
@@ -406,7 +407,7 @@ export default function DashboardPage() {
 
             {activeOrders.length === 0 ? (
               <Card className="bg-purple border-2 border-accent shadow-lg animate-slide-up">
-                <CardContent className="pt-6 text-center py-8 sm:py-12 px-4">
+                <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
                   <div className="text-5xl sm:text-6xl mb-4">📱</div>
                   <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE ESIMS</h3>
                   <p className="text-sm sm:text-base font-bold text-muted-foreground mb-6">
@@ -423,11 +424,27 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {activeOrders.map((order, index) => {
                   const daysRemaining = getDaysRemaining(order.created_at, order.plan?.validity_days || 30);
+                  const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
+
                   // Calculate real data usage from database
                   const totalDataBytes = (order.plan?.data_gb || 0) * 1024 * 1024 * 1024; // Convert GB to bytes
                   const dataUsedBytes = order.data_usage_bytes || 0;
                   const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
+                  const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
                   const dataPercentage = totalDataBytes > 0 ? getDataPercentage(dataUsedBytes, totalDataBytes) : 0;
+
+                  // Format data display (MB vs GB)
+                  const formatData = (gb: number) => {
+                    if (gb < 1) {
+                      return `${Math.round(gb * 1024)} MB`;
+                    }
+                    return `${gb.toFixed(2)} GB`;
+                  };
+
+                  const totalData = order.plan?.data_gb || 0;
+                  const totalDataFormatted = totalData < 1
+                    ? `${Math.round(totalData * 1024)} MB`
+                    : `${totalData} GB`;
 
                   return (
                     <Card
@@ -439,44 +456,71 @@ export default function DashboardPage() {
                       <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
                       <CardHeader className="relative z-10">
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-3">
                           <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
                             {order.status}
                           </Badge>
-                          <div className="text-right">
-                            <div className="text-xl sm:text-2xl font-black">{order.plan?.region_code}</div>
+                          <div className="flex items-center gap-2">
+                            {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
+                            <div className="text-right">
+                              <div className="text-lg font-black">{order.plan?.region_code}</div>
+                              <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
+                            </div>
                           </div>
                         </div>
                         <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name}</CardTitle>
                       </CardHeader>
 
                       <CardContent className="space-y-4 relative z-10">
+                        {/* What You Bought */}
+                        <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-primary/20">
+                          <div className="font-black uppercase text-xs text-muted-foreground mb-3">📦 What You Bought</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-mint p-2 rounded-lg">
+                              <div className="text-xs font-bold text-muted-foreground mb-1">Total Data</div>
+                              <div className="text-lg font-black">{totalDataFormatted}</div>
+                            </div>
+                            <div className="bg-mint p-2 rounded-lg">
+                              <div className="text-xs font-bold text-muted-foreground mb-1">Validity</div>
+                              <div className="text-lg font-black">{order.plan?.validity_days} days</div>
+                            </div>
+                          </div>
+                        </div>
+
                         {/* Data Usage */}
                         <div className="p-3 sm:p-4 bg-white rounded-xl">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs">Data Usage</span>
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-xs sm:text-sm">{dataUsedGB.toFixed(1)} / {order.plan?.data_gb} GB</span>
-                              <button
-                                onClick={() => refreshUsageData(order.id)}
-                                disabled={refreshingUsage[order.id]}
-                                className="p-1 hover:bg-foreground/5 rounded-lg transition-colors disabled:opacity-50 touch-ripple"
-                                title="Refresh usage data"
-                              >
-                                <span className={`text-sm ${refreshingUsage[order.id] ? 'animate-spin' : ''}`}>
-                                  🔄
-                                </span>
-                              </button>
+                            <span className="font-black uppercase text-xs">📊 Data Usage</span>
+                            <button
+                              onClick={() => refreshUsageData(order.id)}
+                              disabled={refreshingUsage[order.id]}
+                              className="p-1 hover:bg-foreground/5 rounded-lg transition-colors disabled:opacity-50 touch-ripple"
+                              title="Refresh usage data"
+                            >
+                              <span className={`text-sm ${refreshingUsage[order.id] ? 'animate-spin' : ''}`}>
+                                🔄
+                              </span>
+                            </button>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <div>
+                              <div className="text-xs font-bold text-muted-foreground">Used</div>
+                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB)}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs font-bold text-muted-foreground">Remaining</div>
+                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB)}</div>
                             </div>
                           </div>
-                          <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden">
+                          <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
                             <div
                               className="bg-primary h-full rounded-full transition-all duration-500"
                               style={{ width: `${dataPercentage}%` }}
                             ></div>
                           </div>
+                          <div className="text-xs font-bold text-center">{dataPercentage.toFixed(0)}% used</div>
                           {order.last_usage_update && (
-                            <p className="text-xs font-bold text-muted-foreground mt-1">
+                            <p className="text-xs font-bold text-muted-foreground mt-2">
                               Last updated: {new Date(order.last_usage_update).toLocaleString()}
                             </p>
                           )}
@@ -533,39 +577,56 @@ export default function DashboardPage() {
           {/* Order History */}
           {pastOrders.length > 0 && (
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">ORDER HISTORY</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">ORDER HISTORY</h2>
               <Card className="bg-yellow border-2 border-secondary shadow-lg">
-                <CardContent className="pt-6">
+                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
                   <div className="space-y-3 sm:space-y-4">
-                    {pastOrders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name}</div>
-                          <div className="text-xs sm:text-sm font-bold text-muted-foreground">
-                            {new Date(order.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })}
+                    {pastOrders.map((order) => {
+                      const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
+                      const totalData = order.plan?.data_gb || 0;
+                      const totalDataFormatted = totalData < 1
+                        ? `${Math.round(totalData * 1024)} MB`
+                        : `${totalData} GB`;
+
+                      return (
+                        <div
+                          key={order.id}
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name}</div>
+                              <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>
+                              <div className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+                                <span>📊 {totalDataFormatted}</span>
+                                <span>•</span>
+                                <span>⏰ {order.plan?.validity_days} days</span>
+                              </div>
+                              <div className="text-xs sm:text-sm font-bold text-muted-foreground mt-1">
+                                {new Date(order.created_at).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                            <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
+                              {order.status}
+                            </Badge>
+                            {order.status === 'completed' && (
+                              <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
+                                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
+                                  VIEW
+                                </Button>
+                              </Link>
+                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                          <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                            {order.status}
-                          </Badge>
-                          {order.status === 'completed' && (
-                            <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
-                              <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
-                                VIEW
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

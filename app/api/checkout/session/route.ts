@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
 import { ensureUserProfile } from '@/lib/referral';
+import { getCurrencyForCheckout, convertToStripeAmount, formatPrice, detectCountryFromRequest } from '@/lib/currency';
 import { z } from 'zod';
 
 // Lazy initialization - only create instance when needed
@@ -126,9 +127,18 @@ export async function POST(req: NextRequest) {
       discountPercent = applyDiscount ? 10 : 0;
     }
 
-    // Calculate price with discount if applicable
-    const basePrice = plan.retail_price;
-    const finalPrice = applyDiscount ? basePrice * 0.9 : basePrice; // 10% off
+    // Detect user's currency based on their location
+    const detectedCountry = detectCountryFromRequest(req.headers);
+    const userCurrency = getCurrencyForCheckout(req.headers);
+
+    // Calculate price with discount if applicable (in USD)
+    const basePriceUSD = plan.retail_price;
+    const finalPriceUSD = applyDiscount ? basePriceUSD * 0.9 : basePriceUSD; // 10% off
+
+    // Convert to user's currency for Stripe
+    const stripeAmount = convertToStripeAmount(finalPriceUSD, userCurrency);
+
+    console.log(`Checkout: Country=${detectedCountry}, Currency=${userCurrency}, USD=${finalPriceUSD}, Converted=${stripeAmount}`);
 
     // Create pending order
     const { data: order, error: orderError } = await supabase
@@ -145,17 +155,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
     }
 
-    // Create Stripe Checkout Session
+    // Create Stripe Checkout Session with user's local currency
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';
     const lineItems = [
       {
         price_data: {
-          currency: plan.currency.toLowerCase(),
+          currency: userCurrency.toLowerCase(),
           product_data: {
             name: isTopUp ? `${plan.name} (Top-up)` : plan.name,
             description: `${orderType}: ${plan.data_gb}GB eSIM - Valid for ${plan.validity_days} days${applyDiscount ? ' (10% Referral Discount Applied)' : ''}`,
           },
-          unit_amount: Math.round(finalPrice * 100), // Convert to cents
+          unit_amount: stripeAmount, // Already converted to smallest currency unit
         },
         quantity: 1,
       },
@@ -188,6 +198,9 @@ export async function POST(req: NextRequest) {
         isTopUp: isTopUp ? 'true' : 'false',
         existingOrderId: existingOrderId || '',
         iccid: iccid || '',
+        detectedCountry: detectedCountry,
+        currency: userCurrency,
+        originalPriceUSD: finalPriceUSD.toString(),
       },
       payment_intent_data: {
         metadata: {
