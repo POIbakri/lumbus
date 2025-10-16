@@ -51,12 +51,27 @@ interface WebhookPayload {
   content: any;
 }
 
+// Handle GET requests for webhook validation
+export async function GET() {
+  return NextResponse.json({
+    status: 'ready',
+    message: 'eSIM Access webhook endpoint is operational',
+    supported_events: ['CHECK_HEALTH', 'ORDER_STATUS', 'SMDP_EVENT', 'ESIM_STATUS', 'DATA_USAGE', 'VALIDITY_USAGE']
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
     const payload: WebhookPayload = JSON.parse(body);
 
-    // Optional: Verify webhook secret if configured
+    // Handle CHECK_HEALTH for webhook validation (allow without secret)
+    if (payload.notifyType === 'CHECK_HEALTH') {
+      console.log('eSIM Access health check received');
+      return NextResponse.json({ success: true, message: 'Health check OK' });
+    }
+
+    // Verify webhook secret for all non-health check requests
     const webhookSecret = process.env.ESIMACCESS_WEBHOOK_SECRET;
     if (webhookSecret) {
       const providedSecret = req.headers.get('x-webhook-secret');
@@ -113,10 +128,6 @@ export async function POST(req: NextRequest) {
 
     // Handle different webhook types
     switch (payload.notifyType) {
-      case 'CHECK_HEALTH':
-        console.log('eSIM Access health check received');
-        return NextResponse.json({ success: true, message: 'Health check OK' });
-
       case 'ORDER_STATUS':
         await handleOrderStatus(payload.content);
         break;
