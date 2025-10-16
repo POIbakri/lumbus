@@ -66,23 +66,35 @@ interface HealthCheckResponse {
 async function checkDatabase(): Promise<ServiceHealth> {
   const start = Date.now();
   try {
-    const { error } = await supabase
-      .from('users')
+    // Check environment variables
+    const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const hasKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY);
+
+    console.log('[Health] Supabase config:', { hasUrl, hasKey });
+
+    // Test plans table specifically (the problematic table)
+    const { data, error } = await supabase
+      .from('plans')
       .select('id')
+      .eq('is_active', true)
       .limit(1);
 
     if (error) {
+      console.error('[Health] Database error:', error);
       return {
         status: 'down',
         error: error.message,
       };
     }
 
+    console.log('[Health] Database check successful, found', data?.length || 0, 'plans');
+
     return {
       status: 'up',
       latency_ms: Date.now() - start,
     };
   } catch (error) {
+    console.error('[Health] Database exception:', error);
     return {
       status: 'down',
       error: error instanceof Error ? error.message : 'Unknown error',

@@ -3,6 +3,16 @@ import { supabase } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
+    // Log environment check
+    const hasSupabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const hasServiceKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY);
+
+    console.log('[Plans API] Environment check:', {
+      hasSupabaseUrl,
+      hasServiceKey,
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...',
+    });
+
     const searchParams = req.nextUrl.searchParams;
     const region = searchParams.get('region');
     const continent = searchParams.get('continent');
@@ -24,21 +34,34 @@ export async function GET(req: NextRequest) {
       query = query.or(`name.ilike.%${search}%,region_code.ilike.%${search}%`);
     }
 
+    console.log('[Plans API] Executing query...');
     const { data: plans, error } = await query;
 
     if (error) {
-      console.error('Error fetching plans:', error);
+      console.error('[Plans API] Supabase error:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
       return NextResponse.json(
-        { error: 'Failed to fetch plans' },
+        {
+          error: 'Failed to fetch plans',
+          details: error.message
+        },
         { status: 500 }
       );
     }
 
+    console.log(`[Plans API] Successfully fetched ${plans?.length || 0} plans`);
     return NextResponse.json({ plans: plans || [] });
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('[Plans API] Unexpected error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
