@@ -124,14 +124,15 @@ export default function InstallPage() {
                 This usually takes a few seconds.
               </p>
             </div>
-            <div className="mt-6 p-4 bg-accent/50 rounded-lg">
-              <p className="text-sm">
-                <strong>Order Status:</strong>{' '}
+            <div className="mt-6 p-4 bg-accent/50 rounded-lg space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold uppercase text-muted-foreground">Status</span>
                 <Badge variant="secondary">{order.status}</Badge>
-              </p>
-              <p className="text-sm mt-2">
-                <strong>Plan:</strong> {order.plan.name}
-              </p>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold uppercase text-muted-foreground">Plan</span>
+                <span className="text-sm font-black">{order.plan.name}</span>
+              </div>
             </div>
           </CardContent>
         </Card>

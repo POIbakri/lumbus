@@ -30,18 +30,31 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
+    const isFreeOrder = req.headers.get('x-free-order') === 'true';
 
-    if (!signature) {
-      return NextResponse.json({ error: 'No signature' }, { status: 400 });
-    }
-
-    // Verify webhook signature
     let event: Stripe.Event;
-    try {
-      event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (err) {
-      console.error('Webhook signature verification failed:', err);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+
+    if (isFreeOrder) {
+      // Free order from internal checkout - skip signature verification
+      console.log('[Webhook] Processing free order (no Stripe signature verification)');
+      try {
+        event = JSON.parse(body);
+      } catch (parseError) {
+        console.error('[Webhook] Failed to parse free order body:', parseError);
+        return NextResponse.json({ error: 'Invalid free order body' }, { status: 400 });
+      }
+    } else {
+      // Normal Stripe webhook - verify signature
+      if (!signature) {
+        return NextResponse.json({ error: 'No signature' }, { status: 400 });
+      }
+
+      try {
+        event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret);
+      } catch (err) {
+        console.error('Webhook signature verification failed:', err);
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+      }
     }
 
     // Idempotency check using atomic insert to prevent race conditions
