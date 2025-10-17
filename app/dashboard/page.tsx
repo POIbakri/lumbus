@@ -463,10 +463,10 @@ export default function DashboardPage() {
           {/* Active eSIMs */}
           <div className="mb-6 sm:mb-8 md:mb-12">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE ESIMS</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE eSIMs</h2>
               <Link href="/plans" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
-                  + BUY NEW ESIM
+                  + BUY NEW eSIM
                 </Button>
               </Link>
             </div>
@@ -475,7 +475,7 @@ export default function DashboardPage() {
               <Card className="bg-purple border-2 border-accent shadow-lg ">
                 <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
                   <div className="text-5xl sm:text-6xl mb-4">📱</div>
-                  <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE ESIMS</h3>
+                  <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE eSIMs</h3>
                   <p className="text-sm sm:text-base font-bold text-muted-foreground mb-6">
                     Get started by purchasing your first eSIM
                   </p>

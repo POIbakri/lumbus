@@ -146,7 +146,7 @@ export default function InstallPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 px-4">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
-              YOUR ESIM IS READY!
+              YOUR eSIM IS READY!
             </h1>
             <p className="text-base sm:text-lg md:text-xl font-bold mb-4">
               Connected via Lumbus — Expires in {order.plan.validityDays} days

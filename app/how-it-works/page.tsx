@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
                     <div className="w-32 h-32 mx-auto mb-4 bg-foreground/10 rounded-2xl flex items-center justify-center">
                       <div className="text-4xl">📲</div>
                     </div>
-                    <div className="font-black text-lg mb-2">YOUR ESIM IS READY!</div>
+                    <div className="font-black text-lg mb-2">YOUR eSIM IS READY!</div>
                     <div className="text-sm font-bold text-foreground/70">
                       Scan QR code or tap to install
                     </div>

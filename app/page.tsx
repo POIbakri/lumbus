@@ -43,11 +43,22 @@ export default async function Home() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto  leading-tight" style={{animationDelay: '0.1s'}}>
-            <span className="inline-block">ESIMS THAT JUST WORK.</span><br/>
+            <span className="inline-block">eSIMs THAT JUST WORK.</span><br/>
             <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
+          {/* Dynamic Value Prop */}
+          <div className="mb-8 px-4">
+            <div className="inline-block bg-gradient-to-r from-primary via-cyan to-yellow p-1 rounded-xl sm:rounded-2xl shadow-2xl">
+              <div className="bg-white px-4 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl">
+                <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground leading-tight">
+                  UP TO <span className="text-primary">10X CHEAPER</span><br className="sm:hidden"/> THAN ROAMING
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
             Get connected in <span className="text-primary">150+ countries</span>.<br className="hidden sm:block"/>
             <span className="sm:hidden"> </span>No physical SIM card needed. No signup required. Instant activation.
           </p>
@@ -222,14 +233,153 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Comparison Table */}
       <section className="relative py-32 px-4 bg-white overflow-hidden">
+        <div className="container mx-auto relative z-10 max-w-5xl">
+          <div className="text-center mb-12 sm:mb-16 ">
+            <div className="inline-block mb-4">
+              <span className="px-4 sm:px-6 py-2 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
+                THE DIFFERENCE
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-3 sm:mb-4 leading-tight px-2">
+              LUMBUS VS<br className="sm:hidden"/> ROAMING
+            </h2>
+            <p className="text-base sm:text-xl font-bold opacity-70 mb-3 sm:mb-4 px-4">See why 10,000+ travelers choose Lumbus</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-primary uppercase px-2">
+              UP TO 10X CHEAPER
+            </p>
+          </div>
+
+          {/* Comparison Table */}
+          <div className="overflow-hidden rounded-2xl sm:rounded-3xl border-2 sm:border-4 border-foreground shadow-2xl">
+            {/* Header */}
+            <div className="grid grid-cols-3 bg-foreground text-white">
+              <div className="p-2 sm:p-4 md:p-6"></div>
+              <div className="p-2 sm:p-4 md:p-6 text-center border-l-2 border-white/20 bg-primary text-foreground">
+                <div className="text-base sm:text-xl md:text-2xl font-black uppercase">LUMBUS</div>
+              </div>
+              <div className="p-2 sm:p-4 md:p-6 text-center border-l-2 border-white/20">
+                <div className="text-base sm:text-xl md:text-2xl font-black uppercase opacity-70">ROAMING</div>
+              </div>
+            </div>
+
+            {/* Row 1: Price */}
+            <div className="grid grid-cols-3 bg-mint border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Price</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">1GB data</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center bg-primary">
+                <div className="text-lg sm:text-2xl md:text-3xl font-black text-foreground">£5-15</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-lg sm:text-2xl md:text-3xl font-black opacity-40">£50-150</div>
+              </div>
+            </div>
+
+            {/* Row 2: Setup */}
+            <div className="grid grid-cols-3 bg-white border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Setup</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">Time to activate</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-base sm:text-2xl md:text-3xl font-black text-primary">5 MIN</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Hours</div>
+              </div>
+            </div>
+
+            {/* Row 3: Coverage */}
+            <div className="grid grid-cols-3 bg-cyan border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Coverage</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">Countries</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-lg sm:text-2xl md:text-3xl font-black">150+</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Limited</div>
+              </div>
+            </div>
+
+            {/* Row 4: Control */}
+            <div className="grid grid-cols-3 bg-white border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Control</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">Bill surprises</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black text-primary">PREPAID</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">SHOCK</div>
+              </div>
+            </div>
+
+            {/* Row 5: Speed */}
+            <div className="grid grid-cols-3 bg-yellow border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Speed</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">Network quality</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-base sm:text-xl md:text-2xl font-black">4G/5G</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Throttled</div>
+              </div>
+            </div>
+
+            {/* Row 6: Hotspot */}
+            <div className="grid grid-cols-3 bg-white border-t-2 border-foreground/10">
+              <div className="p-3 sm:p-4 md:p-6 flex items-center">
+                <div>
+                  <div className="font-black text-sm sm:text-lg md:text-xl uppercase mb-0.5 sm:mb-1">Hotspot</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70 hidden sm:block">Share data</div>
+                </div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black text-primary">YES ✓</div>
+              </div>
+              <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Extra ££</div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Below Comparison */}
+          <div className="text-center mt-8 sm:mt-12 ">
+            <Link href="/plans" className="w-full sm:w-auto inline-block">
+              <Button className="w-full sm:w-auto bg-primary text-foreground hover:bg-primary/90 font-black text-base sm:text-xl px-8 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl">
+                START SAVING NOW
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="relative py-32 px-4 bg-light-mint overflow-hidden">
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-20 ">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
-              WHY CHOOSE LUMBUS?
+              WHAT YOU GET
             </h2>
-            <p className="text-xl font-bold opacity-70">Experience the difference</p>
+            <p className="text-xl font-bold opacity-70">Everything you need to stay connected</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             <Card className="bg-mint border-2 border-foreground/5 rounded-3xl   overflow-hidden">
@@ -263,6 +413,129 @@ export default async function Home() {
                 <p className="font-bold opacity-70">Bank-level encryption</p>
               </CardContent>
             </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="relative py-32 px-4 bg-white overflow-hidden">
+        <div className="container mx-auto relative z-10">
+          <div className="text-center mb-20 ">
+            <div className="inline-block mb-4">
+              <span className="px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
+                ⭐ Trusted by Travelers
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
+              WHAT TRAVELERS SAY
+            </h2>
+            <p className="text-xl font-bold opacity-70">Join 10,000+ happy customers worldwide</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+            {/* Testimonial 1 */}
+            <div className="bg-mint p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 ">
+              <div className="flex gap-1 mb-4">
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+              </div>
+              <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
+                "Saved me hundreds on my Europe trip! Setup was instant and worked perfectly in every country."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center font-black text-lg sm:text-xl">
+                  S
+                </div>
+                <div>
+                  <div className="font-black text-sm sm:text-base">Sarah M.</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70">London, UK</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 2 */}
+            <div className="bg-cyan p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 " style={{animationDelay: '0.1s'}}>
+              <div className="flex gap-1 mb-4">
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+              </div>
+              <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
+                "Best travel purchase ever. No more hunting for WiFi or paying crazy roaming fees!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yellow flex items-center justify-center font-black text-lg sm:text-xl">
+                  J
+                </div>
+                <div>
+                  <div className="font-black text-sm sm:text-base">James T.</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70">Manchester, UK</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Testimonial 3 */}
+            <div className="bg-yellow p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
+              <div className="flex gap-1 mb-4">
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+                <span className="text-xl sm:text-2xl">⭐</span>
+              </div>
+              <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
+                "So easy! Bought before my flight, activated when I landed. Connected in seconds!"
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple flex items-center justify-center font-black text-lg sm:text-xl">
+                  E
+                </div>
+                <div>
+                  <div className="font-black text-sm sm:text-base">Emma L.</div>
+                  <div className="text-xs sm:text-sm font-bold opacity-70">Birmingham, UK</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Referral Highlight Section */}
+      <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-br from-primary via-cyan to-yellow overflow-hidden">
+        <div className="container mx-auto text-center relative z-10">
+          <div className="max-w-4xl mx-auto ">
+            <div className="inline-block mb-4 sm:mb-6">
+              <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
+                🎁 REFER & EARN
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
+              GIVE 10% OFF<br/>GET 1GB FREE
+            </h2>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold mb-6 sm:mb-8 text-foreground/80 max-w-2xl mx-auto px-4">
+              Share Lumbus with friends and family. They save money, you get free data!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-6 sm:mb-8">
+              <Link href="/affiliate-program" className="w-full sm:w-auto">
+                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg md:text-xl px-8 sm:px-12 py-6 sm:py-7 rounded-xl shadow-2xl font-black">
+                  LEARN MORE
+                </Button>
+              </Link>
+              <Link href="/dashboard" className="w-full sm:w-auto">
+                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90 text-base sm:text-lg md:text-xl px-8 sm:px-12 py-6 sm:py-7 rounded-xl font-black">
+                  GET YOUR LINK
+                </Button>
+              </Link>
+            </div>
+            <div className="inline-flex items-center gap-2 bg-foreground/10 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-full mx-4">
+              <span className="text-xl sm:text-2xl">🚀</span>
+              <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
+            </div>
           </div>
         </div>
       </section>

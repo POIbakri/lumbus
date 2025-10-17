@@ -164,7 +164,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
               ← BACK TO DASHBOARD
             </Link>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase mb-4">
-              TOP UP YOUR ESIM
+              TOP UP YOUR eSIM
             </h1>
             <p className="text-lg font-bold text-muted-foreground">
               Add more data to your existing eSIM - {order.plan?.name}
@@ -177,7 +177,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-2xl font-black uppercase mb-2">
-                    CURRENT ESIM
+                    CURRENT eSIM
                   </CardTitle>
                   <p className="font-bold text-muted-foreground">{order.plan?.name}</p>
                 </div>

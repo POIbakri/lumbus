@@ -70,7 +70,7 @@ export default function SupportPage() {
             {/* Installation Instructions */}
             <Card className="bg-mint border-2 border-primary shadow-lg mb-6 sm:mb-8">
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">HOW TO INSTALL YOUR ESIM</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">HOW TO INSTALL YOUR eSIM</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
