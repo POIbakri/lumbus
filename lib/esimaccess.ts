@@ -110,6 +110,10 @@ async function makeEsimAccessRequest<T>(
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
+      console.log(`[eSIM Access] Making request to: ${url}`);
+      console.log(`[eSIM Access] Headers:`, headers);
+      console.log(`[eSIM Access] Body:`, JSON.stringify(body));
+
       const response = await rateLimitedFetch(url, {
         method: 'POST', // eSIM Access API uses POST for all requests
         headers,
@@ -117,15 +121,21 @@ async function makeEsimAccessRequest<T>(
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          errorCode: response.status.toString(),
-          errorMsg: 'Unknown error'
-        }));
+        console.error(`[eSIM Access] HTTP ${response.status} error for ${url}`);
+        const errorText = await response.text();
+        console.error(`[eSIM Access] Error response:`, errorText);
+
+        let error;
+        try {
+          error = JSON.parse(errorText);
+        } catch {
+          error = { errorCode: response.status.toString(), errorMsg: errorText || 'Unknown error' };
+        }
 
         // Don't retry on client errors (4xx)
         if (response.status >= 400 && response.status < 500) {
           throw new Error(
-            `eSIM Access API error: ${error.errorCode} - ${error.errorMsg || 'Request failed'}`
+            `eSIM Access API error: ${error.errorCode || response.status} - ${error.errorMsg || 'Request failed'}`
           );
         }
 
