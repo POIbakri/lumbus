@@ -79,6 +79,11 @@ export async function POST(req: NextRequest) {
       const iccid = session.metadata?.iccid;
       const needsPasswordSetup = session.metadata?.needsPasswordSetup === 'true';
       const userEmail = session.metadata?.userEmail;
+      const discountCodeId = session.metadata?.discountCodeId;
+      const discountSource = session.metadata?.discountSource;
+      const discountPercent = parseInt(session.metadata?.discountPercent || '0', 10);
+      const basePriceUSD = parseFloat(session.metadata?.basePriceUSD || '0');
+      const finalPriceUSD = parseFloat(session.metadata?.finalPriceUSD || '0');
 
       if (!orderId) {
         console.error('No orderId in session metadata');
@@ -134,6 +139,36 @@ export async function POST(req: NextRequest) {
           }
         } catch (error) {
           console.error('[Webhook] Error sending password setup email:', error);
+          // Don't fail the webhook
+        }
+      }
+
+      // Track discount code usage
+      if (discountCodeId && discountSource === 'code' && discountPercent > 0) {
+        console.log('[Webhook] Recording discount code usage:', discountCodeId);
+        try {
+          const discountAmountUSD = basePriceUSD - finalPriceUSD;
+
+          const { error: usageError } = await supabase
+            .from('discount_code_usage')
+            .insert({
+              discount_code_id: discountCodeId,
+              order_id: orderId,
+              user_id: order.user_id,
+              discount_percent: discountPercent,
+              original_price_usd: basePriceUSD,
+              discount_amount_usd: discountAmountUSD,
+              final_price_usd: finalPriceUSD,
+            });
+
+          if (usageError) {
+            console.error('[Webhook] Failed to record discount code usage:', usageError);
+            // Don't fail the webhook - this is not critical
+          } else {
+            console.log('[Webhook] Discount code usage recorded successfully');
+          }
+        } catch (error) {
+          console.error('[Webhook] Error recording discount code usage:', error);
           // Don't fail the webhook
         }
       }

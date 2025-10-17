@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
+import { AdminDiscountCodes } from '@/components/admin-discount-codes';
 
 // Format data amounts to clean values
 function formatDataAmount(dataGB: number): string {
@@ -252,6 +253,11 @@ export default function AdminPage() {
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Revenue (USD)</div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Discount Codes Section */}
+          <div className="mb-6 sm:mb-8">
+            <AdminDiscountCodes />
           </div>
 
           {/* Pending Affiliates Section */}

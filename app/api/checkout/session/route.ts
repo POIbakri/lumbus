@@ -27,6 +27,8 @@ const checkoutSchema = z.object({
   isTopUp: z.boolean().optional(),
   existingOrderId: z.string().uuid().optional(),
   iccid: z.string().optional(),
+  discountCode: z.string().optional(),
+  referralCode: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
 
-    const { planId, email, isTopUp, existingOrderId, iccid } = checkoutSchema.parse(body);
+    const { planId, email, isTopUp, existingOrderId, iccid, discountCode, referralCode } = checkoutSchema.parse(body);
 
     // Get cookies for attribution
     const cookies = req.cookies;
@@ -226,33 +228,82 @@ export async function POST(req: NextRequest) {
           // Create user profile
           console.log('[Checkout] Creating user profile...');
           await ensureUserProfile(user.id);
+
+          // Link referral code if provided
+          if (referralCode) {
+            console.log('[Checkout] Linking referral code:', referralCode);
+            const { linkReferrer } = await import('@/lib/referral');
+            const linked = await linkReferrer(user.id, referralCode);
+            if (linked) {
+              console.log('[Checkout] Referral code linked successfully');
+            } else {
+              console.log('[Checkout] Invalid or already used referral code');
+            }
+          }
         }
       }
     }
     console.log('[Checkout] User ready:', user.id);
 
-    // Check if user was referred and is eligible for 10% discount (first order only)
+    // Discount logic: Priority 1 = Promo code, Priority 2 = Referral
     // Top-ups never get discounts
     let applyDiscount = false;
     let discountPercent = 0;
+    let discountCodeId: string | null = null;
+    let discountSource: 'code' | 'referral' | null = null;
 
     if (!isTopUp) {
-      const { data: userProfile } = await supabase
-        .from('user_profiles')
-        .select('referred_by_code')
-        .eq('id', user.id)
-        .single();
+      // Priority 1: Check for discount code
+      if (discountCode) {
+        const { data: validationResult } = await supabase
+          .rpc('validate_discount_code', {
+            p_code: discountCode.toUpperCase().trim(),
+            p_user_id: user.id,
+          });
 
-      const { count: orderCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .in('status', ['paid', 'completed']);
+        const result = Array.isArray(validationResult) ? validationResult[0] : validationResult;
 
-      const isFirstOrder = (orderCount || 0) === 0;
-      const hasReferral = userProfile?.referred_by_code !== null && userProfile?.referred_by_code !== undefined;
-      applyDiscount = isFirstOrder && hasReferral;
-      discountPercent = applyDiscount ? 10 : 0;
+        if (result && result.is_valid) {
+          applyDiscount = true;
+          discountPercent = result.discount_percent;
+          discountSource = 'code';
+
+          // Get the discount code ID for tracking
+          const { data: codeData } = await supabase
+            .from('discount_codes')
+            .select('id')
+            .eq('code', discountCode.toUpperCase().trim())
+            .single();
+
+          if (codeData) {
+            discountCodeId = codeData.id;
+          }
+        }
+      }
+
+      // Priority 2: Check for referral discount (only if no discount code)
+      if (!applyDiscount) {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('referred_by_code')
+          .eq('id', user.id)
+          .single();
+
+        const { count: orderCount } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .in('status', ['paid', 'completed']);
+
+        const isFirstOrder = (orderCount || 0) === 0;
+        const hasReferral = userProfile?.referred_by_code !== null && userProfile?.referred_by_code !== undefined;
+
+        if (isFirstOrder && hasReferral) {
+          applyDiscount = true;
+          discountPercent = 10;
+          discountSource = 'referral';
+        }
+      }
     }
 
     // Detect user's currency based on their location
@@ -262,7 +313,8 @@ export async function POST(req: NextRequest) {
 
     // Calculate price with discount if applicable (in USD)
     const basePriceUSD = plan.retail_price;
-    const finalPriceUSD = applyDiscount ? basePriceUSD * 0.9 : basePriceUSD; // 10% off
+    const discountMultiplier = applyDiscount ? (100 - discountPercent) / 100 : 1;
+    const finalPriceUSD = basePriceUSD * discountMultiplier;
 
     // Convert to user's currency for Stripe
     const stripeAmount = convertToStripeAmount(finalPriceUSD, userCurrency);
@@ -290,13 +342,24 @@ export async function POST(req: NextRequest) {
     // Create Stripe Checkout Session with user's local currency
     console.log('[Checkout] Creating Stripe session...');
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';
+
+    // Build discount description
+    let discountDescription = '';
+    if (applyDiscount) {
+      if (discountSource === 'code') {
+        discountDescription = ` (${discountPercent}% Discount Code Applied)`;
+      } else if (discountSource === 'referral') {
+        discountDescription = ` (${discountPercent}% Referral Discount Applied)`;
+      }
+    }
+
     const lineItems = [
       {
         price_data: {
           currency: userCurrency.toLowerCase(),
           product_data: {
             name: isTopUp ? `${plan.name} (Top-up)` : plan.name,
-            description: `${orderType}: ${plan.data_gb}GB eSIM - Valid for ${plan.validity_days} days${applyDiscount ? ' (10% Referral Discount Applied)' : ''}`,
+            description: `${orderType}: ${plan.data_gb}GB eSIM - Valid for ${plan.validity_days} days${discountDescription}`,
           },
           unit_amount: stripeAmount, // Already converted to smallest currency unit
         },
@@ -331,12 +394,16 @@ export async function POST(req: NextRequest) {
         userAgent: userAgent || '',
         discountApplied: applyDiscount ? 'true' : 'false',
         discountPercent: discountPercent.toString(),
+        discountSource: discountSource || '',
+        discountCodeId: discountCodeId || '',
+        discountCode: discountCode || '',
         isTopUp: isTopUp ? 'true' : 'false',
         existingOrderId: existingOrderId || '',
         iccid: iccid || '',
         detectedCountry: detectedCountry,
         currency: userCurrency,
-        originalPriceUSD: finalPriceUSD.toString(),
+        basePriceUSD: basePriceUSD.toString(),
+        finalPriceUSD: finalPriceUSD.toString(),
       },
       payment_intent_data: {
         metadata: {

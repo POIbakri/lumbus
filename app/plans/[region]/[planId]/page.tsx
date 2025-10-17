@@ -38,6 +38,11 @@ export default function PlanDetailPage() {
   const [currencySymbol, setCurrencySymbol] = useState('$');
   const [convertedPrice, setConvertedPrice] = useState<number | null>(null);
   const [planLoading, setPlanLoading] = useState(true);
+  const [discountCode, setDiscountCode] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [showCodes, setShowCodes] = useState(false);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [validatingCode, setValidatingCode] = useState(false);
 
   const loadPlan = useCallback(async () => {
     try {
@@ -79,6 +84,25 @@ export default function PlanDetailPage() {
     loadPlan();
   }, [loadPlan]);
 
+  const validateDiscountCode = async (code: string) => {
+    if (!code.trim()) {
+      setDiscountPercent(0);
+      return;
+    }
+
+    setValidatingCode(true);
+    try {
+      // For discount code validation, we need a user ID
+      // Since we don't have a logged-in user yet, we'll validate on the backend
+      // For now, just store the code and let backend validate during checkout
+      setDiscountPercent(0); // Will be set by backend
+    } catch (error) {
+      console.error('Error validating code:', error);
+    } finally {
+      setValidatingCode(false);
+    }
+  };
+
   const handleCheckout = async () => {
     if (!email || !email.includes('@')) {
       setError('Please enter a valid email address');
@@ -98,17 +122,20 @@ export default function PlanDetailPage() {
         body: JSON.stringify({
           planId: plan.id,
           email,
+          discountCode: discountCode.trim() || undefined,
+          referralCode: referralCode.trim() || undefined,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create checkout session');
       }
 
       const { url } = await response.json();
       window.location.href = url;
     } catch (err) {
-      setError('Failed to start checkout. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to start checkout. Please try again.');
       setLoading(false);
     }
   };
@@ -251,6 +278,74 @@ export default function PlanDetailPage() {
                           <li>✓ Account setup link (set your password)</li>
                         </ul>
                       </div>
+                    </div>
+
+                    {/* Discount & Referral Codes Section */}
+                    <div className="border-2 border-dashed border-primary/30 rounded-lg sm:rounded-xl overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setShowCodes(!showCodes)}
+                        className="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-yellow/20 hover:bg-yellow/30  font-black uppercase text-xs sm:text-sm flex items-center justify-between"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-base sm:text-lg">🎟️</span>
+                          <span>Have a discount or referral code?</span>
+                        </span>
+                        <span className="text-base sm:text-lg">{showCodes ? '−' : '+'}</span>
+                      </button>
+
+                      {showCodes && (
+                        <div className="p-3 sm:p-4 space-y-3 bg-white">
+                          <div>
+                            <label htmlFor="discountCode" className="block font-bold uppercase text-xs mb-2">
+                              Discount Code
+                            </label>
+                            <input
+                              id="discountCode"
+                              type="text"
+                              value={discountCode}
+                              onChange={(e) => {
+                                const value = e.target.value.toUpperCase();
+                                setDiscountCode(value);
+                                validateDiscountCode(value);
+                              }}
+                              placeholder="SUMMER20"
+                              className="w-full px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
+                              disabled={loading || validatingCode}
+                            />
+                            {validatingCode && (
+                              <p className="mt-1 text-xs font-bold text-muted-foreground">Validating...</p>
+                            )}
+                            {discountPercent > 0 && (
+                              <p className="mt-1 text-xs font-black text-primary">✓ {discountPercent}% discount will be applied!</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <label htmlFor="referralCode" className="block font-bold uppercase text-xs mb-2">
+                              Referral Code
+                            </label>
+                            <input
+                              id="referralCode"
+                              type="text"
+                              value={referralCode}
+                              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                              placeholder="ABC12345"
+                              className="w-full px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
+                              disabled={loading}
+                            />
+                            <p className="mt-1 text-xs font-bold text-muted-foreground">
+                              Get 10% off your first order with a friend's referral code
+                            </p>
+                          </div>
+
+                          <div className="p-2 sm:p-3 bg-cyan/10 rounded-lg border border-cyan/20">
+                            <p className="text-xs font-bold text-foreground/80">
+                              💡 <strong>Note:</strong> If you have both codes, the discount code will take priority. Referral discounts only apply to first-time orders.
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {error && (

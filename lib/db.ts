@@ -186,3 +186,31 @@ export interface WebhookEvent {
   created_at: string;
   processed_at: string | null;
 }
+
+export interface DiscountCode {
+  id: string;
+  code: string;
+  description: string | null;
+  discount_percent: 10 | 20 | 30 | 40 | 50 | 100;
+  max_uses: number | null;
+  current_uses: number;
+  max_uses_per_user: number;
+  valid_from: string;
+  valid_until: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiscountCodeUsage {
+  id: string;
+  discount_code_id: string;
+  order_id: string;
+  user_id: string;
+  discount_percent: number;
+  original_price_usd: number;
+  discount_amount_usd: number;
+  final_price_usd: number;
+  created_at: string;
+}

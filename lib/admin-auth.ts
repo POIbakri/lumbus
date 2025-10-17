@@ -13,10 +13,10 @@ export function checkAdminAuth(req: NextRequest): boolean {
   const [username, password] = credentials.split(':');
 
   const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || '';
+  const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || '').replace(/\s+/g, '');
 
   if (!adminPasswordHash) {
-    console.warn('ADMIN_PASSWORD_HASH not set');
+    console.warn('[Admin Auth] ADMIN_PASSWORD_HASH not set');
     return false;
   }
 
@@ -24,7 +24,9 @@ export function checkAdminAuth(req: NextRequest): boolean {
     return false;
   }
 
-  return bcrypt.compareSync(password, adminPasswordHash);
+  const passwordMatch = bcrypt.compareSync(password, adminPasswordHash);
+
+  return passwordMatch;
 }
 
 export function requireAuth(req: NextRequest) {

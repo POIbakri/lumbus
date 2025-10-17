@@ -14,6 +14,81 @@ function getResendClient() {
   return resend;
 }
 
+// Shared email template wrapper with Lumbus branding
+function createEmailTemplate(params: {
+  title: string;
+  subtitle?: string;
+  content: string;
+  headerGradient?: string;
+}) {
+  const { title, subtitle, content, headerGradient = 'linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%)' } = params;
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - Lumbus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        @media screen and (max-width: 600px) {
+            .mobile-padding { padding: 20px !important; }
+            .mobile-center { text-align: center !important; }
+            .container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px; background: ${headerGradient};">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">LUMBUS</h1>
+                            ${subtitle ? `<p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">${subtitle}</p>` : ''}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px 60px;">
+                            ${content}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                            Need help? Contact us at <a href="mailto:support@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@lumbus.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                            © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+  `;
+}
+
 export interface SendOrderConfirmationParams {
   to: string;
   orderDetails: {
@@ -96,164 +171,95 @@ export interface SendAdminNewAffiliateApplicationParams {
 export async function sendOrderConfirmationEmail(params: SendOrderConfirmationParams) {
   const { to, orderDetails, activationDetails, installUrl } = params;
 
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">✅ Your eSIM is Ready!</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Your Lumbus eSIM has been activated and is ready to use!
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+      <h3 style="margin: 0 0 15px; font-size: 20px; font-weight: 700; color: #1A1A1A;">${orderDetails.planName}</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+            <strong>📊 Data:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${orderDetails.dataGb} GB
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+            <strong>⏰ Valid for:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${orderDetails.validityDays} days
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">📱 HOW TO INSTALL</p>
+      <ol style="margin: 0; padding-left: 20px; color: #1A1A1A; font-weight: 600; line-height: 1.8;">
+        <li>Go to your device settings</li>
+        <li>Navigate to Cellular/Mobile Data → Add eSIM</li>
+        <li>Scan the QR code below or enter details manually</li>
+      </ol>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #F9FAFB; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Scan this QR Code</h3>
+      <img src="${activationDetails.qrUrl}" alt="eSIM QR Code" style="max-width: 300px; width: 100%; height: auto;" />
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${installUrl}" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            OPEN INSTALLATION GUIDE
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Or enter manually:</h3>
+
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">SM-DP+ Address</p>
+        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+          ${activationDetails.smdp}
+        </div>
+      </div>
+
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">Activation Code</p>
+        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+          ${activationDetails.activationCode}
+        </div>
+      </div>
+
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">LPA String</p>
+        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 12px; word-break: break-all; color: #1A1A1A;">
+          ${activationDetails.lpaString}
+        </div>
+      </div>
+    </div>
+  `;
+
   try {
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your Lumbus eSIM is ready! - ${orderDetails.planName}`,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Lumbus eSIM</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #1a1a1a;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      padding: 40px 20px;
-      text-align: center;
-      color: white;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .plan-details {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .plan-details h2 {
-      margin: 0 0 10px 0;
-      font-size: 20px;
-      color: #1a1a1a;
-    }
-    .plan-details p {
-      margin: 5px 0;
-      color: #666;
-    }
-    .qr-code {
-      text-align: center;
-      margin: 30px 0;
-      padding: 20px;
-      background: #f9fafb;
-      border-radius: 12px;
-    }
-    .qr-code img {
-      max-width: 300px;
-      width: 100%;
-      height: auto;
-    }
-    .activation-code {
-      background: #fff;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 20px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      word-break: break-all;
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-    .instructions {
-      background: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Your eSIM is Ready!</h1>
-    </div>
-    <div class="content">
-      <p>Hello!</p>
-      <p>Your Lumbus eSIM has been activated and is ready to use. Here are your plan details:</p>
-
-      <div class="plan-details">
-        <h2>${orderDetails.planName}</h2>
-        <p><strong>Data:</strong> ${orderDetails.dataGb} GB</p>
-        <p><strong>Valid for:</strong> ${orderDetails.validityDays} days</p>
-      </div>
-
-      <div class="instructions">
-        <strong>How to install:</strong>
-        <ol>
-          <li>Go to your device settings</li>
-          <li>Navigate to Cellular/Mobile Data → Add eSIM</li>
-          <li>Scan the QR code below or enter the details manually</li>
-        </ol>
-      </div>
-
-      <div class="qr-code">
-        <h3>Scan this QR Code</h3>
-        <img src="${activationDetails.qrUrl}" alt="eSIM QR Code" />
-      </div>
-
-      <p style="text-align: center;">
-        <a href="${installUrl}" class="btn">Open Installation Guide</a>
-      </p>
-
-      <h3>Or enter manually:</h3>
-      <p><strong>SM-DP+ Address:</strong></p>
-      <div class="activation-code">${activationDetails.smdp}</div>
-
-      <p><strong>Activation Code:</strong></p>
-      <div class="activation-code">${activationDetails.activationCode}</div>
-
-      <p><strong>LPA String:</strong></p>
-      <div class="activation-code">${activationDetails.lpaString}</div>
-
-      <p style="margin-top: 30px;">Need help? Visit <a href="${process.env.NEXT_PUBLIC_APP_URL}/support">lumbus.com/support</a></p>
-    </div>
-    <div class="footer">
-      <p>Powered by eSIM Access network</p>
-      <p>&copy; ${new Date().getFullYear()} Lumbus. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
+      html: createEmailTemplate({
+        title: 'Your eSIM is Ready',
+        subtitle: 'Fast Global Connectivity',
+        content,
+      }),
     });
 
     if (error) {
@@ -277,186 +283,92 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
   // Determine urgency level
   const isUrgent = usagePercent >= 90;
   const isWarning = usagePercent >= 80;
-  const alertColor = isUrgent ? '#dc2626' : isWarning ? '#f59e0b' : '#3b82f6';
   const alertLevel = isUrgent ? 'Urgent' : isWarning ? 'Warning' : 'Notice';
+  const alertEmoji = isUrgent ? '🚨' : isWarning ? '⚠️' : 'ℹ️';
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">${alertEmoji} Data Usage ${alertLevel}</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      This is a ${alertLevel.toLowerCase()} about your data usage for <strong>${planName}</strong>.
+    </p>
+
+    <div style="margin: 0 0 30px; background: #E0FEF7; border-radius: 12px; height: 50px; overflow: hidden; position: relative;">
+      <div style="background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%); height: 100%; width: ${usagePercent.toFixed(1)}%; display: flex; align-items: center; justify-content: center; color: #1A1A1A; font-weight: 900; font-size: 18px; transition: width 0.5s ease;">
+        ${usagePercent.toFixed(0)}%
+      </div>
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin: 0 0 30px;">
+      <tr>
+        <td width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
+          <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Data Used</p>
+          <p style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataUsedGB.toFixed(2)} GB</p>
+          <p style="margin: 0; font-size: 14px; color: #515154;">of ${totalDataGB.toFixed(2)} GB</p>
+        </td>
+        <td width="4%"></td>
+        <td width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
+          <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Remaining</p>
+          <p style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataRemainingGB.toFixed(2)} GB</p>
+          <p style="margin: 0; font-size: 14px; color: #515154;">${(100 - usagePercent).toFixed(0)}% left</p>
+        </td>
+      </tr>
+    </table>
+
+    ${isUrgent ? `
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">🚨 CRITICAL: RUNNING LOW ON DATA</p>
+        <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
+          You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. Consider purchasing a top-up to avoid service interruption.
+        </p>
+      </div>
+    ` : isWarning ? `
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">⚠️ WARNING: HIGH DATA USAGE</p>
+        <p style="margin: 0; font-size: 14px; color: #515154; font-weight: 600; line-height: 1.6;">
+          You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You may want to monitor your usage or purchase a top-up soon.
+        </p>
+      </div>
+    ` : `
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">ℹ️ NOTICE: DATA USAGE UPDATE</p>
+        <p style="margin: 0; font-size: 14px; color: #515154; font-weight: 600; line-height: 1.6;">
+          You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You still have plenty of data remaining.
+        </p>
+      </div>
+    `}
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            VIEW DASHBOARD
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 Tips to manage your data:</p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Use Wi-Fi when available</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Disable automatic app updates over cellular</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Monitor streaming quality settings</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Check background app refresh settings</p></td></tr>
+      </table>
+    </div>
+  `;
 
   try {
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `${alertLevel}: ${usagePercent.toFixed(0)}% of your data used - ${planName}`,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Usage Alert</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #1a1a1a;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: ${alertColor};
-      padding: 40px 20px;
-      text-align: center;
-      color: white;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .usage-bar {
-      background: #e5e7eb;
-      border-radius: 12px;
-      height: 40px;
-      overflow: hidden;
-      margin: 20px 0;
-      position: relative;
-    }
-    .usage-fill {
-      background: ${alertColor};
-      height: 100%;
-      width: ${usagePercent.toFixed(1)}%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      transition: width 0.5s ease;
-    }
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .stat-box {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 32px;
-      font-weight: 700;
-      color: ${alertColor};
-      margin: 10px 0;
-    }
-    .stat-label {
-      color: #666;
-      font-size: 14px;
-    }
-    .alert-box {
-      background: #fef3c7;
-      border-left: 4px solid ${alertColor};
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 14px;
-      background: #f9fafb;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>📊 Data Usage Alert</h1>
-    </div>
-    <div class="content">
-      <p>Hello!</p>
-      <p>This is a ${alertLevel.toLowerCase()} about your data usage for <strong>${planName}</strong>.</p>
-
-      <div class="usage-bar">
-        <div class="usage-fill">
-          ${usagePercent.toFixed(0)}%
-        </div>
-      </div>
-
-      <div class="stats">
-        <div class="stat-box">
-          <div class="stat-label">Data Used</div>
-          <div class="stat-value">${dataUsedGB.toFixed(2)} GB</div>
-          <div class="stat-label">of ${totalDataGB.toFixed(2)} GB</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Remaining</div>
-          <div class="stat-value">${dataRemainingGB.toFixed(2)} GB</div>
-          <div class="stat-label">${(100 - usagePercent).toFixed(0)}% left</div>
-        </div>
-      </div>
-
-      ${isUrgent ? `
-      <div class="alert-box">
-        <strong>⚠️ Critical: Running Low on Data</strong>
-        <p>You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. Consider purchasing a top-up to avoid service interruption.</p>
-      </div>
-      ` : isWarning ? `
-      <div class="alert-box">
-        <strong>⚠️ Warning: High Data Usage</strong>
-        <p>You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You may want to monitor your usage or purchase a top-up soon.</p>
-      </div>
-      ` : `
-      <div class="alert-box">
-        <strong>ℹ️ Notice: Data Usage Update</strong>
-        <p>You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You still have plenty of data remaining.</p>
-      </div>
-      `}
-
-      <p style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="btn">View Dashboard</a>
-      </p>
-
-      <p style="margin-top: 30px; font-size: 14px; color: #666;">
-        <strong>Tips to manage your data:</strong><br>
-        • Use Wi-Fi when available<br>
-        • Disable automatic app updates over cellular<br>
-        • Monitor streaming quality settings<br>
-        • Check background app refresh settings
-      </p>
-
-      <p style="margin-top: 20px;">Need help? Visit <a href="${process.env.NEXT_PUBLIC_APP_URL}/support">lumbus.com/support</a></p>
-    </div>
-    <div class="footer">
-      <p>This is an automated alert from Lumbus eSIM</p>
-      <p>&copy; ${new Date().getFullYear()} Lumbus. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
+      html: createEmailTemplate({
+        title: 'Data Usage Alert',
+        subtitle: 'Usage Notification',
+        content,
+      }),
     });
 
     if (error) {
@@ -477,131 +389,57 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
 export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
   const { to, planName, daysRemaining, expiryDate } = params;
 
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">⏰ Plan Expiring Soon</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Your <strong>${planName}</strong> plan is expiring soon.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #FEF3C7; border: 3px solid #F59E0B; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Expires In</p>
+      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</p>
+      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">Expiry Date: ${expiryDate}</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">⚠️ ACTION REQUIRED</p>
+      <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
+        After the expiry date, your eSIM will no longer have data connectivity. Purchase a new plan or top-up to continue using your eSIM.
+      </p>
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            BROWSE PLANS
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">What happens when my plan expires?</p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data connectivity will stop</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> You can still top-up your eSIM with a new plan</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM profile will remain on your device</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> No action needed if you're done traveling</p></td></tr>
+      </table>
+    </div>
+  `;
+
   try {
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your eSIM plan expires soon - ${planName}`,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plan Expiring Soon</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #1a1a1a;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
-      padding: 40px 20px;
-      text-align: center;
-      color: white;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .expiry-box {
-      background: #fee2e2;
-      border: 2px solid #dc2626;
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      margin: 20px 0;
-    }
-    .expiry-date {
-      font-size: 36px;
-      font-weight: 700;
-      color: #dc2626;
-      margin: 10px 0;
-    }
-    .alert-box {
-      background: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 14px;
-      background: #f9fafb;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>⏰ Plan Expiring Soon</h1>
-    </div>
-    <div class="content">
-      <p>Hello!</p>
-      <p>Your <strong>${planName}</strong> plan is expiring soon.</p>
-
-      <div class="expiry-box">
-        <div style="font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;">Expires In</div>
-        <div class="expiry-date">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</div>
-        <div style="font-size: 16px; color: #666; margin-top: 10px;">Expiry Date: ${expiryDate}</div>
-      </div>
-
-      <div class="alert-box">
-        <strong>⚠️ Action Required</strong>
-        <p>After the expiry date, your eSIM will no longer have data connectivity. Purchase a new plan or top-up to continue using your eSIM.</p>
-      </div>
-
-      <p style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" class="btn">Browse Plans</a>
-      </p>
-
-      <p style="margin-top: 30px; font-size: 14px; color: #666;">
-        <strong>What happens when my plan expires?</strong><br>
-        • Data connectivity will stop<br>
-        • You can still top-up your eSIM with a new plan<br>
-        • Your eSIM profile will remain on your device<br>
-        • No action needed if you're done traveling
-      </p>
-
-      <p style="margin-top: 20px;">Need help? Visit <a href="${process.env.NEXT_PUBLIC_APP_URL}/support">lumbus.com/support</a></p>
-    </div>
-    <div class="footer">
-      <p>This is an automated alert from Lumbus eSIM</p>
-      <p>&copy; ${new Date().getFullYear()} Lumbus. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
+      html: createEmailTemplate({
+        title: 'Plan Expiring Soon',
+        subtitle: 'Expiry Alert',
+        content,
+      }),
     });
 
     if (error) {
@@ -622,129 +460,72 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
 export async function sendReferralRewardEmail(params: SendReferralRewardParams) {
   const { to, referredUserEmail, rewardAmount, referralCode } = params;
 
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">🎉 Referral Reward!</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Great news! Someone used your referral code and made their first purchase. You've earned a reward!
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">You Earned</p>
+      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${rewardAmount}</p>
+      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">🎊 Added to your wallet!</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #F3F4F6; border-radius: 12px;">
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+            <strong>Referred user:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${referredUserEmail}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+            <strong>Your referral code:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700; font-family: monospace;">
+            ${referralCode}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Your reward has been added to your Lumbus wallet and can be used on your next purchase!
+    </p>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            VIEW WALLET
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A; text-align: center;">Keep sharing and earning!</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #515154; text-align: center;">
+        Share your referral code <strong>${referralCode}</strong> with friends and family. You'll earn rewards for every purchase they make, and they'll get a discount too!
+      </p>
+    </div>
+  `;
+
   try {
-    const { data, error } = await getResendClient().emails.send({
+    const { data, error} = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `You earned a reward! 🎉 - ${rewardAmount}`,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Referral Reward Earned</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #1a1a1a;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      padding: 40px 20px;
-      text-align: center;
-      color: white;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .reward-box {
-      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-      border: 2px solid #10b981;
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      margin: 20px 0;
-    }
-    .reward-amount {
-      font-size: 48px;
-      font-weight: 700;
-      color: #059669;
-      margin: 10px 0;
-    }
-    .info-box {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 14px;
-      background: #f9fafb;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🎉 Referral Reward!</h1>
-    </div>
-    <div class="content">
-      <p>Hello!</p>
-      <p>Great news! Someone used your referral code and made their first purchase. You've earned a reward!</p>
-
-      <div class="reward-box">
-        <div style="font-size: 14px; color: #059669; text-transform: uppercase; letter-spacing: 1px;">You Earned</div>
-        <div class="reward-amount">${rewardAmount}</div>
-        <div style="font-size: 16px; color: #059669; margin-top: 10px;">🎊 Added to your wallet!</div>
-      </div>
-
-      <div class="info-box">
-        <p style="margin: 5px 0;"><strong>Referred user:</strong> ${referredUserEmail}</p>
-        <p style="margin: 5px 0;"><strong>Your referral code:</strong> ${referralCode}</p>
-      </div>
-
-      <p>Your reward has been added to your Lumbus wallet and can be used on your next purchase!</p>
-
-      <p style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="btn">View Wallet</a>
-      </p>
-
-      <p style="margin-top: 30px; font-size: 14px; color: #666;">
-        <strong>Keep sharing and earning!</strong><br>
-        Share your referral code <strong>${referralCode}</strong> with friends and family. You'll earn rewards for every purchase they make, and they'll get a discount too!
-      </p>
-
-      <p style="margin-top: 20px;">Questions? Visit <a href="${process.env.NEXT_PUBLIC_APP_URL}/support">lumbus.com/support</a></p>
-    </div>
-    <div class="footer">
-      <p>Thank you for spreading the word about Lumbus eSIM!</p>
-      <p>&copy; ${new Date().getFullYear()} Lumbus. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
+      html: createEmailTemplate({
+        title: 'Referral Reward Earned',
+        subtitle: 'Congratulations!',
+        content,
+      }),
     });
 
     if (error) {
@@ -765,160 +546,98 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
 export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationParams) {
   const { to, planName, dataAdded, validityDays, iccid } = params;
 
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">✅ Top-Up Successful!</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Great news! Your eSIM has been successfully topped up with additional data.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Data Added</p>
+      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
+      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">📶 Ready to use!</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #F3F4F6; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Top-Up Details</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+            <strong>Plan:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${planName}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+            <strong>Data Added:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${dataAdded} GB
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+            <strong>Validity:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${validityDays} days from today
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">✨ NO ACTION NEEDED!</p>
+      <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
+        The data has been automatically added to your existing eSIM. Just continue using your device as normal - no reinstallation required!
+      </p>
+    </div>
+
+    <div style="margin: 0 0 20px; padding: 15px; background-color: #F9FAFB; border: 2px solid #e5e5e7; border-radius: 8px;">
+      <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">ICCID</p>
+      <p style="margin: 0; font-size: 12px; color: #1A1A1A; font-family: monospace; word-break: break-all;">
+        ${iccid}
+      </p>
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            VIEW DASHBOARD
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 How it works:</p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data is added to your existing eSIM instantly</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Validity period resets from the top-up date</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> No need to scan a new QR code or reinstall</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM continues working seamlessly</p></td></tr>
+      </table>
+    </div>
+
+    <p style="margin: 30px 0 0; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+      Need more data? Visit your <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="color: #2EFECC; font-weight: 700; text-decoration: none;">dashboard</a> to top up again!
+    </p>
+  `;
+
   try {
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
       subject: `Your eSIM top-up is complete! - ${dataAdded}GB added`,
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Top-Up Successful</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #1a1a1a;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-      padding: 40px 20px;
-      text-align: center;
-      color: white;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .success-box {
-      background: linear-gradient(135deg, #dcfce7 0%, #dbeafe 100%);
-      border: 2px solid #10b981;
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      margin: 20px 0;
-    }
-    .data-amount {
-      font-size: 48px;
-      font-weight: 700;
-      color: #059669;
-      margin: 10px 0;
-    }
-    .plan-details {
-      background: #f3f4f6;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .plan-details p {
-      margin: 5px 0;
-      color: #666;
-    }
-    .info-box {
-      background: #fef3c7;
-      border-left: 4px solid #10b981;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
-      color: white;
-      padding: 16px 32px;
-      border-radius: 16px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      color: #666;
-      font-size: 14px;
-      background: #f9fafb;
-    }
-    .iccid-box {
-      background: #fff;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 20px 0;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      word-break: break-all;
-      color: #666;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>✅ Top-Up Successful!</h1>
-    </div>
-    <div class="content">
-      <p>Hello!</p>
-      <p>Great news! Your eSIM has been successfully topped up with additional data.</p>
-
-      <div class="success-box">
-        <div style="font-size: 14px; color: #059669; text-transform: uppercase; letter-spacing: 1px;">Data Added</div>
-        <div class="data-amount">${dataAdded} GB</div>
-        <div style="font-size: 16px; color: #059669; margin-top: 10px;">📶 Ready to use!</div>
-      </div>
-
-      <div class="plan-details">
-        <p><strong>Plan:</strong> ${planName}</p>
-        <p><strong>Data Added:</strong> ${dataAdded} GB</p>
-        <p><strong>Validity:</strong> ${validityDays} days from today</p>
-        <p><strong>ICCID:</strong></p>
-        <div class="iccid-box">${iccid}</div>
-      </div>
-
-      <div class="info-box">
-        <strong>✨ No action needed!</strong>
-        <p>The data has been automatically added to your existing eSIM. Just continue using your device as normal - no reinstallation required!</p>
-      </div>
-
-      <p style="text-align: center;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="btn">View Dashboard</a>
-      </p>
-
-      <p style="margin-top: 30px; font-size: 14px; color: #666;">
-        <strong>How it works:</strong><br>
-        • Data is added to your existing eSIM instantly<br>
-        • Validity period resets from the top-up date<br>
-        • No need to scan a new QR code or reinstall<br>
-        • Your eSIM continues working seamlessly
-      </p>
-
-      <p style="margin-top: 20px;">Need more data? Visit <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard">your dashboard</a> to top up again!</p>
-    </div>
-    <div class="footer">
-      <p>Thank you for choosing Lumbus eSIM!</p>
-      <p>&copy; ${new Date().getFullYear()} Lumbus. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-      `,
+      html: createEmailTemplate({
+        title: 'Top-Up Successful',
+        subtitle: 'Data Added',
+        content,
+      }),
     });
 
     if (error) {
