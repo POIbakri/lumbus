@@ -408,9 +408,25 @@ export default function PlanDetailPage() {
                       {loading ? 'PROCESSING...' : 'PROCEED TO CHECKOUT'}
                     </Button>
 
-                    <p className="text-xs sm:text-sm text-center font-bold uppercase text-muted-foreground">
-                      🔒 Secure payment via Stripe
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-xs sm:text-sm text-center font-bold uppercase text-muted-foreground">
+                        🔒 Secure payment via Stripe
+                      </p>
+                      <p className="text-xs text-center text-muted-foreground leading-relaxed">
+                        By proceeding, you agree to our{' '}
+                        <Link href="/terms" target="_blank" className="text-primary hover:underline font-bold">
+                          Terms & Conditions
+                        </Link>
+                        ,{' '}
+                        <Link href="/privacy" target="_blank" className="text-primary hover:underline font-bold">
+                          Privacy Policy
+                        </Link>
+                        {' '}and{' '}
+                        <Link href="/refund-policy" target="_blank" className="text-primary hover:underline font-bold">
+                          Refund Policy
+                        </Link>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </CardContent>

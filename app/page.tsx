@@ -329,6 +329,9 @@ export default async function Home() {
                 <Link href="/plans" className="block text-gray-400 hover:text-white">
                   Plans
                 </Link>
+                <Link href="/support" className="block text-gray-400 hover:text-white">
+                  Contact Us
+                </Link>
               </div>
             </div>
             <div>
@@ -344,7 +347,20 @@ export default async function Home() {
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Lumbus. All rights reserved.</p>
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-4 text-sm sm:text-base">
+              <Link href="/terms" className="hover:text-white transition-colors">
+                Terms & Conditions
+              </Link>
+              <span>•</span>
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link href="/refund-policy" className="hover:text-white transition-colors">
+                Refund Policy
+              </Link>
+            </div>
+            <p className="text-sm">&copy; {new Date().getFullYear()} Lumbus Telecom Limited. Company No. 16793515. All rights reserved.</p>
           </div>
         </div>
       </footer>

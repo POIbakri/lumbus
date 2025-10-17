@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { checkEsimUsage } from '@/lib/esimaccess';
+import { requireUserAuth } from '@/lib/server-auth';
 
 interface RouteParams {
   params: Promise<{
@@ -22,6 +23,13 @@ interface RouteParams {
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
+    // Require authentication
+    const auth = await requireUserAuth(req);
+    if (auth.error) {
+      return auth.error;
+    }
+
+    const userId = auth.user.id;
     const { orderId } = await params;
 
     // Get order with esim_tran_no
@@ -36,6 +44,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         { error: 'Order not found' },
         { status: 404 }
       );
+    }
+
+    // Verify the order belongs to the authenticated user
+    if (order.user_id !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Check if order has esim_tran_no (required for usage query)

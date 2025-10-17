@@ -12,6 +12,7 @@ import { supabaseClient } from '@/lib/supabase-client';
 import { Order, Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
+import { authenticatedGet } from '@/lib/api-client';
 
 // Format data amounts to clean values
 function formatDataAmount(dataGB: number): string {
@@ -236,37 +237,35 @@ export default function DashboardPage() {
     triggerHaptic('light');
 
     try {
-      const response = await fetch(`/api/orders/${orderId}/usage`);
-      if (response.ok) {
-        const usageData = await response.json();
+      const usageData = await authenticatedGet<{
+        data_usage_bytes: number;
+        data_remaining_bytes: number;
+        last_update: string;
+      }>(`/api/orders/${orderId}/usage`);
 
-        // Update the order in the state with new usage data
-        setOrders(prevOrders => {
-          const updatedOrders = prevOrders.map(order => {
-            if (order.id === orderId) {
-              return {
-                ...order,
-                data_usage_bytes: usageData.data_usage_bytes,
-                data_remaining_bytes: usageData.data_remaining_bytes,
-                last_usage_update: usageData.last_update,
-              };
-            }
-            return order;
-          });
-
-          // Update cache with new usage data
-          const cacheKey = `lumbus_orders_${user?.id}`;
-          localStorage.setItem(cacheKey, JSON.stringify(updatedOrders));
-          localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
-
-          return updatedOrders;
+      // Update the order in the state with new usage data
+      setOrders(prevOrders => {
+        const updatedOrders = prevOrders.map(order => {
+          if (order.id === orderId) {
+            return {
+              ...order,
+              data_usage_bytes: usageData.data_usage_bytes,
+              data_remaining_bytes: usageData.data_remaining_bytes,
+              last_usage_update: usageData.last_update,
+            };
+          }
+          return order;
         });
 
-        triggerHaptic('light');
-      } else {
-        console.error('Failed to refresh usage data');
-        triggerHaptic('medium');
-      }
+        // Update cache with new usage data
+        const cacheKey = `lumbus_orders_${user?.id}`;
+        localStorage.setItem(cacheKey, JSON.stringify(updatedOrders));
+        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
+
+        return updatedOrders;
+      });
+
+      triggerHaptic('light');
     } catch (error) {
       console.error('Error refreshing usage:', error);
       triggerHaptic('medium');

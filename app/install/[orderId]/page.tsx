@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Nav } from '@/components/nav';
 import { ReferralShareModal } from '@/components/referral-share-modal';
 import { useAuth } from '@/lib/auth-context';
+import { authenticatedGet } from '@/lib/api-client';
 
 interface OrderData {
   id: string;
@@ -36,11 +37,7 @@ export default function InstallPage() {
 
   const loadOrder = useCallback(async () => {
     try {
-      const response = await fetch(`/api/orders/${params.orderId}`);
-      if (!response.ok) {
-        throw new Error('Order not found');
-      }
-      const data = await response.json();
+      const data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
       setOrder(data);
 
       // Stop polling once we have activation details

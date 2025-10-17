@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, type Plan } from '@/lib/db';
+import { requireUserAuth } from '@/lib/server-auth';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
+    // Require authentication
+    const auth = await requireUserAuth(req);
+    if (auth.error) {
+      return auth.error;
+    }
+
+    const userId = auth.user.id;
     const { orderId } = await params;
 
     const { data: order, error } = await supabase
       .from('orders')
       .select(`
         id,
+        user_id,
         status,
         qr_url,
         smdp,
@@ -29,6 +38,11 @@ export async function GET(
 
     if (error || !order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    // Verify the order belongs to the authenticated user
+    if (order.user_id !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Sanitize response (never expose internal IDs, secrets, or full URLs)
