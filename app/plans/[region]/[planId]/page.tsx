@@ -242,9 +242,15 @@ export default function PlanDetailPage() {
                         className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-foreground/20 rounded-lg sm:rounded-xl focus:outline-none focus:border-primary font-bold transition-colors"
                         disabled={loading}
                       />
-                      <p className="text-xs sm:text-sm font-bold uppercase text-muted-foreground mt-2">
-                        We'll send your eSIM here
-                      </p>
+                      <div className="mt-2 p-2 sm:p-3 bg-mint rounded-lg border border-primary/20">
+                        <p className="text-xs sm:text-sm font-bold text-foreground/80 mb-1">
+                          📧 After payment, you'll receive:
+                        </p>
+                        <ul className="text-xs sm:text-sm font-bold text-foreground/70 space-y-0.5">
+                          <li>✓ Your eSIM activation details</li>
+                          <li>✓ Account setup link (set your password)</li>
+                        </ul>
+                      </div>
                     </div>
 
                     {error && (

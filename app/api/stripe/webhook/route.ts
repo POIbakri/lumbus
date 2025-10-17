@@ -77,6 +77,8 @@ export async function POST(req: NextRequest) {
       const userAgent = session.metadata?.userAgent;
       const isTopUp = session.metadata?.isTopUp === 'true';
       const iccid = session.metadata?.iccid;
+      const needsPasswordSetup = session.metadata?.needsPasswordSetup === 'true';
+      const userEmail = session.metadata?.userEmail;
 
       if (!orderId) {
         console.error('No orderId in session metadata');
@@ -114,6 +116,26 @@ export async function POST(req: NextRequest) {
       if (orderError || !order) {
         console.error('Failed to update order:', orderError);
         return NextResponse.json({ error: 'Order update failed' }, { status: 500 });
+      }
+
+      // Send password setup email for new users
+      if (needsPasswordSetup && userEmail) {
+        console.log('[Webhook] Sending password setup email to new user:', userEmail);
+        try {
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(userEmail, {
+            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+          });
+
+          if (resetError) {
+            console.error('[Webhook] Failed to send password setup email:', resetError);
+            // Don't fail the webhook - this is not critical
+          } else {
+            console.log('[Webhook] Password setup email sent successfully');
+          }
+        } catch (error) {
+          console.error('[Webhook] Error sending password setup email:', error);
+          // Don't fail the webhook
+        }
       }
 
       // Resolve attribution

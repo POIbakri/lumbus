@@ -66,8 +66,10 @@ export async function POST(req: NextRequest) {
     // Get or create user (for top-ups, get from existing order)
     console.log('[Checkout] Getting/creating user...');
     let user;
+    let isNewUser = false; // Track if this is a brand new user for password setup
     if (isTopUp && existingOrderId) {
       // For top-ups, get user from existing order
+      console.log('[Checkout] Top-up flow - getting user from order');
       const { data: existingOrder } = await supabase
         .from('orders')
         .select('user_id, users(*)')
@@ -85,29 +87,72 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Email is required for new orders' }, { status: 400 });
       }
 
-      const { data: existingUser } = await supabase
+      console.log('[Checkout] Looking for existing user:', email);
+      const { data: existingUser, error: findError } = await supabase
         .from('users')
         .select('*')
         .eq('email', email)
-        .single();
+        .maybeSingle(); // Use maybeSingle() to handle 0 or 1 results
+
+      console.log('[Checkout] Find user result:', { found: !!existingUser, error: findError?.message });
 
       if (existingUser) {
+        console.log('[Checkout] Using existing user:', existingUser.id);
         user = existingUser;
+        isNewUser = false;
+
+        // Ensure user profile exists (creates ref_code if existing user without profile)
+        console.log('[Checkout] Ensuring user profile...');
+        await ensureUserProfile(user.id);
       } else {
-        const { data: newUser, error: userError } = await supabase
+        // For new users, create auth account WITHOUT password (passwordless)
+        // They'll set password later via "setup account" email after payment
+        console.log('[Checkout] Creating new user (no password yet)...');
+        isNewUser = true;
+
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email: email,
+          email_confirm: false, // They'll verify via password reset link after payment
+          user_metadata: {
+            created_via: 'checkout',
+            needs_password_setup: true
+          }
+        });
+
+        if (authError || !authData.user) {
+          console.error('[Checkout] Auth user creation error:', authError);
+          return NextResponse.json({
+            error: 'Failed to create user account',
+            details: authError?.message
+          }, { status: 500 });
+        }
+
+        console.log('[Checkout] Passwordless user created:', authData.user.id);
+
+        // Fetch the user from users table (created by trigger)
+        // Wait a moment for trigger to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const { data: newUser, error: fetchError } = await supabase
           .from('users')
-          .insert({ email })
-          .select()
+          .select('*')
+          .eq('id', authData.user.id)
           .single();
 
-        if (userError || !newUser) {
-          return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+        if (fetchError || !newUser) {
+          console.error('[Checkout] Failed to fetch new user:', fetchError);
+          return NextResponse.json({
+            error: 'User account created but failed to fetch',
+            details: fetchError?.message
+          }, { status: 500 });
         }
-        user = newUser;
-      }
 
-      // Ensure user profile exists (creates ref_code if new user)
-      await ensureUserProfile(user.id);
+        user = newUser;
+
+        // Create user profile
+        console.log('[Checkout] Creating user profile...');
+        await ensureUserProfile(user.id);
+      }
     }
     console.log('[Checkout] User ready:', user.id);
 
@@ -202,6 +247,8 @@ export async function POST(req: NextRequest) {
         orderId: order.id,
         planId: planId,
         userId: user.id,
+        userEmail: email || user.email,
+        needsPasswordSetup: isNewUser ? 'true' : 'false', // New users need to set password
         afid: afid || '',
         rfcd: rfcd || '',
         sessionId: sid || '',
