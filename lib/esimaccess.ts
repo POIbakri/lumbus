@@ -374,6 +374,10 @@ export async function getOrderStatus(orderNo: string): Promise<{
   try {
     const data = await makeEsimAccessRequest<any>('/esim/query', {
       orderNo: orderNo,
+      pager: {
+        pageNum: 1,
+        pageSize: 100,
+      },
     });
 
     return data;
