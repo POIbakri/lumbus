@@ -55,6 +55,13 @@ interface Affiliate {
   commission_value: number;
   application_status: string;
   applied_at: string;
+  stats?: {
+    total_clicks: number;
+    total_conversions: number;
+    total_commissions_earned: number;
+    pending_commissions: number;
+    conversion_rate: string;
+  };
 }
 
 export default function AdminPage() {
@@ -260,17 +267,23 @@ export default function AdminPage() {
             <AdminDiscountCodes />
           </div>
 
-          {/* Pending Affiliates Section */}
+          {/* Affiliates Section */}
           {affiliates.length > 0 && (
             <Card className="border-2 sm:border-4 border-secondary shadow-xl mb-6 sm:mb-8">
               <CardHeader className="bg-yellow p-4 sm:p-6">
                 <CardTitle className="text-xl sm:text-2xl font-black uppercase">
-                  Pending Affiliate Applications ({affiliates.length})
+                  Affiliates Management ({affiliates.length})
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-3 sm:p-4 md:p-6">
-                <div className="space-y-4">
-                  {affiliates.map((affiliate) => (
+                {/* Pending Applications */}
+                {affiliates.filter(a => a.application_status === 'pending').length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-black uppercase mb-4 text-purple">
+                      Pending Applications ({affiliates.filter(a => a.application_status === 'pending').length})
+                    </h3>
+                    <div className="space-y-4">
+                      {affiliates.filter(a => a.application_status === 'pending').map((affiliate) => (
                     <Card key={affiliate.id} className="border-2 border-foreground/10">
                       <CardContent className="p-4 sm:p-6">
                         <div className="space-y-4">
@@ -369,7 +382,96 @@ export default function AdminPage() {
                       </CardContent>
                     </Card>
                   ))}
-                </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Approved Affiliates */}
+                {affiliates.filter(a => a.application_status === 'approved').length > 0 && (
+                  <div className="mb-8">
+                    <h3 className="text-lg font-black uppercase mb-4 text-primary">
+                      Active Affiliates ({affiliates.filter(a => a.application_status === 'approved').length})
+                    </h3>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {affiliates.filter(a => a.application_status === 'approved').map((affiliate) => (
+                        <Card key={affiliate.id} className="border-2 border-primary/20">
+                          <CardContent className="p-4">
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="text-lg font-black mb-1">{affiliate.display_name}</h4>
+                                <p className="text-xs font-bold text-muted-foreground">{affiliate.email}</p>
+                                <p className="text-xs font-mono text-primary">/{affiliate.slug}</p>
+                              </div>
+
+                              {affiliate.stats && (
+                                <div className="grid grid-cols-2 gap-3 bg-primary/5 p-3 rounded-lg">
+                                  <div>
+                                    <p className="text-xs font-black uppercase text-muted-foreground">Clicks</p>
+                                    <p className="text-lg font-black">{affiliate.stats.total_clicks}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-black uppercase text-muted-foreground">Sales</p>
+                                    <p className="text-lg font-black">{affiliate.stats.total_conversions}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-black uppercase text-muted-foreground">Conv. Rate</p>
+                                    <p className="text-lg font-black">{affiliate.stats.conversion_rate}%</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-black uppercase text-muted-foreground">Commission</p>
+                                    <p className="text-lg font-black">{affiliate.commission_value}%</p>
+                                  </div>
+                                  <div className="col-span-2">
+                                    <p className="text-xs font-black uppercase text-muted-foreground">Earned</p>
+                                    <p className="text-xl font-black text-primary">${affiliate.stats.total_commissions_earned.toFixed(2)}</p>
+                                    {affiliate.stats.pending_commissions > 0 && (
+                                      <p className="text-xs font-bold text-muted-foreground">
+                                        +${affiliate.stats.pending_commissions.toFixed(2)} pending
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              <div className="text-xs font-bold text-muted-foreground">
+                                Joined: {new Date(affiliate.applied_at).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Rejected Affiliates */}
+                {affiliates.filter(a => a.application_status === 'rejected').length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-black uppercase mb-4 text-destructive">
+                      Rejected Applications ({affiliates.filter(a => a.application_status === 'rejected').length})
+                    </h3>
+                    <div className="space-y-3">
+                      {affiliates.filter(a => a.application_status === 'rejected').map((affiliate) => (
+                        <Card key={affiliate.id} className="border border-destructive/20 bg-destructive/5">
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="text-base font-black mb-1">{affiliate.display_name}</h4>
+                                <p className="text-xs font-bold text-muted-foreground">{affiliate.email}</p>
+                              </div>
+                              <Badge className="bg-destructive text-white font-black uppercase text-xs">
+                                Rejected
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              Applied: {new Date(affiliate.applied_at).toLocaleDateString()}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
