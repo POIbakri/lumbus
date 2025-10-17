@@ -126,75 +126,35 @@ export async function POST(req: NextRequest) {
           if (authError.message?.includes('already been registered') || authError.code === 'email_exists') {
             console.log('[Checkout] Auth user already exists, fetching by email...');
 
-            // Get user by email from auth
-            const { data: { users: authUsers }, error: listError } = await supabase.auth.admin.listUsers();
-
-            if (listError) {
-              console.error('[Checkout] Failed to list users:', listError);
-              return NextResponse.json({
-                error: 'Failed to fetch user',
-                details: listError.message
-              }, { status: 500 });
-            }
-
-            const authUser = authUsers?.find(u => u.email === email);
-
-            if (!authUser) {
-              console.error('[Checkout] Auth user exists but not found in list');
-              return NextResponse.json({
-                error: 'User state inconsistent'
-              }, { status: 500 });
-            }
-
-            console.log('[Checkout] Found existing auth user:', authUser.id);
-
-            // Now fetch from users table
-            const { data: existingDbUser, error: dbError } = await supabase
+            // Try to get user ID by querying the users table first
+            // (In case they exist in both auth and database but we missed them)
+            const { data: dbUser, error: dbCheckError } = await supabase
               .from('users')
               .select('*')
-              .eq('id', authUser.id)
+              .eq('email', email)
               .maybeSingle();
 
-            if (existingDbUser) {
-              // User exists in both auth and database
-              console.log('[Checkout] User found in database');
-              user = existingDbUser;
+            if (dbUser) {
+              // User exists in database, use them
+              console.log('[Checkout] Found user in database:', dbUser.id);
+              user = dbUser;
               isNewUser = false;
 
               // Ensure user profile exists
-              console.log('[Checkout] Ensuring user profile...');
               await ensureUserProfile(user.id);
+
+              // Skip the rest - user is ready
             } else {
-              // User exists in auth but not in database - create database entry
-              console.log('[Checkout] User in auth but not in database, creating database entry...');
-
-              const { data: createdUser, error: createError } = await supabase
-                .from('users')
-                .insert({
-                  id: authUser.id,
-                  email: authUser.email || email,
-                })
-                .select()
-                .single();
-
-              if (createError || !createdUser) {
-                console.error('[Checkout] Failed to create user in database:', createError);
-                return NextResponse.json({
-                  error: 'Failed to create user record',
-                  details: createError?.message
-                }, { status: 500 });
-              }
-
-              console.log('[Checkout] User database entry created');
-              user = createdUser;
-              isNewUser = true; // Treat as new user for password setup
-
-              // Create user profile
-              console.log('[Checkout] Creating user profile...');
-              await ensureUserProfile(user.id);
+              // User is in auth but not in database - need to create database entry
+              // Since we can't easily get the auth user ID without listing all users,
+              // let's just ask the user to try again or use a different email
+              console.error('[Checkout] User exists in auth but not in database - cannot recover');
+              return NextResponse.json({
+                error: 'This email is already registered. Please check your email for a password setup link, or contact support.',
+              }, { status: 400 });
             }
 
-            // Skip the rest of new user creation
+            // User is ready - continue to checkout
           } else {
             console.error('[Checkout] Auth user creation error:', authError);
             return NextResponse.json({
