@@ -13,6 +13,23 @@ import { Order, Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
 
+// Format data amounts to clean values
+function formatDataAmount(dataGB: number): string {
+  if (dataGB >= 1) {
+    return `${dataGB} GB`;
+  }
+
+  const dataMB = dataGB * 1024;
+
+  // Round to nearest sensible value
+  if (dataMB <= 110) return '100 MB';
+  if (dataMB <= 250) return '200 MB';
+  if (dataMB <= 550) return '500 MB';
+
+  // For other values, round to nearest 50MB
+  return `${Math.round(dataMB / 50) * 50} MB`;
+}
+
 interface OrderWithPlan extends Order {
   plan: Plan;
 }
@@ -433,8 +450,9 @@ export default function DashboardPage() {
                   const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
                   const dataPercentage = totalDataBytes > 0 ? getDataPercentage(dataUsedBytes, totalDataBytes) : 0;
 
-                  // Format data display (MB vs GB)
+                  // Format data for display
                   const formatData = (gb: number) => {
+                    if (gb < 0.01) return '0 MB';
                     if (gb < 1) {
                       return `${Math.round(gb * 1024)} MB`;
                     }
@@ -442,9 +460,7 @@ export default function DashboardPage() {
                   };
 
                   const totalData = order.plan?.data_gb || 0;
-                  const totalDataFormatted = totalData < 1
-                    ? `${Math.round(totalData * 1024)} MB`
-                    : `${totalData} GB`;
+                  const totalDataFormatted = formatDataAmount(totalData);
 
                   return (
                     <Card
@@ -584,9 +600,7 @@ export default function DashboardPage() {
                     {pastOrders.map((order) => {
                       const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
                       const totalData = order.plan?.data_gb || 0;
-                      const totalDataFormatted = totalData < 1
-                        ? `${Math.round(totalData * 1024)} MB`
-                        : `${totalData} GB`;
+                      const totalDataFormatted = formatDataAmount(totalData);
 
                       return (
                         <div

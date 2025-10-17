@@ -6,6 +6,23 @@ import { Badge } from '@/components/ui/badge';
 import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
 
+// Format data amounts to clean values
+function formatDataAmount(dataGB: number): string {
+  if (dataGB >= 1) {
+    return `${dataGB} GB`;
+  }
+
+  const dataMB = dataGB * 1024;
+
+  // Round to nearest sensible value
+  if (dataMB <= 110) return '100 MB';
+  if (dataMB <= 250) return '200 MB';
+  if (dataMB <= 550) return '500 MB';
+
+  // For other values, round to nearest 50MB
+  return `${Math.round(dataMB / 50) * 50} MB`;
+}
+
 interface Order {
   id: string;
   status: string;
@@ -189,7 +206,7 @@ export default function AdminPage() {
                             <div className="pb-3 sm:pb-0 border-b sm:border-b-0 border-foreground/10">
                               <p className="font-black uppercase text-xs text-muted-foreground mb-2">Plan Details</p>
                               <div className="grid grid-cols-3 sm:grid-cols-1 gap-2 sm:gap-1 sm:space-y-1">
-                                <p className="text-xs sm:text-sm font-bold">💾 {order.plan?.data_gb} GB</p>
+                                <p className="text-xs sm:text-sm font-bold">💾 {formatDataAmount(order.plan?.data_gb || 0)}</p>
                                 <p className="text-xs sm:text-sm font-bold">⏰ {order.plan?.validity_days}d</p>
                                 <p className="text-xs sm:text-sm font-bold">💰 ${order.plan?.retail_price}</p>
                               </div>
