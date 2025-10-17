@@ -10,7 +10,20 @@ export async function GET(
 
     const { data: order, error } = await supabase
       .from('orders')
-      .select('id, status, qr_url, smdp, activation_code, created_at, plans(*)')
+      .select(`
+        id,
+        status,
+        qr_url,
+        smdp,
+        activation_code,
+        created_at,
+        plans (
+          name,
+          region_code,
+          data_gb,
+          validity_days
+        )
+      `)
       .eq('id', orderId)
       .single();
 
@@ -19,11 +32,16 @@ export async function GET(
     }
 
     // Sanitize response (never expose internal IDs, secrets, or full URLs)
-    // Supabase returns plans as an array when using select with relations
-    const planArray = order.plans as Plan[];
-    const plan = planArray?.[0] || null;
+    // Supabase returns plans as an object or array depending on relationship type
+    const plan = (Array.isArray(order.plans) ? order.plans[0] : order.plans) as Plan | null;
 
     console.log('[Order API] Order:', order.id, 'Plan data:', plan);
+
+    // Extract region from plan name (e.g., "Japan 5GB - 30 Days" -> "Japan")
+    const extractRegionFromName = (name: string): string => {
+      const match = name.match(/^([^0-9]+?)\s+\d+/);
+      return match ? match[1].trim() : name.split(' ')[0];
+    };
 
     return NextResponse.json({
       id: order.id,
@@ -33,7 +51,7 @@ export async function GET(
       activationCode: order.activation_code,
       plan: {
         name: plan?.name || 'Unknown Plan',
-        region: plan?.region_code || 'Unknown Region',
+        region: plan?.name ? extractRegionFromName(plan.name) : 'Unknown Region',
         dataGb: plan?.data_gb || 0,
         validityDays: plan?.validity_days || 0,
       },
