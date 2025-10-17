@@ -343,6 +343,104 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Handle payment_intent.succeeded (for mobile Payment Sheet)
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      const orderId = paymentIntent.metadata?.orderId;
+      const needsPasswordSetup = paymentIntent.metadata?.needsPasswordSetup === 'true';
+      const userEmail = paymentIntent.metadata?.userEmail;
+      const source = paymentIntent.metadata?.source;
+
+      if (!orderId) {
+        console.error('[Webhook] No orderId in payment intent metadata');
+        return NextResponse.json({ error: 'No orderId' }, { status: 400 });
+      }
+
+      console.log(`[Webhook] Processing mobile payment for order: ${orderId}`);
+
+      // Get order details first
+      const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('*, plans(*), users(*)')
+        .eq('id', orderId)
+        .single();
+
+      if (!existingOrder) {
+        console.error('[Webhook] Order not found:', orderId);
+        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      }
+
+      // Update order status to paid
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .update({
+          status: 'paid',
+          paid_at: new Date().toISOString(),
+        })
+        .eq('id', orderId)
+        .select('*, plans(*), users(*)')
+        .single();
+
+      if (orderError || !order) {
+        console.error('[Webhook] Failed to update order:', orderError);
+        return NextResponse.json({ error: 'Order update failed' }, { status: 500 });
+      }
+
+      // Send password setup email for new users
+      if (needsPasswordSetup && userEmail) {
+        console.log('[Webhook] Sending password setup email to new mobile user:', userEmail);
+        try {
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(userEmail, {
+            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+          });
+
+          if (resetError) {
+            console.error('[Webhook] Failed to send password setup email:', resetError);
+          } else {
+            console.log('[Webhook] Password setup email sent successfully');
+          }
+        } catch (error) {
+          console.error('[Webhook] Error sending password setup email:', error);
+        }
+      }
+
+      try {
+        // Get plan and user data
+        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+        const user = Array.isArray(order.users) ? order.users[0] : order.users;
+
+        if (!plan || !user) {
+          throw new Error('Plan or user data missing from order');
+        }
+
+        // Assign new eSIM via eSIM Access API
+        console.log('[Webhook] Assigning eSIM for mobile order...');
+        const esimResponse = await assignEsim({
+          packageId: plan.supplier_sku,
+          email: user.email,
+          reference: orderId,
+        });
+
+        // Update order with initial eSIM details
+        await supabase
+          .from('orders')
+          .update({
+            status: 'provisioning',
+            connect_order_id: esimResponse.orderId,
+            iccid: esimResponse.iccid || null,
+          })
+          .eq('id', orderId);
+
+        console.log('[Webhook] eSIM Access order created for mobile:', esimResponse.orderId);
+      } catch (error) {
+        console.error('[Webhook] Failed to assign eSIM for mobile order:', error);
+        await supabase
+          .from('orders')
+          .update({ status: 'failed' })
+          .eq('id', orderId);
+      }
+    }
+
     // Handle charge.refunded
     if (event.type === 'charge.refunded') {
       const charge = event.data.object as Stripe.Charge;
