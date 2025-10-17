@@ -31,7 +31,10 @@ const checkoutSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    console.log('[Checkout] Starting checkout session...');
     const body = await req.json();
+    console.log('[Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
+
     const { planId, email, isTopUp, existingOrderId, iccid } = checkoutSchema.parse(body);
 
     // Get cookies for attribution
@@ -46,6 +49,7 @@ export async function POST(req: NextRequest) {
     const userAgent = req.headers.get('user-agent') || '';
 
     // Get plan details
+    console.log('[Checkout] Fetching plan:', planId);
     const { data: plan, error: planError } = await supabase
       .from('plans')
       .select('*')
@@ -54,10 +58,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (planError || !plan) {
+      console.error('[Checkout] Plan not found:', planError);
       return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
     }
+    console.log('[Checkout] Plan found:', plan.name);
 
     // Get or create user (for top-ups, get from existing order)
+    console.log('[Checkout] Getting/creating user...');
     let user;
     if (isTopUp && existingOrderId) {
       // For top-ups, get user from existing order
@@ -102,6 +109,7 @@ export async function POST(req: NextRequest) {
       // Ensure user profile exists (creates ref_code if new user)
       await ensureUserProfile(user.id);
     }
+    console.log('[Checkout] User ready:', user.id);
 
     // Check if user was referred and is eligible for 10% discount (first order only)
     // Top-ups never get discounts
@@ -128,6 +136,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Detect user's currency based on their location
+    console.log('[Checkout] Detecting currency...');
     const detectedCountry = detectCountryFromRequest(req.headers);
     const userCurrency = getCurrencyForCheckout(req.headers);
 
@@ -138,9 +147,10 @@ export async function POST(req: NextRequest) {
     // Convert to user's currency for Stripe
     const stripeAmount = convertToStripeAmount(finalPriceUSD, userCurrency);
 
-    console.log(`Checkout: Country=${detectedCountry}, Currency=${userCurrency}, USD=${finalPriceUSD}, Converted=${stripeAmount}`);
+    console.log(`[Checkout] Pricing: Country=${detectedCountry}, Currency=${userCurrency}, USD=${finalPriceUSD}, Converted=${stripeAmount}`);
 
     // Create pending order
+    console.log('[Checkout] Creating order in database...');
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -152,10 +162,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (orderError || !order) {
+      console.error('[Checkout] Failed to create order:', orderError);
       return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
     }
+    console.log('[Checkout] Order created:', order.id);
 
     // Create Stripe Checkout Session with user's local currency
+    console.log('[Checkout] Creating Stripe session...');
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';
     const lineItems = [
       {
@@ -175,6 +188,7 @@ export async function POST(req: NextRequest) {
       ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
       : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`;
 
+    console.log('[Checkout] Calling Stripe API...');
     const session = await getStripeClient().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
@@ -216,12 +230,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log('[Checkout] Stripe session created:', session.id);
+
     // Update order with Stripe session ID
     await supabase
       .from('orders')
       .update({ stripe_session_id: session.id })
       .eq('id', order.id);
 
+    console.log('[Checkout] Success! Redirecting to:', session.url);
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,

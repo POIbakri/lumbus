@@ -77,34 +77,52 @@ export async function generateUniqueSlug(baseName: string, maxAttempts = 10): Pr
  * Get or create user profile with ref_code
  */
 export async function ensureUserProfile(userId: string): Promise<UserProfile> {
-  // Try to get existing profile
-  const { data: existing } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
+  try {
+    console.log('[ensureUserProfile] Checking profile for user:', userId);
 
-  if (existing) {
-    return existing as UserProfile;
+    // Try to get existing profile
+    const { data: existing, error: fetchError } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // PGRST116 is "not found", which is fine - we'll create one
+      console.error('[ensureUserProfile] Error fetching profile:', fetchError);
+    }
+
+    if (existing) {
+      console.log('[ensureUserProfile] Profile exists:', existing.ref_code);
+      return existing as UserProfile;
+    }
+
+    // Create new profile with unique ref_code
+    console.log('[ensureUserProfile] Generating ref code...');
+    const refCode = await generateUniqueRefCode();
+    console.log('[ensureUserProfile] Generated ref code:', refCode);
+
+    console.log('[ensureUserProfile] Creating profile...');
+    const { data: newProfile, error } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: userId,
+        ref_code: refCode,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[ensureUserProfile] Insert error:', error);
+      throw new Error(`Failed to create user profile: ${error.message}`);
+    }
+
+    console.log('[ensureUserProfile] Profile created successfully');
+    return newProfile as UserProfile;
+  } catch (error) {
+    console.error('[ensureUserProfile] Unexpected error:', error);
+    throw error;
   }
-
-  // Create new profile with unique ref_code
-  const refCode = await generateUniqueRefCode();
-
-  const { data: newProfile, error } = await supabase
-    .from('user_profiles')
-    .insert({
-      id: userId,
-      ref_code: refCode,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to create user profile: ${error.message}`);
-  }
-
-  return newProfile as UserProfile;
 }
 
 /**
