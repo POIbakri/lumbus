@@ -202,15 +202,29 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     // Fetch full activation details from eSIM Access
     const orderDetails = await getOrderStatus(content.orderNo);
 
-    if (!orderDetails || !orderDetails.detailList || orderDetails.detailList.length === 0) {
-      console.error('No activation details returned from eSIM Access');
+    console.log('[ORDER_STATUS] Got order details:', JSON.stringify(orderDetails));
+
+    if (!orderDetails || !orderDetails.esimList || orderDetails.esimList.length === 0) {
+      console.error('[ORDER_STATUS] No activation details returned from eSIM Access');
       return;
     }
 
-    const firstProfile = orderDetails.detailList[0];
+    const firstProfile = orderDetails.esimList[0];
 
-    // Extract SM-DP+ address safely
-    const smdpAddress = extractSmdpAddress(firstProfile.confirmationCode);
+    // The 'ac' field contains the full LPA string: LPA:1$smdp.address$activation-code
+    const lpaString = firstProfile.ac;
+    const smdpAddress = extractSmdpAddress(lpaString);
+
+    // Extract activation code from LPA string
+    const parts = lpaString.split('$');
+    const activationCode = parts.length >= 3 ? parts[2] : '';
+
+    console.log('[ORDER_STATUS] Extracted details:', {
+      iccid: firstProfile.iccid,
+      smdpAddress,
+      activationCode,
+      lpaString,
+    });
 
     // Update order with activation details
     await supabase
@@ -220,16 +234,15 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         iccid: firstProfile.iccid,
         esim_tran_no: firstProfile.esimTranNo,
         smdp: smdpAddress,
-        activation_code: firstProfile.activationCode,
-        qr_url: firstProfile.qrUrl || null,
+        activation_code: activationCode,
+        qr_url: firstProfile.qrCodeUrl || firstProfile.shortUrl || null,
       })
       .eq('id', order.id);
 
-    console.log('eSIM order updated with activation details:', content.orderNo);
+    console.log('[ORDER_STATUS] eSIM order updated with activation details:', content.orderNo);
 
     // Send confirmation email
-    if (firstProfile.activationCode && smdpAddress) {
-      const lpaString = buildLpaString(smdpAddress, firstProfile.activationCode);
+    if (activationCode && smdpAddress) {
       const installUrl = `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}`;
 
       // Get plan and user data separately (avoid joins)
@@ -255,18 +268,18 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
           },
           activationDetails: {
             smdp: smdpAddress,
-            activationCode: firstProfile.activationCode,
-            qrUrl: firstProfile.qrUrl || '',
+            activationCode: activationCode,
+            qrUrl: firstProfile.qrCodeUrl || firstProfile.shortUrl || '',
             lpaString: lpaString,
           },
           installUrl: installUrl,
         });
 
-        console.log('Confirmation email sent to:', user.email);
+        console.log('[ORDER_STATUS] Confirmation email sent to:', user.email);
       }
     }
   } catch (error) {
-    console.error('Error handling ORDER_STATUS webhook:', error);
+    console.error('[ORDER_STATUS] Error handling webhook:', error);
   }
 }
 

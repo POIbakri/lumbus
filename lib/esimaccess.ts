@@ -359,17 +359,43 @@ export async function assignEsim(
  * to get activation codes and QR URL
  */
 export async function getOrderStatus(orderNo: string): Promise<{
-  orderNo: string;
-  orderStatus: string;
-  detailList: Array<{
+  esimList: Array<{
     esimTranNo: string;
+    orderNo: string;
+    transactionId?: string;
     iccid: string;
     eid?: string;
-    activationCode: string;
-    confirmationCode: string;
-    qrUrl?: string;
-    status?: string;
+    ac: string; // Activation code (LPA string)
+    qrCodeUrl?: string;
+    shortUrl?: string;
+    smdpStatus?: string;
+    esimStatus: string;
+    msisdn?: string;
+    pin?: string;
+    puk?: string;
+    apn?: string;
+    activateTime?: string | null;
+    expiredTime?: string;
+    installationTime?: string | null;
+    totalVolume?: number;
+    totalDuration?: number;
+    durationUnit?: string;
+    orderUsage?: number;
+    packageList?: Array<{
+      packageName: string;
+      packageCode: string;
+      slug?: string;
+      duration: number;
+      volume: number;
+      locationCode: string;
+      createTime: string;
+    }>;
   }>;
+  pager?: {
+    pageSize: number;
+    pageNum: number;
+    total: number;
+  };
 }> {
   try {
     const data = await makeEsimAccessRequest<any>('/esim/query', {
