@@ -61,6 +61,38 @@ export interface SendTopUpConfirmationParams {
   iccid: string;
 }
 
+export interface SendAffiliateApplicationParams {
+  applicantEmail: string;
+  displayName: string;
+  website?: string;
+}
+
+export interface SendAffiliateApprovedParams {
+  to: string;
+  displayName: string;
+  slug: string;
+  commissionRate: number;
+}
+
+export interface SendAffiliateRejectedParams {
+  to: string;
+  displayName: string;
+  reason?: string;
+}
+
+export interface SendAdminNewAffiliateApplicationParams {
+  adminEmail: string;
+  applicant: {
+    displayName: string;
+    email: string;
+    website?: string;
+    audienceDescription: string;
+    trafficSources: string;
+    promotionalMethods: string;
+  };
+  applicationId: string;
+}
+
 export async function sendOrderConfirmationEmail(params: SendOrderConfirmationParams) {
   const { to, orderDetails, activationDetails, installUrl } = params;
 
@@ -897,6 +929,622 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     return data;
   } catch (error) {
     console.error('Failed to send top-up confirmation email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send affiliate application confirmation to applicant
+ */
+export async function sendAffiliateApplicationEmail(params: SendAffiliateApplicationParams) {
+  const { applicantEmail, displayName, website } = params;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      to: [applicantEmail],
+      subject: 'Application Received - Lumbus Affiliate Program',
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Received - Lumbus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        @media screen and (max-width: 600px) {
+            .mobile-padding { padding: 20px !important; }
+            .mobile-center { text-align: center !important; }
+            .container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px 60px;">
+                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">Application Received!</h2>
+
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                Hi ${displayName}! 👋
+                            </p>
+
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                Thank you for applying to the Lumbus Affiliate Program! We've received your application and will review it within 1-2 business days.
+                            </p>
+
+                            <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+                                <p style="margin: 0 0 10px; font-size: 14px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">Application Details</p>
+                                <p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                    <strong>Name/Brand:</strong> ${displayName}
+                                </p>
+                                ${website ? `<p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                    <strong>Website:</strong> ${website}
+                                </p>` : ''}
+                                <p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                    <strong>Email:</strong> ${applicantEmail}
+                                </p>
+                            </div>
+
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1d1d1f; text-align: center;">
+                                    What Happens Next?
+                                </h3>
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0 0 15px;">
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">1</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">We'll review your application within 1-2 business days</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0 0 15px;">
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">2</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">You'll receive an email with our decision</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">3</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">If approved, you'll get access to your affiliate dashboard</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                            © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send affiliate application email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send affiliate approved notification
+ */
+export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedParams) {
+  const { to, displayName, slug, commissionRate } = params;
+  const affiliateLink = `${process.env.NEXT_PUBLIC_APP_URL}/a/${slug}`;
+  const dashboardLink = `${process.env.NEXT_PUBLIC_APP_URL}/affiliate`;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      to: [to],
+      subject: '🎉 Welcome to Lumbus Affiliate Program - Application Approved!',
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Approved - Lumbus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        @media screen and (max-width: 600px) {
+            .mobile-padding { padding: 20px !important; }
+            .mobile-center { text-align: center !important; }
+            .container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px 60px;">
+                            <h2 style="margin: 0 0 20px; font-size: 32px; font-weight: 600; color: #1d1d1f; text-align: center;">🎉 You're Approved!</h2>
+
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                Congratulations ${displayName}! We're excited to welcome you to the Lumbus Affiliate Program.
+                            </p>
+
+                            <div style="margin: 0 0 30px; padding: 25px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+                                <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-align: center;">Your Affiliate Details</h3>
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                            <strong>Commission Rate:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
+                                            ${commissionRate}%
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                            <strong>Cookie Duration:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
+                                            90 Days
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                            <strong>Your Slug:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
+                                            ${slug}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div style="margin: 0 0 30px; padding: 20px; background-color: #FFF; border-radius: 12px; border: 2px solid #e5e5e7;">
+                                <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                                    Your Affiliate Link
+                                </p>
+                                <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; word-break: break-all;">
+                                    ${affiliateLink}
+                                </p>
+                            </div>
+
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 0 0 30px;">
+                                        <a href="${dashboardLink}" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.05);">
+                                            Go to Dashboard
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1d1d1f; text-align: center;">
+                                    Get Started
+                                </h3>
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 0 0 15px;">
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Copy your affiliate link and share it on your platforms</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 0 0 15px;">
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Track your performance in real-time from your dashboard</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table border="0" cellspacing="0" cellpadding="0">
+                                                <tr>
+                                                    <td style="width: 24px; vertical-align: top;">
+                                                        <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
+                                                    </td>
+                                                    <td style="padding-left: 10px;">
+                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Earn ${commissionRate}% commission on every sale</p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                            © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send affiliate approved email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send affiliate rejected notification
+ */
+export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedParams) {
+  const { to, displayName, reason } = params;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      to: [to],
+      subject: 'Update on Your Affiliate Application - Lumbus',
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Update - Lumbus</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        @media screen and (max-width: 600px) {
+            .mobile-padding { padding: 20px !important; }
+            .mobile-center { text-align: center !important; }
+            .container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table class="container" border="0" cellspacing="0" cellpadding="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px 60px;">
+                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">Application Update</h2>
+
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                Hi ${displayName},
+                            </p>
+
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                Thank you for your interest in the Lumbus Affiliate Program. After careful review, we're unable to approve your application at this time.
+                            </p>
+
+                            ${reason ? `<div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+                                <p style="margin: 0 0 10px; font-size: 14px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">Reason</p>
+                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6;">
+                                    ${reason}
+                                </p>
+                            </div>` : ''}
+
+                            <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                We appreciate your interest and encourage you to reapply in the future as your audience grows.
+                            </p>
+
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+                                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                                    You can still enjoy Lumbus eSIMs for your own travels! Check out our plans at <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" style="color: #2EFECC; font-weight: 700; text-decoration: none;">lumbus.com/plans</a>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                            © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send affiliate rejected email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send admin notification about new affiliate application
+ */
+export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNewAffiliateApplicationParams) {
+  const { adminEmail, applicant, applicationId } = params;
+  const reviewLink = `${process.env.NEXT_PUBLIC_APP_URL}/admin`;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      to: [adminEmail],
+      subject: `🆕 New Affiliate Application - ${applicant.displayName}`,
+      html: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Affiliate Application - Lumbus Admin</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        @media screen and (max-width: 600px) {
+            .mobile-padding { padding: 20px !important; }
+            .container { width: 100% !important; max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                    <tr>
+                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus Admin</h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: #FFFFFF; font-weight: 600;">New Affiliate Application</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mobile-padding" style="padding: 40px 60px;">
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #1d1d1f;">New Application Received</h2>
+
+                            <div style="margin: 0 0 25px; padding: 20px; background-color: #F3F4F6; border-radius: 12px;">
+                                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666;">
+                                            <strong>Name/Brand:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right;">
+                                            ${applicant.displayName}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666;">
+                                            <strong>Email:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right;">
+                                            ${applicant.email}
+                                        </td>
+                                    </tr>
+                                    ${applicant.website ? `<tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666;">
+                                            <strong>Website:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; word-break: break-all;">
+                                            <a href="${applicant.website}" style="color: #3B82F6; text-decoration: none;">${applicant.website}</a>
+                                        </td>
+                                    </tr>` : ''}
+                                    <tr>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666;">
+                                            <strong>Application ID:</strong>
+                                        </td>
+                                        <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-family: monospace;">
+                                            ${applicationId.substring(0, 8)}...
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div style="margin: 0 0 20px;">
+                                <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Audience Description:</p>
+                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                    ${applicant.audienceDescription}
+                                </p>
+                            </div>
+
+                            <div style="margin: 0 0 20px;">
+                                <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Traffic Sources:</p>
+                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                    ${applicant.trafficSources}
+                                </p>
+                            </div>
+
+                            <div style="margin: 0 0 30px;">
+                                <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Promotional Methods:</p>
+                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                    ${applicant.promotionalMethods}
+                                </p>
+                            </div>
+
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 0 0 20px;">
+                                        <a href="${reviewLink}" style="display: inline-block; padding: 16px 40px; background: #8B5CF6; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.4);">
+                                            Review in Admin Panel
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 20px; background-color: #F9FAFB; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #666666;">
+                                © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send admin notification email:', error);
     throw error;
   }
 }

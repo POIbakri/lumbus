@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Nav } from '@/components/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AffiliateSignupForm } from '@/components/affiliate-signup-form';
 
 export default function AffiliateProgramPage() {
   return (
@@ -25,7 +26,7 @@ export default function AffiliateProgramPage() {
             Earn 12% commission on every sale you refer.<br className="hidden sm:inline"/>
             Help travelers stay connected worldwide and get paid for it.
           </p>
-          <a href="mailto:partners@lumbus.com?subject=Affiliate%20Program%20Application">
+          <a href="#apply-form">
             <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl shadow-2xl">
               APPLY NOW
             </Button>
@@ -99,7 +100,7 @@ export default function AffiliateProgramPage() {
               <div className="flex-1">
                 <h3 className="text-xl sm:text-2xl font-black uppercase mb-2">APPLY TO JOIN</h3>
                 <p className="text-base sm:text-lg font-bold text-foreground/70">
-                  Send us an email at <a href="mailto:partners@lumbus.com" className="text-primary underline">partners@lumbus.com</a> with info about your audience, traffic sources, and promotional methods. We'll review and get back to you within 1-2 business days.
+                  Fill out the application form below with info about your audience, traffic sources, and promotional methods. We'll review and get back to you within 1-2 business days.
                 </p>
               </div>
             </div>
@@ -140,6 +141,13 @@ export default function AffiliateProgramPage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Application Form Section */}
+      <section id="apply-form" className="py-16 sm:py-20 px-4 bg-white scroll-mt-24">
+        <div className="container mx-auto max-w-3xl">
+          <AffiliateSignupForm />
         </div>
       </section>
 
@@ -262,7 +270,7 @@ export default function AffiliateProgramPage() {
             Join hundreds of partners earning commission by helping travelers stay connected
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <a href="mailto:partners@lumbus.com?subject=Affiliate%20Program%20Application">
+            <a href="#apply-form">
               <Button className="w-full sm:w-auto bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-16 py-6 rounded-lg shadow-2xl">
                 APPLY NOW
               </Button>

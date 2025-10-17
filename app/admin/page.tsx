@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
 
@@ -41,14 +42,41 @@ interface Order {
   } | null;
 }
 
+interface Affiliate {
+  id: string;
+  display_name: string;
+  email: string;
+  website: string | null;
+  audience_description: string;
+  traffic_sources: string;
+  promotional_methods: string;
+  slug: string;
+  commission_value: number;
+  application_status: string;
+  applied_at: string;
+}
+
 export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    loadOrders();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      await Promise.all([loadOrders(), loadAffiliates()]);
+    } catch (err) {
+      setError('Failed to load data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadOrders = async () => {
     try {
@@ -65,8 +93,72 @@ export default function AdminPage() {
       setOrders(data);
     } catch (err) {
       setError('Failed to load orders');
+    }
+  };
+
+  const loadAffiliates = async () => {
+    try {
+      const response = await fetch('/api/admin/affiliates');
+      if (response.status === 401) {
+        setError('Authentication required');
+        return;
+      }
+      if (!response.ok) {
+        throw new Error('Failed to load affiliates');
+      }
+      const data = await response.json();
+      setAffiliates(data);
+    } catch (err) {
+      setError('Failed to load affiliates');
+    }
+  };
+
+  const handleApprove = async (affiliateId: string) => {
+    setActionLoading(affiliateId);
+    try {
+      const response = await fetch(`/api/affiliates/${affiliateId}/approve`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to approve affiliate');
+      }
+      // Reload affiliates
+      await loadAffiliates();
+    } catch (err) {
+      alert('Failed to approve affiliate');
     } finally {
-      setLoading(false);
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (affiliateId: string) => {
+    const reason = rejectionReason[affiliateId];
+    if (!reason || !confirm('Are you sure you want to reject this affiliate application?')) {
+      return;
+    }
+
+    setActionLoading(affiliateId);
+    try {
+      const response = await fetch(`/api/affiliates/${affiliateId}/reject`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to reject affiliate');
+      }
+      // Reload affiliates
+      await loadAffiliates();
+      // Clear rejection reason
+      setRejectionReason((prev) => {
+        const newState = { ...prev };
+        delete newState[affiliateId];
+        return newState;
+      });
+    } catch (err) {
+      alert('Failed to reject affiliate');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -161,6 +253,120 @@ export default function AdminPage() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Pending Affiliates Section */}
+          {affiliates.length > 0 && (
+            <Card className="border-2 sm:border-4 border-secondary shadow-xl mb-6 sm:mb-8">
+              <CardHeader className="bg-yellow p-4 sm:p-6">
+                <CardTitle className="text-xl sm:text-2xl font-black uppercase">
+                  Pending Affiliate Applications ({affiliates.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-4 md:p-6">
+                <div className="space-y-4">
+                  {affiliates.map((affiliate) => (
+                    <Card key={affiliate.id} className="border-2 border-foreground/10">
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="space-y-4">
+                          {/* Header */}
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                            <div className="flex-1">
+                              <h3 className="text-xl sm:text-2xl font-black mb-1">{affiliate.display_name}</h3>
+                              <p className="text-sm font-bold text-muted-foreground">{affiliate.email}</p>
+                              {affiliate.website && (
+                                <a
+                                  href={affiliate.website}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-bold text-primary hover:underline"
+                                >
+                                  🔗 {affiliate.website}
+                                </a>
+                              )}
+                            </div>
+                            <div className="text-sm font-bold text-muted-foreground">
+                              Applied: {new Date(affiliate.applied_at).toLocaleDateString()}
+                            </div>
+                          </div>
+
+                          {/* Application Details */}
+                          <div className="grid sm:grid-cols-3 gap-4 bg-foreground/5 p-4 rounded-lg">
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-2">Slug</p>
+                              <p className="text-sm font-bold break-all">{affiliate.slug}</p>
+                            </div>
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-2">Commission</p>
+                              <p className="text-sm font-bold">{affiliate.commission_value}%</p>
+                            </div>
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-2">Status</p>
+                              <Badge className="bg-purple text-white font-black uppercase text-xs">
+                                {affiliate.application_status}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {/* Audience & Marketing Info */}
+                          <div className="space-y-3">
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-1">Audience Description</p>
+                              <p className="text-sm font-bold">{affiliate.audience_description}</p>
+                            </div>
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-1">Traffic Sources</p>
+                              <p className="text-sm font-bold">{affiliate.traffic_sources}</p>
+                            </div>
+                            <div>
+                              <p className="font-black uppercase text-xs text-muted-foreground mb-1">Promotional Methods</p>
+                              <p className="text-sm font-bold">{affiliate.promotional_methods}</p>
+                            </div>
+                          </div>
+
+                          {/* Rejection Reason Input */}
+                          <div className="border-t border-foreground/10 pt-4">
+                            <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                              Rejection Reason (required to reject)
+                            </label>
+                            <textarea
+                              className="w-full border-2 border-foreground/10 rounded-lg p-3 text-sm font-bold focus:border-primary focus:outline-none"
+                              rows={2}
+                              placeholder="Enter reason for rejection..."
+                              value={rejectionReason[affiliate.id] || ''}
+                              onChange={(e) =>
+                                setRejectionReason((prev) => ({
+                                  ...prev,
+                                  [affiliate.id]: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <Button
+                              onClick={() => handleApprove(affiliate.id)}
+                              disabled={actionLoading === affiliate.id}
+                              className="flex-1 bg-primary text-foreground hover:bg-primary/90 font-black uppercase"
+                            >
+                              {actionLoading === affiliate.id ? 'Processing...' : '✓ Approve'}
+                            </Button>
+                            <Button
+                              onClick={() => handleReject(affiliate.id)}
+                              disabled={actionLoading === affiliate.id || !rejectionReason[affiliate.id]}
+                              className="flex-1 bg-destructive text-white hover:bg-destructive/90 font-black uppercase"
+                            >
+                              {actionLoading === affiliate.id ? 'Processing...' : '✗ Reject'}
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="border-2 sm:border-4 border-primary shadow-xl">
             <CardHeader className="bg-mint p-4 sm:p-6">

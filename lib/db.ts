@@ -72,6 +72,8 @@ export interface Order {
   updated_at?: string;
 }
 
+export type AffiliateApplicationStatus = 'pending' | 'approved' | 'rejected';
+
 export interface Affiliate {
   id: string;
   user_id: string | null;
@@ -81,6 +83,16 @@ export interface Affiliate {
   commission_value: number;
   is_active: boolean;
   notes: string | null;
+  email: string | null;
+  website: string | null;
+  audience_description: string | null;
+  traffic_sources: string | null;
+  promotional_methods: string | null;
+  application_status: AffiliateApplicationStatus;
+  applied_at: string;
+  approved_at: string | null;
+  rejected_at: string | null;
+  rejection_reason: string | null;
   created_at: string;
   updated_at: string;
 }
