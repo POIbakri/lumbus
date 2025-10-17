@@ -339,6 +339,110 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Checkout] Order created:', order.id);
 
+    // Handle 100% discount - bypass Stripe entirely
+    if (finalPriceUSD === 0 && applyDiscount && discountPercent === 100) {
+      console.log('[Checkout] 100% discount detected - bypassing Stripe');
+
+      // Mark order as paid with $0
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          status: 'paid',
+          total_price: 0,
+        })
+        .eq('id', order.id);
+
+      if (updateError) {
+        console.error('[Checkout] Failed to update order:', updateError);
+        return NextResponse.json({ error: 'Failed to process free order' }, { status: 500 });
+      }
+
+      // Record discount code usage
+      if (discountCodeId && discountSource === 'code') {
+        console.log('[Checkout] Recording 100% discount code usage');
+        const { error: usageError } = await supabase
+          .from('discount_code_usage')
+          .insert({
+            discount_code_id: discountCodeId,
+            order_id: order.id,
+            user_id: user.id,
+            discount_percent: 100,
+            original_price_usd: basePriceUSD,
+            discount_amount_usd: basePriceUSD,
+            final_price_usd: 0,
+          });
+
+        if (usageError) {
+          console.error('[Checkout] Failed to record discount usage:', usageError);
+        }
+      }
+
+      // Trigger eSIM provisioning
+      const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/stripe/webhook`;
+      console.log('[Checkout] Triggering eSIM provisioning for free order');
+
+      // Call webhook handler directly (simulating successful payment)
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-free-order': 'true', // Special header to identify internal call
+          },
+          body: JSON.stringify({
+            type: 'checkout.session.completed',
+            data: {
+              object: {
+                id: 'free_' + order.id,
+                customer_email: user.email,
+                amount_total: 0,
+                currency: userCurrency.toLowerCase(),
+                payment_status: 'paid',
+                metadata: {
+                  orderId: order.id,
+                  planId: planId,
+                  userId: user.id,
+                  userEmail: user.email,
+                  needsPasswordSetup: isNewUser ? 'true' : 'false',
+                  afid: afid || '',
+                  rfcd: rfcd || '',
+                  sessionId: sid || '',
+                  ipAddress: ipAddress || '',
+                  userAgent: userAgent || '',
+                  discountApplied: 'true',
+                  discountPercent: '100',
+                  discountSource: discountSource || '',
+                  discountCodeId: discountCodeId || '',
+                  discountCode: discountCode || '',
+                  isTopUp: isTopUp ? 'true' : 'false',
+                  existingOrderId: existingOrderId || '',
+                  iccid: iccid || '',
+                  detectedCountry: detectedCountry,
+                  currency: userCurrency,
+                  basePriceUSD: basePriceUSD.toString(),
+                  finalPriceUSD: '0',
+                },
+              },
+            },
+          }),
+        });
+      } catch (webhookError) {
+        console.error('[Checkout] Failed to trigger provisioning:', webhookError);
+      }
+
+      // Return success URL directly (no Stripe session)
+      const successUrl = isTopUp
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
+        : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?free=true`;
+
+      console.log('[Checkout] Free order success! Redirecting to:', successUrl);
+      return NextResponse.json({
+        sessionId: 'free_' + order.id,
+        url: successUrl,
+        isFree: true,
+      });
+    }
+
     // Create Stripe Checkout Session with user's local currency
     console.log('[Checkout] Creating Stripe session...');
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';

@@ -132,8 +132,17 @@ export default function PlanDetailPage() {
         throw new Error(errorData.error || 'Failed to create checkout session');
       }
 
-      const { url } = await response.json();
-      window.location.href = url;
+      const data = await response.json();
+
+      // Check if this is a free order (100% discount)
+      if (data.isFree) {
+        // For free orders, redirect directly to success page
+        triggerHaptic('success');
+        window.location.href = data.url;
+      } else {
+        // For paid orders, redirect to Stripe checkout
+        window.location.href = data.url;
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start checkout. Please try again.');
       setLoading(false);
