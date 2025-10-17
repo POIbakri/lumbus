@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
     const paymentIntent = await getStripeClient().paymentIntents.create({
       amount: amount,
       currency: currency.toLowerCase(),
-      customer_email: user.email,
+      receipt_email: user.email,
       metadata: {
         orderId: order.id,
         planId: planId,

@@ -65,10 +65,34 @@ function PlansPageContent() {
   const loadPlans = async () => {
     setLoading(true);
     try {
+      // Try to load from cache first
+      const cachedData = localStorage.getItem('lumbus_plans_cache');
+      const cacheTime = localStorage.getItem('lumbus_plans_cache_time');
+      const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+
+      if (cachedData && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < cacheExpiry) {
+          // Use cached data
+          const fetchedPlans = JSON.parse(cachedData);
+          setPlans(fetchedPlans);
+          if (fetchedPlans.length > 0) {
+            await convertAllPrices(fetchedPlans);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fetch fresh data
       const response = await fetch('/api/plans');
       const data = await response.json();
       const fetchedPlans = data.plans || [];
       setPlans(fetchedPlans);
+
+      // Cache the data
+      localStorage.setItem('lumbus_plans_cache', JSON.stringify(fetchedPlans));
+      localStorage.setItem('lumbus_plans_cache_time', Date.now().toString());
 
       // Convert all prices at once
       if (fetchedPlans.length > 0) {

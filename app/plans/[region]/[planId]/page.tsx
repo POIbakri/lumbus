@@ -48,7 +48,40 @@ export default function PlanDetailPage() {
     try {
       setPlanLoading(true);
 
-      // Fetch plan from API
+      // Try to load from cache first
+      const cacheKey = `lumbus_plan_${params.planId}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+      const cacheExpiry = 10 * 60 * 1000; // 10 minutes
+
+      if (cachedData && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < cacheExpiry) {
+          // Use cached data
+          const cachedPlan = JSON.parse(cachedData);
+          setPlan(cachedPlan);
+
+          // Convert currency
+          const currencyResponse = await fetch('/api/currency/detect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prices: [cachedPlan.retail_price] }),
+          });
+
+          if (currencyResponse.ok) {
+            const currencyData = await currencyResponse.json();
+            setCurrencySymbol(currencyData.symbol);
+            if (currencyData.prices[0]) {
+              setConvertedPrice(currencyData.prices[0].converted);
+            }
+          }
+
+          setPlanLoading(false);
+          return;
+        }
+      }
+
+      // Fetch fresh plan from API
       const response = await fetch(`/api/plans/${params.planId}`);
       if (!response.ok) {
         setPlan(null);
@@ -57,6 +90,10 @@ export default function PlanDetailPage() {
 
       const data = await response.json();
       setPlan(data.plan);
+
+      // Cache the plan data
+      localStorage.setItem(cacheKey, JSON.stringify(data.plan));
+      localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
 
       // Convert currency
       const currencyResponse = await fetch('/api/currency/detect', {

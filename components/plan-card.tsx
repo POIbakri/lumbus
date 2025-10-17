@@ -57,20 +57,20 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
           </Badge>
         </div>
 
-        {/* Country name and price */}
-        <div className="flex justify-between items-start gap-2">
-          <div className="text-xs sm:text-sm font-bold text-foreground/70 line-clamp-1">
-            {countryInfo.name}
-          </div>
-          <div className="text-right shrink-0">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-black text-foreground leading-none">
-              {symbol}{price.toFixed(2)}
-            </div>
+        {/* Country name */}
+        <div className="text-xs sm:text-sm font-bold text-foreground/70 line-clamp-2 mb-2">
+          {countryInfo.name}
+        </div>
+
+        {/* Price - always on its own line */}
+        <div className="mb-2">
+          <div className="text-2xl sm:text-3xl font-black text-foreground leading-none break-all">
+            {symbol}{price.toFixed(2)}
           </div>
         </div>
 
         {/* Plan name */}
-        <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase leading-tight tracking-tight mt-3">
+        <h3 className="text-base sm:text-lg font-black uppercase leading-tight tracking-tight line-clamp-2">
           {plan.name}
         </h3>
       </CardHeader>

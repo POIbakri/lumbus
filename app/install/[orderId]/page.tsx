@@ -154,12 +154,12 @@ export default function InstallPage() {
             <p className="text-base sm:text-lg md:text-xl font-bold mb-4">
               Connected via Lumbus — Expires in {order.plan.validityDays} days
             </p>
-            <div className="mt-6 p-4 bg-mint border-2 border-primary rounded-xl inline-block max-w-md">
-              <p className="font-bold uppercase text-sm text-foreground">
+            <div className="mt-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl inline-block max-w-md">
+              <p className="font-bold uppercase text-sm text-red-700">
                 📧 Installation instructions have been sent to your email
               </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Check your inbox for activation details and QR code
+              <p className="text-xs text-red-600 mt-1">
+                Check your inbox (and junk/spam folder) for activation details and QR code
               </p>
             </div>
 

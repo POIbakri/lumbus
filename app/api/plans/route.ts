@@ -54,7 +54,13 @@ export async function GET(req: NextRequest) {
     }
 
     console.log(`[Plans API] Successfully fetched ${plans?.length || 0} plans`);
-    return NextResponse.json({ plans: plans || [] });
+
+    const response = NextResponse.json({ plans: plans || [] });
+
+    // Cache for 5 minutes (300 seconds)
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+
+    return response;
   } catch (error) {
     console.error('[Plans API] Unexpected error:', error);
     return NextResponse.json(

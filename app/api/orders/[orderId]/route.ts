@@ -39,8 +39,15 @@ export async function GET(
 
     // Extract region from plan name (e.g., "Japan 5GB - 30 Days" -> "Japan")
     const extractRegionFromName = (name: string): string => {
-      const match = name.match(/^([^0-9]+?)\s+\d+/);
-      return match ? match[1].trim() : name.split(' ')[0];
+      // Remove quotes if present
+      const cleanName = name.replace(/^["']|["']$/g, '');
+      const match = cleanName.match(/^([^0-9]+?)\s+\d+/);
+      return match ? match[1].trim() : cleanName.split(' ')[0];
+    };
+
+    // Remove quotes from plan name if present
+    const cleanPlanName = (name: string): string => {
+      return name.replace(/^["']|["']$/g, '');
     };
 
     return NextResponse.json({
@@ -50,7 +57,7 @@ export async function GET(
       smdp: order.smdp,
       activationCode: order.activation_code,
       plan: {
-        name: plan?.name || 'Unknown Plan',
+        name: plan?.name ? cleanPlanName(plan.name) : 'Unknown Plan',
         region: plan?.name ? extractRegionFromName(plan.name) : 'Unknown Region',
         dataGb: plan?.data_gb || 0,
         validityDays: plan?.validity_days || 0,

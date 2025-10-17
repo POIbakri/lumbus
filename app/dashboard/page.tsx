@@ -60,6 +60,24 @@ export default function DashboardPage() {
 
   const loadOrders = useCallback(async () => {
     try {
+      // Try to load from cache first
+      const cacheKey = `lumbus_orders_${user?.id}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+      const cacheExpiry = 2 * 60 * 1000; // 2 minutes
+
+      if (cachedData && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < cacheExpiry) {
+          // Use cached data
+          const orders = JSON.parse(cachedData);
+          setOrders(orders);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Fetch fresh data
       const { data, error } = await supabaseClient
         .from('orders')
         .select(`
@@ -78,6 +96,10 @@ export default function DashboardPage() {
       }));
 
       setOrders(transformedData as OrderWithPlan[]);
+
+      // Cache the data
+      localStorage.setItem(cacheKey, JSON.stringify(transformedData));
+      localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
     } catch (error) {
       console.error('Failed to load orders:', error);
     } finally {
@@ -87,17 +109,38 @@ export default function DashboardPage() {
 
   const loadReferralStats = useCallback(async () => {
     try {
+      // Try to load from cache first
+      const cacheKey = `lumbus_referral_stats_${user?.id}`;
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTime = localStorage.getItem(`${cacheKey}_time`);
+      const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+
+      if (cachedData && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < cacheExpiry) {
+          // Use cached data
+          setReferralStats(JSON.parse(cachedData));
+          return;
+        }
+      }
+
+      // Fetch fresh data
       const response = await fetch(`/api/referrals/me?user_id=${user?.id}`);
       if (response.ok) {
         const data = await response.json();
-        setReferralStats({
+        const stats = {
           ref_code: data.ref_code,
           referral_link: data.referral_link,
           total_clicks: data.stats.total_clicks || 0,
           total_referrals: data.stats.total_signups || 0,
           pending_rewards: data.stats.pending_rewards || 0,
           earned_rewards: data.stats.earned_rewards || 0,
-        });
+        };
+        setReferralStats(stats);
+
+        // Cache the data
+        localStorage.setItem(cacheKey, JSON.stringify(stats));
+        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
       }
     } catch (error) {
       console.error('Failed to load referral stats:', error);
@@ -198,8 +241,8 @@ export default function DashboardPage() {
         const usageData = await response.json();
 
         // Update the order in the state with new usage data
-        setOrders(prevOrders =>
-          prevOrders.map(order => {
+        setOrders(prevOrders => {
+          const updatedOrders = prevOrders.map(order => {
             if (order.id === orderId) {
               return {
                 ...order,
@@ -209,8 +252,15 @@ export default function DashboardPage() {
               };
             }
             return order;
-          })
-        );
+          });
+
+          // Update cache with new usage data
+          const cacheKey = `lumbus_orders_${user?.id}`;
+          localStorage.setItem(cacheKey, JSON.stringify(updatedOrders));
+          localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
+
+          return updatedOrders;
+        });
 
         triggerHaptic('light');
       } else {
