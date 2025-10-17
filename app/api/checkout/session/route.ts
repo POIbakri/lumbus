@@ -93,10 +93,16 @@ export async function POST(req: NextRequest) {
       const { data: existingUser, error: findError } = await supabase
         .from('users')
         .select('*')
-        .eq('email', email)
+        .eq('email', email.toLowerCase().trim()) // Normalize email
         .maybeSingle(); // Use maybeSingle() to handle 0 or 1 results
 
-      console.log('[Checkout] Find user result:', { found: !!existingUser, error: findError?.message });
+      console.log('[Checkout] Find user result:', {
+        email: email,
+        normalized: email.toLowerCase().trim(),
+        found: !!existingUser,
+        userId: existingUser?.id,
+        error: findError?.message
+      });
 
       if (existingUser) {
         console.log('[Checkout] Using existing user:', existingUser.id);
@@ -124,37 +130,14 @@ export async function POST(req: NextRequest) {
         if (authError) {
           // If user already exists in auth but not in users table, fetch them
           if (authError.message?.includes('already been registered') || authError.code === 'email_exists') {
-            console.log('[Checkout] Auth user already exists, fetching by email...');
+            console.log('[Checkout] Auth user already exists, checking database...');
 
-            // Try to get user ID by querying the users table first
-            // (In case they exist in both auth and database but we missed them)
-            const { data: dbUser, error: dbCheckError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('email', email)
-              .maybeSingle();
-
-            if (dbUser) {
-              // User exists in database, use them
-              console.log('[Checkout] Found user in database:', dbUser.id);
-              user = dbUser;
-              isNewUser = false;
-
-              // Ensure user profile exists
-              await ensureUserProfile(user.id);
-
-              // Skip the rest - user is ready
-            } else {
-              // User is in auth but not in database - need to create database entry
-              // Since we can't easily get the auth user ID without listing all users,
-              // let's just ask the user to try again or use a different email
-              console.error('[Checkout] User exists in auth but not in database - cannot recover');
-              return NextResponse.json({
-                error: 'This email is already registered. Please check your email for a password setup link, or contact support.',
-              }, { status: 400 });
-            }
-
-            // User is ready - continue to checkout
+            // This shouldn't happen since we already checked at line 93-108
+            // But if it does, return a clear error
+            console.error('[Checkout] User exists in auth but maybeSingle() at line 93 missed them');
+            return NextResponse.json({
+              error: 'Account already exists. Please try again or contact support if the issue persists.',
+            }, { status: 400 });
           } else {
             console.error('[Checkout] Auth user creation error:', authError);
             return NextResponse.json({
