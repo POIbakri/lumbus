@@ -22,6 +22,9 @@ export async function GET(
     // Supabase returns plans as an array when using select with relations
     const planArray = order.plans as Plan[];
     const plan = planArray?.[0] || null;
+
+    console.log('[Order API] Order:', order.id, 'Plan data:', plan);
+
     return NextResponse.json({
       id: order.id,
       status: order.status,
@@ -29,10 +32,10 @@ export async function GET(
       smdp: order.smdp,
       activationCode: order.activation_code,
       plan: {
-        name: plan?.name,
-        region: plan?.region_code,
-        dataGb: plan?.data_gb,
-        validityDays: plan?.validity_days,
+        name: plan?.name || 'Unknown Plan',
+        region: plan?.region_code || 'Unknown Region',
+        dataGb: plan?.data_gb || 0,
+        validityDays: plan?.validity_days || 0,
       },
       createdAt: order.created_at,
     });

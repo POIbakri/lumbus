@@ -151,9 +151,17 @@ export default function InstallPage() {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
               YOUR ESIM IS READY!
             </h1>
-            <p className="text-base sm:text-lg md:text-xl font-bold">
+            <p className="text-base sm:text-lg md:text-xl font-bold mb-4">
               Connected via Lumbus — Expires in {order.plan.validityDays} days
             </p>
+            <div className="mt-6 p-4 bg-mint border-2 border-primary rounded-xl inline-block max-w-md">
+              <p className="font-bold uppercase text-sm text-foreground">
+                📧 Installation instructions have been sent to your email
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Check your inbox for activation details and QR code
+              </p>
+            </div>
 
             {/* Auto Deep Link Notification for iOS 17.4+ */}
             {deviceInfo.supportsUniversalLink && !deepLinkTriggered && (

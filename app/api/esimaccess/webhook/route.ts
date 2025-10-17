@@ -259,6 +259,26 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         .single();
 
       if (plan && user) {
+        // Format activate before date
+        let formattedActivateBeforeDate: string | undefined;
+        if (firstProfile.expiredTime) {
+          try {
+            // expiredTime format from API: "YYYY-MM-DD hh:mm:ss UTC"
+            const expireDate = new Date(firstProfile.expiredTime.replace(' UTC', 'Z'));
+            formattedActivateBeforeDate = expireDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              timeZoneName: 'short',
+            });
+          } catch (dateError) {
+            console.error('[ORDER_STATUS] Error formatting expiredTime:', dateError);
+            formattedActivateBeforeDate = firstProfile.expiredTime;
+          }
+        }
+
         await sendOrderConfirmationEmail({
           to: user.email,
           orderDetails: {
@@ -271,6 +291,9 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
             activationCode: activationCode,
             qrUrl: firstProfile.qrCodeUrl || firstProfile.shortUrl || '',
             lpaString: lpaString,
+            iccid: firstProfile.iccid,
+            activateBeforeDate: formattedActivateBeforeDate,
+            apn: firstProfile.apn,
           },
           installUrl: installUrl,
         });

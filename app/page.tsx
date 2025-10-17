@@ -49,7 +49,7 @@ export default async function Home() {
 
           <p className="text-lg sm:text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
             Get connected in <span className="text-primary">150+ countries</span>.<br className="hidden sm:block"/>
-            <span className="sm:hidden"> </span>No physical SIM card needed. Instant activation.
+            <span className="sm:hidden"> </span>No physical SIM card needed. No signup required. Instant activation.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center  px-4" style={{animationDelay: '0.3s'}}>
@@ -76,6 +76,10 @@ export default async function Home() {
             <div className="flex items-center gap-2">
               <div className="text-2xl">⭐</div>
               <span className="font-bold text-sm">5.0 Rating</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">✨</div>
+              <span className="font-bold text-sm">No Signup Required</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-2xl">🔒</div>

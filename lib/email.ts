@@ -101,6 +101,9 @@ export interface SendOrderConfirmationParams {
     activationCode: string;
     qrUrl: string;
     lpaString: string;
+    iccid?: string;
+    activateBeforeDate?: string;
+    apn?: string;
   };
   installUrl: string;
 }
@@ -248,6 +251,45 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
         </div>
       </div>
     </div>
+
+    ${activationDetails.iccid || activationDetails.activateBeforeDate || activationDetails.apn ? `
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Technical Details:</h3>
+
+      ${activationDetails.iccid ? `
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">ICCID</p>
+        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+          ${activationDetails.iccid}
+        </div>
+      </div>
+      ` : ''}
+
+      ${activationDetails.activateBeforeDate ? `
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">Activate Before</p>
+        <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 8px; padding: 15px; font-size: 14px; color: #1A1A1A; font-weight: 600;">
+          ⏰ ${activationDetails.activateBeforeDate}
+        </div>
+        <p style="margin: 8px 0 0; font-size: 12px; color: #86868b;">
+          Please activate your eSIM before this date to ensure it works properly
+        </p>
+      </div>
+      ` : ''}
+
+      ${activationDetails.apn ? `
+      <div style="margin: 0 0 20px;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">APN (Access Point Name)</p>
+        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+          ${activationDetails.apn}
+        </div>
+        <p style="margin: 8px 0 0; font-size: 12px; color: #86868b;">
+          Usually configured automatically. Manual setup is rarely needed.
+        </p>
+      </div>
+      ` : ''}
+    </div>
+    ` : ''}
   `;
 
   try {
