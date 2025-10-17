@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
 import { z } from 'zod';
+import { convertToStripeAmount, type Currency } from '@/lib/currency';
 
 // Lazy initialization - only create instance when needed
 let stripe: Stripe | null = null;
@@ -22,6 +23,7 @@ function getStripeClient() {
 const checkoutSchema = z.object({
   planId: z.string().uuid(),
   email: z.string().email(),
+  currency: z.string().optional().default('USD'),
 });
 
 /**
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[Mobile Checkout] Request body:', { planId: body.planId, email: body.email });
 
-    const { planId, email } = checkoutSchema.parse(body);
+    const { planId, email, currency } = checkoutSchema.parse(body);
 
     // Get plan details
     console.log('[Mobile Checkout] Fetching plan:', planId);
@@ -144,12 +146,13 @@ export async function POST(req: NextRequest) {
     console.log('[Mobile Checkout] Order created:', order.id);
 
     // Create Payment Intent for mobile
-    const amount = Math.round(plan.retail_price * 100); // Convert to cents
+    // Convert price from USD to user's currency
+    const amount = convertToStripeAmount(plan.retail_price, currency as Currency);
 
-    console.log('[Mobile Checkout] Creating Payment Intent...');
+    console.log('[Mobile Checkout] Creating Payment Intent...', { currency, amount });
     const paymentIntent = await getStripeClient().paymentIntents.create({
       amount: amount,
-      currency: 'usd',
+      currency: currency.toLowerCase(),
       customer_email: user.email,
       metadata: {
         orderId: order.id,
