@@ -273,10 +273,10 @@ export default async function Home() {
                 </div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center bg-primary">
-                <div className="text-lg sm:text-2xl md:text-3xl font-black text-foreground">£5-15</div>
+                <div className="text-base sm:text-xl md:text-2xl font-black text-foreground">LOW COST</div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
-                <div className="text-lg sm:text-2xl md:text-3xl font-black opacity-40">£50-150</div>
+                <div className="text-base sm:text-xl md:text-2xl font-black opacity-40">EXPENSIVE</div>
               </div>
             </div>
 
@@ -356,7 +356,7 @@ export default async function Home() {
                 <div className="text-sm sm:text-xl md:text-2xl font-black text-primary">YES ✓</div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
-                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Extra ££</div>
+                <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">EXTRA FEES</div>
               </div>
             </div>
           </div>

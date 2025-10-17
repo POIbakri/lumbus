@@ -144,7 +144,7 @@ export default function RefundPolicyPage() {
 
               <h3 className="text-lg sm:text-xl font-bold mb-2">When We Will Refund</h3>
               <p className="text-sm sm:text-base leading-relaxed mb-3">
-                You are eligible for a full or partial refund if:
+                You are eligible for a full refund if:
               </p>
               <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base mb-4">
                 <li><strong>eSIM fails to activate</strong> due to an error on our part or our eSIM provider</li>
@@ -202,7 +202,7 @@ export default function RefundPolicyPage() {
               <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base">
                 <li>Verify with our network provider</li>
                 <li>Check if there's a known outage or issue</li>
-                <li>Offer store credit or partial refund if the issue is on our provider's end</li>
+                <li>Offer store credit or full refund if the issue is on our provider's end</li>
               </ul>
 
               <div className="bg-yellow p-4 sm:p-6 rounded-xl border-2 border-secondary">

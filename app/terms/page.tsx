@@ -91,7 +91,7 @@ export default function TermsPage() {
 
               <h3 className="text-lg sm:text-xl font-bold mb-2">5.1 Pricing</h3>
               <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base mb-4">
-                <li>All prices are displayed in GBP (£) unless otherwise stated</li>
+                <li>All prices are displayed in your local currency unless otherwise stated</li>
                 <li>Prices include applicable VAT where required</li>
                 <li>We reserve the right to change prices at any time without prior notice</li>
                 <li>Price changes do not affect orders already placed</li>

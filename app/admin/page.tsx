@@ -40,6 +40,7 @@ interface Order {
     data_gb: number;
     validity_days: number;
     retail_price: number;
+    currency?: string;
   } | null;
 }
 
@@ -519,11 +520,15 @@ export default function AdminPage() {
                             {/* Plan Details */}
                             <div className="pb-3 sm:pb-0 border-b sm:border-b-0 border-foreground/10">
                               <p className="font-black uppercase text-xs text-muted-foreground mb-2">Plan Details</p>
-                              <div className="grid grid-cols-3 sm:grid-cols-1 gap-2 sm:gap-1 sm:space-y-1">
-                                <p className="text-xs sm:text-sm font-bold">💾 {formatDataAmount(order.plan?.data_gb || 0)}</p>
-                                <p className="text-xs sm:text-sm font-bold">⏰ {order.plan?.validity_days}d</p>
-                                <p className="text-xs sm:text-sm font-bold">💰 ${order.plan?.retail_price}</p>
-                              </div>
+                              {order.plan ? (
+                                <div className="grid grid-cols-3 sm:grid-cols-1 gap-2 sm:gap-1 sm:space-y-1">
+                                  <p className="text-xs sm:text-sm font-bold">💾 {formatDataAmount(order.plan.data_gb)}</p>
+                                  <p className="text-xs sm:text-sm font-bold">⏰ {order.plan.validity_days}d</p>
+                                  <p className="text-xs sm:text-sm font-bold">💰 {order.plan.currency === 'USD' ? '$' : order.plan.currency || '$'}{order.plan.retail_price.toFixed(2)}</p>
+                                </div>
+                              ) : (
+                                <p className="text-xs text-muted-foreground">No plan data</p>
+                              )}
                             </div>
 
                             {/* Usage */}

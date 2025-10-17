@@ -18,33 +18,20 @@ export async function GET(req: NextRequest) {
         data_usage_bytes,
         data_remaining_bytes,
         iccid,
-        users(email),
-        plans(name, region_code, data_gb, validity_days, retail_price)
+        plan_id,
+        user_id,
+        users!orders_user_id_fkey(email),
+        plans!orders_plan_id_fkey(name, region_code, data_gb, validity_days, retail_price, currency)
       `)
       .order('created_at', { ascending: false })
       .limit(50);
 
     if (error) {
+      console.error('Error fetching orders:', error);
       return NextResponse.json({ error: 'Failed to load orders' }, { status: 500 });
     }
 
-    const formattedOrders = orders?.map((order: {
-      id: string;
-      status: string;
-      created_at: string;
-      stripe_session_id: string | null;
-      data_usage_bytes: number | null;
-      data_remaining_bytes: number | null;
-      iccid: string | null;
-      users: { email: string }[];
-      plans: {
-        name: string;
-        region_code: string;
-        data_gb: number;
-        validity_days: number;
-        retail_price: number;
-      }[];
-    }) => ({
+    const formattedOrders = orders?.map((order: any) => ({
       id: order.id,
       status: order.status,
       created_at: order.created_at,
@@ -52,8 +39,15 @@ export async function GET(req: NextRequest) {
       data_usage_bytes: order.data_usage_bytes,
       data_remaining_bytes: order.data_remaining_bytes,
       iccid: order.iccid,
-      user_email: order.users?.[0]?.email,
-      plan: order.plans?.[0] || null,
+      user_email: order.users?.email || 'N/A',
+      plan: order.plans ? {
+        name: order.plans.name,
+        region_code: order.plans.region_code,
+        data_gb: order.plans.data_gb,
+        validity_days: order.plans.validity_days,
+        retail_price: order.plans.retail_price,
+        currency: order.plans.currency || 'USD',
+      } : null,
     }));
 
     return NextResponse.json(formattedOrders || []);
