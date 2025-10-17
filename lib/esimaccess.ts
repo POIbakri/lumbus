@@ -280,8 +280,8 @@ export async function listPackages(regionCode?: string): Promise<EsimAccessPacka
  *   "packageInfoList": [
  *     {
  *       "packageCode": "P0B2MJ9JR",
- *       "quantity": 1,
- *       "transactionId": "your-order-id"
+ *       "count": 1,
+ *       "transactionId": "your-order-id"  // Optional for webhook correlation
  *     }
  *   ]
  * }
@@ -290,6 +290,24 @@ export async function assignEsim(
   request: EsimAccessAssignRequest
 ): Promise<EsimAccessAssignResponse> {
   try {
+    const requestBody: any = {
+      packageInfoList: [
+        {
+          packageCode: request.packageId,
+          count: 1, // Use 'count' not 'quantity'
+          // Optional fields:
+          // price: number,  // optional price override
+          // amount: number, // optional amount override
+          // periodNum: number, // for daypass plans (v1.5+)
+        },
+      ],
+    };
+
+    // Add transactionId at root level if provided (for webhook correlation)
+    if (request.reference) {
+      requestBody.transactionId = request.reference;
+    }
+
     const data = await makeEsimAccessRequest<{
       orderNo: string;
       detailList: Array<{
@@ -300,19 +318,7 @@ export async function assignEsim(
         confirmationCode?: string;
         qrUrl?: string;
       }>;
-    }>('/esim/order', {
-      packageInfoList: [
-        {
-          packageCode: request.packageId,
-          quantity: 1,
-          transactionId: request.reference, // Your internal order ID for webhook correlation
-          // Optional fields:
-          // price: number,  // optional price override
-          // amount: number, // optional amount override
-          // periodNum: number, // for daypass plans (v1.5+)
-        },
-      ],
-    });
+    }>('/esim/order', requestBody);
 
     // Order is created, but activation details come via:
     // 1. Webhook (ORDER_STATUS with GOT_RESOURCE), or
