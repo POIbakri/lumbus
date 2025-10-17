@@ -15,7 +15,7 @@ function getStripeClient() {
       throw new Error('STRIPE_SECRET_KEY is not configured');
     }
     stripe = new Stripe(apiKey, {
-      apiVersion: '2025-09-30.clover',
+      apiVersion: '2024-12-18.acacia',
     });
   }
   return stripe;
@@ -145,43 +145,50 @@ export async function POST(req: NextRequest) {
               details: authError?.message
             }, { status: 500 });
           }
-        } else if (authData?.user) {
-            console.log('[Checkout] Passwordless user created:', authData.user.id);
+        }
 
-          // Fetch the user from users table (created by trigger)
-          // Wait a moment for trigger to complete
-          await new Promise(resolve => setTimeout(resolve, 500));
+        if (!authData?.user) {
+          console.error('[Checkout] Auth user creation failed - no user data returned');
+          return NextResponse.json({
+            error: 'Failed to create user account - no user data',
+          }, { status: 500 });
+        }
 
-          const { data: newUser, error: fetchError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', authData.user.id)
-            .single();
+        console.log('[Checkout] Passwordless user created:', authData.user.id);
 
-          if (fetchError || !newUser) {
-            console.error('[Checkout] Failed to fetch new user:', fetchError);
-            return NextResponse.json({
-              error: 'User account created but failed to fetch',
-              details: fetchError?.message
-            }, { status: 500 });
-          }
+        // Fetch the user from users table (created by trigger)
+        // Wait a moment for trigger to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-          user = newUser;
+        const { data: newUser, error: fetchError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', authData.user.id)
+          .single();
 
-          // Create user profile
-          console.log('[Checkout] Creating user profile...');
-          await ensureUserProfile(user.id);
+        if (fetchError || !newUser) {
+          console.error('[Checkout] Failed to fetch new user:', fetchError);
+          return NextResponse.json({
+            error: 'User account created but failed to fetch',
+            details: fetchError?.message
+          }, { status: 500 });
+        }
 
-          // Link referral code if provided
-          if (referralCode) {
-            console.log('[Checkout] Linking referral code:', referralCode);
-            const { linkReferrer } = await import('@/lib/referral');
-            const linked = await linkReferrer(user.id, referralCode);
-            if (linked) {
-              console.log('[Checkout] Referral code linked successfully');
-            } else {
-              console.log('[Checkout] Invalid or already used referral code');
-            }
+        user = newUser;
+
+        // Create user profile
+        console.log('[Checkout] Creating user profile...');
+        await ensureUserProfile(user.id);
+
+        // Link referral code if provided
+        if (referralCode) {
+          console.log('[Checkout] Linking referral code:', referralCode);
+          const { linkReferrer } = await import('@/lib/referral');
+          const linked = await linkReferrer(user.id, referralCode);
+          if (linked) {
+            console.log('[Checkout] Referral code linked successfully');
+          } else {
+            console.log('[Checkout] Invalid or already used referral code');
           }
         }
       }
@@ -420,6 +427,13 @@ export async function POST(req: NextRequest) {
       : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`;
 
     console.log('[Checkout] Calling Stripe API...');
+    console.log('[Checkout] Stripe params:', {
+      currency: userCurrency.toLowerCase(),
+      amount: stripeAmount,
+      customerEmail: user.email,
+      planName: plan.name,
+    });
+
     const session = await getStripeClient().checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
