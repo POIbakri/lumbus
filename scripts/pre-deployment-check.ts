@@ -45,18 +45,13 @@ const ENV_CHECKS: EnvCheck[] = [
   {
     key: 'ESIMACCESS_API_URL',
     required: true,
-    description: 'eSIM Access API URL (should be v1.6)',
-    validate: (val) => val.includes('v1.6'),
+    description: 'eSIM Access API URL (should be v1/open)',
+    validate: (val) => val.includes('v1/open'),
   },
   {
-    key: 'ESIMACCESS_API_KEY',
+    key: 'ESIMACCESS_ACCESS_CODE',
     required: true,
-    description: 'eSIM Access API key',
-  },
-  {
-    key: 'ESIMACCESS_API_SECRET',
-    required: true,
-    description: 'eSIM Access API secret',
+    description: 'eSIM Access RT-AccessCode',
   },
   {
     key: 'ESIMACCESS_WEBHOOK_SECRET',

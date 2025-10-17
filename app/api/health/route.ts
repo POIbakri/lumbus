@@ -106,10 +106,9 @@ async function checkEsimAccess(): Promise<ServiceHealth> {
   const start = Date.now();
   try {
     const apiUrl = process.env.ESIMACCESS_API_URL;
-    const apiKey = process.env.ESIMACCESS_API_KEY;
-    const apiSecret = process.env.ESIMACCESS_API_SECRET;
+    const accessCode = process.env.ESIMACCESS_ACCESS_CODE;
 
-    if (!apiUrl || !apiKey || !apiSecret) {
+    if (!apiUrl || !accessCode) {
       return {
         status: 'down',
         error: 'Missing eSIM Access credentials',
@@ -117,15 +116,14 @@ async function checkEsimAccess(): Promise<ServiceHealth> {
     }
 
     // Try to get account balance as a health check
-    const response = await fetch(`${apiUrl}/account/balance`, {
+    // Endpoint: /api/v1/open/balance/query
+    const response = await fetch(`${apiUrl}/balance/query`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'RT-AccessCode': accessCode,
       },
-      body: JSON.stringify({
-        apiKey,
-        apiSecret,
-      }),
+      body: JSON.stringify({}),
     });
 
     if (!response.ok) {
@@ -137,8 +135,8 @@ async function checkEsimAccess(): Promise<ServiceHealth> {
 
     const data = await response.json();
 
-    // Check if response has expected format
-    if (data.errorCode && data.errorCode !== '000000') {
+    // Check if response has expected format (errorCode '0' means success)
+    if (data.errorCode && data.errorCode !== '0') {
       return {
         status: 'down',
         error: `API Error: ${data.errorCode}`,

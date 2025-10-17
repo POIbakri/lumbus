@@ -233,16 +233,37 @@ export async function listSupportedRegions(): Promise<Array<{
 
 /**
  * List available eSIM packages
- * Note: This endpoint may not exist - you'll need to sync packages from their dashboard
- * and store them in your plan_sku table with provider_code (packageCode or slug)
+ * Endpoint: /api/v1/open/package/list
  */
 export async function listPackages(regionCode?: string): Promise<EsimAccessPackage[]> {
   try {
-    // Note: eSIM Access may not have a public package list endpoint
-    // You may need to manage packages in your database and map to their packageCode/slug
-    // For now, returning empty array - populate from your plan_sku table
-    console.warn('listPackages: No public endpoint available. Use plan_sku table with provider_code mapping.');
-    return [];
+    const body: any = {};
+    if (regionCode) {
+      body.location = regionCode;
+    }
+
+    const data = await makeEsimAccessRequest<{
+      packageList: Array<{
+        packageCode: string;
+        slug?: string;
+        name: string;
+        data: string;
+        validity: string;
+        price: number;
+        currency: string;
+        locationList: Array<{ code: string; name: string }>;
+      }>;
+    }>('/package/list', body);
+
+    return (data.packageList || []).map(pkg => ({
+      packageId: pkg.packageCode,
+      name: pkg.name,
+      data: pkg.data,
+      validity: pkg.validity,
+      price: pkg.price,
+      currency: pkg.currency,
+      countries: pkg.locationList?.map(loc => loc.code) || [],
+    }));
   } catch (error) {
     console.error('listPackages error:', error);
     throw error;
@@ -252,7 +273,7 @@ export async function listPackages(regionCode?: string): Promise<EsimAccessPacka
 /**
  * Order Profiles (Assign/Purchase eSIMs)
  * This is called after successful Stripe payment
- * Endpoint: /api/v1/open/order/profiles (batch ordering)
+ * Endpoint: /api/v1/open/esim/order
  */
 export async function assignEsim(
   request: EsimAccessAssignRequest
@@ -268,7 +289,7 @@ export async function assignEsim(
         confirmationCode?: string;
         qrUrl?: string;
       }>;
-    }>('/order/profiles', {
+    }>('/esim/order', {
       packageCode: request.packageId, // or use 'slug' (v1.3+)
       quantity: 1,
       transactionId: request.reference, // Your internal order ID for webhook correlation
@@ -300,7 +321,7 @@ export async function assignEsim(
 
 /**
  * Query order status and retrieve activation details
- * Endpoint: /api/v1/open/order/query
+ * Endpoint: /api/v1/open/esim/query
  *
  * Poll this after orderProfiles() until orderStatus === 'GOT_RESOURCE'
  * to get activation codes and QR URL
@@ -319,7 +340,7 @@ export async function getOrderStatus(orderNo: string): Promise<{
   }>;
 }> {
   try {
-    const data = await makeEsimAccessRequest<any>('/order/query', {
+    const data = await makeEsimAccessRequest<any>('/esim/query', {
       orderNo: orderNo,
     });
 
@@ -406,11 +427,11 @@ export async function topUpEsim(iccid: string, packageCode: string): Promise<{
 
 /**
  * Cancel an eSIM order
- * Endpoint: /api/v1/open/order/cancel
+ * Endpoint: /api/v1/open/esim/cancel
  */
 export async function cancelEsim(orderNo: string): Promise<{ success: boolean }> {
   try {
-    await makeEsimAccessRequest<any>('/order/cancel', {
+    await makeEsimAccessRequest<any>('/esim/cancel', {
       orderNo,
     });
 
