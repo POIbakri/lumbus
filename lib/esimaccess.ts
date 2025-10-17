@@ -274,6 +274,17 @@ export async function listPackages(regionCode?: string): Promise<EsimAccessPacka
  * Order Profiles (Assign/Purchase eSIMs)
  * This is called after successful Stripe payment
  * Endpoint: /api/v1/open/esim/order
+ *
+ * Request format (batch ordering):
+ * {
+ *   "packageInfoList": [
+ *     {
+ *       "packageCode": "P0B2MJ9JR",
+ *       "quantity": 1,
+ *       "transactionId": "your-order-id"
+ *     }
+ *   ]
+ * }
  */
 export async function assignEsim(
   request: EsimAccessAssignRequest
@@ -290,13 +301,17 @@ export async function assignEsim(
         qrUrl?: string;
       }>;
     }>('/esim/order', {
-      packageCode: request.packageId, // or use 'slug' (v1.3+)
-      quantity: 1,
-      transactionId: request.reference, // Your internal order ID for webhook correlation
-      // Optional fields (v1.2+):
-      // price: number,  // optional price override
-      // amount: number, // optional amount override
-      // periodNum: number, // for daypass plans (v1.5+)
+      packageInfoList: [
+        {
+          packageCode: request.packageId,
+          quantity: 1,
+          transactionId: request.reference, // Your internal order ID for webhook correlation
+          // Optional fields:
+          // price: number,  // optional price override
+          // amount: number, // optional amount override
+          // periodNum: number, // for daypass plans (v1.5+)
+        },
+      ],
     });
 
     // Order is created, but activation details come via:
