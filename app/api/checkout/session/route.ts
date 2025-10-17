@@ -291,12 +291,13 @@ export async function POST(req: NextRequest) {
         .from('orders')
         .update({
           status: 'paid',
-          total_price: 0,
+          amount_cents: 0,
         })
         .eq('id', order.id);
 
       if (updateError) {
         console.error('[Checkout] Failed to update order:', updateError);
+        console.error('[Checkout] Update error details:', JSON.stringify(updateError));
         return NextResponse.json({ error: 'Failed to process free order' }, { status: 500 });
       }
 
