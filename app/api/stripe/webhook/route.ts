@@ -38,7 +38,11 @@ export async function POST(req: NextRequest) {
       // Free order from internal checkout - skip signature verification
       console.log('[Webhook] Processing free order (no Stripe signature verification)');
       try {
-        event = JSON.parse(body);
+        const parsedEvent = JSON.parse(body);
+        // Generate a unique ID for free orders using timestamp and order ID
+        const orderId = parsedEvent.data?.object?.metadata?.orderId || 'unknown';
+        parsedEvent.id = `free_${orderId}_${Date.now()}`;
+        event = parsedEvent;
       } catch (parseError) {
         console.error('[Webhook] Failed to parse free order body:', parseError);
         return NextResponse.json({ error: 'Invalid free order body' }, { status: 400 });
@@ -156,32 +160,43 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Track discount code usage
+      // Track discount code usage (skip if already recorded by checkout route)
       if (discountCodeId && discountSource === 'code' && discountPercent > 0) {
-        console.log('[Webhook] Recording discount code usage:', discountCodeId);
+        console.log('[Webhook] Checking discount code usage for order:', discountCodeId);
         try {
-          const discountAmountUSD = basePriceUSD - finalPriceUSD;
-
-          const { error: usageError } = await supabase
+          // Check if already recorded (for free orders, checkout route records it)
+          const { data: existingUsage } = await supabase
             .from('discount_code_usage')
-            .insert({
-              discount_code_id: discountCodeId,
-              order_id: orderId,
-              user_id: order.user_id,
-              discount_percent: discountPercent,
-              original_price_usd: basePriceUSD,
-              discount_amount_usd: discountAmountUSD,
-              final_price_usd: finalPriceUSD,
-            });
+            .select('id')
+            .eq('order_id', orderId)
+            .single();
 
-          if (usageError) {
-            console.error('[Webhook] Failed to record discount code usage:', usageError);
-            // Don't fail the webhook - this is not critical
+          if (!existingUsage) {
+            console.log('[Webhook] Recording discount code usage');
+            const discountAmountUSD = basePriceUSD - finalPriceUSD;
+
+            const { error: usageError } = await supabase
+              .from('discount_code_usage')
+              .insert({
+                discount_code_id: discountCodeId,
+                order_id: orderId,
+                user_id: order.user_id,
+                discount_percent: discountPercent,
+                original_price_usd: basePriceUSD,
+                discount_amount_usd: discountAmountUSD,
+                final_price_usd: finalPriceUSD,
+              });
+
+            if (usageError) {
+              console.error('[Webhook] Failed to record discount code usage:', usageError);
+            } else {
+              console.log('[Webhook] Discount code usage recorded successfully');
+            }
           } else {
-            console.log('[Webhook] Discount code usage recorded successfully');
+            console.log('[Webhook] Discount code usage already recorded, skipping');
           }
         } catch (error) {
-          console.error('[Webhook] Error recording discount code usage:', error);
+          console.error('[Webhook] Error checking/recording discount code usage:', error);
           // Don't fail the webhook
         }
       }
