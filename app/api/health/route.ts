@@ -135,8 +135,8 @@ async function checkEsimAccess(): Promise<ServiceHealth> {
 
     const data = await response.json();
 
-    // Check if response has expected format (errorCode '0' means success)
-    if (data.errorCode && data.errorCode !== '0') {
+    // Check if response has expected format (errorCode '0' or null means success)
+    if (data.errorCode && data.errorCode !== '0' && data.errorCode !== null) {
       return {
         status: 'down',
         error: `API Error: ${data.errorCode}`,

@@ -146,7 +146,10 @@ async function makeEsimAccessRequest<T>(
 
       console.log('[eSIM Access] Response data:', JSON.stringify(data));
 
-      if (!data.success || data.errorCode !== '0') {
+      // Check for success: either success=true OR errorCode is null/'0'
+      const isSuccess = data.success === true || data.errorCode === null || data.errorCode === '0';
+
+      if (!isSuccess) {
         // Map critical error codes
         switch (data.errorCode) {
           case '200007':
@@ -313,7 +316,8 @@ export async function assignEsim(
 
     const data = await makeEsimAccessRequest<{
       orderNo: string;
-      detailList: Array<{
+      transactionId?: string;
+      detailList?: Array<{
         esimTranNo: string;
         iccid?: string;
         eid?: string;
@@ -323,18 +327,22 @@ export async function assignEsim(
       }>;
     }>('/esim/order', requestBody);
 
-    // Order is created, but activation details come via:
+    // Order is created successfully
+    // Activation details will come later via:
     // 1. Webhook (ORDER_STATUS with GOT_RESOURCE), or
     // 2. Polling orderQuery(orderNo) until status is GOT_RESOURCE
 
-    const firstProfile = data.detailList[0] || {};
+    console.log('[eSIM Access] Order created successfully:', data.orderNo);
+    console.log('[eSIM Access] Waiting for ORDER_STATUS webhook with activation details...');
+
+    const firstProfile = data.detailList?.[0];
 
     return {
       orderId: data.orderNo,
-      iccid: firstProfile.iccid || '',
+      iccid: firstProfile?.iccid || '',
       smdpAddress: '', // Will be populated via webhook or orderQuery
-      activationCode: firstProfile.activationCode || '',
-      qrCode: firstProfile.qrUrl,
+      activationCode: firstProfile?.activationCode || '',
+      qrCode: firstProfile?.qrUrl,
       status: 'pending', // Initial status; wait for GOT_RESOURCE
     };
   } catch (error) {
