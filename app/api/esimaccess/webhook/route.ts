@@ -63,11 +63,18 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
+    console.log('[eSIM Webhook] Received webhook, body length:', body.length);
+
     const payload: WebhookPayload = JSON.parse(body);
+    console.log('[eSIM Webhook] Parsed payload:', {
+      notifyType: payload.notifyType,
+      notifyId: payload.notifyId,
+      hasContent: !!payload.content,
+    });
 
     // Handle CHECK_HEALTH for webhook validation (allow without secret)
     if (payload.notifyType === 'CHECK_HEALTH') {
-      console.log('eSIM Access health check received');
+      console.log('[eSIM Webhook] Health check received');
       return NextResponse.json({ success: true, message: 'Health check OK' });
     }
 
@@ -75,10 +82,20 @@ export async function POST(req: NextRequest) {
     const webhookSecret = process.env.ESIMACCESS_WEBHOOK_SECRET;
     if (webhookSecret) {
       const providedSecret = req.headers.get('x-webhook-secret');
+      console.log('[eSIM Webhook] Secret check:', {
+        hasConfiguredSecret: !!webhookSecret,
+        hasProvidedSecret: !!providedSecret,
+        secretsMatch: providedSecret === webhookSecret,
+      });
+
       if (providedSecret !== webhookSecret) {
-        console.error('eSIM Access webhook secret verification failed');
+        console.error('[eSIM Webhook] Secret verification failed');
+        console.error('[eSIM Webhook] Expected secret length:', webhookSecret.length);
+        console.error('[eSIM Webhook] Provided secret length:', providedSecret?.length || 0);
         return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
       }
+    } else {
+      console.log('[eSIM Webhook] No webhook secret configured, skipping verification');
     }
 
     // IP whitelist verification (handle comma-separated x-forwarded-for)

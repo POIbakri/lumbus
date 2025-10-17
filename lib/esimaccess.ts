@@ -144,6 +144,8 @@ async function makeEsimAccessRequest<T>(
 
       const data: EsimAccessResponse<T> = await response.json();
 
+      console.log('[eSIM Access] Response data:', JSON.stringify(data));
+
       if (!data.success || data.errorCode !== '0') {
         // Map critical error codes
         switch (data.errorCode) {
@@ -169,6 +171,7 @@ async function makeEsimAccessRequest<T>(
         }
       }
 
+      console.log('[eSIM Access] Success! Returning data.obj');
       return data.obj!;
     } catch (error) {
       lastError = error as Error;
