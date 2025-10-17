@@ -70,7 +70,7 @@ export default function DevicePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* iPhone Check */}
-            <Card className="bg-mint border-2 border-foreground/10 hover-lift">
+            <Card className="bg-mint border-2 border-foreground/10 ">
               <CardContent className="p-8">
                 <div className="text-6xl mb-6 text-center">🍎</div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For iPhone</h3>
@@ -101,7 +101,7 @@ export default function DevicePage() {
             </Card>
 
             {/* Android Check */}
-            <Card className="bg-yellow border-2 border-foreground/10 hover-lift">
+            <Card className="bg-yellow border-2 border-foreground/10 ">
               <CardContent className="p-8">
                 <div className="text-6xl mb-6 text-center">🤖</div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For Android</h3>
@@ -269,12 +269,12 @@ export default function DevicePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/plans">
-              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-16 py-6 rounded-lg hover-lift">
+              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-16 py-6 rounded-lg ">
                 BROWSE PLANS
               </Button>
             </Link>
             <Link href="/help">
-              <Button className="bg-white text-foreground hover:bg-white/90 font-black text-lg px-16 py-6 rounded-lg hover-lift">
+              <Button className="bg-white text-foreground hover:bg-white/90 font-black text-lg px-16 py-6 rounded-lg ">
                 GET HELP
               </Button>
             </Link>
@@ -285,7 +285,7 @@ export default function DevicePage() {
       {/* Footer */}
       <footer className="bg-foreground text-white py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="font-black text-2xl mb-4">LUMBUS</h3>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
@@ -305,8 +305,26 @@ export default function DevicePage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">eSIM Access Network</p>
+              <h4 className="font-bold uppercase mb-4">Support</h4>
+              <div className="space-y-2">
+                <Link href="/help" className="block text-gray-400 hover:text-white">
+                  Help Center
+                </Link>
+                <Link href="/plans" className="block text-gray-400 hover:text-white">
+                  Plans
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Partners</h4>
+              <div className="space-y-2">
+                <Link href="/affiliate-program" className="block text-gray-400 hover:text-white">
+                  Affiliate Program
+                </Link>
+                <Link href="/affiliate" className="block text-gray-400 hover:text-white">
+                  Affiliate Login
+                </Link>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

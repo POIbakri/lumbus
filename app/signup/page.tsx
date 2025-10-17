@@ -80,8 +80,8 @@ export default function SignUpPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="text-center animate-slide-up">
-          <div className="inline-block p-6 sm:p-8 bg-primary rounded-full mb-6 animate-bounce-subtle">
+        <div className="text-center ">
+          <div className="inline-block p-6 sm:p-8 bg-primary rounded-full mb-6 ">
             <div className="text-5xl sm:text-6xl">✓</div>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
@@ -98,8 +98,8 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-cyan rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow rounded-full blur-3xl opacity-10 animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+      <div className="absolute top-20 right-10 w-96 h-96 bg-cyan rounded-full blur-3xl opacity-10 "></div>
+      <div className="absolute bottom-20 left-10 w-96 h-96 bg-yellow rounded-full blur-3xl opacity-10 " style={{animationDelay: '1s'}}></div>
 
       {/* Navigation */}
       <Nav />
@@ -107,7 +107,7 @@ export default function SignUpPage() {
       {/* Sign Up Form */}
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-md relative z-10">
-          <div className="text-center mb-6 sm:mb-8 animate-slide-up">
+          <div className="text-center mb-6 sm:mb-8 ">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
               GET STARTED
             </h1>
@@ -116,7 +116,7 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <Card className="bg-yellow border-4 border-secondary shadow-2xl hover-lift card-stack relative overflow-hidden animate-slide-up" style={{animationDelay: '0.1s'}}>
+          <Card className="bg-yellow border-4 border-secondary shadow-2xl   relative overflow-hidden " style={{animationDelay: '0.1s'}}>
             {/* Shine Effect */}
             <div className="absolute inset-0 bg-white/20 opacity-50 pointer-events-none"></div>
 
@@ -130,7 +130,7 @@ export default function SignUpPage() {
                 <Button
                   onClick={handleGoogleSignUp}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg  "
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -146,7 +146,7 @@ export default function SignUpPage() {
                 <Button
                   onClick={handleAppleSignUp}
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg touch-ripple elastic-bounce"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-4 sm:py-6 shadow-lg  "
                 >
                   <span className="flex items-center justify-center gap-3">
                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -228,7 +228,7 @@ export default function SignUpPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg py-4 sm:py-6 shadow-xl touch-ripple elastic-bounce pulse-glow"
+                  className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg py-4 sm:py-6 shadow-xl   "
                 >
                   {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
                 </Button>
@@ -250,7 +250,7 @@ export default function SignUpPage() {
           </Card>
 
           <div className="mt-8 text-center">
-            <Link href="/plans" className="font-bold text-sm text-muted-foreground hover:text-primary transition-colors">
+            <Link href="/plans" className="font-bold text-sm text-muted-foreground hover:text-primary ">
               ← Back to Plans
             </Link>
           </div>

@@ -119,39 +119,114 @@ export async function POST(req: NextRequest) {
           }
         });
 
-        if (authError || !authData.user) {
-          console.error('[Checkout] Auth user creation error:', authError);
-          return NextResponse.json({
-            error: 'Failed to create user account',
-            details: authError?.message
-          }, { status: 500 });
+        if (authError) {
+          // If user already exists in auth but not in users table, fetch them
+          if (authError.message?.includes('already been registered') || authError.code === 'email_exists') {
+            console.log('[Checkout] Auth user already exists, fetching by email...');
+
+            // Get user by email from auth
+            const { data: { users: authUsers }, error: listError } = await supabase.auth.admin.listUsers();
+
+            if (listError) {
+              console.error('[Checkout] Failed to list users:', listError);
+              return NextResponse.json({
+                error: 'Failed to fetch user',
+                details: listError.message
+              }, { status: 500 });
+            }
+
+            const authUser = authUsers?.find(u => u.email === email);
+
+            if (!authUser) {
+              console.error('[Checkout] Auth user exists but not found in list');
+              return NextResponse.json({
+                error: 'User state inconsistent'
+              }, { status: 500 });
+            }
+
+            console.log('[Checkout] Found existing auth user:', authUser.id);
+
+            // Now fetch from users table
+            const { data: existingDbUser, error: dbError } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', authUser.id)
+              .maybeSingle();
+
+            if (existingDbUser) {
+              // User exists in both auth and database
+              console.log('[Checkout] User found in database');
+              user = existingDbUser;
+              isNewUser = false;
+
+              // Ensure user profile exists
+              console.log('[Checkout] Ensuring user profile...');
+              await ensureUserProfile(user.id);
+            } else {
+              // User exists in auth but not in database - create database entry
+              console.log('[Checkout] User in auth but not in database, creating database entry...');
+
+              const { data: createdUser, error: createError } = await supabase
+                .from('users')
+                .insert({
+                  id: authUser.id,
+                  email: authUser.email || email,
+                })
+                .select()
+                .single();
+
+              if (createError || !createdUser) {
+                console.error('[Checkout] Failed to create user in database:', createError);
+                return NextResponse.json({
+                  error: 'Failed to create user record',
+                  details: createError?.message
+                }, { status: 500 });
+              }
+
+              console.log('[Checkout] User database entry created');
+              user = createdUser;
+              isNewUser = true; // Treat as new user for password setup
+
+              // Create user profile
+              console.log('[Checkout] Creating user profile...');
+              await ensureUserProfile(user.id);
+            }
+
+            // Skip the rest of new user creation
+          } else {
+            console.error('[Checkout] Auth user creation error:', authError);
+            return NextResponse.json({
+              error: 'Failed to create user account',
+              details: authError?.message
+            }, { status: 500 });
+          }
+        } else if (authData?.user) {
+            console.log('[Checkout] Passwordless user created:', authData.user.id);
+
+          // Fetch the user from users table (created by trigger)
+          // Wait a moment for trigger to complete
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          const { data: newUser, error: fetchError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', authData.user.id)
+            .single();
+
+          if (fetchError || !newUser) {
+            console.error('[Checkout] Failed to fetch new user:', fetchError);
+            return NextResponse.json({
+              error: 'User account created but failed to fetch',
+              details: fetchError?.message
+            }, { status: 500 });
+          }
+
+          user = newUser;
+
+          // Create user profile
+          console.log('[Checkout] Creating user profile...');
+          await ensureUserProfile(user.id);
         }
-
-        console.log('[Checkout] Passwordless user created:', authData.user.id);
-
-        // Fetch the user from users table (created by trigger)
-        // Wait a moment for trigger to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const { data: newUser, error: fetchError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', authData.user.id)
-          .single();
-
-        if (fetchError || !newUser) {
-          console.error('[Checkout] Failed to fetch new user:', fetchError);
-          return NextResponse.json({
-            error: 'User account created but failed to fetch',
-            details: fetchError?.message
-          }, { status: 500 });
-        }
-
-        user = newUser;
-
-        // Create user profile
-        console.log('[Checkout] Creating user profile...');
-        await ensureUserProfile(user.id);
       }
     }
     console.log('[Checkout] User ready:', user.id);

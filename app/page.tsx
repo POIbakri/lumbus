@@ -36,43 +36,43 @@ export default async function Home() {
         <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan/10 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-6 animate-zoom-in">
+          <div className="inline-block mb-6 ">
             <span className="inline-block px-8 py-3 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-primary shadow-lg backdrop-blur-sm">
               ⚡ Instant eSIM Delivery
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto animate-slide-up leading-tight" style={{animationDelay: '0.1s'}}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto  leading-tight" style={{animationDelay: '0.1s'}}>
             <span className="inline-block">ESIMS THAT JUST WORK.</span><br/>
             <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto animate-slide-up px-4" style={{animationDelay: '0.2s'}}>
-            Get connected in <span className="text-primary">190+ countries</span>.<br className="hidden sm:block"/>
+          <p className="text-lg sm:text-xl md:text-3xl font-bold mb-12 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
+            Get connected in <span className="text-primary">150+ countries</span>.<br className="hidden sm:block"/>
             <span className="sm:hidden"> </span>No physical SIM card needed. Instant activation.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center animate-slide-up px-4" style={{animationDelay: '0.3s'}}>
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center  px-4" style={{animationDelay: '0.3s'}}>
             <Link href="/plans" className="group w-full sm:w-auto">
-              <Button className="w-full bg-primary text-foreground hover:bg-primary/90 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl font-black shadow-2xl hover:scale-105 transition-transform">
+              <Button className="w-full bg-primary text-foreground hover:bg-primary/90 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl font-black shadow-2xl  ">
                 <span className="flex items-center justify-center gap-3">
                   GET STARTED
-                  <span className="inline-block group-hover:translate-x-2 transition-transform duration-300">→</span>
+                  <span className="inline-block group-hover:translate-x-2  ">→</span>
                 </span>
               </Button>
             </Link>
             <Link href="/how-it-works" className="group w-full sm:w-auto">
-              <Button className="w-full bg-white text-foreground hover:bg-foreground/5 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl border-4 border-foreground font-black shadow-2xl hover:scale-105 transition-transform">
+              <Button className="w-full bg-white text-foreground hover:bg-foreground/5 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl border-4 border-foreground font-black shadow-2xl  ">
                 <span className="flex items-center justify-center gap-3">
                   HOW IT WORKS
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">↗</span>
+                  <span className="opacity-0 group-hover:opacity-100  ">↗</span>
                 </span>
               </Button>
             </Link>
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-16 flex flex-wrap justify-center gap-8 items-center opacity-60 animate-fade-in" style={{animationDelay: '0.5s'}}>
+          <div className="mt-16 flex flex-wrap justify-center gap-8 items-center opacity-60 " style={{animationDelay: '0.5s'}}>
             <div className="flex items-center gap-2">
               <div className="text-2xl">⭐</div>
               <span className="font-bold text-sm">5.0 Rating</span>
@@ -87,7 +87,7 @@ export default async function Home() {
             </div>
             <div className="flex items-center gap-2">
               <div className="text-2xl">🌍</div>
-              <span className="font-bold text-sm">190+ Countries</span>
+              <span className="font-bold text-sm">150+ Countries</span>
             </div>
           </div>
         </div>
@@ -97,17 +97,17 @@ export default async function Home() {
       <section className="py-32 px-4 bg-light-mint relative overflow-hidden">
         <div className="container mx-auto relative z-10">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 text-center max-w-7xl mx-auto">
-            <div className="p-8 sm:p-10 md:p-12 bg-yellow rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift">
-              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">190+</div>
+            <div className="p-8 sm:p-10 md:p-12 bg-yellow rounded-3xl border-2 border-foreground/5  shadow-xl ">
+              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">150+</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Countries</div>
               <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Global Coverage ✓</div>
             </div>
-            <div className="p-8 sm:p-10 md:p-12 bg-cyan rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift" style={{animationDelay: '0.1s'}}>
+            <div className="p-8 sm:p-10 md:p-12 bg-cyan rounded-3xl border-2 border-foreground/5  shadow-xl " style={{animationDelay: '0.1s'}}>
               <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">5 MIN</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
               <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Super Fast ⚡</div>
             </div>
-            <div className="p-8 sm:p-10 md:p-12 bg-purple rounded-3xl border-2 border-foreground/5 animate-slide-up shadow-xl hover-lift sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
+            <div className="p-8 sm:p-10 md:p-12 bg-purple rounded-3xl border-2 border-foreground/5  shadow-xl  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
               <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">24/7</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Support</div>
               <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Always Here 💬</div>
@@ -119,7 +119,7 @@ export default async function Home() {
       {/* How It Works */}
       <section className="relative py-32 px-4 bg-white overflow-hidden">
         <div className="container mx-auto relative z-10">
-          <div className="text-center mb-20 animate-fade-in">
+          <div className="text-center mb-20 ">
             <div className="inline-block mb-4">
               <span className="px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
                 Simple Process
@@ -132,9 +132,9 @@ export default async function Home() {
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 max-w-6xl mx-auto">
-            <div className="group text-center animate-slide-up" style={{animationDelay: '0.1s'}}>
+            <div className="group text-center " style={{animationDelay: '0.1s'}}>
               <div className="relative inline-block mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-primary rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-primary rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl ">
                   1
                 </div>
               </div>
@@ -144,9 +144,9 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="group text-center animate-slide-up" style={{animationDelay: '0.2s'}}>
+            <div className="group text-center " style={{animationDelay: '0.2s'}}>
               <div className="relative inline-block mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-yellow rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-yellow rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl ">
                   2
                 </div>
               </div>
@@ -156,9 +156,9 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="group text-center animate-slide-up sm:col-span-2 md:col-span-1" style={{animationDelay: '0.3s'}}>
+            <div className="group text-center  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.3s'}}>
               <div className="relative inline-block mb-6 sm:mb-8">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-cyan rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl hover-lift">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-cyan rounded-3xl flex items-center justify-center text-4xl sm:text-5xl font-black mx-auto shadow-2xl ">
                   3
                 </div>
               </div>
@@ -171,7 +171,7 @@ export default async function Home() {
 
           <div className="text-center mt-16">
             <Link href="/how-it-works">
-              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-12 py-6 rounded-xl hover-lift">
+              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-12 py-6 rounded-xl ">
                 LEARN MORE
               </Button>
             </Link>
@@ -182,7 +182,7 @@ export default async function Home() {
       {/* Popular Plans */}
       <section className="relative py-32 px-4 bg-mint">
         <div className="container mx-auto">
-          <div className="text-center mb-16 animate-fade-in">
+          <div className="text-center mb-16 ">
             <div className="inline-block mb-4">
               <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
                 🌍 Most Popular
@@ -203,14 +203,14 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
             {plans.map((plan, index) => (
-              <div key={plan.id} className="animate-slide-up" style={{animationDelay: `${index * 0.1}s`}}>
+              <div key={plan.id} className="" style={{animationDelay: `${index * 0.1}s`}}>
                 <PlanCard plan={plan} />
               </div>
             ))}
           </div>
-          <div className="text-center animate-scale-in">
+          <div className="text-center ">
             <Link href="/plans">
-              <Button className="bg-yellow text-foreground hover:bg-yellow/90 font-black text-lg px-14 py-7 rounded-xl hover-lift shadow-xl">
+              <Button className="bg-yellow text-foreground hover:bg-yellow/90 font-black text-lg px-14 py-7 rounded-xl  shadow-xl">
                 <span className="relative">VIEW ALL PLANS</span>
               </Button>
             </Link>
@@ -221,14 +221,14 @@ export default async function Home() {
       {/* Features Grid */}
       <section className="relative py-32 px-4 bg-white overflow-hidden">
         <div className="container mx-auto relative z-10">
-          <div className="text-center mb-20 animate-fade-in">
+          <div className="text-center mb-20 ">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               WHY CHOOSE LUMBUS?
             </h2>
             <p className="text-xl font-bold opacity-70">Experience the difference</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <Card className="bg-mint border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden">
+            <Card className="bg-mint border-2 border-foreground/5 rounded-3xl   overflow-hidden">
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">⚡</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">INSTANT</h3>
@@ -236,15 +236,15 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.1s'}}>
+            <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.1s'}}>
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">🌍</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">GLOBAL</h3>
-                <p className="font-bold opacity-70">Works in 190+ countries</p>
+                <p className="font-bold opacity-70">Works in 150+ countries</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.2s'}}>
+            <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.2s'}}>
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">💳</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SIMPLE</h3>
@@ -252,7 +252,7 @@ export default async function Home() {
               </CardContent>
             </Card>
 
-            <Card className="bg-purple border-2 border-foreground/5 rounded-3xl hover-lift animate-slide-up overflow-hidden" style={{animationDelay: '0.3s'}}>
+            <Card className="bg-purple border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.3s'}}>
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">🔒</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SECURE</h3>
@@ -266,7 +266,7 @@ export default async function Home() {
       {/* CTA Section */}
       <section className="relative py-40 px-4 bg-primary overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
-          <div className="animate-scale-in">
+          <div className="">
             <div className="inline-block mb-8">
               <span className="px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
                 🚀 Join 10,000+ Happy Travelers
@@ -280,12 +280,12 @@ export default async function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center px-4">
               <Link href="/plans" className="w-full sm:w-auto">
-                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 hover:scale-105 text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black transition-transform">
+                <Button className="w-full bg-foreground text-white hover:bg-foreground/90  text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black ">
                   <span className="relative z-10">BROWSE PLANS</span>
                 </Button>
               </Link>
               <Link href="/help" className="w-full sm:w-auto">
-                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90 hover:scale-105 text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl font-black transition-transform">
+                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90  text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl font-black ">
                   GET HELP
                 </Button>
               </Link>
@@ -328,8 +328,15 @@ export default async function Home() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">eSIM Access Network</p>
+              <h4 className="font-bold uppercase mb-4">Partners</h4>
+              <div className="space-y-2">
+                <Link href="/affiliate-program" className="block text-gray-400 hover:text-white">
+                  Affiliate Program
+                </Link>
+                <Link href="/affiliate" className="block text-gray-400 hover:text-white">
+                  Affiliate Login
+                </Link>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

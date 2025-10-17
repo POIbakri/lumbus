@@ -20,7 +20,7 @@ Modern, mobile-first eSIM marketplace with instant activation. Built with Next.j
 ### 📱 eSIM Provisioning
 - **Instant Activation** - iOS 17.4+ users get scan-free eSIM activation via Universal Links
 - **Multi-Platform** - Support for iOS, Android, and desktop with QR codes and manual entry
-- **190+ Countries** - Global coverage via 1GLOBAL network
+- **150+ Countries** - Global coverage via 1GLOBAL network
 - **Auto Deep-Link** - One-tap eSIM installation on compatible devices
 - **Success Animations** - Beautiful planet + signal bars animation
 

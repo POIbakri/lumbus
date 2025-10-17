@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">CHOOSE YOUR PLAN</h2>
               <p className="text-base sm:text-lg md:text-xl font-bold text-foreground/70 mb-6">
-                Select the perfect data plan for your destination. We offer plans for 190+ countries with flexible data options and durations.
+                Select the perfect data plan for your destination. We offer plans for 150+ countries with flexible data options and durations.
               </p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
@@ -205,7 +205,7 @@ export default function HowItWorksPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card className="border-2 border-foreground/10 hover-lift">
+            <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
                 <div className="text-6xl mb-6">⚡</div>
                 <h3 className="font-black text-xl mb-4 uppercase">One-Tap Install</h3>
@@ -218,7 +218,7 @@ export default function HowItWorksPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-foreground/10 hover-lift">
+            <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
                 <div className="text-6xl mb-6">📸</div>
                 <h3 className="font-black text-xl mb-4 uppercase">QR Code</h3>
@@ -231,7 +231,7 @@ export default function HowItWorksPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-foreground/10 hover-lift">
+            <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
                 <div className="text-6xl mb-6">⌨️</div>
                 <h3 className="font-black text-xl mb-4 uppercase">Manual Entry</h3>
@@ -257,7 +257,7 @@ export default function HowItWorksPage() {
           </div>
 
           <div className="space-y-6">
-            <Card className="border-2 border-foreground/5 hover-lift">
+            <Card className="border-2 border-foreground/5 ">
               <CardContent className="p-6">
                 <h3 className="font-black text-lg mb-3">When should I install my eSIM?</h3>
                 <p className="font-bold text-foreground/70">
@@ -266,7 +266,7 @@ export default function HowItWorksPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-foreground/5 hover-lift">
+            <Card className="border-2 border-foreground/5 ">
               <CardContent className="p-6">
                 <h3 className="font-black text-lg mb-3">Do I need to remove my primary SIM?</h3>
                 <p className="font-bold text-foreground/70">
@@ -275,7 +275,7 @@ export default function HowItWorksPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-foreground/5 hover-lift">
+            <Card className="border-2 border-foreground/5 ">
               <CardContent className="p-6">
                 <h3 className="font-black text-lg mb-3">What if I run out of data?</h3>
                 <p className="font-bold text-foreground/70">
@@ -284,7 +284,7 @@ export default function HowItWorksPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-foreground/5 hover-lift">
+            <Card className="border-2 border-foreground/5 ">
               <CardContent className="p-6">
                 <h3 className="font-black text-lg mb-3">Can I use hotspot/tethering?</h3>
                 <p className="font-bold text-foreground/70">
@@ -307,12 +307,12 @@ export default function HowItWorksPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/plans">
-              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-16 py-6 rounded-lg hover-lift">
+              <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-lg px-16 py-6 rounded-lg ">
                 GET STARTED
               </Button>
             </Link>
             <Link href="/help">
-              <Button className="bg-white text-foreground hover:bg-white/90 font-black text-lg px-16 py-6 rounded-lg hover-lift">
+              <Button className="bg-white text-foreground hover:bg-white/90 font-black text-lg px-16 py-6 rounded-lg ">
                 HELP CENTER
               </Button>
             </Link>
@@ -323,7 +323,7 @@ export default function HowItWorksPage() {
       {/* Footer */}
       <footer className="bg-foreground text-white py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="font-black text-2xl mb-4">LUMBUS</h3>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
@@ -343,8 +343,26 @@ export default function HowItWorksPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">eSIM Access Network</p>
+              <h4 className="font-bold uppercase mb-4">Support</h4>
+              <div className="space-y-2">
+                <Link href="/help" className="block text-gray-400 hover:text-white">
+                  Help Center
+                </Link>
+                <Link href="/plans" className="block text-gray-400 hover:text-white">
+                  Plans
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Partners</h4>
+              <div className="space-y-2">
+                <Link href="/affiliate-program" className="block text-gray-400 hover:text-white">
+                  Affiliate Program
+                </Link>
+                <Link href="/affiliate" className="block text-gray-400 hover:text-white">
+                  Affiliate Login
+                </Link>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

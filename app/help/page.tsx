@@ -144,7 +144,7 @@ export default function HelpPage() {
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             <Link href="/how-it-works">
-              <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all">
+              <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-4 sm:p-6 text-center">
                   <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">⚡</div>
                   <h3 className="font-black text-xs sm:text-sm uppercase">How it Works</h3>
@@ -152,7 +152,7 @@ export default function HelpPage() {
               </Card>
             </Link>
             <Link href="/device">
-              <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all">
+              <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl mb-3">📱</div>
                   <h3 className="font-black text-sm uppercase">Device Check</h3>
@@ -160,7 +160,7 @@ export default function HelpPage() {
               </Card>
             </Link>
             <Link href="/destinations">
-              <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all">
+              <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl mb-3">🌍</div>
                   <h3 className="font-black text-sm uppercase">Destinations</h3>
@@ -168,7 +168,7 @@ export default function HelpPage() {
               </Card>
             </Link>
             <Link href="/plans">
-              <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all">
+              <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
                   <div className="text-4xl mb-3">💎</div>
                   <h3 className="font-black text-sm uppercase">Browse Plans</h3>
@@ -195,7 +195,7 @@ export default function HelpPage() {
                   onClick={() => setExpandedCategory(expandedCategory === category.category ? null : category.category)}
                   className="w-full"
                 >
-                  <Card className="border-2 border-foreground/10 hover-lift cursor-pointer transition-all">
+                  <Card className="border-2 border-foreground/10  cursor-pointer ">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-center">
                         <h3 className="font-black text-xl uppercase text-left">{category.category}</h3>
@@ -208,7 +208,7 @@ export default function HelpPage() {
                 </button>
 
                 {expandedCategory === category.category && (
-                  <div className="mt-4 space-y-4 animate-slide-up">
+                  <div className="mt-4 space-y-4 ">
                     {category.questions.map((faq, qIndex) => (
                       <Card
                         key={qIndex}
@@ -217,7 +217,7 @@ export default function HelpPage() {
                         <CardContent className="p-0">
                           <button
                             onClick={() => setExpandedQuestion(expandedQuestion === `${catIndex}-${qIndex}` ? null : `${catIndex}-${qIndex}`)}
-                            className="w-full p-6 text-left hover:bg-foreground/5 transition-colors"
+                            className="w-full p-6 text-left hover:bg-foreground/5 "
                           >
                             <div className="flex justify-between items-start gap-4">
                               <h4 className="font-black text-base">{faq.q}</h4>
@@ -227,7 +227,7 @@ export default function HelpPage() {
                             </div>
                           </button>
                           {expandedQuestion === `${catIndex}-${qIndex}` && (
-                            <div className="px-6 pb-6 animate-slide-up">
+                            <div className="px-6 pb-6 ">
                               <p className="font-bold text-foreground/70">{faq.a}</p>
                             </div>
                           )}
@@ -298,7 +298,7 @@ export default function HelpPage() {
       {/* Footer */}
       <footer className="bg-foreground text-white py-12 px-4">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="font-black text-2xl mb-4">LUMBUS</h3>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
@@ -318,8 +318,26 @@ export default function HelpPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold uppercase mb-4">Powered By</h4>
-              <p className="text-gray-400">eSIM Access Network</p>
+              <h4 className="font-bold uppercase mb-4">Support</h4>
+              <div className="space-y-2">
+                <Link href="/help" className="block text-gray-400 hover:text-white">
+                  Help Center
+                </Link>
+                <Link href="/plans" className="block text-gray-400 hover:text-white">
+                  Plans
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold uppercase mb-4">Partners</h4>
+              <div className="space-y-2">
+                <Link href="/affiliate-program" className="block text-gray-400 hover:text-white">
+                  Affiliate Program
+                </Link>
+                <Link href="/affiliate" className="block text-gray-400 hover:text-white">
+                  Affiliate Login
+                </Link>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">

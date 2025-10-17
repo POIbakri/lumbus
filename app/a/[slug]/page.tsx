@@ -74,11 +74,11 @@ export default function AffiliateReferencePage() {
         <div className="container mx-auto relative z-10">
           <div className="max-w-2xl mx-auto text-center">
             {status === 'tracking' && (
-              <div className="animate-fade-in">
+              <div className="">
                 <div className="relative inline-block mb-6 sm:mb-8">
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full "></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-3xl sm:text-4xl animate-pulse-slow">✨</div>
+                    <div className="text-3xl sm:text-4xl ">✨</div>
                   </div>
                 </div>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">WELCOME!</h1>
@@ -89,8 +89,8 @@ export default function AffiliateReferencePage() {
             )}
 
             {status === 'redirecting' && (
-              <div className="animate-scale-in">
-                <div className="text-5xl sm:text-6xl mb-6 sm:mb-8 animate-bounce-slow">🎉</div>
+              <div className="">
+                <div className="text-5xl sm:text-6xl mb-6 sm:mb-8 ">🎉</div>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">ALL SET!</h1>
                 <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70">
                   Redirecting you to our plans...
@@ -99,7 +99,7 @@ export default function AffiliateReferencePage() {
             )}
 
             {status === 'error' && (
-              <div className="animate-fade-in">
+              <div className="">
                 <div className="text-5xl sm:text-6xl mb-6 sm:mb-8">⚠️</div>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">OOPS!</h1>
                 <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70 mb-4">

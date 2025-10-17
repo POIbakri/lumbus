@@ -36,25 +36,25 @@ export function RegionPicker({ selectedRegion, onSelectRegion }: RegionPickerPro
         return (
           <Card
             key={region.code}
-            className={`group cursor-pointer transition-all duration-300 border-4 ${colorClass} relative overflow-hidden ${
+            className={`group cursor-pointer   border-4 ${colorClass} relative overflow-hidden ${
               isSelected
                 ? 'ring-4 ring-foreground shadow-2xl scale-105'
-                : 'hover:shadow-xl hover:scale-105'
+                : ' '
             }`}
             onClick={() => onSelectRegion?.(region.code)}
           >
             {/* Shine Effect */}
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100   pointer-events-none"></div>
 
             {/* Selection Indicator */}
             {isSelected && (
-              <div className="absolute top-3 right-3 w-6 h-6 bg-foreground rounded-full flex items-center justify-center animate-scale-in">
+              <div className="absolute top-3 right-3 w-6 h-6 bg-foreground rounded-full flex items-center justify-center ">
                 <span className="text-white text-xs">✓</span>
               </div>
             )}
 
             <CardContent className="p-8 text-center relative z-10">
-              <div className={`text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300 ${isSelected ? 'animate-bounce-subtle' : ''}`}>
+              <div className={`text-6xl mb-4 transform group-   ${isSelected ? '' : ''}`}>
                 {region.flag}
               </div>
               <div className="font-black uppercase text-lg tracking-tight">{region.name}</div>

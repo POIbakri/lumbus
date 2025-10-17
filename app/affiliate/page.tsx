@@ -103,7 +103,7 @@ export default function AffiliateDashboardPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted-foreground font-bold">Loading affiliate dashboard...</p>
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function AffiliateDashboardPage() {
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="mb-8 sm:mb-12 animate-slide-up">
+          <div className="mb-8 sm:mb-12 ">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">AFFILIATE DASHBOARD</h1>
             <p className="text-base sm:text-lg font-bold text-muted-foreground">
               Welcome back, {affiliate.display_name}
@@ -155,7 +155,7 @@ export default function AffiliateDashboardPage() {
           </div>
 
           {/* Affiliate Link */}
-          <div className="mb-8 sm:mb-12 animate-slide-up" style={{animationDelay: '0.1s'}}>
+          <div className="mb-8 sm:mb-12 " style={{animationDelay: '0.1s'}}>
             <Card className="bg-purple border-4 border-accent shadow-xl">
               <CardHeader>
                 <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">YOUR AFFILIATE LINK</CardTitle>
@@ -168,7 +168,7 @@ export default function AffiliateDashboardPage() {
                     </div>
                     <Button
                       onClick={copyAffiliateLink}
-                      className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 touch-ripple"
+                      className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 "
                     >
                       {copied ? '✓ COPIED' : 'COPY'}
                     </Button>
@@ -194,8 +194,8 @@ export default function AffiliateDashboardPage() {
 
           {/* Stats Grid */}
           {stats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 animate-slide-up" style={{animationDelay: '0.2s'}}>
-              <Card className="bg-mint border-4 border-primary shadow-xl hover-lift">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 " style={{animationDelay: '0.2s'}}>
+              <Card className="bg-mint border-4 border-primary shadow-xl ">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     {stats.totalClicks}
@@ -206,7 +206,7 @@ export default function AffiliateDashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-yellow border-4 border-secondary shadow-xl hover-lift">
+              <Card className="bg-yellow border-4 border-secondary shadow-xl ">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     {stats.totalConversions}
@@ -220,7 +220,7 @@ export default function AffiliateDashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-cyan border-4 border-primary shadow-xl hover-lift">
+              <Card className="bg-cyan border-4 border-primary shadow-xl ">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     ${(stats.epc / 100).toFixed(2)}
@@ -235,7 +235,7 @@ export default function AffiliateDashboardPage() {
 
           {/* Commission Breakdown */}
           {stats && (
-            <div className="animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <div className="" style={{animationDelay: '0.3s'}}>
               <Card className="bg-white border-2 border-foreground/10 shadow-lg">
                 <CardHeader>
                   <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">EARNINGS BREAKDOWN</CardTitle>

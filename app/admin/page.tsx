@@ -182,7 +182,7 @@ export default function AdminPage() {
                     return (
                       <Card
                         key={order.id}
-                        className="border border-foreground/10 hover:border-primary transition-all duration-300"
+                        className="border border-foreground/10 hover:border-primary  "
                       >
                         <CardContent className="p-3 sm:p-4">
                           {/* Mobile: Stack all content vertically */}
@@ -223,7 +223,7 @@ export default function AdminPage() {
                                   </div>
                                   <div className="w-full bg-foreground/10 rounded-full h-2">
                                     <div
-                                      className="bg-primary h-full rounded-full transition-all"
+                                      className="bg-primary h-full rounded-full "
                                       style={{ width: `${dataUsage.percentage}%` }}
                                     ></div>
                                   </div>

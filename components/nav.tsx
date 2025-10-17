@@ -18,26 +18,29 @@ export function Nav() {
       <div className="container mx-auto px-4 md:px-6 py-5">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="text-2xl md:text-3xl font-black uppercase tracking-tighter hover:text-primary transition-all duration-300">
+          <Link href="/" className="text-2xl md:text-3xl font-black uppercase tracking-tighter hover:text-primary  ">
             <span className="text-foreground">LUMBUS</span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex gap-8 items-center">
-            <Link href="/" className="font-bold text-sm hover:text-primary transition-colors duration-300">
+            <Link href="/" className="font-bold text-sm hover:text-primary  ">
               Home
             </Link>
-            <Link href="/destinations" className="font-bold text-sm hover:text-primary transition-colors duration-300">
+            <Link href="/destinations" className="font-bold text-sm hover:text-primary  ">
               Destinations
             </Link>
-            <Link href="/device" className="font-bold text-sm hover:text-primary transition-colors duration-300">
+            <Link href="/device" className="font-bold text-sm hover:text-primary  ">
               Device
             </Link>
-            <Link href="/how-it-works" className="font-bold text-sm hover:text-primary transition-colors duration-300">
+            <Link href="/how-it-works" className="font-bold text-sm hover:text-primary  ">
               How it works
             </Link>
-            <Link href="/help" className="font-bold text-sm hover:text-primary transition-colors duration-300">
+            <Link href="/help" className="font-bold text-sm hover:text-primary  ">
               Help Center
+            </Link>
+            <Link href="/affiliate-program" className="font-bold text-sm hover:text-primary  ">
+              Affiliates
             </Link>
 
             {!loading && (
@@ -74,9 +77,9 @@ export function Nav() {
             aria-label="Toggle menu"
           >
             <div className="w-6 h-5 relative flex flex-col justify-between">
-              <span className={`w-full h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-              <span className={`w-full h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`w-full h-0.5 bg-foreground transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+              <span className={`w-full h-0.5 bg-foreground  ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+              <span className={`w-full h-0.5 bg-foreground  ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+              <span className={`w-full h-0.5 bg-foreground  ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
             </div>
           </button>
         </div>
@@ -84,20 +87,23 @@ export function Nav() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 flex flex-col gap-4">
-            <Link href="/" className="font-bold text-sm hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link href="/" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
               Home
             </Link>
-            <Link href="/destinations" className="font-bold text-sm hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link href="/destinations" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
               Destinations
             </Link>
-            <Link href="/device" className="font-bold text-sm hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link href="/device" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
               Device
             </Link>
-            <Link href="/how-it-works" className="font-bold text-sm hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link href="/how-it-works" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
               How it works
             </Link>
-            <Link href="/help" className="font-bold text-sm hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+            <Link href="/help" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
               Help Center
+            </Link>
+            <Link href="/affiliate-program" className="font-bold text-sm hover:text-primary " onClick={() => setMobileMenuOpen(false)}>
+              Affiliates
             </Link>
 
             {!loading && (

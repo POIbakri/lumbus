@@ -119,7 +119,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted-foreground font-bold">Loading top-up options...</p>
         </div>
       </div>
@@ -159,7 +159,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="mb-8 animate-slide-up">
+          <div className="mb-8 ">
             <Link href="/dashboard" className="inline-flex items-center gap-2 text-primary font-black mb-4 hover:underline">
               ← BACK TO DASHBOARD
             </Link>
@@ -172,7 +172,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           </div>
 
           {/* Current eSIM Status */}
-          <Card className="bg-mint border-4 border-primary shadow-xl mb-8 animate-slide-up" style={{animationDelay: '0.1s'}}>
+          <Card className="bg-mint border-4 border-primary shadow-xl mb-8 " style={{animationDelay: '0.1s'}}>
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -218,7 +218,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
 
           {/* Available Top-Up Plans */}
           <div className="mb-8">
-            <h2 className="text-3xl font-black uppercase mb-6 animate-slide-up" style={{animationDelay: '0.2s'}}>
+            <h2 className="text-3xl font-black uppercase mb-6 " style={{animationDelay: '0.2s'}}>
               AVAILABLE TOP-UP PLANS
             </h2>
 
@@ -237,7 +237,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
                 {availablePlans.map((plan, index) => (
                   <Card
                     key={plan.id}
-                    className="bg-cyan border-4 border-secondary shadow-xl hover-lift card-stack animate-slide-up touch-ripple"
+                    className="bg-cyan border-4 border-secondary shadow-xl    "
                     style={{animationDelay: `${0.3 + index * 0.1}s`}}
                   >
                     <CardHeader>
@@ -287,11 +287,11 @@ export default function TopUpPage({ params }: TopUpPageProps) {
                       <Button
                         onClick={() => handleTopUp(plan.id)}
                         disabled={checkoutLoading === plan.id}
-                        className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-6 text-lg touch-ripple"
+                        className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-6 text-lg "
                       >
                         {checkoutLoading === plan.id ? (
                           <>
-                            <span className="inline-block animate-spin mr-2">⏳</span>
+                            <span className="inline-block  mr-2">⏳</span>
                             LOADING...
                           </>
                         ) : (
@@ -310,7 +310,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           </div>
 
           {/* Info Box */}
-          <Card className="bg-purple border-2 border-accent shadow-lg animate-slide-up" style={{animationDelay: '0.4s'}}>
+          <Card className="bg-purple border-2 border-accent shadow-lg " style={{animationDelay: '0.4s'}}>
             <CardContent className="pt-6">
               <h3 className="text-xl font-black uppercase mb-4">HOW TOP-UP WORKS</h3>
               <div className="space-y-3">

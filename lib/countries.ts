@@ -1,6 +1,6 @@
 /**
  * Country and region mappings for eSIM plans
- * Based on actual data from database (188 regions, 1,775 plans)
+ * Based on actual data from database (188 regions, 1700+ plans)
  */
 
 export interface CountryInfo {

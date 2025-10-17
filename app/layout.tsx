@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Lumbus - Fast eSIM Store",
-  description: "Travel lighter. Lumbus drops an eSIM into your phone in seconds. Instant eSIMs for 190+ countries.",
+  description: "Travel lighter. Lumbus drops an eSIM into your phone in seconds. Instant eSIMs for 150+ countries.",
   manifest: "/manifest.json",
   themeColor: "#8b5cf6",
   appleWebApp: {

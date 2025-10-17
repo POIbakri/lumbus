@@ -176,14 +176,14 @@ function PlansPageContent() {
           <div className="text-center mb-8 sm:mb-12 md:mb-16 px-2 sm:px-4">
             <div className="inline-block mb-4 sm:mb-6">
               <span className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-primary">
-                💎 {plans.length}+ eSIM Plans
+                💎 1700+ eSIM Plans
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-3 sm:mb-4 md:mb-6 leading-tight">
               CHOOSE YOUR PLAN
             </h1>
             <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold max-w-3xl mx-auto opacity-70 px-2">
-              Get instant connectivity in 160+ countries. No contracts, no hassle.
+              Get instant connectivity in 150+ countries. No contracts, no hassle.
             </p>
           </div>
 
@@ -315,7 +315,7 @@ function PlansPageContent() {
           {loading ? (
             <div className="text-center py-20 sm:py-32 px-4">
               <div className="relative inline-block">
-                <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full "></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-2xl sm:text-4xl">⚡</div>
                 </div>
@@ -370,7 +370,7 @@ export default function PlansPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full  mx-auto mb-4"></div>
           <p className="font-black uppercase">Loading plans...</p>
         </div>
       </div>

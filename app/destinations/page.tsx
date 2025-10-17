@@ -101,21 +101,21 @@ export default function DestinationsPage() {
         <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-3 sm:mb-4 md:mb-6 animate-fade-in">
+          <div className="inline-block mb-3 sm:mb-4 md:mb-6 ">
             <span className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
-              🌍 {countriesWithPlans.length}+ Countries
+              🌍 150+ Countries
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-3 sm:mb-4 md:mb-6 leading-tight animate-slide-up px-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-3 sm:mb-4 md:mb-6 leading-tight  px-2">
             WHERE WILL YOU<br/>GO NEXT?
           </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold max-w-3xl mx-auto text-foreground/70 animate-slide-up px-2" style={{animationDelay: '0.1s'}}>
-            Get instant connectivity in {countriesWithPlans.length}+ countries worldwide.<br className="hidden sm:inline"/>
+          <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold max-w-3xl mx-auto text-foreground/70  px-2" style={{animationDelay: '0.1s'}}>
+            Get instant connectivity in 150+ countries worldwide.<br className="hidden sm:inline"/>
             <span className="sm:hidden"> </span>No SIM card needed. Activate in seconds.
           </p>
 
           {/* Search Bar */}
-          <div className="mt-6 sm:mt-8 max-w-2xl mx-auto animate-slide-up px-2" style={{animationDelay: '0.2s'}}>
+          <div className="mt-6 sm:mt-8 max-w-2xl mx-auto  px-2" style={{animationDelay: '0.2s'}}>
             <Input
               type="text"
               placeholder="🔍 Search for a country..."
@@ -144,10 +144,10 @@ export default function DestinationsPage() {
               <Link
                 key={dest.code}
                 href={`/plans?region=${dest.code}`}
-                className="animate-slide-up"
+                className=""
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <Card className="hover-lift cursor-pointer border-4 border-foreground/5 hover:border-primary transition-all duration-300 bg-mint">
+                <Card className=" cursor-pointer border-4 border-foreground/5 hover:border-primary   bg-mint">
                   <CardContent className="p-4 sm:p-6 text-center">
                     <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">{dest.flag}</div>
                     <h3 className="font-black text-base sm:text-lg mb-2">{dest.name}</h3>
@@ -180,10 +180,10 @@ export default function DestinationsPage() {
                 <Link
                   key={region.code}
                   href={`/plans?region=${region.code}`}
-                  className="animate-slide-up"
+                  className=""
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  <Card className="hover-lift cursor-pointer border-2 sm:border-4 border-foreground/5 hover:border-primary transition-all duration-300 bg-cyan">
+                  <Card className=" cursor-pointer border-2 sm:border-4 border-foreground/5 hover:border-primary   bg-cyan">
                     <CardContent className="p-4 sm:p-6 md:p-8">
                       <div className="text-center">
                         <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">{region.flag}</div>
@@ -248,10 +248,10 @@ export default function DestinationsPage() {
                   <Link
                     key={country.code}
                     href={`/plans?region=${country.code}`}
-                    className="animate-slide-up"
+                    className=""
                     style={{ animationDelay: `${index * 0.02}s` }}
                   >
-                    <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all duration-300">
+                    <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
                       <CardContent className="p-3 sm:p-4 text-center">
                         <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
                         <div className="font-black text-xs sm:text-sm mb-1">{country.name}</div>
@@ -280,10 +280,10 @@ export default function DestinationsPage() {
                   <Link
                     key={country.code}
                     href={`/plans?region=${country.code}`}
-                    className="animate-slide-up"
+                    className=""
                     style={{ animationDelay: `${index * 0.02}s` }}
                   >
-                    <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all duration-300">
+                    <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
                       <CardContent className="p-3 sm:p-4 text-center">
                         <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
                         <div className="font-black text-xs sm:text-sm mb-1">{country.name}</div>
@@ -322,10 +322,10 @@ export default function DestinationsPage() {
                         <Link
                           key={country.code}
                           href={`/plans?region=${country.code}`}
-                          className="animate-slide-up"
+                          className=""
                           style={{ animationDelay: `${index * 0.02}s` }}
                         >
-                          <Card className="hover-lift cursor-pointer border-2 border-foreground/5 hover:border-primary transition-all duration-300">
+                          <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
                             <CardContent className="p-3 sm:p-4 text-center">
                               <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
                               <div className="font-black text-xs sm:text-sm mb-1 truncate" title={country.name}>
@@ -351,19 +351,19 @@ export default function DestinationsPage() {
       <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 bg-light-mint">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 text-center">
-            <div className="p-4 sm:p-6 md:p-8 bg-cyan rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl animate-slide-up">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">{countriesWithPlans.length}+</div>
+            <div className="p-4 sm:p-6 md:p-8 bg-cyan rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl ">
+              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">150+</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Countries</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-yellow rounded-xl sm:rounded-2xl border-2 sm:border-4 border-secondary shadow-xl animate-slide-up" style={{animationDelay: '0.1s'}}>
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">{plans.length}+</div>
+            <div className="p-4 sm:p-6 md:p-8 bg-yellow rounded-xl sm:rounded-2xl border-2 sm:border-4 border-secondary shadow-xl " style={{animationDelay: '0.1s'}}>
+              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">1700+</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Plans</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-purple rounded-xl sm:rounded-2xl border-2 sm:border-4 border-accent shadow-xl animate-slide-up" style={{animationDelay: '0.2s'}}>
+            <div className="p-4 sm:p-6 md:p-8 bg-purple rounded-xl sm:rounded-2xl border-2 sm:border-4 border-accent shadow-xl " style={{animationDelay: '0.2s'}}>
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">24/7</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Support</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-mint rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <div className="p-4 sm:p-6 md:p-8 bg-mint rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl " style={{animationDelay: '0.3s'}}>
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">5G</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Speeds</div>
             </div>
@@ -381,7 +381,7 @@ export default function DestinationsPage() {
             Choose your destination and get instant connectivity
           </p>
           <Link href="/plans">
-            <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl hover-lift shadow-2xl">
+            <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl  shadow-2xl">
               BROWSE ALL PLANS
             </Button>
           </Link>

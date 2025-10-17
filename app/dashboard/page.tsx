@@ -169,7 +169,7 @@ export default function DashboardPage() {
   const shareViaTwitter = () => {
     if (referralStats?.referral_link) {
       const text = encodeURIComponent(
-        `Get 10% off your first eSIM with @LumbusTravel! Stay connected in 190+ countries. Use my link:`
+        `Get 10% off your first eSIM with @LumbusTravel! Stay connected in 150+ countries. Use my link:`
       );
       window.open(
         `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(referralStats.referral_link)}`,
@@ -182,7 +182,7 @@ export default function DashboardPage() {
     if (referralStats?.referral_link) {
       const subject = encodeURIComponent('Get 10% off Lumbus eSIM');
       const body = encodeURIComponent(
-        `Hey! I've been using Lumbus for my international travel connectivity and thought you might like it too.\n\nUse my referral link to get 10% off your first eSIM purchase:\n${referralStats.referral_link}\n\nStay connected in 190+ countries without roaming fees!`
+        `Hey! I've been using Lumbus for my international travel connectivity and thought you might like it too.\n\nUse my referral link to get 10% off your first eSIM purchase:\n${referralStats.referral_link}\n\nStay connected in 150+ countries without roaming fees!`
       );
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
@@ -229,7 +229,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted-foreground font-bold">Loading dashboard...</p>
         </div>
       </div>
@@ -248,7 +248,7 @@ export default function DashboardPage() {
       <div className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="mb-6 sm:mb-8 md:mb-12 animate-slide-up">
+          <div className="mb-6 sm:mb-8 md:mb-12 ">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-2 sm:mb-4 leading-tight">
               YOUR DASHBOARD
             </h1>
@@ -258,8 +258,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12 animate-slide-up" style={{animationDelay: '0.1s'}}>
-            <Card className="bg-mint border-2 sm:border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.1s'}}>
+            <Card className="bg-mint border-2 sm:border-4 border-primary shadow-xl   ">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {activeOrders.length}
@@ -270,7 +270,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-yellow border-2 sm:border-4 border-secondary shadow-xl hover-lift card-stack touch-ripple">
+            <Card className="bg-yellow border-2 sm:border-4 border-secondary shadow-xl   ">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {orders.length}
@@ -281,7 +281,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-cyan border-2 sm:border-4 border-primary shadow-xl hover-lift card-stack touch-ripple">
+            <Card className="bg-cyan border-2 sm:border-4 border-primary shadow-xl   ">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {activeOrders.reduce((sum, o) => sum + (o.plan?.data_gb || 0), 0)} GB
@@ -295,7 +295,7 @@ export default function DashboardPage() {
 
           {/* Referral Section */}
           {referralStats && (
-            <div className="mb-6 sm:mb-8 md:mb-12 animate-slide-up" style={{animationDelay: '0.2s'}}>
+            <div className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.2s'}}>
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">REFER & EARN</h2>
               <Card className="bg-purple border-2 sm:border-4 border-accent shadow-xl">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                           </div>
                           <Button
                             onClick={copyReferralLink}
-                            className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 touch-ripple"
+                            className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 "
                           >
                             {copiedLink ? '✓ COPIED' : 'COPY'}
                           </Button>
@@ -332,19 +332,19 @@ export default function DashboardPage() {
                       <div className="space-y-3">
                         <Button
                           onClick={shareViaWhatsApp}
-                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4 touch-ripple flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4  flex items-center justify-center gap-2"
                         >
                           <span className="text-xl">💬</span> SHARE VIA WHATSAPP
                         </Button>
                         <Button
                           onClick={shareViaTwitter}
-                          className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4 touch-ripple flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4  flex items-center justify-center gap-2"
                         >
                           <span className="text-xl">🐦</span> SHARE ON TWITTER
                         </Button>
                         <Button
                           onClick={shareViaEmail}
-                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4 touch-ripple flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4  flex items-center justify-center gap-2"
                         >
                           <span className="text-xl">✉️</span> SHARE VIA EMAIL
                         </Button>
@@ -416,14 +416,14 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE ESIMS</h2>
               <Link href="/plans" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black touch-ripple elastic-bounce pulse-glow text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
+                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
                   + BUY NEW ESIM
                 </Button>
               </Link>
             </div>
 
             {activeOrders.length === 0 ? (
-              <Card className="bg-purple border-2 border-accent shadow-lg animate-slide-up">
+              <Card className="bg-purple border-2 border-accent shadow-lg ">
                 <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
                   <div className="text-5xl sm:text-6xl mb-4">📱</div>
                   <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE ESIMS</h3>
@@ -465,11 +465,11 @@ export default function DashboardPage() {
                   return (
                     <Card
                       key={order.id}
-                      className="bg-mint border-4 border-primary shadow-xl hover-lift card-stack relative overflow-hidden animate-slide-up touch-ripple"
+                      className="bg-mint border-4 border-primary shadow-xl   relative overflow-hidden  "
                       style={{animationDelay: `${index * 0.1}s`}}
                     >
                       {/* Shine Effect */}
-                      <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                      <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100   pointer-events-none"></div>
 
                       <CardHeader className="relative z-10">
                         <div className="flex justify-between items-start mb-3">
@@ -510,10 +510,10 @@ export default function DashboardPage() {
                             <button
                               onClick={() => refreshUsageData(order.id)}
                               disabled={refreshingUsage[order.id]}
-                              className="p-1 hover:bg-foreground/5 rounded-lg transition-colors disabled:opacity-50 touch-ripple"
+                              className="p-1 hover:bg-foreground/5 rounded-lg  disabled:opacity-50 "
                               title="Refresh usage data"
                             >
-                              <span className={`text-sm ${refreshingUsage[order.id] ? 'animate-spin' : ''}`}>
+                              <span className={`text-sm ${refreshingUsage[order.id] ? '' : ''}`}>
                                 🔄
                               </span>
                             </button>
@@ -530,7 +530,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
                             <div
-                              className="bg-primary h-full rounded-full transition-all duration-500"
+                              className="bg-primary h-full rounded-full  "
                               style={{ width: `${dataPercentage}%` }}
                             ></div>
                           </div>
@@ -570,13 +570,13 @@ export default function DashboardPage() {
                         {/* Actions */}
                         <div className="flex gap-2 sm:gap-3">
                           <Link href={`/install/${order.id}`} className="flex-1">
-                            <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 touch-ripple">
+                            <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
                               VIEW DETAILS
                             </Button>
                           </Link>
                           {(order.status === 'completed' || order.status === 'active') && order.iccid && (
                             <Link href={`/topup/${order.id}`} className="flex-1">
-                              <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 touch-ripple">
+                              <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
                                 + TOP UP
                               </Button>
                             </Link>
@@ -605,7 +605,7 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={order.id}
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl hover:shadow-md transition-shadow"
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl  "
                         >
                           <div className="flex items-start gap-3 flex-1 min-w-0">
                             {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}

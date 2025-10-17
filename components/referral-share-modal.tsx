@@ -60,7 +60,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   const shareViaTwitter = () => {
     const text = encodeURIComponent(
-      `Just got my eSIM from @LumbusTravel! Stay connected in 190+ countries. Get 10% off:`
+      `Just got my eSIM from @LumbusTravel! Stay connected in 150+ countries. Get 10% off:`
     );
     window.open(
       `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(referralLink)}`,
@@ -72,7 +72,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
   const shareViaEmail = () => {
     const subject = encodeURIComponent('Get 10% off Lumbus eSIM');
     const body = encodeURIComponent(
-      `Hey!\n\nI just got my eSIM from Lumbus and it's been great for travel connectivity. Thought you might like it too!\n\nUse my referral link to get 10% off your first eSIM:\n${referralLink}\n\nStay connected in 190+ countries without roaming fees!`
+      `Hey!\n\nI just got my eSIM from Lumbus and it's been great for travel connectivity. Thought you might like it too!\n\nUse my referral link to get 10% off your first eSIM:\n${referralLink}\n\nStay connected in 150+ countries without roaming fees!`
     );
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
     triggerHaptic('medium');
@@ -80,10 +80,10 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
         <Card className="max-w-lg w-full">
           <CardContent className="pt-6 text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
             <p className="font-bold">Loading...</p>
           </CardContent>
         </Card>
@@ -93,7 +93,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
         <Card className="max-w-lg w-full">
           <CardContent className="pt-6 text-center">
             <div className="text-6xl mb-4">⚠️</div>
@@ -124,20 +124,20 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-      <Card className="max-w-lg w-full bg-purple border-4 border-accent shadow-2xl animate-scale-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
+      <Card className="max-w-lg w-full bg-purple border-4 border-accent shadow-2xl ">
         <CardContent className="pt-6">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-2xl font-black hover:scale-110 transition-transform"
+            className="absolute top-4 right-4 text-2xl font-black  "
           >
             ✕
           </button>
 
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="text-6xl mb-4 animate-bounce-slow">🎁</div>
+            <div className="text-6xl mb-4 ">🎁</div>
             <h2 className="heading-md mb-3">SHARE & EARN!</h2>
             <p className="text-lg font-bold text-foreground/80">
               Your friends get 10% off. You get 1GB of free data when they make their first purchase!
@@ -160,7 +160,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
               </div>
               <Button
                 onClick={copyLink}
-                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black touch-ripple"
+                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black "
               >
                 {copied ? '✓' : 'COPY'}
               </Button>
@@ -171,19 +171,19 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
           <div className="space-y-3 mb-6">
             <Button
               onClick={shareViaWhatsApp}
-              className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4 touch-ripple flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4  flex items-center justify-center gap-2"
             >
               <span className="text-xl">💬</span> SHARE ON WHATSAPP
             </Button>
             <Button
               onClick={shareViaTwitter}
-              className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4 touch-ripple flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4  flex items-center justify-center gap-2"
             >
               <span className="text-xl">🐦</span> SHARE ON TWITTER
             </Button>
             <Button
               onClick={shareViaEmail}
-              className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4 touch-ripple flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4  flex items-center justify-center gap-2"
             >
               <span className="text-xl">✉️</span> SHARE VIA EMAIL
             </Button>
@@ -192,7 +192,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
           {/* Skip Button */}
           <Button
             onClick={onClose}
-            className="w-full bg-transparent border-2 border-foreground/20 hover:bg-foreground/5 font-black text-foreground/60 py-3 touch-ripple"
+            className="w-full bg-transparent border-2 border-foreground/20 hover:bg-foreground/5 font-black text-foreground/60 py-3 "
           >
             MAYBE LATER
           </Button>

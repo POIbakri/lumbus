@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InstallPanel } from '@/components/install-panel';
 import { useDeviceDetection, buildIOSUniversalLink } from '@/lib/device-detection';
 import { Badge } from '@/components/ui/badge';
-import { SuccessAnimation } from '@/components/success-animation';
 import { Nav } from '@/components/nav';
 import { ReferralShareModal } from '@/components/referral-share-modal';
 import { useAuth } from '@/lib/auth-context';
@@ -63,7 +62,7 @@ export default function InstallPage() {
   // Auto-trigger deep link for iOS 17.4+ when activation details are ready
   useEffect(() => {
     if (order?.hasActivationDetails && !deepLinkTriggered && deviceInfo.supportsUniversalLink && order.smdp && order.activationCode) {
-      // Delay by 2 seconds to show success animation first
+      // Delay by 2 seconds to give user time to see the ready message
       setTimeout(() => {
         // Type guard ensures we have non-null values
         if (order.smdp && order.activationCode) {
@@ -75,7 +74,7 @@ export default function InstallPage() {
     }
   }, [order, deepLinkTriggered, deviceInfo]);
 
-  // Show referral modal after success (5 seconds delay to let user see the success animation)
+  // Show referral modal after success (5 seconds delay)
   useEffect(() => {
     if (order?.hasActivationDetails && user && !showReferralModal) {
       const timer = setTimeout(() => {
@@ -101,7 +100,7 @@ export default function InstallPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted-foreground">Loading order...</p>
         </div>
       </div>
@@ -117,7 +116,7 @@ export default function InstallPage() {
           </CardHeader>
           <CardContent>
             <div className="text-center py-6">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+              <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
               <p className="text-muted-foreground mb-2">
                 Your eSIM is being activated...
               </p>
@@ -147,20 +146,17 @@ export default function InstallPage() {
       <div className="pt-32 pb-20 px-4">
         <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12 animate-slide-up px-4">
-            {/* Success Animation with Planet and Signal */}
-            <SuccessAnimation />
-
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 animate-slide-up leading-tight" style={{animationDelay: '0.2s'}}>
+          <div className="text-center mb-8 sm:mb-12 px-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
               YOUR ESIM IS READY!
             </h1>
-            <p className="text-base sm:text-lg md:text-xl font-bold animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <p className="text-base sm:text-lg md:text-xl font-bold">
               Connected via Lumbus — Expires in {order.plan.validityDays} days
             </p>
 
             {/* Auto Deep Link Notification for iOS 17.4+ */}
             {deviceInfo.supportsUniversalLink && !deepLinkTriggered && (
-              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block animate-slide-up" style={{animationDelay: '0.4s'}}>
+              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block">
                 <p className="font-black uppercase text-sm text-primary">
                   📲 Opening eSIM installer automatically...
                 </p>
@@ -168,7 +164,7 @@ export default function InstallPage() {
             )}
 
             {deepLinkTriggered && (
-              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block animate-slide-up">
+              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block ">
                 <p className="font-black uppercase text-sm text-primary">
                   ✓ eSIM installer opened! Follow the prompts to complete setup.
                 </p>

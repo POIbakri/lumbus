@@ -47,7 +47,7 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
   const displayData = formatDataAmount(plan.data_gb);
 
   return (
-    <Card className={`group ${colorClass} border-4 border-foreground/10 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden relative`}>
+    <Card className={`group ${colorClass} border-4 border-foreground/10 shadow-xl    overflow-hidden relative`}>
       <CardHeader className="pb-3 sm:pb-4 relative z-10">
         {/* Top row with flag and region badge */}
         <div className="flex items-center gap-2 mb-3">
@@ -96,7 +96,7 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
 
       <CardFooter className="relative z-10 pt-0">
         <Link href={`/plans/${plan.region_code.toLowerCase()}/${plan.id}`} className="w-full block">
-          <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base md:text-lg py-5 sm:py-6 md:py-7 shadow-xl hover:shadow-2xl transition-all">
+          <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base md:text-lg py-5 sm:py-6 md:py-7 shadow-xl  ">
             BUY NOW →
           </Button>
         </Link>

@@ -117,7 +117,7 @@ export default function PlanDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full  mx-auto mb-4"></div>
           <p className="font-black uppercase">Loading plan...</p>
         </div>
       </div>
@@ -148,21 +148,21 @@ export default function PlanDetailPage() {
 
       <div className="relative pt-20 sm:pt-24 md:pt-28 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4 bg-mint overflow-hidden">
         {/* Floating Elements */}
-        <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary rounded-full blur-3xl opacity-10 animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-10 sm:left-20 w-48 sm:w-64 h-48 sm:h-64 bg-cyan rounded-full blur-3xl opacity-10 animate-pulse-slow" style={{animationDelay: '1s'}}></div>
+        <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary rounded-full blur-3xl opacity-10 "></div>
+        <div className="absolute bottom-20 left-10 sm:left-20 w-48 sm:w-64 h-48 sm:h-64 bg-cyan rounded-full blur-3xl opacity-10 " style={{animationDelay: '1s'}}></div>
 
         <div className="container mx-auto relative z-10 max-w-4xl">
           <Link
             href="/plans"
-            className="inline-flex items-center gap-2 font-black uppercase text-xs sm:text-sm hover:text-primary mb-4 sm:mb-6 md:mb-8 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-slide-up"
+            className="inline-flex items-center gap-2 font-black uppercase text-xs sm:text-sm hover:text-primary mb-4 sm:mb-6 md:mb-8 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl bg-white/80 backdrop-blur-sm shadow-lg     "
           >
             ← BACK TO PLANS
           </Link>
 
-          <div className="max-w-3xl mx-auto animate-slide-up" style={{animationDelay: '0.1s'}}>
-            <Card className="group bg-white border-2 sm:border-3 md:border-4 border-primary shadow-2xl hover-lift relative overflow-hidden">
+          <div className="max-w-3xl mx-auto " style={{animationDelay: '0.1s'}}>
+            <Card className="group bg-white border-2 sm:border-3 md:border-4 border-primary shadow-2xl  relative overflow-hidden">
               {/* Shine Effect */}
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100   pointer-events-none"></div>
 
               {/* Decorative Elements */}
               <div className="absolute top-0 right-0 w-24 sm:w-32 md:w-48 h-24 sm:h-32 md:h-48 bg-primary/10 rounded-bl-full"></div>
@@ -194,11 +194,11 @@ export default function PlanDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 relative z-10 px-4 sm:px-6">
                 <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
-                  <div className="group/stat p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 bg-yellow rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground/5 hover-lift shadow-lg">
+                  <div className="group/stat p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 bg-yellow rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground/5  shadow-lg">
                     <div className="text-xs sm:text-sm font-black uppercase text-muted-foreground mb-1 sm:mb-2">Data</div>
                     <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground">{displayData}</div>
                   </div>
-                  <div className="group/stat p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 bg-cyan rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground/5 hover-lift shadow-lg">
+                  <div className="group/stat p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 bg-cyan rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground/5  shadow-lg">
                     <div className="text-xs sm:text-sm font-black uppercase text-muted-foreground mb-1 sm:mb-2">Valid for</div>
                     <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground">{plan.validity_days} days</div>
                   </div>
@@ -239,7 +239,7 @@ export default function PlanDetailPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="your@email.com"
-                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-foreground/20 rounded-lg sm:rounded-xl focus:outline-none focus:border-primary font-bold transition-colors"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-foreground/20 rounded-lg sm:rounded-xl focus:outline-none focus:border-primary font-bold "
                         disabled={loading}
                       />
                       <div className="mt-2 p-2 sm:p-3 bg-mint rounded-lg border border-primary/20">
@@ -262,7 +262,7 @@ export default function PlanDetailPage() {
                     <Button
                       onClick={handleCheckout}
                       disabled={loading || !email}
-                      className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 text-sm sm:text-base md:text-lg py-5 sm:py-6 md:py-7 font-black shadow-xl hover:shadow-2xl transition-all"
+                      className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 text-sm sm:text-base md:text-lg py-5 sm:py-6 md:py-7 font-black shadow-xl  "
                     >
                       {loading ? 'PROCESSING...' : 'PROCEED TO CHECKOUT'}
                     </Button>
