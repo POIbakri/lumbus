@@ -15,7 +15,7 @@ function getStripeClient() {
       throw new Error('STRIPE_SECRET_KEY is not configured');
     }
     stripe = new Stripe(apiKey, {
-      apiVersion: '2025-09-30.clover',
+      apiVersion: '2024-11-20.acacia',
     });
   }
   return stripe;
@@ -228,9 +228,14 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Checkout session error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid request', details: error.issues }, { status: 400 });
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+    }, { status: 500 });
   }
 }

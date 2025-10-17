@@ -1,0 +1,26 @@
+Welcome to Lumbus!
+
+Hi there! 👋
+
+Thanks for signing up for Lumbus. We're excited to have you on board! Please confirm your email address to get started with seamless global connectivity.
+
+Confirm Your Email Address:
+{{ .ConfirmationURL }}
+
+This confirmation link will expire in 24 hours. If you didn't create an account with Lumbus, you can safely ignore this email.
+
+What's Next?
+✓ Browse our global eSIM plans
+✓ Choose your destination  
+✓ Install and connect instantly
+
+Need help? Contact us at support@lumbus.com
+
+© 2024 Lumbus. All rights reserved.
+
+---
+Email: {{ .Email }}
+Token: {{ .Token }}
+TokenHash: {{ .TokenHash }}
+SiteURL: {{ .SiteURL }}
+RedirectTo: {{ .RedirectTo }}
