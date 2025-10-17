@@ -137,7 +137,7 @@ export default function PlanDetailPage() {
       // Check if this is a free order (100% discount)
       if (data.isFree) {
         // For free orders, redirect directly to success page
-        triggerHaptic('success');
+        triggerHaptic('heavy');
         window.location.href = data.url;
       } else {
         // For paid orders, redirect to Stripe checkout
