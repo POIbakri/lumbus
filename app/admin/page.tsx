@@ -189,6 +189,7 @@ export default function AdminPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'active':
       case 'completed':
         return 'bg-primary text-foreground';
       case 'provisioning':
@@ -197,12 +198,29 @@ export default function AdminPage() {
         return 'bg-purple text-white';
       case 'failed':
         return 'bg-destructive text-white';
+      case 'depleted':
+      case 'finished':
+        return 'bg-gray-500 text-white';
       default:
         return 'bg-gray-500 text-white';
     }
   };
 
-  const formatDataUsage = (usedBytes: number | null, totalGB: number) => {
+  const getStatusLabel = (status: string) => {
+    if (status === 'depleted') return 'finished';
+    return status;
+  };
+
+  const formatDataUsage = (usedBytes: number | null, totalGB: number, status: string) => {
+    // If status is depleted/finished, show 100% usage
+    if (status === 'depleted' || status === 'finished') {
+      return {
+        used: totalGB.toFixed(2),
+        remaining: '0.00',
+        percentage: '100',
+      };
+    }
+
     if (!usedBytes && usedBytes !== 0) return null;
     const usedGB = usedBytes / (1024 * 1024 * 1024);
     const remainingGB = totalGB - usedGB;
@@ -491,7 +509,7 @@ export default function AdminPage() {
                 <div className="space-y-3 sm:space-y-4">
                   {orders.map((order) => {
                     const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
-                    const dataUsage = order.plan ? formatDataUsage(order.data_usage_bytes, order.plan.data_gb) : null;
+                    const dataUsage = order.plan ? formatDataUsage(order.data_usage_bytes, order.plan.data_gb, order.status) : null;
                     const daysRemaining = order.plan ? getDaysRemaining(order.created_at, order.plan.validity_days) : 0;
 
                     return (
@@ -507,7 +525,7 @@ export default function AdminPage() {
                               <div className="flex items-center gap-2 mb-2">
                                 {countryInfo && <span className="text-2xl sm:text-3xl">{countryInfo.flag}</span>}
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-black text-xs sm:text-sm truncate">{order.plan?.name || 'N/A'}</p>
+                                  <p className="font-black text-xs sm:text-sm truncate">{order.plan?.name?.replace(/"/g, '') || 'N/A'}</p>
                                   <p className="text-xs text-muted-foreground truncate">{countryInfo?.name}</p>
                                 </div>
                               </div>
@@ -559,7 +577,7 @@ export default function AdminPage() {
                               <div>
                                 <p className="font-black uppercase text-xs text-muted-foreground mb-2">Status</p>
                                 <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs`}>
-                                  {order.status}
+                                  {getStatusLabel(order.status)}
                                 </Badge>
                               </div>
                               {order.iccid && (
