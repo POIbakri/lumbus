@@ -50,11 +50,11 @@ export default function HowItWorksPage() {
                 </li>
                 <li className="flex gap-3">
                   <span className="text-primary font-black text-xl">✓</span>
-                  <span className="font-bold">Choose data amount (1GB - 20GB)</span>
+                  <span className="font-bold">Choose data amount (100MB - 20GB)</span>
                 </li>
                 <li className="flex gap-3">
                   <span className="text-primary font-black text-xl">✓</span>
-                  <span className="font-bold">Select validity period (7-30 days)</span>
+                  <span className="font-bold">Select validity period (1-30 days)</span>
                 </li>
               </ul>
             </div>

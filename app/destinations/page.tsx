@@ -132,7 +132,7 @@ export default function DestinationsPage() {
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl font-bold mb-8 sm:mb-10 max-w-3xl mx-auto px-4 opacity-70">
-            Get instant connectivity in <span className="text-primary">150+ countries</span>.
+            Get instant connectivity in <span className="text-primary">150+ countries</span> or use at home as backup data.
           </p>
 
           {/* Search Box */}

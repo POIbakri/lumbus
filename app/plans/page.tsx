@@ -189,7 +189,7 @@ function PlansPageContent() {
           </h1>
 
           <p className="text-lg sm:text-xl md:text-2xl font-bold mb-8 sm:mb-10 max-w-3xl mx-auto px-4 opacity-70">
-            1700+ plans across <span className="text-primary">150+ countries</span>.
+            1700+ plans across <span className="text-primary">150+ countries</span>. Works at home too!
           </p>
 
           {/* Search Box */}

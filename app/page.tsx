@@ -36,13 +36,7 @@ export default async function Home() {
         <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan/10 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-6 ">
-            <span className="inline-block px-8 py-3 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-primary shadow-lg backdrop-blur-sm">
-              ⚡ Instant eSIM Delivery
-            </span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto  leading-tight" style={{animationDelay: '0.1s'}}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto  leading-tight pt-6" style={{animationDelay: '0.1s'}}>
             <span className="inline-block">eSIMs THAT JUST WORK.</span><br/>
             <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
           </h1>
@@ -58,10 +52,19 @@ export default async function Home() {
             </div>
           </div>
 
-          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-8 max-w-3xl mx-auto  px-4" style={{animationDelay: '0.2s'}}>
             Get connected in <span className="text-primary">150+ countries</span>.<br className="hidden sm:block"/>
             <span className="sm:hidden"> </span>No physical SIM card needed. No signup required. Instant activation.
           </p>
+
+          {/* Home Usage Badge - Visual Element */}
+          <div className="mb-8 px-4" style={{animationDelay: '0.25s'}}>
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-yellow/80 via-mint/80 to-cyan/80 border-2 border-foreground/10 shadow-lg">
+              <span className="text-base sm:text-lg">🏠</span>
+              <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Also Works At Home</span>
+              <span className="text-base sm:text-lg">📱</span>
+            </div>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center  px-4" style={{animationDelay: '0.3s'}}>
             <Link href="/destinations" className="group w-full sm:w-auto">
@@ -101,8 +104,8 @@ export default async function Home() {
               <span className="font-bold text-sm">Instant Delivery</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">🌍</div>
-              <span className="font-bold text-sm">150+ Countries</span>
+              <div className="text-2xl">🏠</div>
+              <span className="font-bold text-sm">Works At Home</span>
             </div>
           </div>
         </div>
@@ -207,7 +210,7 @@ export default async function Home() {
               POPULAR DESTINATIONS
             </h2>
             <p className="text-xl font-bold opacity-70 max-w-2xl mx-auto">
-              Get instant connectivity in the world's most visited locations
+              Perfect for travel or when you need extra data at home
             </p>
           </div>
 
@@ -379,7 +382,7 @@ export default async function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
               WHAT YOU GET
             </h2>
-            <p className="text-xl font-bold opacity-70">Everything you need to stay connected</p>
+            <p className="text-xl font-bold opacity-70">Perfect for travel and emergency data at home</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             <Card className="bg-mint border-2 border-foreground/5 rounded-3xl   overflow-hidden">
@@ -394,15 +397,15 @@ export default async function Home() {
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">🌍</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">GLOBAL</h3>
-                <p className="font-bold opacity-70">Works in 150+ countries</p>
+                <p className="font-bold opacity-70">Works abroad & at home</p>
               </CardContent>
             </Card>
 
             <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.2s'}}>
               <CardContent className="p-10 text-center">
                 <div className="text-6xl mb-6">💳</div>
-                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SIMPLE</h3>
-                <p className="font-bold opacity-70">No contracts, no commitments</p>
+                <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">FLEXIBLE</h3>
+                <p className="font-bold opacity-70">Use as backup data anytime</p>
               </CardContent>
             </Card>
 
