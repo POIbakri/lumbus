@@ -190,40 +190,47 @@ function PlansPageContent() {
     <div className="min-h-screen bg-white">
       <Nav />
 
-      <div className="relative pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-24 md:pb-32 px-3 sm:px-4 bg-mint overflow-hidden">
-        {/* Floating Background Elements */}
-        <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>
+      {/* Hero Section */}
+      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-yellow">
+        {/* Decorative Blobs */}
+        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-secondary/10 rounded-full blur-3xl"></div>
 
-        <div className="container mx-auto relative z-10 max-w-7xl">
-          {/* Hero Section */}
-          <div className="text-center mb-8 sm:mb-12 md:mb-16 px-2 sm:px-4">
-            <div className="inline-block mb-4 sm:mb-6">
-              <span className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full bg-primary/10 border-2 border-primary font-black uppercase text-xs tracking-widest text-primary">
-                💎 1700+ eSIM Plans
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-3 sm:mb-4 md:mb-6 leading-tight">
-              CHOOSE YOUR PLAN
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold max-w-3xl mx-auto opacity-70 px-2">
-              Get instant connectivity in 150+ countries. No contracts, no hassle.
-            </p>
+        <div className="container mx-auto text-center relative z-10 max-w-7xl">
+          {/* Page Badge */}
+          <div className="inline-block mb-6">
+            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground shadow-lg backdrop-blur-sm">
+              💎 Buy eSIM Plans
+            </span>
           </div>
 
-          {/* Search and Filters */}
-          <div className="mb-8 sm:mb-12 md:mb-16">
-            <div className="bg-white rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl p-4 sm:p-6 md:p-8">
-              {/* Search Bar */}
-              <div className="mb-4 sm:mb-6">
-                <Input
-                  type="text"
-                  placeholder="🔍 Search by country, region..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold border-2 border-foreground/10 rounded-lg sm:rounded-xl focus:border-primary"
-                />
-              </div>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black uppercase mb-6 sm:mb-8 max-w-5xl mx-auto leading-tight px-2">
+            FIND YOUR<br/>PERFECT PLAN
+          </h1>
+
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto px-4 opacity-70">
+            1700+ plans across <span className="text-primary">150+ countries</span>.
+            <br className="hidden sm:block"/>
+            <span className="sm:hidden"> </span>Filter & compare to find your ideal data plan.
+          </p>
+
+          {/* Search Box */}
+          <div className="max-w-2xl mx-auto px-4 mb-8">
+            <Input
+              type="text"
+              placeholder="🔍 Search plans by country or plan name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-primary rounded-xl sm:rounded-2xl shadow-xl focus:border-foreground transition-all"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto relative z-10 max-w-7xl px-4 -mt-8">
+        {/* Filters */}
+        <div className="mb-8 sm:mb-12 md:mb-16">
+          <div className="bg-white rounded-2xl border-4 border-foreground shadow-2xl p-4 sm:p-6 md:p-8">
 
               {/* Sort Options */}
               <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -326,20 +333,11 @@ function PlansPageContent() {
             </div>
           </div>
 
-          {/* Results Count */}
-          <div className="mb-6 px-4">
-            <p className="text-lg font-black">
-              {filteredPlans.length} PLAN{filteredPlans.length !== 1 ? 'S' : ''} AVAILABLE
-              {selectedRegion && ` IN ${getCountryInfo(selectedRegion).name.toUpperCase()}`}
-              {selectedContinent && !selectedRegion && ` IN ${selectedContinent.toUpperCase()}`}
-            </p>
-          </div>
-
           {/* Plans Grid */}
           {loading ? (
             <div className="text-center py-20 sm:py-32 px-4">
               <div className="relative inline-block">
-                <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full "></div>
+                <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-2xl sm:text-4xl">⚡</div>
                 </div>
@@ -385,7 +383,6 @@ function PlansPageContent() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
 

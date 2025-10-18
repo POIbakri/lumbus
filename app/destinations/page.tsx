@@ -96,32 +96,37 @@ export default function DestinationsPage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-32 md:pt-40 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4 bg-mint relative overflow-hidden">
-        <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>
+      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-mint">
+        {/* Decorative Blobs */}
+        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-cyan/10 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-3 sm:mb-4 md:mb-6 ">
-            <span className="px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
-              🌍 150+ Countries
+          {/* Page Badge */}
+          <div className="inline-block mb-6">
+            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground shadow-lg backdrop-blur-sm">
+              📍 Browse Destinations
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-3 sm:mb-4 md:mb-6 leading-tight  px-2">
+
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black uppercase mb-6 sm:mb-8 max-w-5xl mx-auto leading-tight px-2">
             WHERE WILL YOU<br/>GO NEXT?
           </h1>
-          <p className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold max-w-3xl mx-auto text-foreground/70  px-2" style={{animationDelay: '0.1s'}}>
-            Get instant connectivity in 150+ countries worldwide.<br className="hidden sm:inline"/>
-            <span className="sm:hidden"> </span>No SIM card needed. Activate in seconds.
+
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto px-4 opacity-70">
+            Get instant connectivity in <span className="text-primary">150+ countries</span>.
+            <br className="hidden sm:block"/>
+            <span className="sm:hidden"> </span>Browse by destination or search below.
           </p>
 
-          {/* Search Bar */}
-          <div className="mt-6 sm:mt-8 max-w-2xl mx-auto  px-2" style={{animationDelay: '0.2s'}}>
+          {/* Search Box */}
+          <div className="max-w-2xl mx-auto px-4">
             <Input
               type="text"
-              placeholder="🔍 Search for a country..."
+              placeholder="🔍 Search for a country or region..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold border-2 sm:border-4 border-primary rounded-xl sm:rounded-2xl shadow-xl"
+              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-primary rounded-xl sm:rounded-2xl shadow-xl focus:border-foreground transition-all"
             />
           </div>
         </div>
