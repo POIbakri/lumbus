@@ -64,7 +64,7 @@ export default async function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center  px-4" style={{animationDelay: '0.3s'}}>
-            <Link href="/plans" className="group w-full sm:w-auto">
+            <Link href="/destinations" className="group w-full sm:w-auto">
               <Button className="w-full bg-primary text-foreground hover:bg-primary/90 text-lg sm:text-xl px-8 sm:px-14 py-6 sm:py-8 rounded-xl font-black shadow-2xl  ">
                 <span className="flex items-center justify-center gap-3">
                   GET STARTED

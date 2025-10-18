@@ -5,18 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import { Nav } from '@/components/nav';
 import { PlanCard } from '@/components/plan-card';
 import { Plan } from '@/lib/db';
-import { getCountryInfo, getCountriesByContinent, getContinentEmoji } from '@/lib/countries';
+import { getCountryInfo, REGIONS } from '@/lib/countries';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
 function PlansPageContent() {
   const searchParams = useSearchParams();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<Plan[]>([]);
-  const [selectedRegion, setSelectedRegion] = useState<string | undefined>();
-  const [selectedContinent, setSelectedContinent] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'price' | 'data' | 'validity'>('price');
@@ -29,28 +26,14 @@ function PlansPageContent() {
   const [userCountry, setUserCountry] = useState<string | null>(null);
   const [userLocationDetected, setUserLocationDetected] = useState(false);
 
-  const countriesByContinent = getCountriesByContinent();
-  const continents = Object.keys(countriesByContinent).sort();
-
-  // Read URL parameters on mount
+  // Read URL parameters for initial search
   useEffect(() => {
     const regionParam = searchParams.get('region');
-    const continentParam = searchParams.get('continent');
-
     if (regionParam) {
-      setSelectedRegion(regionParam.toUpperCase());
-    }
-    if (continentParam) {
-      setSelectedContinent(continentParam);
+      const regionInfo = getCountryInfo(regionParam.toUpperCase());
+      setSearchQuery(regionInfo.name);
     }
   }, [searchParams]);
-
-  // Auto-select user's location when detected (only if no manual selection)
-  useEffect(() => {
-    if (userLocationDetected && userCountry && !selectedRegion && !selectedContinent && !searchQuery) {
-      setSelectedRegion(userCountry);
-    }
-  }, [userLocationDetected, userCountry]);
 
   useEffect(() => {
     loadPlans();
@@ -59,7 +42,7 @@ function PlansPageContent() {
 
   useEffect(() => {
     filterPlans();
-  }, [plans, selectedRegion, selectedContinent, searchQuery, sortBy]);
+  }, [plans, searchQuery, sortBy]);
 
   const detectCurrency = async () => {
     try {
@@ -148,25 +131,21 @@ function PlansPageContent() {
   const filterPlans = () => {
     let filtered = [...plans];
 
-    // Filter by selected region
-    if (selectedRegion) {
-      filtered = filtered.filter(p => p.region_code === selectedRegion);
-    }
-
-    // Filter by selected continent
-    if (selectedContinent && !selectedRegion) {
-      const countriesInContinent = countriesByContinent[selectedContinent]?.map(c => c.code) || [];
-      filtered = filtered.filter(p => countriesInContinent.includes(p.region_code));
-    }
-
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.region_code.toLowerCase().includes(query) ||
-        getCountryInfo(p.region_code).name.toLowerCase().includes(query)
-      );
+      filtered = filtered.filter(p => {
+        const countryInfo = getCountryInfo(p.region_code);
+        const regionInfo = REGIONS[p.region_code];
+
+        return (
+          p.name.toLowerCase().includes(query) ||
+          p.region_code.toLowerCase().includes(query) ||
+          countryInfo.name.toLowerCase().includes(query) ||
+          (regionInfo && regionInfo.name.toLowerCase().includes(query)) ||
+          (regionInfo && regionInfo.description.toLowerCase().includes(query))
+        );
+      });
     }
 
     // Sort plans
@@ -186,20 +165,6 @@ function PlansPageContent() {
     setFilteredPlans(filtered);
   };
 
-  // Get unique regions from plans
-  const availableRegions = Array.from(new Set(plans.map(p => p.region_code)))
-    .map(code => ({
-      code,
-      info: getCountryInfo(code),
-      count: plans.filter(p => p.region_code === code).length
-    }))
-    .sort((a, b) => b.count - a.count);
-
-  const clearFilters = () => {
-    setSelectedRegion(undefined);
-    setSelectedContinent(undefined);
-    setSearchQuery('');
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -223,17 +188,15 @@ function PlansPageContent() {
             FIND YOUR<br/>PERFECT PLAN
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto px-4 opacity-70">
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-8 sm:mb-10 max-w-3xl mx-auto px-4 opacity-70">
             1700+ plans across <span className="text-primary">150+ countries</span>.
-            <br className="hidden sm:block"/>
-            <span className="sm:hidden"> </span>Filter & compare to find your ideal data plan.
           </p>
 
           {/* Search Box */}
-          <div className="max-w-2xl mx-auto px-4 mb-8">
+          <div className="max-w-2xl mx-auto px-4">
             <Input
               type="text"
-              placeholder="🔍 Search plans by country or plan name..."
+              placeholder="🔍 Search country, region, or plan name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
@@ -242,111 +205,54 @@ function PlansPageContent() {
         </div>
       </section>
 
-      <div className="container mx-auto relative z-10 max-w-7xl px-4 -mt-8">
-        {/* Filters */}
-        <div className="mb-8 sm:mb-12 md:mb-16">
-          <div className="bg-white rounded-2xl border-4 border-foreground shadow-2xl p-4 sm:p-6 md:p-8">
+      <div className="container mx-auto relative z-10 max-w-7xl px-4">
+        {/* Sort Options - Simplified */}
+        <div className="mb-8 sm:mb-12">
+          <div className="flex justify-center gap-2 sm:gap-3">
+            <Button
+              onClick={() => setSortBy('price')}
+              variant={sortBy === 'price' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm"
+            >
+              💰 PRICE
+            </Button>
+            <Button
+              onClick={() => setSortBy('data')}
+              variant={sortBy === 'data' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm"
+            >
+              📊 DATA
+            </Button>
+            <Button
+              onClick={() => setSortBy('validity')}
+              variant={sortBy === 'validity' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm"
+            >
+              📅 DURATION
+            </Button>
+          </div>
+        </div>
 
-              {/* Sort Options */}
-              <div className="flex flex-wrap gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <span className="font-black uppercase text-sm text-muted-foreground my-auto">Sort by:</span>
+        {/* Active Search Filter */}
+        {searchQuery && (
+          <div className="mb-8 sm:mb-12">
+            <div className="bg-yellow rounded-2xl border-4 border-foreground shadow-xl p-4 sm:p-6 max-w-2xl mx-auto">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🔍</span>
+                  <span className="font-black text-sm sm:text-base">Searching for: "{searchQuery}"</span>
+                </div>
                 <Button
-                  onClick={() => setSortBy('price')}
-                  variant={sortBy === 'price' ? 'default' : 'outline'}
+                  onClick={() => setSearchQuery('')}
+                  variant="ghost"
                   className="font-black text-xs"
                 >
-                  💰 PRICE
-                </Button>
-                <Button
-                  onClick={() => setSortBy('data')}
-                  variant={sortBy === 'data' ? 'default' : 'outline'}
-                  className="font-black text-xs"
-                >
-                  📊 DATA
-                </Button>
-                <Button
-                  onClick={() => setSortBy('validity')}
-                  variant={sortBy === 'validity' ? 'default' : 'outline'}
-                  className="font-black text-xs"
-                >
-                  📅 DURATION
+                  ✕ CLEAR
                 </Button>
               </div>
-
-              {/* Continent Filter */}
-              <div className="mb-6">
-                <div className="font-black uppercase text-sm text-muted-foreground mb-3">Filter by Continent:</div>
-                <div className="flex flex-wrap gap-2">
-                  {continents.map(continent => (
-                    <Button
-                      key={continent}
-                      onClick={() => {
-                        setSelectedContinent(continent === selectedContinent ? undefined : continent);
-                        setSelectedRegion(undefined);
-                      }}
-                      variant={selectedContinent === continent ? 'default' : 'outline'}
-                      className="font-black text-xs"
-                    >
-                      {getContinentEmoji(continent)} {continent}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Popular Countries */}
-              <div>
-                <div className="font-black uppercase text-sm text-muted-foreground mb-3">Popular Countries:</div>
-                <div className="flex flex-wrap gap-2">
-                  {availableRegions.slice(0, 12).map(region => (
-                    <Button
-                      key={region.code}
-                      onClick={() => {
-                        setSelectedRegion(region.code === selectedRegion ? undefined : region.code);
-                        setSelectedContinent(undefined);
-                      }}
-                      variant={selectedRegion === region.code ? 'default' : 'outline'}
-                      className="font-black text-xs"
-                    >
-                      {region.info.flag} {region.info.name}
-                      <Badge className="ml-2 bg-mint text-foreground border-2 border-foreground">{region.count}</Badge>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Active Filters */}
-              {(selectedRegion || selectedContinent || searchQuery) && (
-                <div className="mt-6 p-4 bg-yellow rounded-xl border-2 border-foreground">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex flex-wrap gap-2">
-                      {selectedRegion && (
-                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
-                          📍 {getCountryInfo(selectedRegion).name}
-                        </Badge>
-                      )}
-                      {selectedContinent && !selectedRegion && (
-                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
-                          🌍 {selectedContinent}
-                        </Badge>
-                      )}
-                      {searchQuery && (
-                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
-                          🔍 "{searchQuery}"
-                        </Badge>
-                      )}
-                    </div>
-                    <Button
-                      onClick={clearFilters}
-                      variant="ghost"
-                      className="font-black text-xs"
-                    >
-                      ✕ CLEAR ALL
-                    </Button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
+        )}
 
           {/* Plans Grid */}
           {loading ? (
@@ -365,11 +271,13 @@ function PlansPageContent() {
                 <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">🌍</div>
                 <p className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4">No Plans Found</p>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-70 mb-6">
-                  Try adjusting your filters or search terms
+                  Try searching for a different country or region
                 </p>
-                <Button onClick={clearFilters} className="font-black">
-                  CLEAR FILTERS
-                </Button>
+                {searchQuery && (
+                  <Button onClick={() => setSearchQuery('')} className="font-black">
+                    CLEAR SEARCH
+                  </Button>
+                )}
               </div>
             </div>
           ) : (
@@ -386,11 +294,11 @@ function PlansPageContent() {
           )}
 
           {/* Browse All Countries */}
-          <div className="mt-16 text-center px-4">
-            <div className="inline-block p-8 bg-white rounded-2xl border-4 border-foreground shadow-xl">
-              <p className="text-xl font-black mb-4">LOOKING FOR A SPECIFIC COUNTRY?</p>
+          <div className="mt-12 sm:mt-16 text-center px-4 pb-8">
+            <div className="inline-block p-6 sm:p-8 bg-white rounded-2xl border-4 border-foreground shadow-xl max-w-md">
+              <p className="text-lg sm:text-xl font-black mb-3 sm:mb-4">LOOKING FOR A SPECIFIC COUNTRY?</p>
               <Link href="/destinations">
-                <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-8 py-4">
+                <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base w-full sm:w-auto">
                   BROWSE ALL DESTINATIONS
                 </Button>
               </Link>
