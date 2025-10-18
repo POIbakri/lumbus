@@ -71,7 +71,7 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
 
         {/* Plan name */}
         <h3 className="text-base sm:text-lg font-black uppercase leading-tight tracking-tight line-clamp-2">
-          {plan.name}
+          {plan.name.replace(/^["']|["']$/g, '')}
         </h3>
       </CardHeader>
 
