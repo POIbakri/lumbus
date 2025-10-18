@@ -25,6 +25,10 @@ function PlansPageContent() {
   const [currencySymbol, setCurrencySymbol] = useState('$');
   const [convertedPrices, setConvertedPrices] = useState<Map<string, number>>(new Map());
 
+  // Location state
+  const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [userLocationDetected, setUserLocationDetected] = useState(false);
+
   const countriesByContinent = getCountriesByContinent();
   const continents = Object.keys(countriesByContinent).sort();
 
@@ -41,6 +45,13 @@ function PlansPageContent() {
     }
   }, [searchParams]);
 
+  // Auto-select user's location when detected (only if no manual selection)
+  useEffect(() => {
+    if (userLocationDetected && userCountry && !selectedRegion && !selectedContinent && !searchQuery) {
+      setSelectedRegion(userCountry);
+    }
+  }, [userLocationDetected, userCountry]);
+
   useEffect(() => {
     loadPlans();
     detectCurrency();
@@ -56,6 +67,10 @@ function PlansPageContent() {
       if (response.ok) {
         const data = await response.json();
         setCurrencySymbol(data.symbol);
+        if (data.country) {
+          setUserCountry(data.country);
+          setUserLocationDetected(true);
+        }
       }
     } catch (error) {
       console.error('Failed to detect currency:', error);
@@ -191,15 +206,15 @@ function PlansPageContent() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-yellow">
+      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-white">
         {/* Decorative Blobs */}
-        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-secondary/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-cyan rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-mint rounded-full blur-3xl"></div>
 
         <div className="container mx-auto text-center relative z-10 max-w-7xl">
           {/* Page Badge */}
           <div className="inline-block mb-6">
-            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground shadow-lg backdrop-blur-sm">
+            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-purple border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
               💎 Buy eSIM Plans
             </span>
           </div>
@@ -221,7 +236,7 @@ function PlansPageContent() {
               placeholder="🔍 Search plans by country or plan name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-primary rounded-xl sm:rounded-2xl shadow-xl focus:border-foreground transition-all"
+              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
             />
           </div>
         </div>
@@ -293,7 +308,7 @@ function PlansPageContent() {
                       className="font-black text-xs"
                     >
                       {region.info.flag} {region.info.name}
-                      <Badge className="ml-2 bg-primary/20 text-foreground">{region.count}</Badge>
+                      <Badge className="ml-2 bg-mint text-foreground border-2 border-foreground">{region.count}</Badge>
                     </Button>
                   ))}
                 </div>
@@ -301,21 +316,21 @@ function PlansPageContent() {
 
               {/* Active Filters */}
               {(selectedRegion || selectedContinent || searchQuery) && (
-                <div className="mt-6 p-4 bg-primary/5 rounded-xl">
+                <div className="mt-6 p-4 bg-yellow rounded-xl border-2 border-foreground">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex flex-wrap gap-2">
                       {selectedRegion && (
-                        <Badge className="bg-primary text-white px-3 py-1 text-sm">
+                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
                           📍 {getCountryInfo(selectedRegion).name}
                         </Badge>
                       )}
                       {selectedContinent && !selectedRegion && (
-                        <Badge className="bg-primary text-white px-3 py-1 text-sm">
+                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
                           🌍 {selectedContinent}
                         </Badge>
                       )}
                       {searchQuery && (
-                        <Badge className="bg-primary text-white px-3 py-1 text-sm">
+                        <Badge className="bg-foreground text-white px-3 py-1 text-sm">
                           🔍 "{searchQuery}"
                         </Badge>
                       )}
@@ -346,7 +361,7 @@ function PlansPageContent() {
             </div>
           ) : filteredPlans.length === 0 ? (
             <div className="text-center py-20 sm:py-32 px-4">
-              <div className="max-w-md mx-auto p-8 sm:p-12 bg-white rounded-3xl border-4 border-primary shadow-2xl">
+              <div className="max-w-md mx-auto p-8 sm:p-12 bg-white rounded-3xl border-4 border-foreground shadow-2xl">
                 <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">🌍</div>
                 <p className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4">No Plans Found</p>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-70 mb-6">
@@ -372,7 +387,7 @@ function PlansPageContent() {
 
           {/* Browse All Countries */}
           <div className="mt-16 text-center px-4">
-            <div className="inline-block p-8 bg-white rounded-2xl border-4 border-primary shadow-xl">
+            <div className="inline-block p-8 bg-white rounded-2xl border-4 border-foreground shadow-xl">
               <p className="text-xl font-black mb-4">LOOKING FOR A SPECIFIC COUNTRY?</p>
               <Link href="/destinations">
                 <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-8 py-4">

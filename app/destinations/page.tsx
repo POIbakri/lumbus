@@ -7,21 +7,41 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { getCountriesByContinent, getContinentEmoji, searchCountries, REGIONS, type CountryInfo, type RegionInfo } from '@/lib/countries';
+import { getCountriesByContinent, searchCountries, REGIONS, type CountryInfo, type RegionInfo } from '@/lib/countries';
 import { Plan } from '@/lib/db';
 
 export default function DestinationsPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedContinent, setSelectedContinent] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'countries' | 'regions'>('countries');
   const [loading, setLoading] = useState(true);
+  const [displayLimit, setDisplayLimit] = useState(32);
+
+  // Location state
+  const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [userLocationDetected, setUserLocationDetected] = useState(false);
 
   const countriesByContinent = getCountriesByContinent();
-  const continents = Object.keys(countriesByContinent).filter(c => c !== 'Multi-Country');
 
   useEffect(() => {
     loadPlans();
+    detectLocation();
   }, []);
+
+  const detectLocation = async () => {
+    try {
+      const response = await fetch('/api/currency/detect');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.country) {
+          setUserCountry(data.country);
+          setUserLocationDetected(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to detect location:', error);
+    }
+  };
 
   const loadPlans = async () => {
     try {
@@ -42,69 +62,67 @@ export default function DestinationsPage() {
     planCounts.set(plan.region_code, count + 1);
   });
 
-  // Get countries to display
-  let displayCountries: CountryInfo[] = [];
-  if (searchQuery) {
-    displayCountries = searchCountries(searchQuery);
-  } else if (selectedContinent) {
-    displayCountries = countriesByContinent[selectedContinent] || [];
-  } else {
-    // Show all countries from all continents
-    displayCountries = Object.values(countriesByContinent).flat();
-  }
+  // Get all countries with plans
+  const allCountries = Object.values(countriesByContinent).flat();
+  const countriesWithPlans = allCountries
+    .filter(country => planCounts.has(country.code) && planCounts.get(country.code)! > 0)
+    .map(country => ({
+      ...country,
+      planCount: planCounts.get(country.code)!,
+      minPrice: Math.min(...plans.filter(p => p.region_code === country.code).map(p => p.retail_price))
+    }))
+    .sort((a, b) => b.planCount - a.planCount);
 
-  // Filter only countries that have plans
-  const countriesWithPlans = displayCountries.filter(country =>
-    planCounts.has(country.code) && planCounts.get(country.code)! > 0
-  );
-
-  // Get popular destinations (actual popular tourist destinations)
-  const popularDestinationCodes = [
-    'TR', // Turkey
-    'TH', // Thailand
-    'US', // USA
-    'GB', // UK
-    'FR', // France
-    'ES', // Spain
-    'IT', // Italy
-    'DE', // Germany
-    'JP', // Japan
-    'AU', // Australia
-    'CA', // Canada
-    'MX', // Mexico
-  ];
-
-  const popularDestinations = popularDestinationCodes
-    .map(code => {
-      const countries = Object.values(countriesByContinent).flat();
-      const country = countries.find(c => c.code === code);
-      const count = planCounts.get(code) || 0;
-      return country && count > 0 ? { ...country, planCount: count } : null;
-    })
-    .filter((c): c is (CountryInfo & { planCount: number }) => c !== null);
-
-  // Get regional plans with available plans
+  // Get regional plans with pricing
   const regionalPlans = Object.values(REGIONS)
-    .map(region => {
+    .filter(region => {
       const count = planCounts.get(region.code) || 0;
-      return count > 0 ? { ...region, planCount: count } : null;
+      return count > 0;
     })
-    .filter((r): r is (RegionInfo & { planCount: number }) => r !== null);
+    .map(region => ({
+      ...region,
+      planCount: planCounts.get(region.code)!,
+      minPrice: Math.min(...plans.filter(p => p.region_code === region.code).map(p => p.retail_price))
+    }))
+    .sort((a, b) => b.planCount - a.planCount);
+
+  // Filter by search
+  const filteredCountries = searchQuery
+    ? countriesWithPlans.filter(country =>
+        country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        country.code.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : countriesWithPlans;
+
+  const filteredRegions = searchQuery
+    ? regionalPlans.filter(region =>
+        region.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        region.code.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : regionalPlans;
+
+  // Items to display based on active tab
+  const displayItems = activeTab === 'countries'
+    ? filteredCountries.slice(0, displayLimit)
+    : filteredRegions.slice(0, displayLimit);
+
+  const totalItems = activeTab === 'countries' ? filteredCountries.length : filteredRegions.length;
+  const hasMore = displayLimit < totalItems;
 
   return (
     <div className="min-h-screen bg-white">
       <Nav />
 
       {/* Hero Section */}
-      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-mint">
+      <section className="relative pt-32 sm:pt-40 pb-12 sm:pb-16 px-4 overflow-hidden bg-white">
         {/* Decorative Blobs */}
-        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-cyan/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-mint rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-purple rounded-full blur-3xl"></div>
 
-        <div className="container mx-auto text-center relative z-10">
+        <div className="container mx-auto text-center relative z-10 max-w-5xl">
           {/* Page Badge */}
           <div className="inline-block mb-6">
-            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground shadow-lg backdrop-blur-sm">
+            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-cyan border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
               📍 Browse Destinations
             </span>
           </div>
@@ -113,262 +131,160 @@ export default function DestinationsPage() {
             WHERE WILL YOU<br/>GO NEXT?
           </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 max-w-3xl mx-auto px-4 opacity-70">
+          <p className="text-lg sm:text-xl md:text-2xl font-bold mb-8 sm:mb-10 max-w-3xl mx-auto px-4 opacity-70">
             Get instant connectivity in <span className="text-primary">150+ countries</span>.
-            <br className="hidden sm:block"/>
-            <span className="sm:hidden"> </span>Browse by destination or search below.
           </p>
 
           {/* Search Box */}
-          <div className="max-w-2xl mx-auto px-4">
+          <div className="max-w-2xl mx-auto px-4 mb-8">
             <Input
               type="text"
-              placeholder="🔍 Search for a country or region..."
+              placeholder="🔍 Search country or region..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-primary rounded-xl sm:rounded-2xl shadow-xl focus:border-foreground transition-all"
+              className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
             />
           </div>
-        </div>
-      </section>
 
-      {/* Popular Destinations */}
-      <section className="py-8 sm:py-12 md:py-20 px-3 sm:px-4 bg-white">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase mb-3 sm:mb-4 leading-tight px-2">
-              POPULAR DESTINATIONS
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-foreground/70 px-2">
-              Our most frequently visited countries
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            {popularDestinations.map((dest, index) => (
-              <Link
-                key={dest.code}
-                href={`/plans?region=${dest.code}`}
-                className=""
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <Card className=" cursor-pointer border-4 border-foreground/5 hover:border-primary   bg-mint">
-                  <CardContent className="p-4 sm:p-6 text-center">
-                    <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">{dest.flag}</div>
-                    <h3 className="font-black text-base sm:text-lg mb-2">{dest.name}</h3>
-                    <Badge className="bg-primary text-white font-black text-xs">
-                      {dest.planCount} plans
-                    </Badge>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+          {/* Tabs */}
+          <div className="flex justify-center gap-2">
+            <Button
+              onClick={() => { setActiveTab('countries'); setDisplayLimit(32); }}
+              variant={activeTab === 'countries' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3"
+            >
+              COUNTRIES
+            </Button>
+            <Button
+              onClick={() => { setActiveTab('regions'); setDisplayLimit(32); }}
+              variant={activeTab === 'regions' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3"
+            >
+              REGIONS
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Regional Plans */}
-      {regionalPlans.length > 0 && (
-        <section className="py-8 sm:py-12 md:py-20 px-3 sm:px-4 bg-white">
+      {/* Your Location */}
+      {userLocationDetected && userCountry && activeTab === 'countries' && planCounts.get(userCountry) && planCounts.get(userCountry)! > 0 && !searchQuery && (
+        <section className="py-6 sm:py-8 px-3 sm:px-4 bg-white">
           <div className="container mx-auto max-w-7xl">
-            <div className="text-center mb-8 sm:mb-12 md:mb-16">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase mb-3 sm:mb-4 leading-tight px-2">
-                REGIONAL PLANS
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold text-foreground/70 px-2">
-                Multi-country packages for your travels
+            <div className="bg-yellow rounded-2xl border-4 border-foreground shadow-xl p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
+                    <span className="text-2xl sm:text-3xl">
+                      {(() => {
+                        const country = allCountries.find(c => c.code === userCountry);
+                        return country?.flag || '📍';
+                      })()}
+                    </span>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase">Your Location</h3>
+                  </div>
+                  <p className="text-sm sm:text-base font-bold opacity-80">
+                    {planCounts.get(userCountry)} plans available for {(() => {
+                      const country = allCountries.find(c => c.code === userCountry);
+                      return country?.name || userCountry;
+                    })()}
+                  </p>
+                </div>
+                <Link href={`/plans?region=${userCountry}`}>
+                  <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 shadow-lg w-full sm:w-auto">
+                    VIEW PLANS →
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Destinations Grid */}
+      <section className="py-8 sm:py-12 md:py-16 px-3 sm:px-4 bg-white">
+        <div className="container mx-auto max-w-7xl">
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="relative inline-block">
+                <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-2xl sm:text-4xl">⚡</div>
+                </div>
+              </div>
+              <p className="mt-6 font-black uppercase text-lg sm:text-2xl">Loading...</p>
+            </div>
+          ) : displayItems.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-5xl sm:text-6xl mb-4">🌍</div>
+              <p className="text-2xl sm:text-3xl font-black uppercase mb-3">No Results Found</p>
+              <p className="text-base sm:text-lg font-bold opacity-70">
+                Try adjusting your search
               </p>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-              {regionalPlans.map((region, index) => (
-                <Link
-                  key={region.code}
-                  href={`/plans?region=${region.code}`}
-                  className=""
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <Card className=" cursor-pointer border-2 sm:border-4 border-foreground/5 hover:border-primary   bg-cyan">
-                    <CardContent className="p-4 sm:p-6 md:p-8">
-                      <div className="text-center">
-                        <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">{region.flag}</div>
-                        <h3 className="font-black text-base sm:text-lg md:text-xl mb-2">{region.name}</h3>
-                        <p className="text-xs sm:text-sm font-bold text-foreground/70 mb-3">{region.description}</p>
-                        <Badge className="bg-primary text-white font-black text-xs">
-                          {region.planCount} plans
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Continent Filter */}
-      {!searchQuery && (
-        <section className="py-6 sm:py-8 md:py-10 px-3 sm:px-4 bg-light-mint">
-          <div className="container mx-auto max-w-7xl">
-            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
-              <Button
-                onClick={() => setSelectedContinent(null)}
-                variant={selectedContinent === null ? 'default' : 'outline'}
-                className="font-black text-xs sm:text-sm"
-              >
-                🌐 ALL CONTINENTS
-              </Button>
-              {continents.map(continent => (
-                <Button
-                  key={continent}
-                  onClick={() => setSelectedContinent(continent)}
-                  variant={selectedContinent === continent ? 'default' : 'outline'}
-                  className="font-black text-xs sm:text-sm"
-                >
-                  {getContinentEmoji(continent)} {continent}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* All Countries by Continent */}
-      <section className="py-8 sm:py-12 md:py-20 px-3 sm:px-4 bg-white">
-        <div className="container mx-auto max-w-7xl">
-          {searchQuery ? (
-            <>
-              <div className="text-center mb-8 sm:mb-12">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 px-2">
-                  SEARCH RESULTS
-                </h2>
-                <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/70 px-2">
-                  {countriesWithPlans.length} countries found for "{searchQuery}"
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {countriesWithPlans.map((country, index) => (
-                  <Link
-                    key={country.code}
-                    href={`/plans?region=${country.code}`}
-                    className=""
-                    style={{ animationDelay: `${index * 0.02}s` }}
-                  >
-                    <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
-                      <CardContent className="p-3 sm:p-4 text-center">
-                        <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
-                        <div className="font-black text-xs sm:text-sm mb-1">{country.name}</div>
-                        <Badge className="bg-primary/20 text-foreground text-xs">
-                          {planCounts.get(country.code)} plans
-                        </Badge>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </>
-          ) : selectedContinent ? (
-            <>
-              <div className="text-center mb-8 sm:mb-12">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 px-2">
-                  {getContinentEmoji(selectedContinent)} {selectedContinent}
-                </h2>
-                <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/70 px-2">
-                  {countriesWithPlans.length} countries available
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {countriesWithPlans.map((country, index) => (
-                  <Link
-                    key={country.code}
-                    href={`/plans?region=${country.code}`}
-                    className=""
-                    style={{ animationDelay: `${index * 0.02}s` }}
-                  >
-                    <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
-                      <CardContent className="p-3 sm:p-4 text-center">
-                        <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
-                        <div className="font-black text-xs sm:text-sm mb-1">{country.name}</div>
-                        <Badge className="bg-primary/20 text-foreground text-xs">
-                          {planCounts.get(country.code)} plans
-                        </Badge>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            </>
           ) : (
             <>
-              {continents.map(continent => {
-                const continentCountries = countriesByContinent[continent].filter(country =>
-                  planCounts.has(country.code) && planCounts.get(country.code)! > 0
-                );
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+                {displayItems.map((item, index) => (
+                  <Link
+                    key={item.code}
+                    href={`/plans?region=${item.code}`}
+                    className="block"
+                  >
+                    <Card className="h-full cursor-pointer border-4 border-foreground hover:border-primary hover:shadow-xl transition-all duration-200 bg-white">
+                      <CardContent className="p-3 sm:p-4 md:p-5 text-center flex flex-col justify-between h-full">
+                        <div>
+                          <div className="text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3">{item.flag}</div>
+                          <h3 className="font-black text-sm sm:text-base md:text-lg mb-2 sm:mb-3 leading-tight min-h-[2.5rem] sm:min-h-[3rem] flex items-center justify-center">
+                            {item.name} eSIM
+                          </h3>
+                        </div>
+                        <div>
+                          <Badge className="bg-mint text-foreground border-2 border-foreground font-black text-xs mb-2">
+                            {item.planCount} {item.planCount === 1 ? 'plan' : 'plans'}
+                          </Badge>
+                          <div className="text-xs sm:text-sm font-bold text-muted-foreground">
+                            from <span className="text-primary font-black text-sm sm:text-base">${item.minPrice.toFixed(2)}/day</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
 
-                if (continentCountries.length === 0) return null;
-
-                return (
-                  <div key={continent} className="mb-12 sm:mb-16">
-                    <div className="mb-6 sm:mb-8">
-                      <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-2 flex items-center gap-2 sm:gap-3 px-2">
-                        <span>{getContinentEmoji(continent)}</span>
-                        <span>{continent}</span>
-                      </h2>
-                      <p className="text-xs sm:text-sm md:text-base font-bold text-foreground/70 px-2">
-                        {continentCountries.length} countries available
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                      {continentCountries.map((country, index) => (
-                        <Link
-                          key={country.code}
-                          href={`/plans?region=${country.code}`}
-                          className=""
-                          style={{ animationDelay: `${index * 0.02}s` }}
-                        >
-                          <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary  ">
-                            <CardContent className="p-3 sm:p-4 text-center">
-                              <div className="text-3xl sm:text-4xl mb-2">{country.flag}</div>
-                              <div className="font-black text-xs sm:text-sm mb-1 truncate" title={country.name}>
-                                {country.name}
-                              </div>
-                              <Badge className="bg-primary/20 text-foreground text-xs">
-                                {planCounts.get(country.code)} plans
-                              </Badge>
-                            </CardContent>
-                          </Card>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="text-center mt-8 sm:mt-12">
+                  <Button
+                    onClick={() => setDisplayLimit(prev => prev + 32)}
+                    className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base px-8 sm:px-12 py-3 sm:py-4 shadow-xl"
+                  >
+                    LOAD MORE
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </div>
       </section>
 
       {/* Global Coverage Stats */}
-      <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 bg-light-mint">
+      <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 text-center">
-            <div className="p-4 sm:p-6 md:p-8 bg-cyan rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl ">
+            <div className="p-4 sm:p-6 md:p-8 bg-cyan rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">150+</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Countries</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-yellow rounded-xl sm:rounded-2xl border-2 sm:border-4 border-secondary shadow-xl " style={{animationDelay: '0.1s'}}>
+            <div className="p-4 sm:p-6 md:p-8 bg-yellow rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">1700+</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Plans</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-purple rounded-xl sm:rounded-2xl border-2 sm:border-4 border-accent shadow-xl " style={{animationDelay: '0.2s'}}>
+            <div className="p-4 sm:p-6 md:p-8 bg-purple rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">24/7</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Support</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-mint rounded-xl sm:rounded-2xl border-2 sm:border-4 border-primary shadow-xl " style={{animationDelay: '0.3s'}}>
+            <div className="p-4 sm:p-6 md:p-8 bg-mint rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
               <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">5G</div>
               <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Speeds</div>
             </div>
@@ -386,7 +302,7 @@ export default function DestinationsPage() {
             Choose your destination and get instant connectivity
           </p>
           <Link href="/plans">
-            <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl  shadow-2xl">
+            <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl shadow-2xl">
               BROWSE ALL PLANS
             </Button>
           </Link>

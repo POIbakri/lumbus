@@ -43,6 +43,8 @@ export default function PlanDetailPage() {
   const [showCodes, setShowCodes] = useState(false);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [validatingCode, setValidatingCode] = useState(false);
+  const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
+  const [showCountries, setShowCountries] = useState(false);
 
   const loadPlan = useCallback(async () => {
     try {
@@ -120,6 +122,25 @@ export default function PlanDetailPage() {
   useEffect(() => {
     loadPlan();
   }, [loadPlan]);
+
+  // Load region information to check if it's a multi-country plan
+  useEffect(() => {
+    const loadRegionInfo = async () => {
+      if (!plan) return;
+
+      try {
+        const response = await fetch(`/api/regions/${plan.region_code}`);
+        if (response.ok) {
+          const data = await response.json();
+          setRegionInfo(data);
+        }
+      } catch (error) {
+        console.error('Failed to load region info:', error);
+      }
+    };
+
+    loadRegionInfo();
+  }, [plan]);
 
   const validateDiscountCode = async (code: string) => {
     if (!code.trim()) {
@@ -263,7 +284,40 @@ export default function PlanDetailPage() {
                     </div>
                   </div>
                 </div>
-                <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase leading-tight">{plan.name}</CardTitle>
+                <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase leading-tight">{plan.name.replace(/^[\"']|[\"']$/g, '')}</CardTitle>
+
+                {/* Coverage Information for Regional Plans */}
+                {regionInfo && regionInfo.isMultiCountry && regionInfo.subLocationList && regionInfo.subLocationList.length > 0 && (
+                  <div className="mt-4 border-2 border-dashed border-primary/30 rounded-lg sm:rounded-xl overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setShowCountries(!showCountries)}
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-mint hover:bg-mint/70 transition-colors font-black uppercase text-xs sm:text-sm flex items-center justify-between"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-base sm:text-lg">🌍</span>
+                        <span>Show all countries ({regionInfo.subLocationList.length})</span>
+                      </span>
+                      <span className="text-base sm:text-lg">{showCountries ? '−' : '+'}</span>
+                    </button>
+
+                    {showCountries && (
+                      <div className="p-3 sm:p-4 bg-white max-h-64 sm:max-h-80 overflow-y-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {regionInfo.subLocationList.map((country) => (
+                            <div
+                              key={country.code}
+                              className="flex items-center gap-2 p-2 rounded-lg bg-mint/20 border border-mint"
+                            >
+                              <span className="text-base sm:text-lg">{getCountryInfo(country.code).flag || '🏳️'}</span>
+                              <span className="font-bold text-xs sm:text-sm">{country.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 relative z-10 px-4 sm:px-6">
                 <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 lg:gap-6">

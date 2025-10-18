@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +47,26 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
 
   const displayData = formatDataAmount(plan.data_gb);
 
+  const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
+  const [showCountries, setShowCountries] = useState(false);
+
+  // Load region information to check if it's a multi-country plan
+  useEffect(() => {
+    const loadRegionInfo = async () => {
+      try {
+        const response = await fetch(`/api/regions/${plan.region_code}`);
+        if (response.ok) {
+          const data = await response.json();
+          setRegionInfo(data);
+        }
+      } catch (error) {
+        // Silently fail - it's ok if region info isn't available
+      }
+    };
+
+    loadRegionInfo();
+  }, [plan.region_code]);
+
   return (
     <Card className={`group ${colorClass} border-4 border-foreground/10 shadow-xl    overflow-hidden relative`}>
       <CardHeader className="pb-3 sm:pb-4 relative z-10">
@@ -73,6 +94,43 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
         <h3 className="text-base sm:text-lg font-black uppercase leading-tight tracking-tight line-clamp-2">
           {plan.name.replace(/^["']|["']$/g, '')}
         </h3>
+
+        {/* Coverage Information for Regional Plans */}
+        {regionInfo && regionInfo.isMultiCountry && regionInfo.subLocationList && regionInfo.subLocationList.length > 0 && (
+          <div className="mt-3 border border-dashed border-foreground/20 rounded-lg overflow-hidden" onClick={(e) => e.preventDefault()}>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowCountries(!showCountries);
+              }}
+              className="w-full px-2 py-2 bg-white/50 hover:bg-white/70 transition-colors font-black uppercase text-[10px] sm:text-xs flex items-center justify-between"
+            >
+              <span className="flex items-center gap-1">
+                <span className="text-xs">🌍</span>
+                <span>Countries ({regionInfo.subLocationList.length})</span>
+              </span>
+              <span className="text-xs">{showCountries ? '−' : '+'}</span>
+            </button>
+
+            {showCountries && (
+              <div className="p-2 bg-white max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1">
+                  {regionInfo.subLocationList.map((country) => (
+                    <div
+                      key={country.code}
+                      className="flex items-center gap-1.5 p-1.5 rounded bg-mint/20 border border-mint/40"
+                    >
+                      <span className="text-xs">{getCountryInfo(country.code).flag || '🏳️'}</span>
+                      <span className="font-bold text-[10px] sm:text-xs">{country.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="pb-4 sm:pb-6 relative z-10">
