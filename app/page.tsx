@@ -201,16 +201,8 @@ export default async function Home() {
       <section className="relative py-32 px-4 bg-mint">
         <div className="container mx-auto">
           <div className="text-center mb-16 ">
-            <div className="inline-block mb-4">
-              <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
-                🌍 Most Popular
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
-              POPULAR DESTINATIONS
-            </h2>
             <p className="text-xl font-bold opacity-70 max-w-2xl mx-auto">
-              Perfect for travel or when you need extra data at home
+              Get instant connectivity in the world's most visited locations
             </p>
           </div>
 
