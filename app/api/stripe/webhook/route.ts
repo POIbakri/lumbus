@@ -275,22 +275,51 @@ export async function POST(req: NextRequest) {
 
         if (isTopUp && iccid) {
           // Top-up existing eSIM
-          console.log('Processing top-up for ICCID:', iccid);
+          console.log('[Webhook] Processing top-up for ICCID:', iccid);
 
-          const topUpResponse = await topUpEsim(iccid, plan.supplier_sku);
+          // Get existing order to check for esimTranNo
+          const { data: existingOrderForTopUp } = await supabase
+            .from('orders')
+            .select('esim_tran_no, iccid')
+            .eq('user_id', user.id)
+            .eq('iccid', iccid)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          const esimTranNo = existingOrderForTopUp?.esim_tran_no;
+          console.log('[Webhook] Found esimTranNo:', esimTranNo || 'none, using ICCID');
+
+          // Generate unique transaction ID
+          const transactionId = `topup_${orderId}_${Date.now()}`;
+
+          const topUpResponse = await topUpEsim({
+            iccid: esimTranNo ? undefined : iccid, // Use iccid only if no esimTranNo
+            esimTranNo: esimTranNo || undefined,
+            packageCode: plan.supplier_sku,
+            transactionId,
+            amount: plan.retail_price.toString(),
+          });
 
           if (topUpResponse.success) {
-            // Update order as completed for top-ups
+            // Update order with top-up details and new expiry/volume from API response
             await supabase
               .from('orders')
               .update({
                 status: 'completed',
-                connect_order_id: topUpResponse.orderNo || null,
+                iccid: topUpResponse.iccid,
+                // Note: We don't update data_usage_bytes here as it's the OLD usage before topup
+                // The totalVolume is the NEW total after top-up
+                data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+                data_usage_bytes: topUpResponse.orderUsage,
+                last_usage_update: new Date().toISOString(),
               })
               .eq('id', orderId);
 
-            console.log('eSIM topped up successfully:', iccid);
-            console.log('Top-up order ID:', topUpResponse.orderNo);
+            console.log('[Webhook] eSIM topped up successfully:', topUpResponse.iccid);
+            console.log('[Webhook] New expiry time:', topUpResponse.expiredTime);
+            console.log('[Webhook] New total volume:', topUpResponse.totalVolume, 'bytes');
+            console.log('[Webhook] New total duration:', topUpResponse.totalDuration, 'days');
 
             // Send top-up confirmation email
             try {
@@ -299,11 +328,11 @@ export async function POST(req: NextRequest) {
                 planName: plan.name,
                 dataAdded: plan.data_gb,
                 validityDays: plan.validity_days,
-                iccid: iccid,
+                iccid: topUpResponse.iccid,
               });
-              console.log('Top-up confirmation email sent to:', user.email);
+              console.log('[Webhook] Top-up confirmation email sent to:', user.email);
             } catch (emailError) {
-              console.error('Failed to send top-up confirmation email:', emailError);
+              console.error('[Webhook] Failed to send top-up confirmation email:', emailError);
               // Don't throw - webhook should still succeed even if email fails
             }
           } else {

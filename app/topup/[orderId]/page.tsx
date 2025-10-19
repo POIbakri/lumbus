@@ -9,11 +9,23 @@ import { Badge } from '@/components/ui/badge';
 import { Nav } from '@/components/nav';
 import { useAuth } from '@/lib/auth-context';
 import { supabaseClient } from '@/lib/supabase-client';
+import { authenticatedGet } from '@/lib/api-client';
 import { triggerHaptic } from '@/lib/device-detection';
 import { Order, Plan } from '@/lib/db';
 
 interface OrderWithPlan extends Order {
   plan: Plan;
+}
+
+interface TopUpPackage {
+  packageCode: string;
+  slug?: string;
+  name: string;
+  data: string;
+  validity: string;
+  price: number;
+  currency: string;
+  locationCode: string;
 }
 
 interface TopUpPageProps {
@@ -28,6 +40,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
   const { orderId } = use(params);
 
   const [order, setOrder] = useState<OrderWithPlan | null>(null);
+  const [availablePackages, setAvailablePackages] = useState<TopUpPackage[]>([]);
   const [availablePlans, setAvailablePlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
@@ -63,19 +76,44 @@ export default function TopUpPage({ params }: TopUpPageProps) {
 
       setOrder(transformedOrder as OrderWithPlan);
 
-      // Load available top-up plans for the same region
-      const regionCode = transformedOrder.plan?.region_code;
-      if (regionCode) {
-        const { data: plansData, error: plansError } = await supabaseClient
-          .from('plans')
-          .select('*')
-          .eq('region_code', regionCode)
-          .eq('is_active', true)
-          .order('retail_price', { ascending: true });
+      // Load available top-up packages from eSIM Access API
+      try {
+        const packagesResponse = await authenticatedGet<{
+          success: boolean;
+          packages: TopUpPackage[];
+          error?: string;
+        }>(`/api/orders/${orderId}/packages`);
 
-        if (plansError) throw plansError;
+        if (packagesResponse.success && packagesResponse.packages) {
+          const packages = packagesResponse.packages;
+          setAvailablePackages(packages);
 
-        setAvailablePlans(plansData || []);
+          // Fetch matching plans from database by supplier_sku
+          if (packages.length > 0) {
+            const packageCodes = packages.map(pkg => pkg.packageCode);
+            const { data: plansData, error: plansError } = await supabaseClient
+              .from('plans')
+              .select('*')
+              .in('supplier_sku', packageCodes)
+              .eq('is_active', true)
+              .order('retail_price', { ascending: true });
+
+            if (plansError) {
+              console.error('Failed to load matching plans:', plansError);
+              setAvailablePlans([]);
+            } else {
+              setAvailablePlans(plansData || []);
+            }
+          }
+        } else {
+          console.error('Failed to load packages:', packagesResponse.error);
+          setAvailablePackages([]);
+          setAvailablePlans([]);
+        }
+      } catch (packagesError) {
+        console.error('Failed to load packages from API:', packagesError);
+        setAvailablePackages([]);
+        setAvailablePlans([]);
       }
     } catch (error) {
       console.error('Failed to load order:', error);

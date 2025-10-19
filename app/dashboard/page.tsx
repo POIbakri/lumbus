@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [refreshingUsage, setRefreshingUsage] = useState<Record<string, boolean>>({});
   const [showOrderHistory, setShowOrderHistory] = useState(false);
+  const [showQuickHelp, setShowQuickHelp] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -625,6 +626,59 @@ export default function DashboardPage() {
                           )}
                         </div>
 
+                        {/* Quick Help Section (only for activated eSIMs) */}
+                        {order.activated_at && (
+                          <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-primary/20">
+                            <button
+                              onClick={() => {
+                                setShowQuickHelp(prev => ({ ...prev, [order.id]: !prev[order.id] }));
+                                triggerHaptic('light');
+                              }}
+                              className="w-full flex items-center justify-between text-left"
+                            >
+                              <span className="font-black uppercase text-xs">❓ Quick Help & Instructions</span>
+                              <span className="text-lg">{showQuickHelp[order.id] ? '▼' : '▶'}</span>
+                            </button>
+
+                            {showQuickHelp[order.id] && (
+                              <div className="mt-4 space-y-3 text-sm">
+                                <div className="p-3 bg-mint rounded-lg">
+                                  <div className="font-black mb-2">📡 Enable Data Roaming</div>
+                                  <p className="text-xs font-bold text-muted-foreground">
+                                    <strong>iPhone:</strong> Settings → Cellular → Cellular Data Options → Data Roaming (ON)
+                                  </p>
+                                  <p className="text-xs font-bold text-muted-foreground mt-1">
+                                    <strong>Android:</strong> Settings → Network & Internet → Mobile Network → Roaming (ON)
+                                  </p>
+                                </div>
+
+                                <div className="p-3 bg-mint rounded-lg">
+                                  <div className="font-black mb-2">🔍 Check Installation Status</div>
+                                  <p className="text-xs font-bold text-muted-foreground">
+                                    <strong>iPhone:</strong> Settings → Cellular → Check for your eSIM plan
+                                  </p>
+                                  <p className="text-xs font-bold text-muted-foreground mt-1">
+                                    <strong>Android:</strong> Settings → Network & Internet → SIMs → Check for your eSIM
+                                  </p>
+                                </div>
+
+                                <div className="p-3 bg-mint rounded-lg">
+                                  <div className="font-black mb-2">⚙️ Select eSIM for Data</div>
+                                  <p className="text-xs font-bold text-muted-foreground">
+                                    Make sure your eSIM is selected as the data line in your device settings
+                                  </p>
+                                </div>
+
+                                <Link href="/how-it-works">
+                                  <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs py-3">
+                                    VIEW FULL INSTRUCTIONS
+                                  </Button>
+                                </Link>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         {/* Actions */}
                         <div className="flex gap-2 sm:gap-3">
                           {/* Show "ACTIVATE SIM" for orders that haven't been activated yet (including provisioning) */}
@@ -636,16 +690,10 @@ export default function DashboardPage() {
                             </Link>
                           ) : (
                             <>
-                              {/* Show "VIEW DETAILS" for activated or active orders */}
-                              <Link href={`/install/${order.id}`} className="flex-1">
-                                <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
-                                  VIEW DETAILS
-                                </Button>
-                              </Link>
-                              {/* Only show top-up for activated orders with ICCID that aren't depleted or expired */}
+                              {/* For activated eSIMs, only show TOP UP button (no VIEW DETAILS needed) */}
                               {order.iccid && !isDepleted && daysRemaining > 0 && (
                                 <Link href={`/topup/${order.id}`} className="flex-1">
-                                  <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
+                                  <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-base sm:text-lg py-4 sm:py-5 ">
                                     + TOP UP
                                   </Button>
                                 </Link>

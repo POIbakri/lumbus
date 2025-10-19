@@ -463,23 +463,126 @@ export async function getEsimByIccid(iccid: string): Promise<EsimAccessOrderStat
 }
 
 /**
+ * Get available top-up packages for a specific eSIM
+ * Endpoint: /api/v1/open/package/list
+ * Query packages compatible with an existing eSIM
+ */
+export async function getTopUpPackages(params: {
+  iccid?: string;
+  esimTranNo?: string;
+  packageCode?: string;
+}): Promise<Array<{
+  packageCode: string;
+  slug?: string;
+  name: string;
+  data: string;
+  validity: string;
+  price: number;
+  currency: string;
+  locationCode: string;
+}>> {
+  try {
+    const { iccid, esimTranNo, packageCode } = params;
+
+    // Require either iccid or esimTranNo
+    if (!iccid && !esimTranNo) {
+      throw new Error('Either iccid or esimTranNo must be provided');
+    }
+
+    const requestBody: any = {};
+
+    // Prefer esimTranNo over iccid
+    if (esimTranNo) {
+      requestBody.esimTranNo = esimTranNo;
+    } else if (iccid) {
+      requestBody.iccid = iccid;
+    }
+
+    if (packageCode) {
+      requestBody.packageCode = packageCode;
+    }
+
+    const data = await makeEsimAccessRequest<{
+      packageList: Array<{
+        packageCode: string;
+        slug?: string;
+        name: string;
+        data: string;
+        validity: string;
+        price: number;
+        currency: string;
+        locationCode: string;
+      }>;
+    }>('/package/list', requestBody);
+
+    return data.packageList || [];
+  } catch (error) {
+    console.error('getTopUpPackages error:', error);
+    throw error;
+  }
+}
+
+/**
  * Top up an existing eSIM
  * Endpoint: /api/v1/open/esim/topup
  * Added in API v1.2 (Jul 26, 2023)
  */
-export async function topUpEsim(iccid: string, packageCode: string): Promise<{
+export async function topUpEsim(params: {
+  iccid?: string;
+  esimTranNo?: string;
+  packageCode: string;
+  transactionId: string;
+  amount?: string;
+}): Promise<{
   success: boolean;
-  orderNo?: string;
+  transactionId: string;
+  iccid: string;
+  expiredTime: string;
+  totalVolume: number;
+  totalDuration: number;
+  orderUsage: number;
 }> {
   try {
-    const data = await makeEsimAccessRequest<any>('/esim/topup', {
-      iccid,
-      packageCode, // or slug (v1.3+)
-    });
+    const { iccid, esimTranNo, packageCode, transactionId, amount } = params;
+
+    // Require either iccid or esimTranNo
+    if (!iccid && !esimTranNo) {
+      throw new Error('Either iccid or esimTranNo must be provided');
+    }
+
+    const requestBody: any = {
+      packageCode,
+      transactionId,
+    };
+
+    // Prefer esimTranNo over iccid (as per API docs)
+    if (esimTranNo) {
+      requestBody.esimTranNo = esimTranNo;
+    } else if (iccid) {
+      requestBody.iccid = iccid;
+    }
+
+    if (amount) {
+      requestBody.amount = amount;
+    }
+
+    const data = await makeEsimAccessRequest<{
+      transactionId: string;
+      iccid: string;
+      expiredTime: string;
+      totalVolume: number;
+      totalDuration: number;
+      orderUsage: number;
+    }>('/esim/topup', requestBody);
 
     return {
       success: true,
-      orderNo: data.orderNo || data.orderId,
+      transactionId: data.transactionId,
+      iccid: data.iccid,
+      expiredTime: data.expiredTime,
+      totalVolume: data.totalVolume,
+      totalDuration: data.totalDuration,
+      orderUsage: data.orderUsage,
     };
   } catch (error) {
     console.error('topUpEsim error:', error);
