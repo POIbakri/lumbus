@@ -43,6 +43,15 @@ function formatPlanData(dataGB: number): string {
 // Format usage data (for Used/Remaining - shows precise values)
 function formatDataUsage(dataGB: number): string {
   if (dataGB >= 1) {
+    // Show whole number for exact GB values (1.00 → "1 GB", 2.00 → "2 GB")
+    if (Number.isInteger(dataGB)) {
+      return `${dataGB} GB`;
+    }
+    // Show 1 decimal for near-whole values (0.98 → "1.0 GB")
+    const rounded = Math.round(dataGB * 10) / 10;
+    if (rounded === Math.floor(rounded)) {
+      return `${rounded.toFixed(1)} GB`;
+    }
     return `${dataGB.toFixed(2)} GB`;
   }
 
@@ -59,7 +68,7 @@ function formatDataUsage(dataGB: number): string {
   }
 
   // If 1000 MB or more, show as GB
-  return `${(dataGB).toFixed(2)} GB`;
+  return `${dataGB.toFixed(2)} GB`;
 }
 
 interface OrderWithPlan extends Order {
@@ -455,14 +464,26 @@ export default function DashboardPage() {
                   {(() => {
                     // Calculate total data remaining across all active eSIMs
                     const totalRemaining = activeOrders.reduce((sum, o) => {
-                      const totalGB = o.plan?.data_gb || 0;
-                      const usedGB = (o.data_usage_bytes || 0) / (1024 * 1024 * 1024);
-                      const remainingGB = Math.max(0, totalGB - usedGB);
+                      // Use marketing values for consistency
+                      const planGB = o.plan?.data_gb || 0;
+                      const planMB = planGB * 1024;
+
+                      // Get marketing total
+                      let marketingTotalMB = planMB;
+                      if (planMB <= 105) marketingTotalMB = 100;
+                      else if (planMB <= 260) marketingTotalMB = 200;
+                      else if (planMB <= 520) marketingTotalMB = 500;
+                      else if (planMB <= 1000) marketingTotalMB = 1000;
+
+                      const marketingTotalBytes = marketingTotalMB * 1024 * 1024;
+                      const usedBytes = o.data_usage_bytes || 0;
+                      const remainingBytes = Math.max(0, marketingTotalBytes - usedBytes);
+                      const remainingGB = remainingBytes / (1024 * 1024 * 1024);
                       return sum + remainingGB;
                     }, 0);
 
-                    // Use formatPlanData for stats display
-                    return totalRemaining > 0 ? formatPlanData(totalRemaining) : '0 MB';
+                    // Use precise formatting for stats (shows 0.9 GB instead of 1 GB)
+                    return totalRemaining > 0 ? formatDataUsage(totalRemaining) : '0 MB';
                   })()}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -522,27 +543,30 @@ export default function DashboardPage() {
                   const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
 
                   // Calculate real data usage from database
-                  const totalDataBytes = (order.plan?.data_gb || 0) * 1024 * 1024 * 1024; // Convert GB to bytes
+                  // Use marketing values for user-facing math (500 MB not 512 MB)
+                  const planGB = order.plan?.data_gb || 0;
+                  const planMB = planGB * 1024;
+
+                  // Get marketing-friendly total (e.g., 500 MB instead of 512 MB)
+                  let marketingTotalMB = planMB;
+                  if (planMB <= 105) marketingTotalMB = 100;
+                  else if (planMB <= 260) marketingTotalMB = 200;
+                  else if (planMB <= 520) marketingTotalMB = 500; // 512 MB shown as 500 MB
+                  else if (planMB <= 1000) marketingTotalMB = 1000;
+
+                  const marketingTotalBytes = marketingTotalMB * 1024 * 1024;
                   const dataUsedBytes = order.data_usage_bytes || 0;
                   const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
-                  const dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
-                  const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
+                  const dataRemainingBytes = Math.max(0, marketingTotalBytes - dataUsedBytes);
+                  const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
 
                   // Progress bar shows USED percentage (fills up as you use data)
-                  const dataUsedPercentage = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
+                  const dataUsedPercentage = marketingTotalBytes > 0 ? (dataUsedBytes / marketingTotalBytes) * 100 : 0;
 
                   // Format data for display
-                  const planTotalGB = order.plan?.data_gb || 0;
-                  const formatData = (gb: number, isRemaining: boolean = false) => {
+                  const formatData = (gb: number) => {
                     // Show 0 MB only if truly 0 (less than 0.001 MB = 1 KB)
                     if (gb < 0.000001) return '0 MB';
-
-                    // For remaining data, if it's >= 99% of plan total, show the plan total
-                    // This prevents showing "510 MB remaining" when you bought "500 MB"
-                    if (isRemaining && gb >= planTotalGB * 0.99) {
-                      return formatPlanData(planTotalGB);
-                    }
-
                     return formatDataUsage(gb); // Use precise formatting for usage
                   };
 
@@ -610,11 +634,11 @@ export default function DashboardPage() {
                           <div className="flex justify-between mb-2">
                             <div>
                               <div className="text-xs font-bold text-muted-foreground">Used</div>
-                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB, false)}</div>
+                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB)}</div>
                             </div>
                             <div className="text-right">
                               <div className="text-xs font-bold text-muted-foreground">Remaining</div>
-                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB, true)}</div>
+                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB)}</div>
                             </div>
                           </div>
                           <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
