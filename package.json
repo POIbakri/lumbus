@@ -9,7 +9,9 @@
     "lint": "eslint",
     "db:verify": "ts-node scripts/verify-database.ts",
     "deploy:check": "ts-node scripts/pre-deployment-check.ts",
-    "health": "curl -s http://localhost:3000/api/health | jq"
+    "health": "curl -s http://localhost:3000/api/health | jq",
+    "cron:test": "./scripts/test-cron.sh",
+    "usage:update": "npx tsx scripts/update-usage.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

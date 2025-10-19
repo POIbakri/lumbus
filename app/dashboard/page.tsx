@@ -14,22 +14,52 @@ import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
 import { authenticatedGet } from '@/lib/api-client';
 
-// Format data amounts to clean values
-function formatDataAmount(dataGB: number): string {
+// Format plan data amounts (for "What You Bought" - shows marketing numbers)
+function formatPlanData(dataGB: number): string {
   if (dataGB >= 1) {
     return `${dataGB} GB`;
   }
 
   const dataMB = dataGB * 1024;
 
-  // Round to nearest sensible value based on common plan sizes
+  // Round to marketing-friendly values
   if (dataMB <= 105) return '100 MB';
   if (dataMB <= 260) return '200 MB';
-  if (dataMB <= 520) return '500 MB'; // 0.5 GB = 512 MB, but we show as 500 MB
+  if (dataMB <= 520) return '500 MB'; // 0.5 GB shown as 500 MB (marketing)
   if (dataMB <= 1000) return '1 GB';
 
   // For other values, round to nearest 100MB
-  return `${Math.round(dataMB / 100) * 100} MB`;
+  const roundedMB = Math.round(dataMB / 100) * 100;
+
+  // If rounded value is 1000 MB or more, show as GB
+  if (roundedMB >= 1000) {
+    const gb = roundedMB / 1024;
+    return gb >= 0.95 ? '1 GB' : `${gb.toFixed(1)} GB`;
+  }
+
+  return `${roundedMB} MB`;
+}
+
+// Format usage data (for Used/Remaining - shows precise values)
+function formatDataUsage(dataGB: number): string {
+  if (dataGB >= 1) {
+    return `${dataGB.toFixed(2)} GB`;
+  }
+
+  const dataMB = dataGB * 1024;
+
+  // For very small amounts (< 10 MB), show 1 decimal place
+  if (dataMB < 10) {
+    return `${dataMB.toFixed(1)} MB`;
+  }
+
+  // For amounts < 1000 MB, show exact rounded MB
+  if (dataMB < 1000) {
+    return `${Math.round(dataMB)} MB`;
+  }
+
+  // If 1000 MB or more, show as GB
+  return `${(dataGB).toFixed(2)} GB`;
 }
 
 interface OrderWithPlan extends Order {
@@ -230,7 +260,7 @@ export default function DashboardPage() {
 
     // Show user-friendly status names
     if (order.status === 'provisioning') {
-      return 'preparing';
+      return 'ready';
     }
 
     return order.status;
@@ -367,14 +397,10 @@ export default function DashboardPage() {
     return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired;
   });
 
-  // Past orders include failed, pending, paid (not yet completed), depleted, and expired orders
+  // Past orders: ONLY show truly depleted eSIMs
   const pastOrders = orders.filter(o => {
-    const status = o.status;
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
-    const expired = isOrderExpired(o);
-
-    // Show if it's not active (failed, pending, paid), or if it's depleted or expired
-    return (status !== 'completed' && status !== 'provisioning' && status !== 'active') || isDepleted || expired;
+    return isDepleted;
   });
 
   return (
@@ -418,7 +444,7 @@ export default function DashboardPage() {
                   {activeOrders.length}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                  Active eSIMs
+                  eSIMs
                 </div>
               </CardContent>
             </Card>
@@ -435,8 +461,8 @@ export default function DashboardPage() {
                       return sum + remainingGB;
                     }, 0);
 
-                    // Use formatDataAmount for consistency
-                    return totalRemaining > 0 ? formatDataAmount(totalRemaining) : '0 MB';
+                    // Use formatPlanData for stats display
+                    return totalRemaining > 0 ? formatPlanData(totalRemaining) : '0 MB';
                   })()}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -466,7 +492,7 @@ export default function DashboardPage() {
           {/* Active eSIMs */}
           <div className="mb-6 sm:mb-8 md:mb-12">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE eSIMs</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">eSIMs</h2>
               <Link href="/plans" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
                   + BUY NEW eSIM
@@ -501,16 +527,28 @@ export default function DashboardPage() {
                   const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
                   const dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
                   const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
+
+                  // Progress bar shows USED percentage (fills up as you use data)
+                  const dataUsedPercentage = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
                   const dataRemainingPercentage = totalDataBytes > 0 ? getDataPercentage(dataRemainingBytes, totalDataBytes) : 100;
 
-                  // Format data for display - use formatDataAmount for consistency
-                  const formatData = (gb: number) => {
-                    if (gb < 0.01) return '0 MB';
-                    return formatDataAmount(gb);
+                  // Format data for display
+                  const planTotalGB = order.plan?.data_gb || 0;
+                  const formatData = (gb: number, isRemaining: boolean = false) => {
+                    // Show 0 MB only if truly 0 (less than 0.001 MB = 1 KB)
+                    if (gb < 0.000001) return '0 MB';
+
+                    // For remaining data, if it's >= 99% of plan total, show the plan total
+                    // This prevents showing "510 MB remaining" when you bought "500 MB"
+                    if (isRemaining && gb >= planTotalGB * 0.99) {
+                      return formatPlanData(planTotalGB);
+                    }
+
+                    return formatDataUsage(gb); // Use precise formatting for usage
                   };
 
                   const totalData = order.plan?.data_gb || 0;
-                  const totalDataFormatted = formatDataAmount(totalData);
+                  const totalDataFormatted = formatPlanData(totalData); // Use marketing-friendly formatting for plan data
 
                   // Check if plan is depleted
                   const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
@@ -560,34 +598,43 @@ export default function DashboardPage() {
                         <div className="p-3 sm:p-4 bg-white rounded-xl">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-black uppercase text-xs">📊 Data Usage</span>
+                            {order.activated_at && (
+                              <button
+                                onClick={() => refreshUsageData(order.id)}
+                                disabled={refreshingUsage[order.id]}
+                                className="text-xs font-black text-primary hover:text-primary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {refreshingUsage[order.id] ? '🔄 Refreshing...' : '🔄 Refresh'}
+                              </button>
+                            )}
                           </div>
                           <div className="flex justify-between mb-2">
                             <div>
                               <div className="text-xs font-bold text-muted-foreground">Used</div>
-                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB)}</div>
+                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB, false)}</div>
                             </div>
                             <div className="text-right">
                               <div className="text-xs font-bold text-muted-foreground">Remaining</div>
-                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB)}</div>
+                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB, true)}</div>
                             </div>
                           </div>
                           <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
                             <div
                               className={`h-full rounded-full transition-all ${
-                                dataRemainingPercentage > 50 ? 'bg-primary' :
-                                dataRemainingPercentage > 20 ? 'bg-yellow-500' :
+                                dataUsedPercentage < 50 ? 'bg-primary' :
+                                dataUsedPercentage < 80 ? 'bg-yellow-500' :
                                 'bg-destructive'
                               }`}
-                              style={{ width: `${dataRemainingPercentage}%` }}
+                              style={{ width: `${dataUsedPercentage}%` }}
                             ></div>
                           </div>
-                          <div className="text-xs font-bold text-center">{dataRemainingPercentage.toFixed(0)}% remaining</div>
+                          <div className="text-xs font-bold text-center">{dataUsedPercentage.toFixed(0)}% used</div>
                           {order.last_usage_update && (
                             <p className="text-xs font-bold text-muted-foreground mt-2">
                               Last updated: {new Date(order.last_usage_update).toLocaleString()}
                             </p>
                           )}
-                          {dataRemainingPercentage < 20 && dataRemainingPercentage > 0 && (
+                          {dataUsedPercentage > 80 && dataUsedPercentage < 100 && (
                             <p className="text-xs font-bold text-destructive mt-2">
                               ⚠️ Running low on data! Consider topping up.
                             </p>
@@ -714,7 +761,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">
-                  ORDER HISTORY ({pastOrders.length})
+                  ORDER HISTORY (DEPLETED) ({pastOrders.length})
                 </h2>
                 <Button
                   onClick={() => {
@@ -734,7 +781,7 @@ export default function DashboardPage() {
                       {pastOrders.map((order) => {
                       const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
                       const totalData = order.plan?.data_gb || 0;
-                      const totalDataFormatted = formatDataAmount(totalData);
+                      const totalDataFormatted = formatPlanData(totalData);
 
                       return (
                         <div

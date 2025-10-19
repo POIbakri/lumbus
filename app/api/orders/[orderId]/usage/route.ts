@@ -91,13 +91,25 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       const usage = usageData[0];
       const dataUsedBytes = usage.dataUsage;
       const totalDataBytes = usage.totalData;
-      const dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+      let dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+
+      // Handle edge case: if remaining is less than 1MB (1048576 bytes), consider it depleted
+      // Some providers report tiny amounts (like a few KB) even when SIM is depleted
+      const DEPLETION_THRESHOLD = 1048576; // 1 MB in bytes
+      if (dataRemainingBytes < DEPLETION_THRESHOLD && dataRemainingBytes > 0) {
+        console.log('[Usage API] Data remaining below threshold, setting to 0:', {
+          dataRemainingBytes,
+          threshold: DEPLETION_THRESHOLD
+        });
+        dataRemainingBytes = 0;
+      }
 
       console.log('[Usage API] Raw data from eSIM Access:', {
         esimTranNo: order.esim_tran_no,
         dataUsedBytes,
         totalDataBytes,
         dataRemainingBytes,
+        usagePercent: totalDataBytes > 0 ? ((dataUsedBytes / totalDataBytes) * 100).toFixed(2) + '%' : '0%',
         lastUpdateTime: usage.lastUpdateTime
       });
 
