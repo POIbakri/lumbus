@@ -14,9 +14,39 @@ export function LocationBanner() {
 
   useEffect(() => {
     async function loadLocation() {
-      const locationData = await detectUserLocation();
-      setLocation(locationData);
-      setLoading(false);
+      try {
+        // Use the same currency detection API as destinations page
+        const response = await fetch('/api/currency/detect');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.country) {
+            // Use the country code from currency API
+            setLocation({
+              country: data.country,
+              countryCode: data.country,
+              region: '',
+              city: '',
+              timezone: '',
+              detected: true,
+            });
+          } else {
+            // Fallback to Cloudflare detection
+            const locationData = await detectUserLocation();
+            setLocation(locationData);
+          }
+        } else {
+          // Fallback to Cloudflare detection
+          const locationData = await detectUserLocation();
+          setLocation(locationData);
+        }
+      } catch (error) {
+        console.error('Location detection error:', error);
+        // Fallback to Cloudflare detection
+        const locationData = await detectUserLocation();
+        setLocation(locationData);
+      } finally {
+        setLoading(false);
+      }
     }
     loadLocation();
   }, []);

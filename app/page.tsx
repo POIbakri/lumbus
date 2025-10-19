@@ -1,83 +1,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { supabase } from '@/lib/db';
-import { PlanCard } from '@/components/plan-card';
 import { LocationBanner } from '@/components/location-banner';
+import { PopularPlansSection } from '@/components/popular-plans-section';
 import { Nav } from '@/components/nav';
-import { headers } from 'next/headers';
 
-export const dynamic = 'force-dynamic';
-
-async function getLocationBasedPlans(countryCode: string) {
-  // First try to get plans for the user's country
-  let { data: plans } = await supabase
-    .from('plans')
-    .select('*')
-    .eq('is_active', true)
-    .eq('region_code', countryCode)
-    .limit(3);
-
-  // If no plans for exact country, get regional plans
-  if (!plans || plans.length === 0) {
-    const regionMap: Record<string, string[]> = {
-      'AE': ['MENA', 'GLOBAL'],
-      'SA': ['MENA', 'GLOBAL'],
-      'GB': ['EU', 'UK', 'GLOBAL'],
-      'US': ['US', 'GLOBAL'],
-      'CA': ['US', 'CA', 'GLOBAL'],
-      'JP': ['JP', 'ASIA', 'GLOBAL'],
-      'CN': ['CN', 'ASIA', 'GLOBAL'],
-      'AU': ['AU', 'GLOBAL'],
-    };
-
-    const regions = regionMap[countryCode] || ['GLOBAL'];
-
-    const { data: regionalPlans } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('is_active', true)
-      .in('region_code', regions)
-      .limit(3);
-
-    plans = regionalPlans;
-  }
-
-  // Fallback to any popular plans if still no results
-  if (!plans || plans.length === 0) {
-    const { data: fallbackPlans } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('is_active', true)
-      .limit(3);
-
-    plans = fallbackPlans;
-  }
-
-  return plans || [];
-}
-
-async function getUserCountryCode(): Promise<string> {
-  try {
-    // Try to get country from Cloudflare headers
-    const headersList = await headers();
-    const cfCountry = headersList.get('cf-ipcountry');
-    if (cfCountry && cfCountry !== 'XX') {
-      return cfCountry;
-    }
-
-    // Fallback to US if no country detected
-    return 'US';
-  } catch {
-    return 'US';
-  }
-}
-
-export default async function Home() {
-  const userCountryCode = await getUserCountryCode();
-  const plans = await getLocationBasedPlans(userCountryCode);
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') || '';
+export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
@@ -255,7 +183,7 @@ export default async function Home() {
       {/* Popular Plans */}
       <section className="relative py-32 px-4 bg-mint">
         <div className="container mx-auto">
-          <div className="text-center mb-16 ">
+          <div className="text-center mb-16">
             <div className="inline-block mb-4">
               <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
                 ⚡ Quick Start
@@ -271,20 +199,8 @@ export default async function Home() {
             <LocationBanner />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-            {plans.map((plan, index) => (
-              <div key={plan.id} className="" style={{animationDelay: `${index * 0.1}s`}}>
-                <PlanCard plan={plan} />
-              </div>
-            ))}
-          </div>
-          <div className="text-center ">
-            <Link href="/plans">
-              <Button className="bg-yellow text-foreground hover:bg-yellow/90 font-black text-lg px-14 py-7 rounded-xl  shadow-xl">
-                <span className="relative">VIEW ALL PLANS</span>
-              </Button>
-            </Link>
-          </div>
+          {/* Location-Based Plans */}
+          <PopularPlansSection />
         </div>
       </section>
 
