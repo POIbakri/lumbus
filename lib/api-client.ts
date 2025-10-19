@@ -8,6 +8,7 @@ import { supabaseClient } from './supabase-client';
 /**
  * Make an authenticated fetch request
  * Automatically adds Authorization header with Supabase JWT token
+ * Retries once with token refresh if 401 error occurs
  */
 export async function authenticatedFetch(
   url: string,
@@ -24,10 +25,32 @@ export async function authenticatedFetch(
   const headers = new Headers(options.headers);
   headers.set('Authorization', `Bearer ${session.access_token}`);
 
-  return fetch(url, {
+  // Make the request
+  let response = await fetch(url, {
     ...options,
     headers,
   });
+
+  // If 401, try refreshing the session and retry once
+  if (response.status === 401) {
+    console.log('[API Client] Got 401, refreshing session and retrying...');
+
+    const { data: { session: refreshedSession }, error } = await supabaseClient.auth.refreshSession();
+
+    if (error || !refreshedSession?.access_token) {
+      console.error('[API Client] Session refresh failed:', error);
+      throw new Error('Session expired. Please log in again.');
+    }
+
+    // Update token and retry request
+    headers.set('Authorization', `Bearer ${refreshedSession.access_token}`);
+    response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  }
+
+  return response;
 }
 
 /**

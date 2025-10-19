@@ -61,21 +61,28 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router]);
 
-  const loadOrders = useCallback(async () => {
+  const loadOrders = useCallback(async (forceRefresh: boolean = false) => {
     try {
-      // Try to load from cache first
+      // Try to load from cache first (unless force refresh)
       const cacheKey = `lumbus_orders_${user?.id}`;
       const cachedData = localStorage.getItem(cacheKey);
       const cacheTime = localStorage.getItem(`${cacheKey}_time`);
       const cacheExpiry = 2 * 60 * 1000; // 2 minutes
 
-      if (cachedData && cacheTime) {
+      if (!forceRefresh && cachedData && cacheTime) {
         const age = Date.now() - parseInt(cacheTime);
         if (age < cacheExpiry) {
           // Use cached data
           const orders = JSON.parse(cachedData);
           setOrders(orders);
           setLoading(false);
+
+          // Check if any orders are provisioning - if so, fetch fresh data in background
+          const hasProvisioning = orders.some((o: OrderWithPlan) => o.status === 'provisioning');
+          if (hasProvisioning) {
+            // Refresh in background without showing loading state
+            loadOrders(true);
+          }
           return;
         }
       }
@@ -99,6 +106,19 @@ export default function DashboardPage() {
       }));
 
       setOrders(transformedData as OrderWithPlan[]);
+
+      // Debug: Log provisioning orders to check if they have activation details
+      const provisioningOrders = transformedData?.filter((o: any) => o.status === 'provisioning');
+      if (provisioningOrders && provisioningOrders.length > 0) {
+        console.log('[Dashboard] Provisioning orders:', provisioningOrders.map((o: any) => ({
+          id: o.id,
+          status: o.status,
+          hasSmdp: !!o.smdp,
+          hasActivationCode: !!o.activation_code,
+          smdp: o.smdp,
+          activationCode: o.activation_code
+        })));
+      }
 
       // Cache the data
       localStorage.setItem(cacheKey, JSON.stringify(transformedData));
@@ -201,14 +221,15 @@ export default function DashboardPage() {
       return 'expired';
     }
 
+    // Show "READY" for orders that have activation details but haven't been activated yet
+    // This includes both "completed" orders and "provisioning" orders that have received activation details
+    if (!order.activated_at && order.smdp && order.activation_code) {
+      return 'ready';
+    }
+
     // Show user-friendly status names
     if (order.status === 'provisioning') {
       return 'preparing';
-    }
-
-    // Show "READY" for completed orders that haven't been activated yet
-    if (order.status === 'completed' && !order.activated_at) {
-      return 'ready';
     }
 
     return order.status;
@@ -335,14 +356,14 @@ export default function DashboardPage() {
     );
   }
 
-  // Filter for truly active orders (completed/provisioning) that are not depleted or expired
+  // Filter for truly active orders (completed/provisioning/active) that are not depleted or expired
   const activeOrders = orders.filter(o => {
     const status = o.status;
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
     const expired = isOrderExpired(o);
 
-    // Only show completed or provisioning orders that aren't depleted or expired
-    return (status === 'completed' || status === 'provisioning') && !isDepleted && !expired;
+    // Only show completed, provisioning, or active orders that aren't depleted or expired
+    return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired;
   });
 
   // Past orders include failed, pending, paid (not yet completed), depleted, and expired orders
@@ -352,7 +373,7 @@ export default function DashboardPage() {
     const expired = isOrderExpired(o);
 
     // Show if it's not active (failed, pending, paid), or if it's depleted or expired
-    return (status !== 'completed' && status !== 'provisioning') || isDepleted || expired;
+    return (status !== 'completed' && status !== 'provisioning' && status !== 'active') || isDepleted || expired;
   });
 
   return (
@@ -580,7 +601,8 @@ export default function DashboardPage() {
                               ⚠️ Running low on data! Consider topping up.
                             </p>
                           )}
-                          {order.status === 'provisioning' && (
+                          {/* Show message for orders still being provisioned (no activation details yet) */}
+                          {order.status === 'provisioning' && !order.smdp && !order.activation_code && (
                             <div className="mt-2">
                               <p className="text-xs font-bold text-primary mb-2">
                                 ⏳ Preparing your eSIM... This usually takes 10-30 seconds.
@@ -629,16 +651,16 @@ export default function DashboardPage() {
 
                         {/* Actions */}
                         <div className="flex gap-2 sm:gap-3">
-                          {/* Show "ACTIVATE SIM" for completed orders that haven't been installed yet */}
-                          {order.status === 'completed' && !order.activated_at ? (
+                          {/* Show "ACTIVATE SIM" for orders with activation details that haven't been activated yet */}
+                          {!order.activated_at && order.smdp && order.activation_code ? (
                             <Link href={`/install/${order.id}`} className="flex-1">
                               <Button className="w-full btn-lumbus bg-primary text-white hover:bg-primary/90 font-black text-base sm:text-lg py-4 sm:py-5 ">
                                 📲 ACTIVATE SIM
                               </Button>
                             </Link>
-                          ) : order.activated_at ? (
+                          ) : (order.activated_at || order.status === 'active') ? (
                             <>
-                              {/* Show "VIEW DETAILS" for activated orders */}
+                              {/* Show "VIEW DETAILS" for activated or active orders */}
                               <Link href={`/install/${order.id}`} className="flex-1">
                                 <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
                                   VIEW DETAILS

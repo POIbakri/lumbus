@@ -53,11 +53,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     // Check if order has esim_tran_no (required for usage query)
     if (!order.esim_tran_no) {
+      // Return full plan data if eSIM hasn't been provisioned yet
+      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+      const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
+
       return NextResponse.json(
         {
           error: 'eSIM not yet provisioned',
           data_usage_bytes: 0,
-          data_remaining_bytes: 0,
+          data_remaining_bytes: totalDataBytes, // Full data available
           last_update: null,
         },
         { status: 200 }
@@ -69,11 +73,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       const usageData = await checkEsimUsage([order.esim_tran_no]);
 
       if (!usageData || usageData.length === 0) {
+        // Return full plan data if no usage data available yet
+        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+        const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
+
         return NextResponse.json(
           {
-            error: 'No usage data available',
+            error: 'No usage data available yet',
             data_usage_bytes: 0,
-            data_remaining_bytes: 0,
+            data_remaining_bytes: totalDataBytes, // Full data available
             last_update: null,
           },
           { status: 200 }
@@ -126,9 +134,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       console.error('Failed to fetch eSIM usage from eSIM Access:', esimError);
 
       // Return cached data from database if API call fails
+      // If no cached data, return full plan data
+      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+      const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
+
       const cachedData = {
         data_usage_bytes: order.data_usage_bytes || 0,
-        data_remaining_bytes: order.data_remaining_bytes || 0,
+        data_remaining_bytes: order.data_remaining_bytes !== null && order.data_remaining_bytes !== undefined
+          ? order.data_remaining_bytes
+          : totalDataBytes, // Use full plan data if no cache
         last_update: order.last_usage_update || null,
       };
 
