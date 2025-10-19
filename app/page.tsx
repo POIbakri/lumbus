@@ -9,18 +9,73 @@ import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-async function getPopularPlans() {
-  const { data: plans } = await supabase
+async function getLocationBasedPlans(countryCode: string) {
+  // First try to get plans for the user's country
+  let { data: plans } = await supabase
     .from('plans')
     .select('*')
     .eq('is_active', true)
+    .eq('region_code', countryCode)
     .limit(3);
+
+  // If no plans for exact country, get regional plans
+  if (!plans || plans.length === 0) {
+    const regionMap: Record<string, string[]> = {
+      'AE': ['MENA', 'GLOBAL'],
+      'SA': ['MENA', 'GLOBAL'],
+      'GB': ['EU', 'UK', 'GLOBAL'],
+      'US': ['US', 'GLOBAL'],
+      'CA': ['US', 'CA', 'GLOBAL'],
+      'JP': ['JP', 'ASIA', 'GLOBAL'],
+      'CN': ['CN', 'ASIA', 'GLOBAL'],
+      'AU': ['AU', 'GLOBAL'],
+    };
+
+    const regions = regionMap[countryCode] || ['GLOBAL'];
+
+    const { data: regionalPlans } = await supabase
+      .from('plans')
+      .select('*')
+      .eq('is_active', true)
+      .in('region_code', regions)
+      .limit(3);
+
+    plans = regionalPlans;
+  }
+
+  // Fallback to any popular plans if still no results
+  if (!plans || plans.length === 0) {
+    const { data: fallbackPlans } = await supabase
+      .from('plans')
+      .select('*')
+      .eq('is_active', true)
+      .limit(3);
+
+    plans = fallbackPlans;
+  }
 
   return plans || [];
 }
 
+async function getUserCountryCode(): Promise<string> {
+  try {
+    // Try to get country from Cloudflare headers
+    const headersList = await headers();
+    const cfCountry = headersList.get('cf-ipcountry');
+    if (cfCountry && cfCountry !== 'XX') {
+      return cfCountry;
+    }
+
+    // Fallback to US if no country detected
+    return 'US';
+  } catch {
+    return 'US';
+  }
+}
+
 export default async function Home() {
-  const plans = await getPopularPlans();
+  const userCountryCode = await getUserCountryCode();
+  const plans = await getLocationBasedPlans(userCountryCode);
   const headersList = await headers();
   const userAgent = headersList.get('user-agent') || '';
 
@@ -201,9 +256,14 @@ export default async function Home() {
       <section className="relative py-32 px-4 bg-mint">
         <div className="container mx-auto">
           <div className="text-center mb-16 ">
-            <p className="text-xl font-bold opacity-70 max-w-2xl mx-auto">
-              Get instant connectivity in the world's most visited locations
-            </p>
+            <div className="inline-block mb-4">
+              <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
+                ⚡ Quick Start
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
+              GET CONNECTED NOW
+            </h2>
           </div>
 
           {/* Location-Based Banner */}

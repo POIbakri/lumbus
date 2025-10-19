@@ -33,44 +33,52 @@ export function LocationBanner() {
     );
   }
 
-  if (!location || !location.detected) {
-    return null;
-  }
-
-  const relevantRegions = getRelevantRegions(location.countryCode);
+  // Always show banner, even if detection fails
+  const relevantRegions = location ? getRelevantRegions(location.countryCode) : ['GLOBAL'];
   const primaryRegion = relevantRegions[0];
 
   return (
-    <Card className="bg-mint border-4 border-primary shadow-2xl   relative overflow-hidden   mb-12">
+    <Card className="bg-mint border-4 border-primary shadow-2xl relative overflow-hidden mb-12">
       {/* Shine Effect */}
-      <div className="absolute inset-0 bg-white/20 opacity-50 group-hover:opacity-100   pointer-events-none"></div>
+      <div className="absolute inset-0 bg-white/20 opacity-50 group-hover:opacity-100 pointer-events-none"></div>
 
       {/* Floating Elements */}
-      <div className="absolute top-2 right-2 text-4xl ">
-        {getFlagEmoji(location.countryCode)}
-      </div>
-      <div className="absolute bottom-2 left-2 text-2xl " style={{animationDelay: '0.5s'}}>
+      {location?.detected && (
+        <div className="absolute top-2 right-2 text-4xl">
+          {getFlagEmoji(location.countryCode)}
+        </div>
+      )}
+      <div className="absolute bottom-2 left-2 text-2xl" style={{animationDelay: '0.5s'}}>
         📍
       </div>
 
       <CardContent className="py-8 px-6 relative z-10">
         <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="inline-block px-4 py-1 bg-primary rounded-full">
-              <span className="font-black uppercase text-xs text-white">📍 DETECTED</span>
+          {location?.detected && (
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="inline-block px-4 py-1 bg-primary rounded-full">
+                <span className="font-black uppercase text-xs text-white">📍 DETECTED</span>
+              </div>
             </div>
-          </div>
+          )}
 
           <h3 className="text-2xl md:text-3xl font-black uppercase mb-3 text-foreground">
-            {deviceInfo.isMobile ? 'Perfect Timing!' : `Hello from ${location.country}!`}
+            {location?.detected ? (
+              deviceInfo.isMobile ? 'Perfect Timing!' : `Hello from ${location.country}!`
+            ) : (
+              'Ready to Get Connected?'
+            )}
           </h3>
 
           <p className="text-base md:text-lg font-bold mb-6 opacity-80">
-            {location.detected && location.city && (
+            {location?.detected && location.city && (
               <>We detected you're in <span className="text-primary font-black">{location.city}, {location.country}</span>. </>
             )}
-            {!location.city && location.country && (
+            {location?.detected && !location.city && location.country && (
               <>We detected you're in <span className="text-primary font-black">{location.country}</span>. </>
+            )}
+            {!location?.detected && (
+              <>Find the perfect eSIM plan for your destination. </>
             )}
             {deviceInfo.supportsEsim ? (
               <>Your device supports eSIM! Get connected in seconds.</>
@@ -81,14 +89,14 @@ export function LocationBanner() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href={`/plans?region=${primaryRegion.toLowerCase()}`}>
-              <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl   ">
+              <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl">
                 <span className="flex items-center gap-2">
                   {getFlagEmoji(primaryRegion)} VIEW {getRegionName(primaryRegion)} PLANS
                 </span>
               </Button>
             </Link>
             <Link href="/plans">
-              <Button className="btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-base px-8 py-4 ">
+              <Button className="btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-base px-8 py-4">
                 BROWSE ALL PLANS
               </Button>
             </Link>
