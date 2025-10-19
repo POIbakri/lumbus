@@ -4,10 +4,23 @@ import Link from 'next/link';
 import { Nav } from '@/components/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { HowToSchema, FAQSchema } from '@/components/structured-data';
 
 export default function HowItWorksPage() {
+  // FAQs for schema
+  const howItWorksFAQs = [
+    { q: 'When should I install my eSIM?', a: 'You can install your eSIM anytime after purchase, but only activate it (turn on data) when you arrive at your destination to start your validity period.' },
+    { q: 'Do I need to remove my primary SIM?', a: 'No! Your eSIM works alongside your existing SIM. You can switch between them in your settings or use both simultaneously (calls on primary, data on eSIM).' },
+    { q: 'What if I run out of data?', a: 'You can purchase a top-up plan from your dashboard. Additional data packages can be added anytime during your validity period.' },
+    { q: 'Can I use hotspot/tethering?', a: 'Yes! All our eSIM plans support hotspot and tethering, so you can share your connection with other devices.' }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      <HowToSchema />
+      <FAQSchema faqs={howItWorksFAQs} />
+
       <Nav />
 
       {/* Hero Section */}

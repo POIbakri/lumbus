@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Nav } from '@/components/nav';
 import { Card, CardContent } from '@/components/ui/card';
+import { FAQSchema } from '@/components/structured-data';
 
 const faqs = [
   {
@@ -117,8 +118,16 @@ export default function HelpPage() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
 
+  // Flatten all FAQs for schema
+  const allFAQs = faqs.flatMap(category =>
+    category.questions.map(q => ({ q: q.q, a: q.a }))
+  );
+
   return (
     <div className="min-h-screen bg-white">
+      {/* FAQ Schema for SEO */}
+      <FAQSchema faqs={allFAQs} />
+
       <Nav />
 
       {/* Hero Section */}

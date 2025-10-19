@@ -296,6 +296,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
       to: [to],
+      bcc: ['getlumbus.com+d39cc9736f@invite.trustpilot.com'], // Trustpilot review automation
       subject: `Your Lumbus eSIM is ready! - ${orderDetails.planName}`,
       html: createEmailTemplate({
         title: 'Your eSIM is Ready',
