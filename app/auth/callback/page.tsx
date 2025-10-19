@@ -13,16 +13,24 @@ export default function AuthCallbackPage() {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const accessToken = hashParams.get('access_token');
       const type = hashParams.get('type');
+      const refreshToken = hashParams.get('refresh_token');
 
       if (accessToken) {
-        // Session will be automatically set by Supabase client
-        await supabaseClient.auth.getSession();
+        // For password recovery, we need to explicitly set the session
+        if (type === 'recovery' && refreshToken) {
+          // Set session using the tokens from the URL
+          await supabaseClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
 
-        // Check if this is a password recovery flow
-        if (type === 'recovery') {
+          // Wait a bit to ensure session is persisted
+          await new Promise(resolve => setTimeout(resolve, 500));
+
           router.push('/auth/reset-password');
         } else {
-          // Regular sign-in, redirect to dashboard
+          // Regular sign-in flow
+          await supabaseClient.auth.getSession();
           router.push('/dashboard');
         }
       } else {
