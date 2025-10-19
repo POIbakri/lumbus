@@ -83,7 +83,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       const usage = usageData[0];
       const dataUsedBytes = usage.dataUsage;
       const totalDataBytes = usage.totalData;
-      const dataRemainingBytes = totalDataBytes - dataUsedBytes;
+      const dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+
+      console.log('[Usage API] Raw data from eSIM Access:', {
+        esimTranNo: order.esim_tran_no,
+        dataUsedBytes,
+        totalDataBytes,
+        dataRemainingBytes,
+        lastUpdateTime: usage.lastUpdateTime
+      });
 
       // Update order with latest usage data
       await supabase
@@ -94,6 +102,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
           last_usage_update: usage.lastUpdateTime,
         })
         .eq('id', orderId);
+
+      console.log('[Usage API] Database updated successfully for order:', orderId);
 
       // Calculate percentage and GB values for response
       const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);

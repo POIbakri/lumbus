@@ -170,7 +170,11 @@ export default function DashboardPage() {
       case 'completed':
       case 'active':
         return 'bg-primary text-foreground';
+      case 'ready':
+        return 'bg-cyan border-2 border-primary text-foreground';
       case 'provisioning':
+      case 'preparing':
+      case 'activating':
         return 'bg-yellow text-foreground';
       case 'pending':
       case 'paid':
@@ -193,27 +197,45 @@ export default function DashboardPage() {
     }
 
     // Check if expired
-    if (isOrderExpired(order.created_at, order.plan?.validity_days || 0)) {
+    if (isOrderExpired(order)) {
       return 'expired';
+    }
+
+    // Show user-friendly status names
+    if (order.status === 'provisioning') {
+      return 'preparing';
+    }
+
+    // Show "READY" for completed orders that haven't been activated yet
+    if (order.status === 'completed' && !order.activated_at) {
+      return 'ready';
     }
 
     return order.status;
   };
 
-  const getDataPercentage = (used: number, total: number) => {
-    return Math.min(100, (used / total) * 100);
+  const getDataPercentage = (remaining: number, total: number) => {
+    return Math.min(100, (remaining / total) * 100);
   };
 
-  const getDaysRemaining = (createdAt: string, validityDays: number) => {
-    const created = new Date(createdAt);
-    const expiry = new Date(created.getTime() + validityDays * 24 * 60 * 60 * 1000);
+  const getDaysRemaining = (order: OrderWithPlan) => {
+    const validityDays = order.plan?.validity_days || 0;
+
+    // If eSIM hasn't been activated yet (no activated_at date), return full validity period
+    if (!order.activated_at) {
+      return validityDays;
+    }
+
+    // Calculate from activation date
+    const activationDate = new Date(order.activated_at);
+    const expiry = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
     const now = new Date();
     const remaining = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return remaining; // Can be negative for expired plans
   };
 
-  const isOrderExpired = (createdAt: string, validityDays: number) => {
-    return getDaysRemaining(createdAt, validityDays) <= 0;
+  const isOrderExpired = (order: OrderWithPlan) => {
+    return getDaysRemaining(order) <= 0;
   };
 
   const copyReferralLink = async () => {
@@ -317,7 +339,7 @@ export default function DashboardPage() {
   const activeOrders = orders.filter(o => {
     const status = o.status;
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
-    const expired = isOrderExpired(o.created_at, o.plan?.validity_days || 0);
+    const expired = isOrderExpired(o);
 
     // Only show completed or provisioning orders that aren't depleted or expired
     return (status === 'completed' || status === 'provisioning') && !isDepleted && !expired;
@@ -327,7 +349,7 @@ export default function DashboardPage() {
   const pastOrders = orders.filter(o => {
     const status = o.status;
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
-    const expired = isOrderExpired(o.created_at, o.plan?.validity_days || 0);
+    const expired = isOrderExpired(o);
 
     // Show if it's not active (failed, pending, paid), or if it's depleted or expired
     return (status !== 'completed' && status !== 'provisioning') || isDepleted || expired;
@@ -391,14 +413,8 @@ export default function DashboardPage() {
                       return sum + remainingGB;
                     }, 0);
 
-                    // Format the display
-                    if (totalRemaining >= 1) {
-                      return `${totalRemaining.toFixed(1)} GB`;
-                    } else if (totalRemaining > 0) {
-                      return `${Math.round(totalRemaining * 1024)} MB`;
-                    } else {
-                      return '0 MB';
-                    }
+                    // Use formatDataAmount for consistency
+                    return totalRemaining > 0 ? formatDataAmount(totalRemaining) : '0 MB';
                   })()}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
@@ -425,9 +441,304 @@ export default function DashboardPage() {
             </Card>
           </div>
 
+          {/* Active eSIMs */}
+          <div className="mb-6 sm:mb-8 md:mb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE eSIMs</h2>
+              <Link href="/plans" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
+                  + BUY NEW eSIM
+                </Button>
+              </Link>
+            </div>
+
+            {activeOrders.length === 0 ? (
+              <Card className="bg-purple border-2 border-accent shadow-lg ">
+                <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
+                  <div className="text-5xl sm:text-6xl mb-4">📱</div>
+                  <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE eSIMs</h3>
+                  <p className="text-sm sm:text-base font-bold text-muted-foreground mb-6">
+                    Get started by purchasing your first eSIM
+                  </p>
+                  <Link href="/plans" className="inline-block w-full sm:w-auto">
+                    <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
+                      BROWSE PLANS
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {activeOrders.map((order, index) => {
+                  const daysRemaining = getDaysRemaining(order);
+                  const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
+
+                  // Calculate real data usage from database
+                  const totalDataBytes = (order.plan?.data_gb || 0) * 1024 * 1024 * 1024; // Convert GB to bytes
+                  const dataUsedBytes = order.data_usage_bytes || 0;
+                  const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
+                  const dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+                  const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
+                  const dataRemainingPercentage = totalDataBytes > 0 ? getDataPercentage(dataRemainingBytes, totalDataBytes) : 100;
+
+                  // Format data for display - use formatDataAmount for consistency
+                  const formatData = (gb: number) => {
+                    if (gb < 0.01) return '0 MB';
+                    return formatDataAmount(gb);
+                  };
+
+                  const totalData = order.plan?.data_gb || 0;
+                  const totalDataFormatted = formatDataAmount(totalData);
+
+                  // Check if plan is depleted
+                  const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+
+                  return (
+                    <Card
+                      key={order.id}
+                      className="bg-mint border-4 border-primary shadow-xl   relative overflow-hidden  "
+                      style={{animationDelay: `${index * 0.1}s`}}
+                    >
+                      {/* Shine Effect */}
+                      <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100   pointer-events-none"></div>
+
+                      <CardHeader className="relative z-10">
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
+                            {getDisplayStatus(order)}
+                          </Badge>
+                          <div className="flex items-center gap-2">
+                            {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
+                            <div className="text-right">
+                              <div className="text-lg font-black">{order.plan?.region_code}</div>
+                              <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name.replace(/^["']|["']$/g, '')}</CardTitle>
+                      </CardHeader>
+
+                      <CardContent className="space-y-4 relative z-10">
+                        {/* What You Bought */}
+                        <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-primary/20">
+                          <div className="font-black uppercase text-xs text-muted-foreground mb-3">📦 What You Bought</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="bg-mint p-2 rounded-lg">
+                              <div className="text-xs font-bold text-muted-foreground mb-1">Total Data</div>
+                              <div className="text-lg font-black">{totalDataFormatted}</div>
+                            </div>
+                            <div className="bg-mint p-2 rounded-lg">
+                              <div className="text-xs font-bold text-muted-foreground mb-1">Validity</div>
+                              <div className="text-lg font-black">{order.plan?.validity_days} days</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Data Usage */}
+                        <div className="p-3 sm:p-4 bg-white rounded-xl">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-black uppercase text-xs">📊 Data Usage</span>
+                            <button
+                              onClick={() => refreshUsageData(order.id)}
+                              disabled={refreshingUsage[order.id]}
+                              className="p-1 hover:bg-foreground/5 rounded-lg  disabled:opacity-50 "
+                              title="Refresh usage data"
+                            >
+                              <span className={`text-sm ${refreshingUsage[order.id] ? '' : ''}`}>
+                                🔄
+                              </span>
+                            </button>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <div>
+                              <div className="text-xs font-bold text-muted-foreground">Used</div>
+                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB)}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xs font-bold text-muted-foreground">Remaining</div>
+                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB)}</div>
+                            </div>
+                          </div>
+                          <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                dataRemainingPercentage > 50 ? 'bg-primary' :
+                                dataRemainingPercentage > 20 ? 'bg-yellow-500' :
+                                'bg-destructive'
+                              }`}
+                              style={{ width: `${dataRemainingPercentage}%` }}
+                            ></div>
+                          </div>
+                          <div className="text-xs font-bold text-center">{dataRemainingPercentage.toFixed(0)}% remaining</div>
+                          {order.last_usage_update && (
+                            <p className="text-xs font-bold text-muted-foreground mt-2">
+                              Last updated: {new Date(order.last_usage_update).toLocaleString()}
+                            </p>
+                          )}
+                          {dataRemainingPercentage < 20 && dataRemainingPercentage > 0 && (
+                            <p className="text-xs font-bold text-destructive mt-2">
+                              ⚠️ Running low on data! Consider topping up.
+                            </p>
+                          )}
+                          {order.status === 'provisioning' && (
+                            <div className="mt-2">
+                              <p className="text-xs font-bold text-primary mb-2">
+                                ⏳ Preparing your eSIM... This usually takes 10-30 seconds.
+                              </p>
+                              <Button
+                                onClick={() => window.location.href = `/install/${order.id}`}
+                                className="w-full btn-lumbus bg-yellow text-foreground hover:bg-yellow/80 font-black text-xs py-2"
+                              >
+                                CHECK STATUS
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Expiry */}
+                        <div className="p-3 sm:p-4 bg-white rounded-xl">
+                          <div className="flex justify-between items-center">
+                            <span className="font-black uppercase text-xs">Days Remaining</span>
+                            {daysRemaining <= 0 ? (
+                              <span className="font-black text-xl sm:text-2xl text-destructive">
+                                EXPIRED
+                              </span>
+                            ) : (
+                              <span className={`font-black text-xl sm:text-2xl ${order.activated_at && daysRemaining <= 5 ? 'text-destructive' : ''}`}>
+                                {daysRemaining}
+                              </span>
+                            )}
+                          </div>
+                          {/* Only show expiry warning if eSIM has been activated */}
+                          {order.activated_at && daysRemaining > 0 && daysRemaining <= 5 && (
+                            <p className="text-xs font-bold text-destructive mt-2">
+                              ⚠️ Expiring soon! Purchase a new plan to stay connected.
+                            </p>
+                          )}
+                          {!order.activated_at && daysRemaining > 0 && (
+                            <p className="text-xs font-bold text-primary mt-2">
+                              ⏳ Validity starts when you activate the eSIM
+                            </p>
+                          )}
+                          {daysRemaining <= 0 && (
+                            <p className="text-xs font-bold text-destructive mt-2">
+                              ⚠️ This plan has expired. Purchase a new plan to stay connected.
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 sm:gap-3">
+                          {/* Show "ACTIVATE SIM" for completed orders that haven't been installed yet */}
+                          {order.status === 'completed' && !order.activated_at ? (
+                            <Link href={`/install/${order.id}`} className="flex-1">
+                              <Button className="w-full btn-lumbus bg-primary text-white hover:bg-primary/90 font-black text-base sm:text-lg py-4 sm:py-5 ">
+                                📲 ACTIVATE SIM
+                              </Button>
+                            </Link>
+                          ) : order.activated_at ? (
+                            <>
+                              {/* Show "VIEW DETAILS" for activated orders */}
+                              <Link href={`/install/${order.id}`} className="flex-1">
+                                <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
+                                  VIEW DETAILS
+                                </Button>
+                              </Link>
+                              {/* Only show top-up for activated orders with ICCID that aren't depleted or expired */}
+                              {order.iccid && !isDepleted && daysRemaining > 0 && (
+                                <Link href={`/topup/${order.id}`} className="flex-1">
+                                  <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
+                                    + TOP UP
+                                  </Button>
+                                </Link>
+                              )}
+                            </>
+                          ) : null}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Order History */}
+          {pastOrders.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">
+                  ORDER HISTORY ({pastOrders.length})
+                </h2>
+                <Button
+                  onClick={() => {
+                    setShowOrderHistory(!showOrderHistory);
+                    triggerHaptic('light');
+                  }}
+                  className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-4 py-2"
+                >
+                  {showOrderHistory ? '▼ HIDE' : '▶ SHOW'}
+                </Button>
+              </div>
+
+              {showOrderHistory && (
+                <Card className="bg-yellow border-2 border-secondary shadow-lg  ">
+                  <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      {pastOrders.map((order) => {
+                      const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
+                      const totalData = order.plan?.data_gb || 0;
+                      const totalDataFormatted = formatDataAmount(totalData);
+
+                      return (
+                        <div
+                          key={order.id}
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl  "
+                        >
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name.replace(/^["']|["']$/g, '')}</div>
+                              <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>
+                              <div className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+                                <span>📊 {totalDataFormatted}</span>
+                                <span>•</span>
+                                <span>⏰ {order.plan?.validity_days} days</span>
+                              </div>
+                              <div className="text-xs sm:text-sm font-bold text-muted-foreground mt-1">
+                                {new Date(order.created_at).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                            <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
+                              {getDisplayStatus(order)}
+                            </Badge>
+                            {(order.status === 'completed' || order.status === 'active') && order.smdp && order.activation_code && (
+                              <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
+                                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
+                                  VIEW
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
           {/* Referral Section */}
           {referralStats && (
-            <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.2s'}}>
+            <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.4s'}}>
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">REFER & EARN</h2>
               <Card className="bg-purple border-2 sm:border-4 border-accent shadow-xl">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
@@ -540,282 +851,6 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-            </div>
-          )}
-
-          {/* Active eSIMs */}
-          <div className="mb-6 sm:mb-8 md:mb-12">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">ACTIVE eSIMs</h2>
-              <Link href="/plans" className="w-full sm:w-auto">
-                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
-                  + BUY NEW eSIM
-                </Button>
-              </Link>
-            </div>
-
-            {activeOrders.length === 0 ? (
-              <Card className="bg-purple border-2 border-accent shadow-lg ">
-                <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
-                  <div className="text-5xl sm:text-6xl mb-4">📱</div>
-                  <h3 className="font-black text-xl sm:text-2xl mb-2">NO ACTIVE eSIMs</h3>
-                  <p className="text-sm sm:text-base font-bold text-muted-foreground mb-6">
-                    Get started by purchasing your first eSIM
-                  </p>
-                  <Link href="/plans" className="inline-block w-full sm:w-auto">
-                    <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6">
-                      BROWSE PLANS
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {activeOrders.map((order, index) => {
-                  const daysRemaining = getDaysRemaining(order.created_at, order.plan?.validity_days || 30);
-                  const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
-
-                  // Calculate real data usage from database
-                  const totalDataBytes = (order.plan?.data_gb || 0) * 1024 * 1024 * 1024; // Convert GB to bytes
-                  const dataUsedBytes = order.data_usage_bytes || 0;
-                  const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
-                  const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
-                  const dataPercentage = totalDataBytes > 0 ? getDataPercentage(dataUsedBytes, totalDataBytes) : 0;
-
-                  // Format data for display - use formatDataAmount for consistency
-                  const formatData = (gb: number) => {
-                    if (gb < 0.01) return '0 MB';
-                    return formatDataAmount(gb);
-                  };
-
-                  const totalData = order.plan?.data_gb || 0;
-                  const totalDataFormatted = formatDataAmount(totalData);
-
-                  // Check if plan is depleted
-                  const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
-
-                  // Check if eSIM has been activated (used for expiry logic)
-                  const isActivated = order.activated_at !== null || dataUsedBytes > 0;
-
-                  return (
-                    <Card
-                      key={order.id}
-                      className="bg-mint border-4 border-primary shadow-xl   relative overflow-hidden  "
-                      style={{animationDelay: `${index * 0.1}s`}}
-                    >
-                      {/* Shine Effect */}
-                      <div className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100   pointer-events-none"></div>
-
-                      <CardHeader className="relative z-10">
-                        <div className="flex justify-between items-start mb-3">
-                          <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                            {getDisplayStatus(order)}
-                          </Badge>
-                          <div className="flex items-center gap-2">
-                            {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
-                            <div className="text-right">
-                              <div className="text-lg font-black">{order.plan?.region_code}</div>
-                              <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
-                            </div>
-                          </div>
-                        </div>
-                        <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name.replace(/^["']|["']$/g, '')}</CardTitle>
-                      </CardHeader>
-
-                      <CardContent className="space-y-4 relative z-10">
-                        {/* What You Bought */}
-                        <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-primary/20">
-                          <div className="font-black uppercase text-xs text-muted-foreground mb-3">📦 What You Bought</div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="bg-mint p-2 rounded-lg">
-                              <div className="text-xs font-bold text-muted-foreground mb-1">Total Data</div>
-                              <div className="text-lg font-black">{totalDataFormatted}</div>
-                            </div>
-                            <div className="bg-mint p-2 rounded-lg">
-                              <div className="text-xs font-bold text-muted-foreground mb-1">Validity</div>
-                              <div className="text-lg font-black">{order.plan?.validity_days} days</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Data Usage */}
-                        <div className="p-3 sm:p-4 bg-white rounded-xl">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs">📊 Data Usage</span>
-                            <button
-                              onClick={() => refreshUsageData(order.id)}
-                              disabled={refreshingUsage[order.id]}
-                              className="p-1 hover:bg-foreground/5 rounded-lg  disabled:opacity-50 "
-                              title="Refresh usage data"
-                            >
-                              <span className={`text-sm ${refreshingUsage[order.id] ? '' : ''}`}>
-                                🔄
-                              </span>
-                            </button>
-                          </div>
-                          <div className="flex justify-between mb-2">
-                            <div>
-                              <div className="text-xs font-bold text-muted-foreground">Used</div>
-                              <div className="text-sm font-black text-destructive">{formatData(dataUsedGB)}</div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-xs font-bold text-muted-foreground">Remaining</div>
-                              <div className="text-sm font-black text-primary">{formatData(dataRemainingGB)}</div>
-                            </div>
-                          </div>
-                          <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden mb-2">
-                            <div
-                              className="bg-primary h-full rounded-full  "
-                              style={{ width: `${dataPercentage}%` }}
-                            ></div>
-                          </div>
-                          <div className="text-xs font-bold text-center">{dataPercentage.toFixed(0)}% used</div>
-                          {order.last_usage_update && (
-                            <p className="text-xs font-bold text-muted-foreground mt-2">
-                              Last updated: {new Date(order.last_usage_update).toLocaleString()}
-                            </p>
-                          )}
-                          {dataPercentage > 80 && (
-                            <p className="text-xs font-bold text-destructive mt-2">
-                              ⚠️ Running low on data! Consider topping up.
-                            </p>
-                          )}
-                          {order.status === 'provisioning' && (
-                            <p className="text-xs font-bold text-primary mt-2">
-                              ⏳ Your eSIM is being activated. Activation details will appear shortly.
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Expiry */}
-                        <div className="p-3 sm:p-4 bg-white rounded-xl">
-                          <div className="flex justify-between items-center">
-                            <span className="font-black uppercase text-xs">Days Remaining</span>
-                            {daysRemaining <= 0 ? (
-                              <span className="font-black text-xl sm:text-2xl text-destructive">
-                                EXPIRED
-                              </span>
-                            ) : (
-                              <span className={`font-black text-xl sm:text-2xl ${isActivated && daysRemaining <= 5 ? 'text-destructive' : ''}`}>
-                                {daysRemaining}
-                              </span>
-                            )}
-                          </div>
-                          {/* Only show expiry warning if eSIM has been activated */}
-                          {isActivated && daysRemaining > 0 && daysRemaining <= 5 && (
-                            <p className="text-xs font-bold text-destructive mt-2">
-                              ⚠️ Expiring soon! Purchase a new plan to stay connected.
-                            </p>
-                          )}
-                          {!isActivated && daysRemaining > 0 && (
-                            <p className="text-xs font-bold text-primary mt-2">
-                              ⏳ Validity starts when you first use the eSIM
-                            </p>
-                          )}
-                          {daysRemaining <= 0 && (
-                            <p className="text-xs font-bold text-destructive mt-2">
-                              ⚠️ This plan has expired. Purchase a new plan to stay connected.
-                            </p>
-                          )}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-2 sm:gap-3">
-                          <Link href={`/install/${order.id}`} className="flex-1">
-                            <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
-                              VIEW DETAILS
-                            </Button>
-                          </Link>
-                          {/* Only show top-up for active orders with ICCID that aren't depleted or expired */}
-                          {(order.status === 'completed' || order.status === 'active') &&
-                           order.iccid &&
-                           !isDepleted &&
-                           daysRemaining > 0 && (
-                            <Link href={`/topup/${order.id}`} className="flex-1">
-                              <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
-                                + TOP UP
-                              </Button>
-                            </Link>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Order History */}
-          {pastOrders.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">
-                  ORDER HISTORY ({pastOrders.length})
-                </h2>
-                <Button
-                  onClick={() => {
-                    setShowOrderHistory(!showOrderHistory);
-                    triggerHaptic('light');
-                  }}
-                  className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-4 py-2"
-                >
-                  {showOrderHistory ? '▼ HIDE' : '▶ SHOW'}
-                </Button>
-              </div>
-
-              {showOrderHistory && (
-                <Card className="bg-yellow border-2 border-secondary shadow-lg  ">
-                  <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
-                    <div className="space-y-3 sm:space-y-4">
-                      {pastOrders.map((order) => {
-                      const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
-                      const totalData = order.plan?.data_gb || 0;
-                      const totalDataFormatted = formatDataAmount(totalData);
-
-                      return (
-                        <div
-                          key={order.id}
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl  "
-                        >
-                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                            {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}
-                            <div className="flex-1 min-w-0">
-                              <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name.replace(/^["']|["']$/g, '')}</div>
-                              <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>
-                              <div className="text-xs font-bold text-muted-foreground flex items-center gap-2">
-                                <span>📊 {totalDataFormatted}</span>
-                                <span>•</span>
-                                <span>⏰ {order.plan?.validity_days} days</span>
-                              </div>
-                              <div className="text-xs sm:text-sm font-bold text-muted-foreground mt-1">
-                                {new Date(order.created_at).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                            <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                              {getDisplayStatus(order)}
-                            </Badge>
-                            {(order.status === 'completed' || order.status === 'active') && order.smdp && order.activation_code && (
-                              <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
-                                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
-                                  VIEW
-                                </Button>
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           )}
         </div>

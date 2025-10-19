@@ -26,6 +26,7 @@ export async function GET(
         smdp,
         activation_code,
         created_at,
+        connect_order_id,
         plans (
           name,
           region_code,
@@ -43,6 +44,52 @@ export async function GET(
     // Verify the order belongs to the authenticated user
     if (order.user_id !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // **NEW: If order is provisioning, try to fetch activation details from eSIM Access**
+    if (order.status === 'provisioning' && order.connect_order_id) {
+      try {
+        console.log('[Order API] Order is provisioning, polling eSIM Access for activation details...');
+        const { getOrderStatus } = await import('@/lib/esimaccess');
+        const orderDetails = await getOrderStatus(order.connect_order_id);
+
+        if (orderDetails?.esimList && orderDetails.esimList.length > 0) {
+          const firstProfile = orderDetails.esimList[0];
+
+          // Extract SMDP and activation code from LPA string
+          const lpaString = firstProfile.ac;
+          const parts = lpaString.split('$');
+          const smdpAddress = parts.length >= 2 ? parts[1] : '';
+          const activationCode = parts.length >= 3 ? parts[2] : '';
+
+          if (smdpAddress && activationCode) {
+            console.log('[Order API] Got activation details! Updating order...');
+
+            // Update order in database
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                iccid: firstProfile.iccid,
+                esim_tran_no: firstProfile.esimTranNo,
+                smdp: smdpAddress,
+                activation_code: activationCode,
+                qr_url: firstProfile.qrCodeUrl || firstProfile.shortUrl || null,
+              })
+              .eq('id', orderId);
+
+            // Update the order object for response
+            order.status = 'completed';
+            order.smdp = smdpAddress;
+            order.activation_code = activationCode;
+
+            console.log('[Order API] Order updated to completed with activation details');
+          }
+        }
+      } catch (pollError) {
+        console.error('[Order API] Error polling eSIM Access:', pollError);
+        // Continue with original order data if polling fails
+      }
     }
 
     // Sanitize response (never expose internal IDs, secrets, or full URLs)

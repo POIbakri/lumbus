@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { InstallPanel } from '@/components/install-panel';
 import { useDeviceDetection, buildIOSUniversalLink } from '@/lib/device-detection';
 import { Badge } from '@/components/ui/badge';
@@ -38,9 +40,19 @@ export default function InstallPage() {
   const loadOrder = useCallback(async () => {
     try {
       const data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
+      console.log('[Install Page] Order data received:', {
+        id: data.id,
+        status: data.status,
+        hasActivationDetails: data.hasActivationDetails,
+        hasSmdp: !!data.smdp,
+        hasActivationCode: !!data.activationCode,
+        smdp: data.smdp,
+        activationCode: data.activationCode
+      });
       setOrder(data);
       setLoading(false); // Always stop loading after first fetch
     } catch (err) {
+      console.error('[Install Page] Error loading order:', err);
       setError('Failed to load order. Please check your email for activation details.');
       setLoading(false);
     }
@@ -109,33 +121,61 @@ export default function InstallPage() {
 
   if (!order.hasActivationDetails) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md">
-          <CardHeader>
-            <CardTitle>Preparing Your eSIM</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6">
-              <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-              <p className="text-muted-foreground mb-2">
-                Your eSIM is being activated...
-              </p>
-              <p className="text-sm text-muted-foreground">
-                This usually takes a few seconds.
-              </p>
-            </div>
-            <div className="mt-6 p-4 bg-accent/50 rounded-lg space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold uppercase text-muted-foreground">Status</span>
-                <Badge variant="secondary">{order.status}</Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold uppercase text-muted-foreground">Plan</span>
-                <span className="text-sm font-black">{order.plan.name.replace(/^["']|["']$/g, '')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-white">
+        <Nav />
+        <div className="pt-32 pb-20 px-4">
+          <div className="container mx-auto max-w-2xl">
+            <Card className="bg-yellow border-4 border-secondary shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-center">
+                  ⏳ ACTIVATING YOUR eSIM
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-6">
+                  <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-primary mb-6"></div>
+                  <p className="text-lg font-bold mb-2">
+                    Setting up your eSIM...
+                  </p>
+                  <p className="text-sm font-bold text-muted-foreground mb-6">
+                    This usually takes 10-30 seconds. You'll receive an email with installation instructions once ready.
+                  </p>
+                </div>
+
+                <div className="mt-6 p-4 bg-white rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold uppercase text-muted-foreground">Status</span>
+                    <Badge className="bg-yellow text-foreground font-black uppercase">
+                      {order.status === 'provisioning' ? 'ACTIVATING' : order.status.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold uppercase text-muted-foreground">Plan</span>
+                    <span className="text-sm font-black">{order.plan.name.replace(/^["']|["']$/g, '')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold uppercase text-muted-foreground">Region</span>
+                    <span className="text-sm font-black">{order.plan.region}</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-primary/10 rounded-xl">
+                  <p className="text-sm font-bold text-center">
+                    💡 <strong>Tip:</strong> This page will automatically update when your eSIM is ready. Keep this tab open or check your email for installation instructions.
+                  </p>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <Link href="/dashboard">
+                    <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black">
+                      ← BACK TO DASHBOARD
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
