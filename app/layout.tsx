@@ -120,7 +120,7 @@ export const metadata: Metadata = {
     google: 'I366hIp0hbTHejtQWurn2hMIpp4Uf-OwuAvpbkgwlMU',
     yandex: 'yandex-verification-code-here',
     other: {
-      'msvalidate.01': '020ddb15f28b792a49e6d3c67bb0b60e',
+      'msvalidate.01': 'EC2129D35A218A72351745BDE93F9351',
     },
   },
 };
@@ -137,6 +137,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+        {/* Search Engine Verification */}
+        <meta name="msvalidate.01" content="EC2129D35A218A72351745BDE93F9351" />
 
         {/* Structured Data for SEO */}
         <OrganizationSchema />
