@@ -601,20 +601,6 @@ export default function DashboardPage() {
                               ⚠️ Running low on data! Consider topping up.
                             </p>
                           )}
-                          {/* Show message for orders still being provisioned (no activation details yet) */}
-                          {order.status === 'provisioning' && !order.smdp && !order.activation_code && (
-                            <div className="mt-2">
-                              <p className="text-xs font-bold text-primary mb-2">
-                                ⏳ Preparing your eSIM... This usually takes 10-30 seconds.
-                              </p>
-                              <Button
-                                onClick={() => window.location.href = `/install/${order.id}`}
-                                className="w-full btn-lumbus bg-yellow text-foreground hover:bg-yellow/80 font-black text-xs py-2"
-                              >
-                                CHECK STATUS
-                              </Button>
-                            </div>
-                          )}
                         </div>
 
                         {/* Expiry */}
