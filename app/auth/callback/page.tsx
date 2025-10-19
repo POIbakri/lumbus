@@ -12,13 +12,19 @@ export default function AuthCallbackPage() {
       // Get auth code from URL
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const accessToken = hashParams.get('access_token');
+      const type = hashParams.get('type');
 
       if (accessToken) {
         // Session will be automatically set by Supabase client
         await supabaseClient.auth.getSession();
 
-        // Redirect to dashboard
-        router.push('/dashboard');
+        // Check if this is a password recovery flow
+        if (type === 'recovery') {
+          router.push('/auth/reset-password');
+        } else {
+          // Regular sign-in, redirect to dashboard
+          router.push('/dashboard');
+        }
       } else {
         // No token, redirect to login
         router.push('/login');
