@@ -4,22 +4,34 @@ import { getCountriesByContinent, REGIONS } from '@/lib/countries'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600 // Revalidate every hour
+export const runtime = 'nodejs' // Ensure Node.js runtime for Supabase
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://getlumbus.com'
   const currentDate = new Date()
 
-  // Fetch all active plans from database
-  const { data: plans } = await supabase
-    .from('plans')
-    .select('region_code, id, updated_at, name')
-    .eq('is_active', true)
-    .order('updated_at', { ascending: false })
+  // Fetch all active plans from database with error handling
+  let plans: any[] = []
+  try {
+    const { data, error } = await supabase
+      .from('plans')
+      .select('region_code, id, updated_at, name')
+      .eq('is_active', true)
+      .order('updated_at', { ascending: false })
+
+    if (error) {
+      console.error('Sitemap: Error fetching plans:', error)
+    } else {
+      plans = data || []
+    }
+  } catch (err) {
+    console.error('Sitemap: Failed to fetch plans:', err)
+  }
 
   // Generate plan URLs (grouped by region)
   const planUrlsByRegion = new Map<string, MetadataRoute.Sitemap[number]>()
 
-  plans?.forEach((plan) => {
+  plans.forEach((plan) => {
     const regionUrl = `${baseUrl}/plans/${plan.region_code}/${plan.id}`
     const updatedDate = plan.updated_at ? new Date(plan.updated_at) : currentDate
 
