@@ -139,9 +139,9 @@ export default function DashboardPage() {
       setOrders(transformedData as OrderWithPlan[]);
 
       // Debug: Log provisioning orders to check if they have activation details
-      const provisioningOrders = transformedData?.filter((o: any) => o.status === 'provisioning');
+      const provisioningOrders = transformedData?.filter((o) => o.status === 'provisioning');
       if (provisioningOrders && provisioningOrders.length > 0) {
-        console.log('[Dashboard] Provisioning orders:', provisioningOrders.map((o: any) => ({
+        console.log('[Dashboard] Provisioning orders:', provisioningOrders.map((o) => ({
           id: o.id,
           status: o.status,
           hasSmdp: !!o.smdp,
@@ -530,7 +530,6 @@ export default function DashboardPage() {
 
                   // Progress bar shows USED percentage (fills up as you use data)
                   const dataUsedPercentage = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
-                  const dataRemainingPercentage = totalDataBytes > 0 ? getDataPercentage(dataRemainingBytes, totalDataBytes) : 100;
 
                   // Format data for display
                   const planTotalGB = order.plan?.data_gb || 0;
