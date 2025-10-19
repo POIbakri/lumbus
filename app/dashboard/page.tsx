@@ -927,7 +927,7 @@ export default function DashboardPage() {
                           <div className="bg-yellow rounded-xl p-4 sm:p-6 border-2 border-secondary">
                             <div className="flex justify-between items-center mb-2">
                               <span className="font-black uppercase text-xs sm:text-sm">
-                                Pending Rewards
+                                Pending Data
                               </span>
                               <span className="text-2xl sm:text-3xl font-black">
                                 {(referralStats.pending_rewards / 1024).toFixed(1)} GB
