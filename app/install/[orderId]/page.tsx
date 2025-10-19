@@ -39,11 +39,7 @@ export default function InstallPage() {
     try {
       const data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
       setOrder(data);
-
-      // Stop polling once we have activation details
-      if (data.hasActivationDetails) {
-        setLoading(false);
-      }
+      setLoading(false); // Always stop loading after first fetch
     } catch (err) {
       setError('Failed to load order. Please check your email for activation details.');
       setLoading(false);
@@ -52,9 +48,16 @@ export default function InstallPage() {
 
   useEffect(() => {
     loadOrder();
-    const interval = setInterval(loadOrder, 2000); // Poll every 2 seconds
+
+    // Only keep polling if we don't have activation details yet
+    const interval = setInterval(() => {
+      if (!order?.hasActivationDetails) {
+        loadOrder();
+      }
+    }, 2000); // Poll every 2 seconds
+
     return () => clearInterval(interval);
-  }, [loadOrder]);
+  }, [loadOrder, order?.hasActivationDetails]);
 
   // Auto-trigger deep link for iOS 17.4+ when activation details are ready
   useEffect(() => {

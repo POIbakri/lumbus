@@ -22,13 +22,14 @@ function formatDataAmount(dataGB: number): string {
 
   const dataMB = dataGB * 1024;
 
-  // Round to nearest sensible value
-  if (dataMB <= 110) return '100 MB';
-  if (dataMB <= 250) return '200 MB';
-  if (dataMB <= 550) return '500 MB';
+  // Round to nearest sensible value based on common plan sizes
+  if (dataMB <= 105) return '100 MB';
+  if (dataMB <= 260) return '200 MB';
+  if (dataMB <= 520) return '500 MB'; // 0.5 GB = 512 MB, but we show as 500 MB
+  if (dataMB <= 1000) return '1 GB';
 
-  // For other values, round to nearest 50MB
-  return `${Math.round(dataMB / 50) * 50} MB`;
+  // For other values, round to nearest 100MB
+  return `${Math.round(dataMB / 100) * 100} MB`;
 }
 
 interface OrderWithPlan extends Order {
@@ -345,9 +346,24 @@ export default function DashboardPage() {
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-2 sm:mb-4 leading-tight">
               YOUR DASHBOARD
             </h1>
-            <p className="text-sm sm:text-base md:text-lg font-bold text-muted-foreground truncate">
-              Welcome back, {user?.email}
-            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-sm sm:text-base md:text-lg font-bold text-muted-foreground truncate">
+                Welcome back, {user?.email}
+              </p>
+              {referralStats && (
+                <a
+                  href="#refer-earn"
+                  className="inline-flex items-center gap-2 text-sm sm:text-base font-black text-primary hover:text-primary/80 transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('refer-earn')?.scrollIntoView({ behavior: 'smooth' });
+                    triggerHaptic('light');
+                  }}
+                >
+                  🎁 Refer Friends for Extra GB →
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -411,7 +427,7 @@ export default function DashboardPage() {
 
           {/* Referral Section */}
           {referralStats && (
-            <div className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.2s'}}>
+            <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.2s'}}>
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">REFER & EARN</h2>
               <Card className="bg-purple border-2 sm:border-4 border-accent shadow-xl">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
@@ -566,13 +582,10 @@ export default function DashboardPage() {
                   const dataRemainingGB = Math.max(0, (order.plan?.data_gb || 0) - dataUsedGB);
                   const dataPercentage = totalDataBytes > 0 ? getDataPercentage(dataUsedBytes, totalDataBytes) : 0;
 
-                  // Format data for display
+                  // Format data for display - use formatDataAmount for consistency
                   const formatData = (gb: number) => {
                     if (gb < 0.01) return '0 MB';
-                    if (gb < 1) {
-                      return `${Math.round(gb * 1024)} MB`;
-                    }
-                    return `${gb.toFixed(2)} GB`;
+                    return formatDataAmount(gb);
                   };
 
                   const totalData = order.plan?.data_gb || 0;
@@ -580,6 +593,9 @@ export default function DashboardPage() {
 
                   // Check if plan is depleted
                   const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+
+                  // Check if eSIM has been activated (used for expiry logic)
+                  const isActivated = order.activated_at !== null || dataUsedBytes > 0;
 
                   return (
                     <Card
@@ -680,14 +696,20 @@ export default function DashboardPage() {
                                 EXPIRED
                               </span>
                             ) : (
-                              <span className={`font-black text-xl sm:text-2xl ${daysRemaining <= 5 ? 'text-destructive' : ''}`}>
+                              <span className={`font-black text-xl sm:text-2xl ${isActivated && daysRemaining <= 5 ? 'text-destructive' : ''}`}>
                                 {daysRemaining}
                               </span>
                             )}
                           </div>
-                          {daysRemaining > 0 && daysRemaining <= 5 && (
+                          {/* Only show expiry warning if eSIM has been activated */}
+                          {isActivated && daysRemaining > 0 && daysRemaining <= 5 && (
                             <p className="text-xs font-bold text-destructive mt-2">
                               ⚠️ Expiring soon! Purchase a new plan to stay connected.
+                            </p>
+                          )}
+                          {!isActivated && daysRemaining > 0 && (
+                            <p className="text-xs font-bold text-primary mt-2">
+                              ⏳ Validity starts when you first use the eSIM
                             </p>
                           )}
                           {daysRemaining <= 0 && (
