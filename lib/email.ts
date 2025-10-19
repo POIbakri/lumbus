@@ -61,6 +61,15 @@ function createEmailTemplate(params: {
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .progress-bar { height: 40px !important; }
+            .progress-bar-text { font-size: 14px !important; }
+            .stat-card {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+            }
+            .stat-value { font-size: 28px !important; }
+            .big-number { font-size: 36px !important; }
         }
     </style>
 </head>
@@ -354,23 +363,28 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
       This is a ${alertLevel.toLowerCase()} about your data usage for <strong>${planName}</strong>.
     </p>
 
-    <div style="margin: 0 0 30px; background: #E0FEF7; border-radius: 12px; height: 50px; overflow: hidden; position: relative;">
-      <div style="background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%); height: 100%; width: ${usagePercent.toFixed(1)}%; display: flex; align-items: center; justify-content: center; color: #1A1A1A; font-weight: 900; font-size: 18px; transition: width 0.5s ease;">
-        ${usagePercent.toFixed(0)}%
-      </div>
-    </div>
+    <table border="0" cellspacing="0" cellpadding="0" width="100%" class="progress-bar" style="margin: 0 0 30px; background: #E0FEF7; border-radius: 12px; height: 50px; overflow: hidden;">
+      <tr>
+        <td width="${usagePercent.toFixed(1)}%" style="background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%); height: 50px; text-align: center; vertical-align: middle;">
+          <span class="progress-bar-text" style="color: #1A1A1A; font-weight: 900; font-size: 18px; display: inline-block; white-space: nowrap;">
+            ${usagePercent.toFixed(0)}%
+          </span>
+        </td>
+        <td style="background: #E0FEF7; height: 50px;"></td>
+      </tr>
+    </table>
 
     <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin: 0 0 30px;">
       <tr>
-        <td width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
+        <td class="stat-card mobile-stack" width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
           <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Data Used</p>
-          <p style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataUsedGB.toFixed(2)} GB</p>
+          <p class="stat-value" style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataUsedGB.toFixed(2)} GB</p>
           <p style="margin: 0; font-size: 14px; color: #515154;">of ${totalDataGB.toFixed(2)} GB</p>
         </td>
-        <td width="4%"></td>
-        <td width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
+        <td class="mobile-hide" width="4%"></td>
+        <td class="stat-card mobile-stack" width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
           <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Remaining</p>
-          <p style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataRemainingGB.toFixed(2)} GB</p>
+          <p class="stat-value" style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataRemainingGB.toFixed(2)} GB</p>
           <p style="margin: 0; font-size: 14px; color: #515154;">${(100 - usagePercent).toFixed(0)}% left</p>
         </td>
       </tr>
@@ -459,7 +473,7 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
 
     <div style="margin: 0 0 30px; padding: 30px; background: #FEF3C7; border: 3px solid #F59E0B; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Expires In</p>
-      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</p>
+      <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</p>
       <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">Expiry Date: ${expiryDate}</p>
     </div>
 
@@ -530,7 +544,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
 
     <div style="margin: 0 0 30px; padding: 30px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">You Earned</p>
-      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${rewardAmount}</p>
+      <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${rewardAmount}</p>
       <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">🎊 Added to your wallet!</p>
     </div>
 
@@ -616,7 +630,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
 
     <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Data Added</p>
-      <p style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
+      <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
       <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">📶 Ready to use!</p>
     </div>
 
@@ -762,6 +776,15 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .progress-bar { height: 40px !important; }
+            .progress-bar-text { font-size: 14px !important; }
+            .stat-card {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+            }
+            .stat-value { font-size: 28px !important; }
+            .big-number { font-size: 36px !important; }
         }
     </style>
 </head>
@@ -942,6 +965,15 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .progress-bar { height: 40px !important; }
+            .progress-bar-text { font-size: 14px !important; }
+            .stat-card {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+            }
+            .stat-value { font-size: 28px !important; }
+            .big-number { font-size: 36px !important; }
         }
     </style>
 </head>
@@ -1152,6 +1184,15 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .progress-bar { height: 40px !important; }
+            .progress-bar-text { font-size: 14px !important; }
+            .stat-card {
+                display: block !important;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+            }
+            .stat-value { font-size: 28px !important; }
+            .big-number { font-size: 36px !important; }
         }
     </style>
 </head>
