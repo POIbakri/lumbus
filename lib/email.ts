@@ -43,6 +43,24 @@ function createEmailTemplate(params: {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
             .container { width: 100% !important; max-width: 100% !important; }
+            h1 { font-size: 24px !important; }
+            h2 { font-size: 22px !important; }
+            h3 { font-size: 18px !important; }
+            .mobile-button {
+                display: block !important;
+                width: 100% !important;
+                padding: 18px 20px !important;
+                font-size: 14px !important;
+                box-sizing: border-box !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+            .mobile-hide { display: none !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
+            .mobile-large-text { font-size: 36px !important; }
+            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
         }
     </style>
 </head>
@@ -220,7 +238,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <td align="center" style="padding: 0 0 30px;">
-          <a href="${installUrl}" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+          <a href="${installUrl}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
             OPEN INSTALLATION GUIDE
           </a>
         </td>
@@ -384,7 +402,7 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <td align="center" style="padding: 0 0 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
             VIEW DASHBOARD
           </a>
         </td>
@@ -455,7 +473,7 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <td align="center" style="padding: 0 0 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
             BROWSE PLANS
           </a>
         </td>
@@ -544,7 +562,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <td align="center" style="padding: 0 0 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
             VIEW WALLET
           </a>
         </td>
@@ -649,7 +667,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
       <tr>
         <td align="center" style="padding: 0 0 30px;">
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
             VIEW DASHBOARD
           </a>
         </td>
@@ -726,6 +744,24 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
             .container { width: 100% !important; max-width: 100% !important; }
+            h1 { font-size: 24px !important; }
+            h2 { font-size: 22px !important; }
+            h3 { font-size: 18px !important; }
+            .mobile-button {
+                display: block !important;
+                width: 100% !important;
+                padding: 18px 20px !important;
+                font-size: 14px !important;
+                box-sizing: border-box !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+            .mobile-hide { display: none !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
+            .mobile-large-text { font-size: 36px !important; }
+            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
         }
     </style>
 </head>
@@ -888,6 +924,24 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
             .container { width: 100% !important; max-width: 100% !important; }
+            h1 { font-size: 24px !important; }
+            h2 { font-size: 22px !important; }
+            h3 { font-size: 18px !important; }
+            .mobile-button {
+                display: block !important;
+                width: 100% !important;
+                padding: 18px 20px !important;
+                font-size: 14px !important;
+                box-sizing: border-box !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+            .mobile-hide { display: none !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
+            .mobile-large-text { font-size: 36px !important; }
+            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
         }
     </style>
 </head>
@@ -953,7 +1007,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center" style="padding: 0 0 30px;">
-                                        <a href="${dashboardLink}" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.05);">
+                                        <a href="${dashboardLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.05);">
                                             Go to Dashboard
                                         </a>
                                     </td>
@@ -1080,6 +1134,24 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
             .container { width: 100% !important; max-width: 100% !important; }
+            h1 { font-size: 24px !important; }
+            h2 { font-size: 22px !important; }
+            h3 { font-size: 18px !important; }
+            .mobile-button {
+                display: block !important;
+                width: 100% !important;
+                padding: 18px 20px !important;
+                font-size: 14px !important;
+                box-sizing: border-box !important;
+            }
+            .mobile-stack {
+                display: block !important;
+                width: 100% !important;
+            }
+            .mobile-hide { display: none !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
+            .mobile-large-text { font-size: 36px !important; }
+            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
         }
     </style>
 </head>
@@ -1274,7 +1346,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center" style="padding: 0 0 20px;">
-                                        <a href="${reviewLink}" style="display: inline-block; padding: 16px 40px; background: #8B5CF6; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.4);">
+                                        <a href="${reviewLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #8B5CF6; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.4);">
                                             Review in Admin Panel
                                         </a>
                                     </td>
