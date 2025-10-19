@@ -362,7 +362,7 @@ export default function DashboardPage() {
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
     const expired = isOrderExpired(o);
 
-    // Only show completed, provisioning, or active orders that aren't depleted or expired
+    // Show completed, provisioning, or active orders that aren't depleted or expired
     return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired;
   });
 
@@ -559,16 +559,6 @@ export default function DashboardPage() {
                         <div className="p-3 sm:p-4 bg-white rounded-xl">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-black uppercase text-xs">📊 Data Usage</span>
-                            <button
-                              onClick={() => refreshUsageData(order.id)}
-                              disabled={refreshingUsage[order.id]}
-                              className="p-1 hover:bg-foreground/5 rounded-lg  disabled:opacity-50 "
-                              title="Refresh usage data"
-                            >
-                              <span className={`text-sm ${refreshingUsage[order.id] ? '' : ''}`}>
-                                🔄
-                              </span>
-                            </button>
                           </div>
                           <div className="flex justify-between mb-2">
                             <div>
@@ -637,14 +627,14 @@ export default function DashboardPage() {
 
                         {/* Actions */}
                         <div className="flex gap-2 sm:gap-3">
-                          {/* Show "ACTIVATE SIM" for orders with activation details that haven't been activated yet */}
-                          {!order.activated_at && order.smdp && order.activation_code ? (
+                          {/* Show "ACTIVATE SIM" for orders that haven't been activated yet (including provisioning) */}
+                          {!order.activated_at ? (
                             <Link href={`/install/${order.id}`} className="flex-1">
                               <Button className="w-full btn-lumbus bg-primary text-white hover:bg-primary/90 font-black text-base sm:text-lg py-4 sm:py-5 ">
                                 📲 ACTIVATE SIM
                               </Button>
                             </Link>
-                          ) : (order.activated_at || order.status === 'active') ? (
+                          ) : (
                             <>
                               {/* Show "VIEW DETAILS" for activated or active orders */}
                               <Link href={`/install/${order.id}`} className="flex-1">
@@ -661,7 +651,7 @@ export default function DashboardPage() {
                                 </Link>
                               )}
                             </>
-                          ) : null}
+                          )}
                         </div>
                       </CardContent>
                     </Card>
