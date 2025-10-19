@@ -9,32 +9,50 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Get auth code from URL
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const accessToken = hashParams.get('access_token');
-      const type = hashParams.get('type');
-      const refreshToken = hashParams.get('refresh_token');
+      try {
+        // Check if there's a hash in the URL (from Supabase magic link)
+        if (window.location.hash) {
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+          const type = hashParams.get('type');
 
-      if (accessToken) {
-        // For password recovery, we need to explicitly set the session
-        if (type === 'recovery' && refreshToken) {
-          // Set session using the tokens from the URL
-          await supabaseClient.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
+          if (accessToken && refreshToken) {
+            // Explicitly set the session from the URL tokens
+            const { data, error } = await supabaseClient.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
 
-          // Wait a bit to ensure session is persisted
-          await new Promise(resolve => setTimeout(resolve, 500));
+            if (error) {
+              console.error('Failed to set session:', error);
+              router.push('/login');
+              return;
+            }
 
-          router.push('/auth/reset-password');
-        } else {
-          // Regular sign-in flow
-          await supabaseClient.auth.getSession();
-          router.push('/dashboard');
+            if (data.session) {
+              // Session successfully set
+              if (type === 'recovery') {
+                // This is a password recovery - redirect to reset password
+                router.push('/auth/reset-password');
+              } else {
+                // Regular login - redirect to dashboard
+                router.push('/dashboard');
+              }
+              return;
+            }
+          }
         }
-      } else {
-        // No token, redirect to login
+
+        // No hash parameters - check if there's an existing session
+        const { data } = await supabaseClient.auth.getSession();
+        if (data.session) {
+          router.push('/dashboard');
+        } else {
+          router.push('/login');
+        }
+      } catch (err) {
+        console.error('Auth callback error:', err);
         router.push('/login');
       }
     };

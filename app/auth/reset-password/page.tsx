@@ -20,10 +20,9 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     // Check if user has a valid session (from reset link)
     const checkSession = async () => {
-      // Wait a moment for session to be properly set from the redirect
-      await new Promise(resolve => setTimeout(resolve, 500));
-
       const { session } = await auth.getSession();
+      console.log('Reset password page - session check:', session ? 'Session found' : 'No session');
+
       if (!session) {
         setError('Invalid or expired reset link. Please request a new password reset.');
       }
