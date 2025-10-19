@@ -4,11 +4,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { LocationBanner } from '@/components/location-banner';
 import { PopularPlansSection } from '@/components/popular-plans-section';
 import { Nav } from '@/components/nav';
+import { AuthRecoveryHandler } from '@/components/auth-recovery-handler';
 
 export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Handle password recovery redirects */}
+      <AuthRecoveryHandler />
+
       {/* Navigation */}
       <Nav />
 

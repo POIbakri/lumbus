@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { detectUserLocation, getRegionName, getRelevantRegions, getFlagEmoji, LocationInfo } from '@/lib/location-detection';
+import { detectUserLocation, getFlagEmoji, LocationInfo } from '@/lib/location-detection';
 import { useDeviceDetection } from '@/lib/device-detection';
+import { getCountryInfo } from '@/lib/countries';
 
 export function LocationBanner() {
   const [location, setLocation] = useState<LocationInfo | null>(null);
@@ -20,9 +21,11 @@ export function LocationBanner() {
         if (response.ok) {
           const data = await response.json();
           if (data.country) {
-            // Use the country code from currency API
+            // Use the same country mapping as destinations page
+            const countryInfo = getCountryInfo(data.country);
+
             setLocation({
-              country: data.country,
+              country: countryInfo.name,
               countryCode: data.country,
               region: '',
               city: '',
@@ -63,9 +66,8 @@ export function LocationBanner() {
     );
   }
 
-  // Always show banner, even if detection fails
-  const relevantRegions = location ? getRelevantRegions(location.countryCode) : ['GLOBAL'];
-  const primaryRegion = relevantRegions[0];
+  // Use the country code directly, not regional mapping
+  const primaryRegion = location?.countryCode || 'GLOBAL';
 
   return (
     <Card className="bg-mint border-4 border-primary shadow-2xl relative overflow-hidden mb-12">
@@ -84,14 +86,6 @@ export function LocationBanner() {
 
       <CardContent className="py-8 px-6 relative z-10">
         <div className="text-center">
-          {location?.detected && (
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="inline-block px-4 py-1 bg-primary rounded-full">
-                <span className="font-black uppercase text-xs text-white">📍 DETECTED</span>
-              </div>
-            </div>
-          )}
-
           <h3 className="text-2xl md:text-3xl font-black uppercase mb-3 text-foreground">
             {location?.detected ? (
               deviceInfo.isMobile ? 'Perfect Timing!' : `Hello from ${location.country}!`
@@ -121,7 +115,7 @@ export function LocationBanner() {
             <Link href={`/plans?region=${primaryRegion.toLowerCase()}`}>
               <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl">
                 <span className="flex items-center gap-2">
-                  {getFlagEmoji(primaryRegion)} VIEW {getRegionName(primaryRegion)} PLANS
+                  {getFlagEmoji(primaryRegion)} VIEW {location?.country?.toUpperCase() || 'GLOBAL'} PLANS
                 </span>
               </Button>
             </Link>
