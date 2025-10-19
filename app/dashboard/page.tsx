@@ -46,12 +46,13 @@ interface ReferralStats {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<OrderWithPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [refreshingUsage, setRefreshingUsage] = useState<Record<string, boolean>>({});
+  const [showOrderHistory, setShowOrderHistory] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -91,7 +92,7 @@ export default function DashboardPage() {
       if (error) throw error;
 
       // Transform Supabase join format
-      const transformedData = data?.map((order: any) => ({
+      const transformedData = data?.map((order) => ({
         ...order,
         plan: Array.isArray(order.plan) ? order.plan[0] : order.plan,
       }));
@@ -125,24 +126,31 @@ export default function DashboardPage() {
         }
       }
 
-      // Fetch fresh data
-      const response = await fetch(`/api/referrals/me?user_id=${user?.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        const stats = {
-          ref_code: data.ref_code,
-          referral_link: data.referral_link,
-          total_clicks: data.stats.total_clicks || 0,
-          total_referrals: data.stats.total_signups || 0,
-          pending_rewards: data.stats.pending_rewards || 0,
-          earned_rewards: data.stats.earned_rewards || 0,
+      // Fetch fresh data with authentication
+      const data = await authenticatedGet<{
+        ref_code: string;
+        referral_link: string;
+        stats: {
+          total_clicks: number;
+          total_signups: number;
+          pending_rewards: number;
+          earned_rewards: number;
         };
-        setReferralStats(stats);
+      }>('/api/referrals/me');
 
-        // Cache the data
-        localStorage.setItem(cacheKey, JSON.stringify(stats));
-        localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
-      }
+      const stats = {
+        ref_code: data.ref_code,
+        referral_link: data.referral_link,
+        total_clicks: data.stats.total_clicks || 0,
+        total_referrals: data.stats.total_signups || 0,
+        pending_rewards: data.stats.pending_rewards || 0,
+        earned_rewards: data.stats.earned_rewards || 0,
+      };
+      setReferralStats(stats);
+
+      // Cache the data
+      localStorage.setItem(cacheKey, JSON.stringify(stats));
+      localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
     } catch (error) {
       console.error('Failed to load referral stats:', error);
     }
@@ -155,25 +163,40 @@ export default function DashboardPage() {
     }
   }, [user, loadOrders, loadReferralStats]);
 
-  const handleSignOut = async () => {
-    triggerHaptic('medium');
-    await signOut();
-    router.push('/');
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
+      case 'active':
         return 'bg-primary text-foreground';
       case 'provisioning':
         return 'bg-yellow text-foreground';
       case 'pending':
+      case 'paid':
         return 'bg-purple text-white';
       case 'failed':
         return 'bg-destructive text-white';
+      case 'depleted':
+        return 'bg-red-500 text-white';
+      case 'expired':
+        return 'bg-orange-500 text-white';
       default:
         return 'bg-gray-500 text-white';
     }
+  };
+
+  const getDisplayStatus = (order: OrderWithPlan): string => {
+    // Check if depleted
+    if (order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0) {
+      return 'depleted';
+    }
+
+    // Check if expired
+    if (isOrderExpired(order.created_at, order.plan?.validity_days || 0)) {
+      return 'expired';
+    }
+
+    return order.status;
   };
 
   const getDataPercentage = (used: number, total: number) => {
@@ -185,7 +208,11 @@ export default function DashboardPage() {
     const expiry = new Date(created.getTime() + validityDays * 24 * 60 * 60 * 1000);
     const now = new Date();
     const remaining = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return Math.max(0, remaining);
+    return remaining; // Can be negative for expired plans
+  };
+
+  const isOrderExpired = (createdAt: string, validityDays: number) => {
+    return getDaysRemaining(createdAt, validityDays) <= 0;
   };
 
   const copyReferralLink = async () => {
@@ -285,8 +312,25 @@ export default function DashboardPage() {
     );
   }
 
-  const activeOrders = orders.filter(o => o.status === 'completed' || o.status === 'provisioning');
-  const pastOrders = orders.filter(o => o.status !== 'completed' && o.status !== 'provisioning');
+  // Filter for truly active orders (completed/provisioning) that are not depleted or expired
+  const activeOrders = orders.filter(o => {
+    const status = o.status;
+    const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
+    const expired = isOrderExpired(o.created_at, o.plan?.validity_days || 0);
+
+    // Only show completed or provisioning orders that aren't depleted or expired
+    return (status === 'completed' || status === 'provisioning') && !isDepleted && !expired;
+  });
+
+  // Past orders include failed, pending, paid (not yet completed), depleted, and expired orders
+  const pastOrders = orders.filter(o => {
+    const status = o.status;
+    const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
+    const expired = isOrderExpired(o.created_at, o.plan?.validity_days || 0);
+
+    // Show if it's not active (failed, pending, paid), or if it's depleted or expired
+    return (status !== 'completed' && status !== 'provisioning') || isDepleted || expired;
+  });
 
   return (
     <div className="min-h-screen bg-white">
@@ -322,10 +366,27 @@ export default function DashboardPage() {
             <Card className="bg-yellow border-2 sm:border-4 border-secondary shadow-xl   ">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
-                  {orders.length}
+                  {(() => {
+                    // Calculate total data remaining across all active eSIMs
+                    const totalRemaining = activeOrders.reduce((sum, o) => {
+                      const totalGB = o.plan?.data_gb || 0;
+                      const usedGB = (o.data_usage_bytes || 0) / (1024 * 1024 * 1024);
+                      const remainingGB = Math.max(0, totalGB - usedGB);
+                      return sum + remainingGB;
+                    }, 0);
+
+                    // Format the display
+                    if (totalRemaining >= 1) {
+                      return `${totalRemaining.toFixed(1)} GB`;
+                    } else if (totalRemaining > 0) {
+                      return `${Math.round(totalRemaining * 1024)} MB`;
+                    } else {
+                      return '0 MB';
+                    }
+                  })()}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                  Total Orders
+                  Data Remaining
                 </div>
               </CardContent>
             </Card>
@@ -333,10 +394,16 @@ export default function DashboardPage() {
             <Card className="bg-cyan border-2 sm:border-4 border-primary shadow-xl   ">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
-                  {activeOrders.reduce((sum, o) => sum + (o.plan?.data_gb || 0), 0)} GB
+                  {(() => {
+                    // Count unique countries from active orders
+                    const uniqueCountries = new Set(
+                      activeOrders.map(o => o.plan?.region_code).filter(Boolean)
+                    );
+                    return uniqueCountries.size;
+                  })()}
                 </div>
                 <div className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                  Total Data
+                  {activeOrders.length > 0 ? 'Countries Connected' : 'Countries'}
                 </div>
               </CardContent>
             </Card>
@@ -511,6 +578,9 @@ export default function DashboardPage() {
                   const totalData = order.plan?.data_gb || 0;
                   const totalDataFormatted = formatDataAmount(totalData);
 
+                  // Check if plan is depleted
+                  const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+
                   return (
                     <Card
                       key={order.id}
@@ -522,8 +592,8 @@ export default function DashboardPage() {
 
                       <CardHeader className="relative z-10">
                         <div className="flex justify-between items-start mb-3">
-                          <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                            {order.status}
+                          <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
+                            {getDisplayStatus(order)}
                           </Badge>
                           <div className="flex items-center gap-2">
                             {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
@@ -533,7 +603,7 @@ export default function DashboardPage() {
                             </div>
                           </div>
                         </div>
-                        <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name}</CardTitle>
+                        <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name.replace(/^["']|["']$/g, '')}</CardTitle>
                       </CardHeader>
 
                       <CardContent className="space-y-4 relative z-10">
@@ -605,13 +675,24 @@ export default function DashboardPage() {
                         <div className="p-3 sm:p-4 bg-white rounded-xl">
                           <div className="flex justify-between items-center">
                             <span className="font-black uppercase text-xs">Days Remaining</span>
-                            <span className={`font-black text-xl sm:text-2xl ${daysRemaining <= 5 ? 'text-destructive' : ''}`}>
-                              {daysRemaining}
-                            </span>
+                            {daysRemaining <= 0 ? (
+                              <span className="font-black text-xl sm:text-2xl text-destructive">
+                                EXPIRED
+                              </span>
+                            ) : (
+                              <span className={`font-black text-xl sm:text-2xl ${daysRemaining <= 5 ? 'text-destructive' : ''}`}>
+                                {daysRemaining}
+                              </span>
+                            )}
                           </div>
-                          {daysRemaining <= 5 && (
+                          {daysRemaining > 0 && daysRemaining <= 5 && (
                             <p className="text-xs font-bold text-destructive mt-2">
                               ⚠️ Expiring soon! Purchase a new plan to stay connected.
+                            </p>
+                          )}
+                          {daysRemaining <= 0 && (
+                            <p className="text-xs font-bold text-destructive mt-2">
+                              ⚠️ This plan has expired. Purchase a new plan to stay connected.
                             </p>
                           )}
                         </div>
@@ -623,7 +704,11 @@ export default function DashboardPage() {
                               VIEW DETAILS
                             </Button>
                           </Link>
-                          {(order.status === 'completed' || order.status === 'active') && order.iccid && (
+                          {/* Only show top-up for active orders with ICCID that aren't depleted or expired */}
+                          {(order.status === 'completed' || order.status === 'active') &&
+                           order.iccid &&
+                           !isDepleted &&
+                           daysRemaining > 0 && (
                             <Link href={`/topup/${order.id}`} className="flex-1">
                               <Button className="w-full btn-lumbus bg-secondary text-foreground hover:bg-secondary/90 font-black text-xs sm:text-sm py-3 sm:py-4 ">
                                 + TOP UP
@@ -642,11 +727,26 @@ export default function DashboardPage() {
           {/* Order History */}
           {pastOrders.length > 0 && (
             <div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">ORDER HISTORY</h2>
-              <Card className="bg-yellow border-2 border-secondary shadow-lg">
-                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
-                  <div className="space-y-3 sm:space-y-4">
-                    {pastOrders.map((order) => {
+              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">
+                  ORDER HISTORY ({pastOrders.length})
+                </h2>
+                <Button
+                  onClick={() => {
+                    setShowOrderHistory(!showOrderHistory);
+                    triggerHaptic('light');
+                  }}
+                  className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-4 py-2"
+                >
+                  {showOrderHistory ? '▼ HIDE' : '▶ SHOW'}
+                </Button>
+              </div>
+
+              {showOrderHistory && (
+                <Card className="bg-yellow border-2 border-secondary shadow-lg  ">
+                  <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
+                    <div className="space-y-3 sm:space-y-4">
+                      {pastOrders.map((order) => {
                       const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
                       const totalData = order.plan?.data_gb || 0;
                       const totalDataFormatted = formatDataAmount(totalData);
@@ -659,7 +759,7 @@ export default function DashboardPage() {
                           <div className="flex items-start gap-3 flex-1 min-w-0">
                             {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}
                             <div className="flex-1 min-w-0">
-                              <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name}</div>
+                              <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name.replace(/^["']|["']$/g, '')}</div>
                               <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>
                               <div className="text-xs font-bold text-muted-foreground flex items-center gap-2">
                                 <span>📊 {totalDataFormatted}</span>
@@ -676,10 +776,10 @@ export default function DashboardPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                            <Badge className={`${getStatusColor(order.status)} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                              {order.status}
+                            <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
+                              {getDisplayStatus(order)}
                             </Badge>
-                            {order.status === 'completed' && (
+                            {(order.status === 'completed' || order.status === 'active') && order.smdp && order.activation_code && (
                               <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
                                 <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
                                   VIEW
@@ -689,10 +789,11 @@ export default function DashboardPage() {
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </div>

@@ -128,7 +128,7 @@ export default function InstallPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold uppercase text-muted-foreground">Plan</span>
-                <span className="text-sm font-black">{order.plan.name}</span>
+                <span className="text-sm font-black">{order.plan.name.replace(/^["']|["']$/g, '')}</span>
               </div>
             </div>
           </CardContent>
@@ -185,7 +185,7 @@ export default function InstallPage() {
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Plan</p>
-                <p className="font-black text-base sm:text-lg">{order.plan.name}</p>
+                <p className="font-black text-base sm:text-lg">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
               </div>
               <div className="p-4 bg-white rounded-xl">
                 <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Region</p>

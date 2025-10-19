@@ -167,7 +167,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
               TOP UP YOUR eSIM
             </h1>
             <p className="text-lg font-bold text-muted-foreground">
-              Add more data to your existing eSIM - {order.plan?.name}
+              Add more data to your existing eSIM - {order.plan?.name.replace(/^["']|["']$/g, '')}
             </p>
           </div>
 
@@ -179,7 +179,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
                   <CardTitle className="text-2xl font-black uppercase mb-2">
                     CURRENT eSIM
                   </CardTitle>
-                  <p className="font-bold text-muted-foreground">{order.plan?.name}</p>
+                  <p className="font-bold text-muted-foreground">{order.plan?.name.replace(/^["']|["']$/g, '')}</p>
                 </div>
                 <Badge className="bg-primary text-foreground font-black uppercase px-3 py-1">
                   {order.plan?.region_code}
@@ -249,7 +249,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
                           <div className="text-2xl font-black">{plan.region_code}</div>
                         </div>
                       </div>
-                      <CardTitle className="text-xl font-black uppercase">{plan.name}</CardTitle>
+                      <CardTitle className="text-xl font-black uppercase">{plan.name.replace(/^["']|["']$/g, '')}</CardTitle>
                     </CardHeader>
 
                     <CardContent className="space-y-4">
