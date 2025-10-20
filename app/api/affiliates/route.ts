@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       }
 
       // First, try to find affiliate by user_id
-      let { data, error } = await supabase
+      const { data: initialData, error } = await supabase
         .from('affiliates')
         .select('*')
         .eq('user_id', userId)
@@ -62,6 +62,8 @@ export async function GET(req: NextRequest) {
         console.error('Failed to get affiliate by user_id:', error);
         return NextResponse.json({ error: 'Failed to get affiliate' }, { status: 500 });
       }
+
+      let data = initialData;
 
       // If no affiliate found by user_id, try to find by email (for existing affiliates without user_id)
       if ((!data || data.length === 0) && userEmail) {

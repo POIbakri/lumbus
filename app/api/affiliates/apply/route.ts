@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { sendAffiliateApplicationEmail, sendAdminNewAffiliateApplicationEmail } from '@/lib/email';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { getAuthenticatedUser } from '@/lib/server-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -35,36 +34,21 @@ export async function POST(request: NextRequest) {
 
     // Get authenticated user if available
     let authenticatedUserId: string | null = null;
-    try {
-      const cookieStore = await cookies();
-      const supabaseClient = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          cookies: {
-            getAll() {
-              return cookieStore.getAll();
-            },
-            setAll() {},
-          },
-        }
-      );
+    const { user } = await getAuthenticatedUser(request);
 
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (user) {
-        authenticatedUserId = user.id;
+    if (user) {
+      authenticatedUserId = user.id;
 
-        // Verify that the authenticated user's email matches the application email
-        if (user.email?.toLowerCase() !== email.toLowerCase().trim()) {
-          return NextResponse.json(
-            { error: 'Application email must match your account email' },
-            { status: 400 }
-          );
-        }
+      // Verify that the authenticated user's email matches the application email
+      if (user.email?.toLowerCase() !== email.toLowerCase().trim()) {
+        return NextResponse.json(
+          { error: 'Application email must match your account email' },
+          { status: 400 }
+        );
       }
-    } catch (authError) {
-      console.log('No authenticated user found, proceeding without user_id:', authError);
-      // Continue without user_id - allow non-authenticated applications
+    } else {
+      // No authenticated user - allow non-authenticated applications
+      console.log('No authenticated user found, proceeding without user_id');
     }
 
     // Check if email already exists
