@@ -554,11 +554,11 @@ export default function Home() {
             <div>
               <Link href="/" className="inline-block mb-4">
                 <Image
-                  src="/logo.jpg"
+                  src="/logotrans.png"
                   alt="Lumbus"
-                  width={120}
-                  height={40}
-                  className="h-8 w-auto sm:h-9 brightness-0 invert"
+                  width={300}
+                  height={80}
+                  className="h-14 w-auto sm:h-16 md:h-18"
                 />
               </Link>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
