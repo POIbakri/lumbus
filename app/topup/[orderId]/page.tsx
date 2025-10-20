@@ -76,7 +76,17 @@ export default function TopUpPage({ params }: TopUpPageProps) {
 
       setOrder(transformedOrder as OrderWithPlan);
 
-      // Load available top-up packages from eSIM Access API
+      // Get the region code from the original order's plan
+      const regionCode = transformedOrder.plan?.region_code;
+
+      if (!regionCode) {
+        console.error('No region code found for order');
+        setLoading(false);
+        return;
+      }
+
+      // Load available top-up plans from the same region
+      // First, try to get packages from eSIM Access API
       try {
         const packagesResponse = await authenticatedGet<{
           success: boolean;
@@ -88,13 +98,14 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           const packages = packagesResponse.packages;
           setAvailablePackages(packages);
 
-          // Fetch matching plans from database by supplier_sku
+          // Fetch matching plans from database by supplier_sku AND filter by region
           if (packages.length > 0) {
             const packageCodes = packages.map(pkg => pkg.packageCode);
             const { data: plansData, error: plansError } = await supabaseClient
               .from('plans')
               .select('*')
               .in('supplier_sku', packageCodes)
+              .eq('region_code', regionCode) // Filter by same region
               .eq('is_active', true)
               .order('retail_price', { ascending: true });
 
@@ -106,14 +117,40 @@ export default function TopUpPage({ params }: TopUpPageProps) {
             }
           }
         } else {
-          console.error('Failed to load packages:', packagesResponse.error);
-          setAvailablePackages([]);
-          setAvailablePlans([]);
+          console.error('Failed to load packages from eSIM Access API:', packagesResponse.error);
+          // Fallback: Load plans directly from database for the same region
+          console.log('Loading plans from database for region:', regionCode);
+          const { data: fallbackPlans, error: fallbackError } = await supabaseClient
+            .from('plans')
+            .select('*')
+            .eq('region_code', regionCode)
+            .eq('is_active', true)
+            .order('retail_price', { ascending: true });
+
+          if (fallbackError) {
+            console.error('Failed to load fallback plans:', fallbackError);
+            setAvailablePlans([]);
+          } else {
+            setAvailablePlans(fallbackPlans || []);
+          }
         }
       } catch (packagesError) {
         console.error('Failed to load packages from API:', packagesError);
-        setAvailablePackages([]);
-        setAvailablePlans([]);
+        // Fallback: Load plans directly from database for the same region
+        console.log('Loading fallback plans from database for region:', regionCode);
+        const { data: fallbackPlans, error: fallbackError } = await supabaseClient
+          .from('plans')
+          .select('*')
+          .eq('region_code', regionCode)
+          .eq('is_active', true)
+          .order('retail_price', { ascending: true });
+
+        if (fallbackError) {
+          console.error('Failed to load fallback plans:', fallbackError);
+          setAvailablePlans([]);
+        } else {
+          setAvailablePlans(fallbackPlans || []);
+        }
       }
     } catch (error) {
       console.error('Failed to load order:', error);
