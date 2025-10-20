@@ -47,7 +47,7 @@ export default function Home() {
 
           {/* Home Usage Badge - Visual Element */}
           <div className="mb-8 px-4" style={{animationDelay: '0.25s'}}>
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-yellow/80 via-mint/80 to-cyan/80 border-2 border-foreground/10 shadow-lg">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-yellow border-2 border-foreground shadow-lg">
               <span className="text-base sm:text-lg">🏠</span>
               <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Also Works At Home</span>
               <span className="text-base sm:text-lg">📱</span>
@@ -482,33 +482,33 @@ export default function Home() {
       </section>
 
       {/* Referral Highlight Section */}
-      <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-br from-primary via-cyan to-yellow overflow-hidden">
+      <section className="relative py-20 sm:py-32 px-4 bg-yellow overflow-hidden border-t-4 border-b-4 border-foreground">
         <div className="container mx-auto text-center relative z-10">
-          <div className="max-w-4xl mx-auto ">
+          <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-3xl border-4 border-foreground shadow-2xl">
             <div className="inline-block mb-4 sm:mb-6">
-              <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
+              <span className="px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
                 🎁 REFER & EARN
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
               GIVE 10% OFF<br/>GET 1GB FREE
             </h2>
-            <p className="text-lg sm:text-xl md:text-2xl font-bold mb-6 sm:mb-8 text-foreground/80 max-w-2xl mx-auto px-4">
+            <p className="text-base sm:text-lg md:text-xl font-bold mb-6 sm:mb-8 text-foreground/80 max-w-2xl mx-auto px-4">
               Share Lumbus with friends and family. They save money, you get free data!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-6 sm:mb-8">
               <Link href="/affiliate-program" className="w-full sm:w-auto">
-                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg md:text-xl px-8 sm:px-12 py-6 sm:py-7 rounded-xl shadow-2xl font-black">
+                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl shadow-xl font-black border-2 border-foreground">
                   LEARN MORE
                 </Button>
               </Link>
               <Link href="/dashboard" className="w-full sm:w-auto">
-                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90 text-base sm:text-lg md:text-xl px-8 sm:px-12 py-6 sm:py-7 rounded-xl font-black">
+                <Button className="w-full bg-primary text-foreground border-4 border-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl font-black shadow-xl">
                   GET YOUR LINK
                 </Button>
               </Link>
             </div>
-            <div className="inline-flex items-center gap-2 bg-foreground/10 backdrop-blur-sm px-4 sm:px-6 py-2 sm:py-3 rounded-full mx-4">
+            <div className="inline-flex items-center gap-2 bg-yellow/50 border-2 border-foreground px-4 sm:px-6 py-2 sm:py-3 rounded-full">
               <span className="text-xl sm:text-2xl">🚀</span>
               <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
             </div>
@@ -517,28 +517,28 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-40 px-4 bg-primary overflow-hidden">
+      <section className="relative py-32 sm:py-40 px-4 bg-gradient-to-br from-primary via-cyan to-purple overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
           <div className="">
-            <div className="inline-block mb-8">
-              <span className="px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
-                🚀 Join 10,000+ Happy Travelers
+            <div className="inline-block mb-6 sm:mb-8">
+              <span className="px-4 sm:px-6 py-2 rounded-full bg-white/20 border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
+                🚀 JOIN 10,000+ HAPPY TRAVELERS
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight">
               READY TO GET<br/>CONNECTED?
             </h2>
-            <p className="text-3xl font-black mb-16 text-foreground/80 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold mb-12 sm:mb-16 text-foreground/80 max-w-3xl mx-auto px-4">
               Join thousands of travelers staying connected worldwide
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center px-4">
               <Link href="/plans" className="w-full sm:w-auto">
-                <Button className="w-full bg-foreground text-white hover:bg-foreground/90  text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black ">
+                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg md:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black border-2 border-foreground">
                   <span className="relative z-10">BROWSE PLANS</span>
                 </Button>
               </Link>
               <Link href="/help" className="w-full sm:w-auto">
-                <Button className="w-full bg-white text-foreground border-4 border-white hover:bg-white/90  text-lg sm:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl font-black ">
+                <Button className="w-full bg-white text-foreground border-4 border-foreground hover:bg-white/90 text-base sm:text-lg md:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl font-black shadow-2xl">
                   GET HELP
                 </Button>
               </Link>
