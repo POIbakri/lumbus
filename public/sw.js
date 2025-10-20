@@ -1,15 +1,10 @@
-// Lumbus Service Worker - Caches install pages only
+// Lumbus Service Worker - Caches install pages dynamically
 const CACHE_NAME = 'lumbus-install-v1';
-const INSTALL_PAGES = [
-  '/install',
-];
 
-// Install event - cache install page shell
+// Install event - skip precaching since install pages are dynamic
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(INSTALL_PAGES);
-    })
+    caches.open(CACHE_NAME)
   );
   self.skipWaiting();
 });

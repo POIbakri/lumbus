@@ -23,12 +23,12 @@ export function OrganizationSchema() {
     url: 'https://getlumbus.com',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://getlumbus.com/icon-192.png',
-      width: 192,
-      height: 192,
+      url: 'https://getlumbus.com/logo.jpg',
+      width: 500,
+      height: 200,
     },
     description: 'Fast eSIM provider offering instant digital SIM cards for 150+ countries. Up to 10x cheaper than roaming with instant activation.',
-    foundingDate: '2024',
+    foundingDate: '2025',
     slogan: 'eSIMs that just work. Everywhere.',
     address: {
       '@type': 'PostalAddress',

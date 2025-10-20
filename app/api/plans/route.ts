@@ -3,16 +3,6 @@ import { supabase } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    // Log environment check
-    const hasSupabaseUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const hasServiceKey = !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY);
-
-    console.log('[Plans API] Environment check:', {
-      hasSupabaseUrl,
-      hasServiceKey,
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...',
-    });
-
     const searchParams = req.nextUrl.searchParams;
     const region = searchParams.get('region');
     const continent = searchParams.get('continent');
@@ -34,7 +24,6 @@ export async function GET(req: NextRequest) {
       query = query.or(`name.ilike.%${search}%,region_code.ilike.%${search}%`);
     }
 
-    console.log('[Plans API] Executing query...');
     const { data: plans, error } = await query;
 
     if (error) {
@@ -52,8 +41,6 @@ export async function GET(req: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log(`[Plans API] Successfully fetched ${plans?.length || 0} plans`);
 
     const response = NextResponse.json({ plans: plans || [] });
 

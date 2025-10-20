@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Nav } from '@/components/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -287,7 +288,15 @@ export default function DevicePage() {
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="font-black text-2xl mb-4">LUMBUS</h3>
+              <Link href="/" className="inline-block mb-4">
+                <Image
+                  src="/logo.jpg"
+                  alt="Lumbus"
+                  width={120}
+                  height={40}
+                  className="h-8 w-auto sm:h-9 brightness-0 invert"
+                />
+              </Link>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
             </div>
             <div>

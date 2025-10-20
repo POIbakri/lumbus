@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
+import Image from 'next/image';
 
 export function Nav() {
   const { user, loading, signOut } = useAuth();
@@ -18,8 +19,15 @@ export function Nav() {
       <div className="container mx-auto px-4 md:px-6 py-5">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link href="/" className="text-2xl md:text-3xl font-black uppercase tracking-tighter hover:text-primary  ">
-            <span className="text-foreground">LUMBUS</span>
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/logo.jpg"
+              alt="Lumbus"
+              width={120}
+              height={40}
+              className="h-7 w-auto sm:h-8 md:h-9 lg:h-10"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
