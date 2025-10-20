@@ -33,6 +33,7 @@ export async function GET(req: NextRequest) {
       // Check if admin
       const isAdmin = checkAdminAuth(req);
 
+      let userEmail: string | undefined;
       if (!isAdmin) {
         // If not admin, require user auth and verify they're requesting their own data
         const auth = await requireUserAuth(req);
@@ -46,9 +47,12 @@ export async function GET(req: NextRequest) {
             { status: 403 }
           );
         }
+
+        userEmail = auth.user.email;
       }
 
-      const { data, error } = await supabase
+      // First, try to find affiliate by user_id
+      let { data, error } = await supabase
         .from('affiliates')
         .select('*')
         .eq('user_id', userId)
@@ -57,6 +61,37 @@ export async function GET(req: NextRequest) {
       if (error) {
         console.error('Failed to get affiliate by user_id:', error);
         return NextResponse.json({ error: 'Failed to get affiliate' }, { status: 500 });
+      }
+
+      // If no affiliate found by user_id, try to find by email (for existing affiliates without user_id)
+      if ((!data || data.length === 0) && userEmail) {
+        const { data: emailData, error: emailError } = await supabase
+          .from('affiliates')
+          .select('*')
+          .eq('email', userEmail.toLowerCase())
+          .limit(1);
+
+        if (emailError) {
+          console.error('Failed to get affiliate by email:', emailError);
+          return NextResponse.json({ error: 'Failed to get affiliate' }, { status: 500 });
+        }
+
+        // If we found an affiliate by email but it doesn't have a user_id, link it now
+        if (emailData && emailData.length > 0 && !emailData[0].user_id) {
+          const { error: updateError } = await supabase
+            .from('affiliates')
+            .update({ user_id: userId })
+            .eq('id', emailData[0].id);
+
+          if (updateError) {
+            console.error('Failed to link user_id to affiliate:', updateError);
+          } else {
+            console.log(`Successfully linked user_id ${userId} to affiliate ${emailData[0].id}`);
+            emailData[0].user_id = userId; // Update the returned data
+          }
+        }
+
+        data = emailData;
       }
 
       return NextResponse.json({

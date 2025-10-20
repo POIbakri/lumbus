@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { sendAffiliateApplicationEmail, sendAdminNewAffiliateApplicationEmail } from '@/lib/email';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,10 +33,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get authenticated user if available
+    let authenticatedUserId: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      const supabaseClient = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+            setAll() {},
+          },
+        }
+      );
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        authenticatedUserId = user.id;
+
+        // Verify that the authenticated user's email matches the application email
+        if (user.email?.toLowerCase() !== email.toLowerCase().trim()) {
+          return NextResponse.json(
+            { error: 'Application email must match your account email' },
+            { status: 400 }
+          );
+        }
+      }
+    } catch (authError) {
+      console.log('No authenticated user found, proceeding without user_id:', authError);
+      // Continue without user_id - allow non-authenticated applications
+    }
+
     // Check if email already exists
     const { data: existingAffiliate } = await supabase
       .from('affiliates')
-      .select('id, email, application_status')
+      .select('id, email, application_status, user_id')
       .eq('email', email.toLowerCase().trim())
       .single();
 
@@ -52,6 +88,22 @@ export async function POST(request: NextRequest) {
       } else if (existingAffiliate.application_status === 'rejected') {
         return NextResponse.json(
           { error: 'A previous application with this email was rejected. Please contact support.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check if user already has an affiliate account with a different email
+    if (authenticatedUserId) {
+      const { data: userAffiliate } = await supabase
+        .from('affiliates')
+        .select('id, email, application_status')
+        .eq('user_id', authenticatedUserId)
+        .single();
+
+      if (userAffiliate) {
+        return NextResponse.json(
+          { error: 'You already have an affiliate application/account' },
           { status: 400 }
         );
       }
@@ -85,6 +137,7 @@ export async function POST(request: NextRequest) {
       .from('affiliates')
       .insert([
         {
+          user_id: authenticatedUserId, // Link to authenticated user if available
           display_name,
           email: email.toLowerCase().trim(),
           website: website?.trim() || null,
