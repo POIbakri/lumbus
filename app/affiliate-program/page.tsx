@@ -299,7 +299,7 @@ export default function AffiliateProgramPage() {
                   alt="Lumbus"
                   width={300}
                   height={80}
-                  className="h-14 w-auto sm:h-16 md:h-18"
+                  className="h-16 w-auto sm:h-20 md:h-24 lg:h-28"
                 />
               </Link>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
