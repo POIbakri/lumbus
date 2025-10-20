@@ -21,7 +21,6 @@ export default function UpdatePasswordPage() {
     // Check if user has a valid session (from reset link)
     const checkSession = async () => {
       const { session } = await auth.getSession();
-      console.log('Reset password page - session check:', session ? 'Session found' : 'No session');
 
       if (!session) {
         setError('Invalid or expired reset link. Please request a new password reset.');

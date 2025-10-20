@@ -63,18 +63,10 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
-    console.log('[eSIM Webhook] Received webhook, body length:', body.length);
-
     const payload: WebhookPayload = JSON.parse(body);
-    console.log('[eSIM Webhook] Parsed payload:', {
-      notifyType: payload.notifyType,
-      notifyId: payload.notifyId,
-      hasContent: !!payload.content,
-    });
 
     // Handle CHECK_HEALTH for webhook validation (allow without secret)
     if (payload.notifyType === 'CHECK_HEALTH') {
-      console.log('[eSIM Webhook] Health check received');
       return NextResponse.json({ success: true, message: 'Health check OK' });
     }
 
@@ -82,20 +74,10 @@ export async function POST(req: NextRequest) {
     const webhookSecret = process.env.ESIMACCESS_WEBHOOK_SECRET;
     if (webhookSecret) {
       const providedSecret = req.headers.get('x-webhook-secret');
-      console.log('[eSIM Webhook] Secret check:', {
-        hasConfiguredSecret: !!webhookSecret,
-        hasProvidedSecret: !!providedSecret,
-        secretsMatch: providedSecret === webhookSecret,
-      });
 
       if (providedSecret !== webhookSecret) {
-        console.error('[eSIM Webhook] Secret verification failed');
-        console.error('[eSIM Webhook] Expected secret length:', webhookSecret.length);
-        console.error('[eSIM Webhook] Provided secret length:', providedSecret?.length || 0);
         return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
       }
-    } else {
-      console.log('[eSIM Webhook] No webhook secret configured, skipping verification');
     }
 
     // IP whitelist verification (handle comma-separated x-forwarded-for)
@@ -120,7 +102,6 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (existingWebhook) {
-        console.log(`Duplicate webhook detected (notifyId: ${payload.notifyId}), skipping processing`);
         return NextResponse.json({ success: true, message: 'Duplicate webhook ignored' });
       }
     }
@@ -135,10 +116,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (logError) {
-      console.error('Failed to log webhook event:', logError);
       // If this is a duplicate key error, it means another instance already processed it
       if (logError.code === '23505') {
-        console.log('Duplicate webhook detected via unique constraint');
         return NextResponse.json({ success: true, message: 'Duplicate webhook ignored' });
       }
     }
@@ -166,12 +145,12 @@ export async function POST(req: NextRequest) {
         break;
 
       default:
-        console.warn('Unknown webhook type:', payload.notifyType);
+        // Unknown webhook type - ignore
+        break;
     }
 
     return NextResponse.json({ success: true, received: true });
   } catch (error) {
-    console.error('eSIM Access webhook error:', error);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
@@ -182,7 +161,6 @@ export async function POST(req: NextRequest) {
  */
 async function handleOrderStatus(content: { orderNo: string; orderStatus: string }) {
   if (content.orderStatus !== 'GOT_RESOURCE') {
-    console.log('Order status is not GOT_RESOURCE, skipping:', content.orderStatus);
     return;
   }
 
@@ -194,7 +172,6 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     .single();
 
   if (!order) {
-    console.error('Order not found for eSIM Access orderNo:', content.orderNo);
     return;
   }
 
@@ -202,10 +179,7 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     // Fetch full activation details from eSIM Access
     const orderDetails = await getOrderStatus(content.orderNo);
 
-    console.log('[ORDER_STATUS] Got order details:', JSON.stringify(orderDetails));
-
     if (!orderDetails || !orderDetails.esimList || orderDetails.esimList.length === 0) {
-      console.error('[ORDER_STATUS] No activation details returned from eSIM Access');
       return;
     }
 
@@ -219,13 +193,6 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     const parts = lpaString.split('$');
     const activationCode = parts.length >= 3 ? parts[2] : '';
 
-    console.log('[ORDER_STATUS] Extracted details:', {
-      iccid: firstProfile.iccid,
-      smdpAddress,
-      activationCode,
-      lpaString,
-    });
-
     // Update order with activation details
     await supabase
       .from('orders')
@@ -238,8 +205,6 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         qr_url: firstProfile.qrCodeUrl || firstProfile.shortUrl || null,
       })
       .eq('id', order.id);
-
-    console.log('[ORDER_STATUS] eSIM order updated with activation details:', content.orderNo);
 
     // Send confirmation email
     if (activationCode && smdpAddress) {
@@ -274,7 +239,6 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
               timeZoneName: 'short',
             });
           } catch (dateError) {
-            console.error('[ORDER_STATUS] Error formatting expiredTime:', dateError);
             formattedActivateBeforeDate = firstProfile.expiredTime;
           }
         }
@@ -297,12 +261,10 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
           },
           installUrl: installUrl,
         });
-
-        console.log('[ORDER_STATUS] Confirmation email sent to:', user.email);
       }
     }
   } catch (error) {
-    console.error('[ORDER_STATUS] Error handling webhook:', error);
+    // Error handling webhook
   }
 }
 
@@ -319,24 +281,16 @@ async function handleSmdpEvent(content: {
   esimTranNo: string;
   transactionId?: string;
 }) {
-  console.log('SM-DP+ Event:', content.smdpStatus, 'for ICCID:', content.iccid);
-
   // Update order based on SM-DP+ status
   if (content.smdpStatus === 'ENABLED') {
     // eSIM has been activated on the device
-    const { error } = await supabase
+    await supabase
       .from('orders')
       .update({
         status: 'active',
         activated_at: new Date().toISOString(),
       })
       .eq('iccid', content.iccid);
-
-    if (error) {
-      console.error('Failed to update order status to active:', error);
-    }
-
-    console.log('eSIM activated:', content.iccid);
   }
 }
 
@@ -352,8 +306,6 @@ async function handleEsimStatus(content: {
   esimStatus: 'IN_USE' | 'USED_UP' | 'USED_EXPIRED' | 'UNUSED_EXPIRED' | 'CANCEL' | 'REVOKED';
   smdpStatus?: string;
 }) {
-  console.log('eSIM Status Change:', content.esimStatus, 'for ICCID:', content.iccid);
-
   const statusMap: Record<string, string> = {
     IN_USE: 'active',
     USED_UP: 'depleted',
@@ -365,14 +317,10 @@ async function handleEsimStatus(content: {
 
   const newStatus = statusMap[content.esimStatus] || 'unknown';
 
-  const { error } = await supabase
+  await supabase
     .from('orders')
     .update({ status: newStatus })
     .eq('iccid', content.iccid);
-
-  if (error) {
-    console.error('Failed to update eSIM status:', error);
-  }
 }
 
 /**
@@ -391,9 +339,6 @@ async function handleDataUsage(content: {
   remainThreshold: 0.5 | 0.8 | 0.9;
 }) {
   const usagePercent = content.remainThreshold * 100;
-  console.log(
-    `Data usage alert: ${usagePercent.toFixed(0)}% consumed for ICCID: ${content.iccid}`
-  );
 
   // Get order details (avoid joins)
   const { data: order, error: orderError } = await supabase
@@ -403,12 +348,11 @@ async function handleDataUsage(content: {
     .single();
 
   if (orderError || !order) {
-    console.error('Order not found for ICCID:', content.iccid);
     return;
   }
 
   // Update usage data in database (use totalVolume from webhook)
-  const { error } = await supabase
+  await supabase
     .from('orders')
     .update({
       data_usage_bytes: content.orderUsage,
@@ -417,10 +361,6 @@ async function handleDataUsage(content: {
       last_usage_update: content.lastUpdateTime,
     })
     .eq('iccid', content.iccid);
-
-  if (error) {
-    console.error('Failed to update data usage:', error);
-  }
 
   // Send email notification to user about data usage
   try {
@@ -452,11 +392,8 @@ async function handleDataUsage(content: {
         dataRemainingGB: dataRemainingGB,
         totalDataGB: totalDataGB,
       });
-
-      console.log(`Data usage alert email sent to ${user.email} (${usagePercent.toFixed(0)}% used)`);
     }
   } catch (emailError) {
-    console.error('Failed to send data usage alert email:', emailError);
     // Don't throw - webhook should still succeed even if email fails
   }
 }
@@ -474,8 +411,6 @@ async function handleValidityUsage(content: {
   expiredTime: string;
   remain: number;
 }) {
-  console.log(`Validity expiring soon for ICCID: ${content.iccid} (${content.remain} days remaining)`);
-
   // Get order details (avoid joins)
   const { data: order, error: orderError } = await supabase
     .from('orders')
@@ -484,7 +419,6 @@ async function handleValidityUsage(content: {
     .single();
 
   if (orderError || !order) {
-    console.error('Order not found for ICCID:', content.iccid);
     return;
   }
 
@@ -518,11 +452,8 @@ async function handleValidityUsage(content: {
         daysRemaining: content.remain,
         expiryDate: formattedDate,
       });
-
-      console.log(`Plan expiry alert email sent to ${user.email} (${content.remain} days remaining)`);
     }
   } catch (emailError) {
-    console.error('Failed to send plan expiry alert email:', emailError);
     // Don't throw - webhook should still succeed even if email fails
   }
 }

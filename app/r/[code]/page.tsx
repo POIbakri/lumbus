@@ -41,7 +41,6 @@ export default function ReferralPage() {
         }
 
         const data = await response.json();
-        console.log('Referral click tracked:', data.click_id);
 
         // Set status to redirecting
         setStatus('redirecting');
@@ -51,7 +50,6 @@ export default function ReferralPage() {
           router.push('/plans');
         }, 2000);
       } catch (error) {
-        console.error('Error tracking referral:', error);
         setStatus('error');
         // Redirect anyway after error
         setTimeout(() => {

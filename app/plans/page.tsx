@@ -56,7 +56,7 @@ function PlansPageContent() {
         }
       }
     } catch (error) {
-      console.error('Failed to detect currency:', error);
+      // Error handled silently
     }
   };
 
@@ -97,7 +97,7 @@ function PlansPageContent() {
         await convertAllPrices(fetchedPlans);
       }
     } catch (error) {
-      console.error('Failed to load plans:', error);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ function PlansPageContent() {
         setCurrencySymbol(data.symbol);
       }
     } catch (error) {
-      console.error('Failed to convert prices:', error);
+      // Error handled silently
     }
   };
 

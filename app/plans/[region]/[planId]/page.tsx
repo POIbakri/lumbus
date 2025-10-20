@@ -112,7 +112,6 @@ export default function PlanDetailPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load plan:', error);
       setPlan(null);
     } finally {
       setPlanLoading(false);
@@ -135,7 +134,7 @@ export default function PlanDetailPage() {
           setRegionInfo(data);
         }
       } catch (error) {
-        console.error('Failed to load region info:', error);
+        // Error handled silently
       }
     };
 
@@ -155,7 +154,7 @@ export default function PlanDetailPage() {
       // For now, just store the code and let backend validate during checkout
       setDiscountPercent(0); // Will be set by backend
     } catch (error) {
-      console.error('Error validating code:', error);
+      // Error handled silently
     } finally {
       setValidatingCode(false);
     }

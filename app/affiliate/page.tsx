@@ -76,7 +76,7 @@ export default function AffiliateDashboardPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load affiliate data:', error);
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export default function AffiliateDashboardPage() {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch (error) {
-        console.error('Failed to copy:', error);
+        // Error handled silently
       }
     }
   };

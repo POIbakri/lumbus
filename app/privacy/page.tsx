@@ -151,7 +151,7 @@ export default function PrivacyPage() {
               <h3 className="text-lg sm:text-xl font-bold mb-2">4.1 Service Providers</h3>
               <ul className="list-disc pl-5 space-y-2 text-sm sm:text-base mb-4">
                 <li><strong>Stripe:</strong> Payment processing (PCI-DSS compliant)</li>
-                <li><strong>eSIM Access / Network Providers:</strong> eSIM provisioning and network connectivity</li>
+                <li><strong>Network Providers:</strong> eSIM provisioning and network connectivity</li>
                 <li><strong>Supabase:</strong> Database hosting and authentication services</li>
                 <li><strong>Vercel:</strong> Website and application hosting</li>
                 <li><strong>Resend:</strong> Transactional email delivery</li>

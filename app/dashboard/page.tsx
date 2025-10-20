@@ -147,24 +147,11 @@ export default function DashboardPage() {
 
       setOrders(transformedData as OrderWithPlan[]);
 
-      // Debug: Log provisioning orders to check if they have activation details
-      const provisioningOrders = transformedData?.filter((o) => o.status === 'provisioning');
-      if (provisioningOrders && provisioningOrders.length > 0) {
-        console.log('[Dashboard] Provisioning orders:', provisioningOrders.map((o) => ({
-          id: o.id,
-          status: o.status,
-          hasSmdp: !!o.smdp,
-          hasActivationCode: !!o.activation_code,
-          smdp: o.smdp,
-          activationCode: o.activation_code
-        })));
-      }
-
       // Cache the data
       localStorage.setItem(cacheKey, JSON.stringify(transformedData));
       localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
     } catch (error) {
-      console.error('Failed to load orders:', error);
+      // Error loading orders
     } finally {
       setLoading(false);
     }
@@ -213,7 +200,7 @@ export default function DashboardPage() {
       localStorage.setItem(cacheKey, JSON.stringify(stats));
       localStorage.setItem(`${cacheKey}_time`, Date.now().toString());
     } catch (error) {
-      console.error('Failed to load referral stats:', error);
+      // Error loading referral stats
     }
   }, [user?.id]);
 
@@ -307,7 +294,7 @@ export default function DashboardPage() {
         triggerHaptic('light');
         setTimeout(() => setCopiedLink(false), 2000);
       } catch (error) {
-        console.error('Failed to copy:', error);
+        // Copy failed
       }
     }
   };
@@ -378,7 +365,6 @@ export default function DashboardPage() {
 
       triggerHaptic('light');
     } catch (error) {
-      console.error('Error refreshing usage:', error);
       triggerHaptic('medium');
     } finally {
       setRefreshingUsage(prev => ({ ...prev, [orderId]: false }));

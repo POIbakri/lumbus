@@ -40,19 +40,9 @@ export default function InstallPage() {
   const loadOrder = useCallback(async () => {
     try {
       const data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
-      console.log('[Install Page] Order data received:', {
-        id: data.id,
-        status: data.status,
-        hasActivationDetails: data.hasActivationDetails,
-        hasSmdp: !!data.smdp,
-        hasActivationCode: !!data.activationCode,
-        smdp: data.smdp,
-        activationCode: data.activationCode
-      });
       setOrder(data);
       setLoading(false); // Always stop loading after first fetch
     } catch (err) {
-      console.error('[Install Page] Error loading order:', err);
       setError('Failed to load order. Please check your email for activation details.');
       setLoading(false);
     }

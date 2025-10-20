@@ -36,7 +36,6 @@ export async function POST(req: NextRequest) {
 
     if (isFreeOrder) {
       // Free order from internal checkout - skip signature verification
-      console.log('[Webhook] Processing free order (no Stripe signature verification)');
       try {
         const parsedEvent = JSON.parse(body);
         // Generate a unique ID for free orders using timestamp and order ID
@@ -44,7 +43,6 @@ export async function POST(req: NextRequest) {
         parsedEvent.id = `free_${orderId}_${Date.now()}`;
         event = parsedEvent;
       } catch (parseError) {
-        console.error('[Webhook] Failed to parse free order body:', parseError);
         return NextResponse.json({ error: 'Invalid free order body' }, { status: 400 });
       }
     } else {
@@ -56,7 +54,6 @@ export async function POST(req: NextRequest) {
       try {
         event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret);
       } catch (err) {
-        console.error('Webhook signature verification failed:', err);
         return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
       }
     }
@@ -76,11 +73,8 @@ export async function POST(req: NextRequest) {
     if (idempotencyError) {
       if (idempotencyError.code === '23505') {
         // PostgreSQL unique violation code
-        console.log(`Webhook ${idempotencyKey} already processed (duplicate detected)`);
         return NextResponse.json({ received: true, cached: true });
       }
-      // Other database errors should be logged but not block processing
-      console.error('Idempotency insert error:', idempotencyError);
     }
 
     // Handle checkout.session.completed
@@ -103,7 +97,6 @@ export async function POST(req: NextRequest) {
       const finalPriceUSD = parseFloat(session.metadata?.finalPriceUSD || '0');
 
       if (!orderId) {
-        console.error('No orderId in session metadata');
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
       }
 
@@ -115,7 +108,6 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (!existingOrder) {
-        console.error('Order not found:', orderId);
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
@@ -136,33 +128,22 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (orderError || !order) {
-        console.error('Failed to update order:', orderError);
         return NextResponse.json({ error: 'Order update failed' }, { status: 500 });
       }
 
       // Send password setup email for new users
       if (needsPasswordSetup && userEmail) {
-        console.log('[Webhook] Sending password setup email to new user:', userEmail);
         try {
-          const { error: resetError } = await supabase.auth.resetPasswordForEmail(userEmail, {
+          await supabase.auth.resetPasswordForEmail(userEmail, {
             redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
           });
-
-          if (resetError) {
-            console.error('[Webhook] Failed to send password setup email:', resetError);
-            // Don't fail the webhook - this is not critical
-          } else {
-            console.log('[Webhook] Password setup email sent successfully');
-          }
         } catch (error) {
-          console.error('[Webhook] Error sending password setup email:', error);
           // Don't fail the webhook
         }
       }
 
       // Track discount code usage (skip if already recorded by checkout route)
       if (discountCodeId && discountSource === 'code' && discountPercent > 0) {
-        console.log('[Webhook] Checking discount code usage for order:', discountCodeId);
         try {
           // Check if already recorded (for free orders, checkout route records it)
           const { data: existingUsage } = await supabase
@@ -172,10 +153,9 @@ export async function POST(req: NextRequest) {
             .single();
 
           if (!existingUsage) {
-            console.log('[Webhook] Recording discount code usage');
             const discountAmountUSD = basePriceUSD - finalPriceUSD;
 
-            const { error: usageError } = await supabase
+            await supabase
               .from('discount_code_usage')
               .insert({
                 discount_code_id: discountCodeId,
@@ -186,17 +166,8 @@ export async function POST(req: NextRequest) {
                 discount_amount_usd: discountAmountUSD,
                 final_price_usd: finalPriceUSD,
               });
-
-            if (usageError) {
-              console.error('[Webhook] Failed to record discount code usage:', usageError);
-            } else {
-              console.log('[Webhook] Discount code usage recorded successfully');
-            }
-          } else {
-            console.log('[Webhook] Discount code usage already recorded, skipping');
           }
         } catch (error) {
-          console.error('[Webhook] Error checking/recording discount code usage:', error);
           // Don't fail the webhook
         }
       }
@@ -214,13 +185,7 @@ export async function POST(req: NextRequest) {
         // Process commissions/rewards
         const result = await processOrderAttribution(order, savedAttribution);
 
-        if (result.commission) {
-          console.log(`Created commission ${result.commission.id} for affiliate ${savedAttribution.affiliate_id}`);
-        }
-
         if (result.reward) {
-          console.log(`Created reward ${result.reward.id} for referrer ${savedAttribution.referrer_user_id}`);
-
           // Send email notification to referrer about their reward
           try {
             // Get referrer user details
@@ -243,11 +208,8 @@ export async function POST(req: NextRequest) {
                 rewardAmount: `${rewardGB} GB`,
                 referralCode: referrerUser.referral_code || '',
               });
-
-              console.log(`Referral reward email sent to ${referrerUser.email}`);
             }
           } catch (emailError) {
-            console.error('Failed to send referral reward email:', emailError);
             // Don't throw - webhook should still succeed even if email fails
           }
         }
@@ -275,8 +237,6 @@ export async function POST(req: NextRequest) {
 
         if (isTopUp && iccid) {
           // Top-up existing eSIM
-          console.log('[Webhook] Processing top-up for ICCID:', iccid);
-
           // Get existing order to check for esimTranNo
           const { data: existingOrderForTopUp } = await supabase
             .from('orders')
@@ -288,7 +248,6 @@ export async function POST(req: NextRequest) {
             .single();
 
           const esimTranNo = existingOrderForTopUp?.esim_tran_no;
-          console.log('[Webhook] Found esimTranNo:', esimTranNo || 'none, using ICCID');
 
           // Generate unique transaction ID
           const transactionId = `topup_${orderId}_${Date.now()}`;
@@ -316,11 +275,6 @@ export async function POST(req: NextRequest) {
               })
               .eq('id', orderId);
 
-            console.log('[Webhook] eSIM topped up successfully:', topUpResponse.iccid);
-            console.log('[Webhook] New expiry time:', topUpResponse.expiredTime);
-            console.log('[Webhook] New total volume:', topUpResponse.totalVolume, 'bytes');
-            console.log('[Webhook] New total duration:', topUpResponse.totalDuration, 'days');
-
             // Send top-up confirmation email
             try {
               await sendTopUpConfirmationEmail({
@@ -330,9 +284,7 @@ export async function POST(req: NextRequest) {
                 validityDays: plan.validity_days,
                 iccid: topUpResponse.iccid,
               });
-              console.log('[Webhook] Top-up confirmation email sent to:', user.email);
             } catch (emailError) {
-              console.error('[Webhook] Failed to send top-up confirmation email:', emailError);
               // Don't throw - webhook should still succeed even if email fails
             }
           } else {
@@ -357,13 +309,9 @@ export async function POST(req: NextRequest) {
             })
             .eq('id', orderId);
 
-          console.log('eSIM Access order created:', esimResponse.orderId);
-          console.log('Waiting for ORDER_STATUS webhook with activation details...');
-
           // Note: Email will be sent by eSIM Access webhook handler when ORDER_STATUS arrives
         }
       } catch (error) {
-        console.error(isTopUp ? 'Failed to top up eSIM:' : 'Failed to assign eSIM:', error);
         // Mark order as failed
         await supabase
           .from('orders')
@@ -381,11 +329,8 @@ export async function POST(req: NextRequest) {
       const source = paymentIntent.metadata?.source;
 
       if (!orderId) {
-        console.error('[Webhook] No orderId in payment intent metadata');
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
       }
-
-      console.log(`[Webhook] Processing mobile payment for order: ${orderId}`);
 
       // Get order details first
       const { data: existingOrder } = await supabase
@@ -395,7 +340,6 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (!existingOrder) {
-        console.error('[Webhook] Order not found:', orderId);
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
@@ -411,25 +355,17 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (orderError || !order) {
-        console.error('[Webhook] Failed to update order:', orderError);
         return NextResponse.json({ error: 'Order update failed' }, { status: 500 });
       }
 
       // Send password setup email for new users
       if (needsPasswordSetup && userEmail) {
-        console.log('[Webhook] Sending password setup email to new mobile user:', userEmail);
         try {
-          const { error: resetError } = await supabase.auth.resetPasswordForEmail(userEmail, {
+          await supabase.auth.resetPasswordForEmail(userEmail, {
             redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
           });
-
-          if (resetError) {
-            console.error('[Webhook] Failed to send password setup email:', resetError);
-          } else {
-            console.log('[Webhook] Password setup email sent successfully');
-          }
         } catch (error) {
-          console.error('[Webhook] Error sending password setup email:', error);
+          // Don't fail the webhook
         }
       }
 
@@ -443,7 +379,6 @@ export async function POST(req: NextRequest) {
         }
 
         // Assign new eSIM via eSIM Access API
-        console.log('[Webhook] Assigning eSIM for mobile order...');
         const esimResponse = await assignEsim({
           packageId: plan.supplier_sku,
           email: user.email,
@@ -459,10 +394,7 @@ export async function POST(req: NextRequest) {
             iccid: esimResponse.iccid || null,
           })
           .eq('id', orderId);
-
-        console.log('[Webhook] eSIM Access order created for mobile:', esimResponse.orderId);
       } catch (error) {
-        console.error('[Webhook] Failed to assign eSIM for mobile order:', error);
         await supabase
           .from('orders')
           .update({ status: 'failed' })
@@ -492,14 +424,11 @@ export async function POST(req: NextRequest) {
           .from('orders')
           .update({ status: 'failed' })
           .eq('id', order.id);
-
-        console.log(`Voided commissions/rewards for refunded order ${order.id}`);
       }
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Stripe webhook error:', error);
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

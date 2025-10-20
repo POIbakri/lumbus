@@ -39,7 +39,7 @@ export default function DestinationsPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to detect location:', error);
+      // Error handled silently
     }
   };
 
@@ -49,7 +49,7 @@ export default function DestinationsPage() {
       const data = await response.json();
       setPlans(data.plans || []);
     } catch (error) {
-      console.error('Failed to load plans:', error);
+      // Error handled silently
     } finally {
       setLoading(false);
     }

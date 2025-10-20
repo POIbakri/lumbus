@@ -40,7 +40,6 @@ export default function AffiliateReferencePage() {
         }
 
         const data = await response.json();
-        console.log('Affiliate click tracked:', data.click_id);
 
         // Set status to redirecting
         setStatus('redirecting');
@@ -50,7 +49,6 @@ export default function AffiliateReferencePage() {
           router.push('/plans');
         }, 1000);
       } catch (error) {
-        console.error('Error tracking affiliate click:', error);
         setStatus('error');
         // Redirect anyway after error
         setTimeout(() => {

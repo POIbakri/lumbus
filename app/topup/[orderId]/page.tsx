@@ -80,13 +80,11 @@ export default function TopUpPage({ params }: TopUpPageProps) {
       const regionCode = transformedOrder.plan?.region_code;
 
       if (!regionCode) {
-        console.error('No region code found for order');
         setLoading(false);
         return;
       }
 
       // Load available top-up plans from the same region
-      // First, try to get packages from eSIM Access API
       try {
         const packagesResponse = await authenticatedGet<{
           success: boolean;
@@ -110,16 +108,13 @@ export default function TopUpPage({ params }: TopUpPageProps) {
               .order('retail_price', { ascending: true });
 
             if (plansError) {
-              console.error('Failed to load matching plans:', plansError);
               setAvailablePlans([]);
             } else {
               setAvailablePlans(plansData || []);
             }
           }
         } else {
-          console.error('Failed to load packages from eSIM Access API:', packagesResponse.error);
           // Fallback: Load plans directly from database for the same region
-          console.log('Loading plans from database for region:', regionCode);
           const { data: fallbackPlans, error: fallbackError } = await supabaseClient
             .from('plans')
             .select('*')
@@ -128,16 +123,13 @@ export default function TopUpPage({ params }: TopUpPageProps) {
             .order('retail_price', { ascending: true });
 
           if (fallbackError) {
-            console.error('Failed to load fallback plans:', fallbackError);
             setAvailablePlans([]);
           } else {
             setAvailablePlans(fallbackPlans || []);
           }
         }
       } catch (packagesError) {
-        console.error('Failed to load packages from API:', packagesError);
         // Fallback: Load plans directly from database for the same region
-        console.log('Loading fallback plans from database for region:', regionCode);
         const { data: fallbackPlans, error: fallbackError } = await supabaseClient
           .from('plans')
           .select('*')
@@ -146,14 +138,13 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           .order('retail_price', { ascending: true });
 
         if (fallbackError) {
-          console.error('Failed to load fallback plans:', fallbackError);
           setAvailablePlans([]);
         } else {
           setAvailablePlans(fallbackPlans || []);
         }
       }
     } catch (error) {
-      console.error('Failed to load order:', error);
+      // Error loading order
     } finally {
       setLoading(false);
     }
@@ -184,7 +175,6 @@ export default function TopUpPage({ params }: TopUpPageProps) {
       const { url } = await response.json();
       window.location.href = url;
     } catch (error) {
-      console.error('Checkout error:', error);
       alert('Failed to start checkout. Please try again.');
       setCheckoutLoading(null);
     }

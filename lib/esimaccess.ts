@@ -110,10 +110,6 @@ async function makeEsimAccessRequest<T>(
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      console.log(`[eSIM Access] Making request to: ${url}`);
-      console.log(`[eSIM Access] Headers:`, headers);
-      console.log(`[eSIM Access] Body:`, JSON.stringify(body));
-
       const response = await rateLimitedFetch(url, {
         method: 'POST', // eSIM Access API uses POST for all requests
         headers,
@@ -121,9 +117,7 @@ async function makeEsimAccessRequest<T>(
       });
 
       if (!response.ok) {
-        console.error(`[eSIM Access] HTTP ${response.status} error for ${url}`);
         const errorText = await response.text();
-        console.error(`[eSIM Access] Error response:`, errorText);
 
         let error;
         try {
@@ -143,8 +137,6 @@ async function makeEsimAccessRequest<T>(
       }
 
       const data: EsimAccessResponse<T> = await response.json();
-
-      console.log('[eSIM Access] Response data:', JSON.stringify(data));
 
       // Check for success: either success=true OR errorCode is null/'0'
       const isSuccess = data.success === true || data.errorCode === null || data.errorCode === '0';
@@ -174,7 +166,6 @@ async function makeEsimAccessRequest<T>(
         }
       }
 
-      console.log('[eSIM Access] Success! Returning data.obj');
       return data.obj!;
     } catch (error) {
       lastError = error as Error;
@@ -186,7 +177,6 @@ async function makeEsimAccessRequest<T>(
 
       // Exponential backoff with jitter
       const backoff = Math.pow(2, attempt) * 500 + Math.random() * 500;
-      console.log(`Retry attempt ${attempt + 1}/${retries} after ${backoff}ms`);
       await new Promise(resolve => setTimeout(resolve, backoff));
     }
   }
@@ -206,7 +196,6 @@ export async function getMerchantBalance(): Promise<{ balance: number; currency:
       currency: data.currency || 'USD',
     };
   } catch (error) {
-    console.error('getMerchantBalance error:', error);
     throw error;
   }
 }
@@ -232,7 +221,6 @@ export async function listSupportedRegions(): Promise<Array<{
 
     return data.locationList || [];
   } catch (error) {
-    console.error('listSupportedRegions error:', error);
     throw error;
   }
 }
@@ -271,7 +259,6 @@ export async function listPackages(regionCode?: string): Promise<EsimAccessPacka
       countries: pkg.locationList?.map(loc => loc.code) || [],
     }));
   } catch (error) {
-    console.error('listPackages error:', error);
     throw error;
   }
 }
@@ -332,9 +319,6 @@ export async function assignEsim(
     // 1. Webhook (ORDER_STATUS with GOT_RESOURCE), or
     // 2. Polling orderQuery(orderNo) until status is GOT_RESOURCE
 
-    console.log('[eSIM Access] Order created successfully:', data.orderNo);
-    console.log('[eSIM Access] Waiting for ORDER_STATUS webhook with activation details...');
-
     const firstProfile = data.detailList?.[0];
 
     return {
@@ -346,7 +330,6 @@ export async function assignEsim(
       status: 'pending', // Initial status; wait for GOT_RESOURCE
     };
   } catch (error) {
-    console.error('assignEsim error:', error);
     throw error;
   }
 }
@@ -408,7 +391,6 @@ export async function getOrderStatus(orderNo: string): Promise<{
 
     return data;
   } catch (error) {
-    console.error('getOrderStatus error:', error);
     throw error;
   }
 }
@@ -442,7 +424,6 @@ export async function checkEsimUsage(esimTranNos: string[]): Promise<Array<{
 
     return data.esimUsageList || [];
   } catch (error) {
-    console.error('checkEsimUsage error:', error);
     throw error;
   }
 }
@@ -453,13 +434,7 @@ export async function checkEsimUsage(esimTranNos: string[]): Promise<Array<{
  * Use orderQuery() with orderNo or checkEsimUsage() with esimTranNo instead
  */
 export async function getEsimByIccid(iccid: string): Promise<EsimAccessOrderStatus> {
-  try {
-    console.warn('getEsimByIccid: No public endpoint available. Use orderQuery() or checkEsimUsage() instead.');
-    throw new Error('Not implemented: Use orderQuery() with orderNo instead');
-  } catch (error) {
-    console.error('getEsimByIccid error:', error);
-    throw error;
-  }
+  throw new Error('Not implemented: Use orderQuery() with orderNo instead');
 }
 
 /**
@@ -517,7 +492,6 @@ export async function getTopUpPackages(params: {
 
     return data.packageList || [];
   } catch (error) {
-    console.error('getTopUpPackages error:', error);
     throw error;
   }
 }
@@ -585,7 +559,6 @@ export async function topUpEsim(params: {
       orderUsage: data.orderUsage,
     };
   } catch (error) {
-    console.error('topUpEsim error:', error);
     throw error;
   }
 }
@@ -602,7 +575,6 @@ export async function cancelEsim(orderNo: string): Promise<{ success: boolean }>
 
     return { success: true };
   } catch (error) {
-    console.error('cancelEsim error:', error);
     throw error;
   }
 }
@@ -619,7 +591,6 @@ export async function suspendEsim(iccid: string): Promise<{ success: boolean }> 
 
     return { success: true };
   } catch (error) {
-    console.error('suspendEsim error:', error);
     throw error;
   }
 }
@@ -636,7 +607,6 @@ export async function unsuspendEsim(iccid: string): Promise<{ success: boolean }
 
     return { success: true };
   } catch (error) {
-    console.error('unsuspendEsim error:', error);
     throw error;
   }
 }
@@ -653,7 +623,6 @@ export async function revokeEsim(iccid: string): Promise<{ success: boolean }> {
 
     return { success: true };
   } catch (error) {
-    console.error('revokeEsim error:', error);
     throw error;
   }
 }
