@@ -113,7 +113,8 @@ export default function AffiliateDashboardPage() {
   }
 
   // Handle different application states
-  if (!affiliate || (affiliate && !affiliate.is_active)) {
+  // If no affiliate record or affiliate exists but not active
+  if (!affiliate || !affiliate.is_active) {
     // Pending Application
     if (affiliate?.application_status === 'pending') {
       return (
