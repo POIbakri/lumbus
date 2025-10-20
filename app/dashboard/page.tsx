@@ -537,8 +537,109 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {activeOrders.map((order, index) => {
+              <>
+                {/* Separate into Ready and Active groups */}
+                {(() => {
+                  const readyOrders = activeOrders.filter(o => !o.activated_at);
+                  const activeOnlyOrders = activeOrders.filter(o => o.activated_at);
+
+                  return (
+                    <>
+                      {/* Ready to Activate Section */}
+                      {readyOrders.length > 0 && (
+                        <div className="mb-8">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="text-3xl">📲</div>
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase">
+                              READY TO ACTIVATE ({readyOrders.length})
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                            {readyOrders.map((order, index) => {
+                              const daysRemaining = getDaysRemaining(order);
+                              const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
+                              const totalData = order.plan?.data_gb || 0;
+                              const totalDataFormatted = formatPlanData(totalData);
+
+                              return (
+                                <Card
+                                  key={order.id}
+                                  className="bg-yellow border-4 border-secondary shadow-xl   relative overflow-hidden  "
+                                  style={{animationDelay: `${index * 0.1}s`}}
+                                >
+                                  {/* Pulsing Animation for Ready eSIMs */}
+                                  <div className="absolute inset-0 bg-white/30 animate-pulse pointer-events-none"></div>
+
+                                  <CardHeader className="relative z-10">
+                                    <div className="flex justify-between items-start mb-3">
+                                      <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs sm:text-sm px-3 py-1.5`}>
+                                        ✨ {getDisplayStatus(order)}
+                                      </Badge>
+                                      <div className="flex items-center gap-2">
+                                        {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
+                                        <div className="text-right">
+                                          <div className="text-lg font-black">{order.plan?.region_code}</div>
+                                          <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <CardTitle className="text-xl sm:text-2xl font-black uppercase">{order.plan?.name.replace(/^["']|["']$/g, '')}</CardTitle>
+                                  </CardHeader>
+
+                                  <CardContent className="space-y-4 relative z-10">
+                                    {/* What You Bought */}
+                                    <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-secondary/40">
+                                      <div className="font-black uppercase text-xs text-muted-foreground mb-3">📦 What You Bought</div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <div className="bg-yellow p-2 rounded-lg">
+                                          <div className="text-xs font-bold text-muted-foreground mb-1">Total Data</div>
+                                          <div className="text-lg font-black">{totalDataFormatted}</div>
+                                        </div>
+                                        <div className="bg-yellow p-2 rounded-lg">
+                                          <div className="text-xs font-bold text-muted-foreground mb-1">Validity</div>
+                                          <div className="text-lg font-black">{order.plan?.validity_days} days</div>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Activation Notice */}
+                                    <div className="p-3 sm:p-4 bg-white rounded-xl border-2 border-secondary">
+                                      <div className="flex items-start gap-2">
+                                        <span className="text-2xl">⏳</span>
+                                        <div>
+                                          <div className="font-black text-sm mb-1">NOT ACTIVATED YET</div>
+                                          <p className="text-xs font-bold text-muted-foreground">
+                                            Your eSIM is ready! Tap "ACTIVATE SIM" below to install it on your device. Your {daysRemaining} days validity will start after activation.
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Prominent Activate Button */}
+                                    <Link href={`/install/${order.id}`} className="block">
+                                      <Button className="w-full btn-lumbus bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-105 font-black text-lg sm:text-xl py-5 sm:py-6 shadow-xl transition-all">
+                                        📲 ACTIVATE SIM NOW
+                                      </Button>
+                                    </Link>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Active & Using Section */}
+                      {activeOnlyOrders.length > 0 && (
+                        <div>
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="text-3xl">✅</div>
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase">
+                              ACTIVE & USING ({activeOnlyOrders.length})
+                            </h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                            {activeOnlyOrders.map((order, index) => {
                   const daysRemaining = getDaysRemaining(order);
                   const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
 
@@ -776,8 +877,14 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </>
+      );
+    })()}
+  </>
+)}
+</div>
 
           {/* Order History */}
           {pastOrders.length > 0 && (
@@ -805,6 +912,8 @@ export default function DashboardPage() {
                       const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
                       const totalData = order.plan?.data_gb || 0;
                       const totalDataFormatted = formatPlanData(totalData);
+                      // Format order reference (last 8 characters of order ID)
+                      const orderRef = order.id.slice(-8).toUpperCase();
 
                       return (
                         <div
@@ -816,10 +925,12 @@ export default function DashboardPage() {
                             <div className="flex-1 min-w-0">
                               <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name.replace(/^["']|["']$/g, '')}</div>
                               <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>
-                              <div className="text-xs font-bold text-muted-foreground flex items-center gap-2">
+                              <div className="text-xs font-bold text-muted-foreground flex items-center gap-2 flex-wrap">
                                 <span>📊 {totalDataFormatted}</span>
                                 <span>•</span>
                                 <span>⏰ {order.plan?.validity_days} days</span>
+                                <span>•</span>
+                                <span>Order #{orderRef}</span>
                               </div>
                               <div className="text-xs sm:text-sm font-bold text-muted-foreground mt-1">
                                 {new Date(order.created_at).toLocaleDateString('en-US', {
@@ -834,13 +945,6 @@ export default function DashboardPage() {
                             <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
                               {getDisplayStatus(order)}
                             </Badge>
-                            {(order.status === 'completed' || order.status === 'active') && order.smdp && order.activation_code && (
-                              <Link href={`/install/${order.id}`} className="flex-1 sm:flex-none">
-                                <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-3 sm:px-4 py-2">
-                                  VIEW
-                                </Button>
-                              </Link>
-                            )}
                           </div>
                         </div>
                       );
