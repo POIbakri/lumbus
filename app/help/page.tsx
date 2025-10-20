@@ -312,7 +312,7 @@ export default function HelpPage() {
             <div>
               <Link href="/" className="inline-block mb-4">
                 <Image
-                  src="/logotrans.png"
+                  src="/logo.jpg"
                   alt="Lumbus"
                   width={300}
                   height={80}

@@ -16,7 +16,7 @@ export function Nav() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-foreground/10 shadow-sm">
-      <div className="container mx-auto px-4 md:px-6 py-3">
+      <div className="container mx-auto px-4 md:px-6 py-2 sm:py-2.5 md:py-2">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -25,7 +25,7 @@ export function Nav() {
               alt="Lumbus"
               width={300}
               height={80}
-              className="h-12 w-auto sm:h-14 md:h-16"
+              className="h-14 w-auto sm:h-16 md:h-[72px]"
               priority
             />
           </Link>
