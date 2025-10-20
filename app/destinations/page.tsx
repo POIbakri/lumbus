@@ -168,30 +168,42 @@ export default function DestinationsPage() {
 
       {/* Your Location */}
       {userLocationDetected && userCountry && activeTab === 'countries' && planCounts.get(userCountry) && planCounts.get(userCountry)! > 0 && !searchQuery && (
-        <section className="py-6 sm:py-8 px-3 sm:px-4 bg-white">
+        <section className="py-4 sm:py-6 md:py-8 px-3 sm:px-4 bg-white">
           <div className="container mx-auto max-w-7xl">
-            <div className="bg-yellow rounded-2xl border-4 border-foreground shadow-xl p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                    <span className="text-2xl sm:text-3xl">
+            <div className="bg-gradient-to-br from-yellow to-yellow/80 rounded-xl sm:rounded-2xl md:rounded-3xl border-2 sm:border-3 md:border-4 border-foreground shadow-xl sm:shadow-2xl p-4 sm:p-6 md:p-8 relative overflow-hidden group hover:scale-[1.02] active:scale-[1.02] transition-transform duration-300">
+              {/* Decorative Element */}
+              <div className="absolute -top-10 -right-10 w-32 sm:w-40 h-32 sm:h-40 bg-white/10 rounded-full blur-2xl"></div>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 relative z-10">
+                <div className="text-center sm:text-left flex-1 w-full sm:w-auto">
+                  <div className="inline-flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 bg-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-foreground/20 sm:border-2">
+                    <span className="text-2xl sm:text-3xl md:text-4xl">
                       {(() => {
                         const country = allCountries.find(c => c.code === userCountry);
                         return country?.flag || '📍';
                       })()}
                     </span>
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase">Your Location</h3>
+                    <span className="font-black uppercase text-[10px] sm:text-xs md:text-sm">Your Location</span>
                   </div>
-                  <p className="text-sm sm:text-base font-bold opacity-80">
-                    {planCounts.get(userCountry)} plans available for {(() => {
+                  <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-2 sm:mb-3 leading-tight">
+                    {(() => {
                       const country = allCountries.find(c => c.code === userCountry);
                       return country?.name || userCountry;
                     })()}
-                  </p>
+                  </h3>
+                  <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-white rounded-md sm:rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 border border-foreground/20 sm:border-2">
+                    <div className="font-black text-xl sm:text-2xl md:text-3xl text-primary">
+                      {planCounts.get(userCountry)}
+                    </div>
+                    <div className="font-black text-xs sm:text-sm uppercase text-muted-foreground">
+                      Plans Available
+                    </div>
+                  </div>
                 </div>
-                <Link href={`/plans?region=${userCountry}`}>
-                  <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 shadow-lg w-full sm:w-auto">
-                    VIEW PLANS →
+                <Link href={`/plans?region=${userCountry}`} className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 hover:scale-105 active:scale-105 font-black text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 shadow-lg sm:shadow-xl rounded-lg sm:rounded-xl transition-all duration-300 touch-manipulation">
+                    VIEW PLANS
+                    <span className="ml-1.5 sm:ml-2 text-lg sm:text-xl">→</span>
                   </Button>
                 </Link>
               </div>
@@ -223,33 +235,69 @@ export default function DestinationsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-                {displayItems.map((item, index) => (
-                  <Link
-                    key={item.code}
-                    href={`/plans?region=${item.code}`}
-                    className="block"
-                  >
-                    <Card className="h-full cursor-pointer border-4 border-foreground hover:border-primary hover:shadow-xl transition-all duration-200 bg-white">
-                      <CardContent className="p-3 sm:p-4 md:p-5 text-center flex flex-col justify-between h-full">
-                        <div>
-                          <div className="text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3">{item.flag}</div>
-                          <h3 className="font-black text-sm sm:text-base md:text-lg mb-2 sm:mb-3 leading-tight min-h-[2.5rem] sm:min-h-[3rem] flex items-center justify-center">
-                            {item.name} eSIM
-                          </h3>
-                        </div>
-                        <div>
-                          <Badge className="bg-mint text-foreground border-2 border-foreground font-black text-xs mb-2">
-                            {item.planCount} {item.planCount === 1 ? 'plan' : 'plans'}
-                          </Badge>
-                          <div className="text-xs sm:text-sm font-bold text-muted-foreground">
-                            from <span className="text-primary font-black text-sm sm:text-base">${item.minPrice.toFixed(2)}/day</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {displayItems.map((item, index) => {
+                  // Rotate through brand colors
+                  const colors = ['bg-mint', 'bg-yellow', 'bg-cyan', 'bg-purple'];
+                  const bgColor = colors[index % colors.length];
+
+                  return (
+                    <Link
+                      key={item.code}
+                      href={`/plans?region=${item.code}`}
+                      className="block group"
+                    >
+                      <Card className={`h-full cursor-pointer border-2 sm:border-3 md:border-4 border-foreground ${bgColor} hover:scale-105 active:scale-105 hover:shadow-2xl active:shadow-2xl transition-all duration-300 overflow-hidden relative touch-manipulation`}>
+                        {/* Shine Effect on Hover/Active */}
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/20 group-active:bg-white/20 transition-all duration-300 pointer-events-none"></div>
+
+                        <CardContent className="p-3 sm:p-4 md:p-5 lg:p-6 text-center flex flex-col justify-between h-full relative z-10">
+                          {/* Flag - Large and Prominent */}
+                          <div className="mb-2 sm:mb-3 md:mb-4">
+                            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 group-active:scale-110 transition-transform duration-300">
+                              {item.flag}
+                            </div>
+
+                            {/* Country/Region Name */}
+                            <h3 className="font-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl uppercase leading-tight min-h-[2rem] sm:min-h-[2.5rem] md:min-h-[3rem] flex items-center justify-center px-1">
+                              {item.name}
+                            </h3>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+
+                          {/* Info Section */}
+                          <div className="space-y-1.5 sm:space-y-2 md:space-y-3">
+                            {/* Plans Available */}
+                            <div className="bg-white rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3 border border-foreground/20 sm:border-2">
+                              <div className="font-black text-lg sm:text-xl md:text-2xl lg:text-3xl text-foreground">
+                                {item.planCount}
+                              </div>
+                              <div className="font-black text-[10px] sm:text-xs uppercase text-muted-foreground">
+                                {item.planCount === 1 ? 'Plan' : 'Plans'}
+                              </div>
+                            </div>
+
+                            {/* Pricing */}
+                            <div className="bg-foreground text-white rounded-md sm:rounded-lg md:rounded-xl p-1.5 sm:p-2 md:p-3">
+                              <div className="text-[9px] sm:text-xs font-bold uppercase mb-0.5 sm:mb-1 opacity-80">
+                                Starting at
+                              </div>
+                              <div className="font-black text-base sm:text-lg md:text-xl lg:text-2xl">
+                                ${item.minPrice.toFixed(2)}
+                              </div>
+                            </div>
+
+                            {/* CTA Arrow */}
+                            <div className="font-black text-[10px] sm:text-xs md:text-sm uppercase text-foreground flex items-center justify-center gap-0.5 sm:gap-1 group-hover:gap-1 sm:group-hover:gap-2 transition-all pt-0.5 sm:pt-1">
+                              <span className="hidden sm:inline">View Plans</span>
+                              <span className="sm:hidden">View</span>
+                              <span className="text-sm sm:text-base md:text-lg group-hover:translate-x-0.5 sm:group-hover:translate-x-1 transition-transform">→</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Load More Button */}
@@ -269,40 +317,40 @@ export default function DestinationsPage() {
       </section>
 
       {/* Global Coverage Stats */}
-      <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 bg-white">
+      <section className="py-8 sm:py-12 md:py-16 lg:py-20 px-3 sm:px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 text-center">
-            <div className="p-4 sm:p-6 md:p-8 bg-cyan rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">150+</div>
-              <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Countries</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6 xl:gap-8 text-center">
+            <div className="p-3 sm:p-4 md:p-6 lg:p-8 bg-cyan rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground shadow-lg sm:shadow-xl">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-1 sm:mb-2">150+</div>
+              <div className="text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-xl font-black uppercase leading-tight">Countries</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-yellow rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">1700+</div>
-              <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Plans</div>
+            <div className="p-3 sm:p-4 md:p-6 lg:p-8 bg-yellow rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground shadow-lg sm:shadow-xl">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-1 sm:mb-2">1700+</div>
+              <div className="text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-xl font-black uppercase leading-tight">Plans</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-purple rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">24/7</div>
-              <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Support</div>
+            <div className="p-3 sm:p-4 md:p-6 lg:p-8 bg-purple rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground shadow-lg sm:shadow-xl">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-1 sm:mb-2">24/7</div>
+              <div className="text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-xl font-black uppercase leading-tight">Support</div>
             </div>
-            <div className="p-4 sm:p-6 md:p-8 bg-mint rounded-xl sm:rounded-2xl border-4 border-foreground shadow-xl">
-              <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-1 sm:mb-2">5G</div>
-              <div className="text-xs sm:text-sm md:text-base lg:text-xl font-black uppercase">Speeds</div>
+            <div className="p-3 sm:p-4 md:p-6 lg:p-8 bg-mint rounded-lg sm:rounded-xl md:rounded-2xl border-2 sm:border-3 md:border-4 border-foreground shadow-lg sm:shadow-xl">
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-1 sm:mb-2">5G</div>
+              <div className="text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-xl font-black uppercase leading-tight">Speeds</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-20 px-4 bg-primary">
+      <section className="py-12 sm:py-16 md:py-20 px-4 bg-primary">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-6 sm:mb-8 text-foreground leading-tight">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase mb-4 sm:mb-6 md:mb-8 text-foreground leading-tight px-2">
             READY TO GET CONNECTED?
           </h2>
-          <p className="text-xl sm:text-2xl font-black mb-8 sm:mb-12 text-foreground/80 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-black mb-6 sm:mb-8 md:mb-12 text-foreground/80 max-w-3xl mx-auto px-4">
             Choose your destination and get instant connectivity
           </p>
           <Link href="/plans">
-            <Button className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-12 sm:px-16 py-5 sm:py-6 rounded-xl shadow-2xl">
+            <Button className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-black text-sm sm:text-base md:text-lg px-8 sm:px-12 md:px-16 py-4 sm:py-5 md:py-6 rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl transition-all hover:scale-105 active:scale-105 touch-manipulation">
               BROWSE ALL PLANS
             </Button>
           </Link>
