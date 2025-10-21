@@ -164,7 +164,7 @@ export default function DestinationsPage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="relative pt-40 pb-12 sm:pb-16 px-4 overflow-hidden bg-white">
+      <section className="relative pt-48 sm:pt-40 pb-12 sm:pb-16 px-4 overflow-hidden bg-white">
         {/* Decorative Blobs */}
         <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-mint rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-purple rounded-full blur-3xl"></div>

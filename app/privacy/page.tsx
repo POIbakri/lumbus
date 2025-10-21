@@ -32,7 +32,7 @@ export default function PrivacyPage() {
               </p>
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary mb-4">
                 <p className="font-bold text-sm sm:text-base">Data Controller:</p>
-                <p className="text-sm">LUMBUS TELECOM LIMITED</p>
+                <p className="text-sm">LUMBUS TECHNOLOGIES LIMITED</p>
                 <p className="text-sm">Company Number: 16793515</p>
                 <p className="text-sm">Registered in England and Wales</p>
                 <p className="text-sm">Location: London, United Kingdom</p>
@@ -316,7 +316,7 @@ export default function PrivacyPage() {
               </p>
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary mb-4">
                 <p className="font-bold text-sm sm:text-base mb-2">Data Protection Officer</p>
-                <p className="text-sm mb-1">LUMBUS TELECOM LIMITED</p>
+                <p className="text-sm mb-1">LUMBUS TECHNOLOGIES LIMITED</p>
                 <p className="text-sm mb-1">Email: privacy@lumbus.com</p>
                 <p className="text-sm mb-1">Support: support@lumbus.com</p>
                 <p className="text-sm">Company Number: 16793515</p>
