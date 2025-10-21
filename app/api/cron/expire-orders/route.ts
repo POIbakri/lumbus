@@ -4,7 +4,7 @@
  * This endpoint automatically marks orders as 'expired' when their
  * validity period has elapsed after activation.
  *
- * Runs every 6 hours via Vercel Cron
+ * Runs every hour via Vercel Cron
  *
  * GET /api/cron/expire-orders
  */
