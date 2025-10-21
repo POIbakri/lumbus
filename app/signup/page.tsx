@@ -125,7 +125,9 @@ export default function SignUpPage() {
             </CardHeader>
 
             <CardContent className="space-y-4 sm:space-y-6 relative z-10">
-              {/* Social Sign Up */}
+              {/* Social Sign Up - DISABLED: Waiting for OAuth provider setup */}
+              {/* See OAUTH_SETUP_GUIDE.md for setup instructions */}
+              {/*
               <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={handleGoogleSignUp}
@@ -165,6 +167,7 @@ export default function SignUpPage() {
                   <span className="px-4 bg-yellow font-black uppercase">Or with email</span>
                 </div>
               </div>
+              */}
 
               {/* Email Sign Up Form */}
               <form onSubmit={handleEmailSignUp} className="space-y-4">

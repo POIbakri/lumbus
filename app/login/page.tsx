@@ -88,7 +88,9 @@ export default function LoginPage() {
             </CardHeader>
 
             <CardContent className="space-y-4 sm:space-y-6 relative z-10">
-              {/* Social Login */}
+              {/* Social Login - DISABLED: Waiting for OAuth provider setup */}
+              {/* See OAUTH_SETUP_GUIDE.md for setup instructions */}
+              {/*
               <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={handleGoogleLogin}
@@ -128,6 +130,7 @@ export default function LoginPage() {
                   <span className="px-4 bg-mint font-black uppercase">Or with email</span>
                 </div>
               </div>
+              */}
 
               {/* Email Login Form */}
               <form onSubmit={handleEmailLogin} className="space-y-4">
