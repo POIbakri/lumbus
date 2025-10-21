@@ -392,10 +392,11 @@ export default function DashboardPage() {
     return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired;
   });
 
-  // Past orders: ONLY show truly depleted eSIMs
+  // Past orders: Show depleted OR expired eSIMs
   const pastOrders = orders.filter(o => {
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
-    return isDepleted;
+    const expired = isOrderExpired(o);
+    return isDepleted || expired;
   });
 
   return (
@@ -877,7 +878,7 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">
-                  ORDER HISTORY (DEPLETED) ({pastOrders.length})
+                  ORDER HISTORY ({pastOrders.length})
                 </h2>
                 <Button
                   onClick={() => {
@@ -900,6 +901,10 @@ export default function DashboardPage() {
                       const totalDataFormatted = formatPlanData(totalData);
                       // Format order reference (last 8 characters of order ID)
                       const orderRef = order.id.slice(-8).toUpperCase();
+
+                      // Check both depleted and expired status
+                      const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+                      const isExpired = isOrderExpired(order);
 
                       return (
                         <div
@@ -927,10 +932,18 @@ export default function DashboardPage() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                            <Badge className={`${getStatusColor(getDisplayStatus(order))} font-black uppercase text-xs px-2 sm:px-3 py-1`}>
-                              {getDisplayStatus(order)}
-                            </Badge>
+                          <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                            {/* Show both badges if order is both depleted AND expired */}
+                            {isDepleted && (
+                              <Badge className="bg-red-500 text-white font-black uppercase text-xs px-2 sm:px-3 py-1">
+                                depleted
+                              </Badge>
+                            )}
+                            {isExpired && (
+                              <Badge className="bg-orange-500 text-white font-black uppercase text-xs px-2 sm:px-3 py-1">
+                                expired
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       );
