@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   description: 'Get instant eSIMs for 150+ countries. Up to 10x cheaper than roaming. No signup required. Works abroad and at home. Fast 4G/5G data plans activated in seconds.',
   applicationName: 'Lumbus',
-  authors: [{ name: 'Lumbus Telecom Limited', url: 'https://getlumbus.com' }],
+  authors: [{ name: 'Lumbus Technologies Limited', url: 'https://getlumbus.com' }],
   generator: 'Next.js',
   keywords: [
     'eSIM',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   ],
   referrer: 'origin-when-cross-origin',
   creator: 'Lumbus',
-  publisher: 'Lumbus Telecom Limited',
+  publisher: 'Lumbus Technologies Limited',
   formatDetection: {
     email: false,
     address: false,

@@ -19,7 +19,7 @@ export function OrganizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Lumbus',
-    legalName: 'Lumbus Telecom Limited',
+    legalName: 'Lumbus Technologies Limited',
     url: 'https://getlumbus.com',
     logo: {
       '@type': 'ImageObject',
@@ -75,7 +75,7 @@ export function WebsiteSchema() {
     description: 'Get instant eSIMs for 150+ countries. Up to 10x cheaper than roaming. Works abroad and at home.',
     publisher: {
       '@type': 'Organization',
-      name: 'Lumbus Telecom Limited',
+      name: 'Lumbus Technologies Limited',
     },
     potentialAction: {
       '@type': 'SearchAction',

@@ -16,7 +16,6 @@ function PlansPageContent() {
   const [filteredPlans, setFilteredPlans] = useState<Plan[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState<'price' | 'data' | 'validity'>('price');
   const [activeTab, setActiveTab] = useState<'countries' | 'regions'>('countries');
 
   // Currency state
@@ -43,7 +42,7 @@ function PlansPageContent() {
 
   useEffect(() => {
     filterPlans();
-  }, [plans, searchQuery, sortBy, activeTab]);
+  }, [plans, searchQuery, activeTab]);
 
   const detectCurrency = async () => {
     try {
@@ -158,19 +157,8 @@ function PlansPageContent() {
       });
     }
 
-    // Sort plans
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'price':
-          return a.retail_price - b.retail_price;
-        case 'data':
-          return b.data_gb - a.data_gb;
-        case 'validity':
-          return b.validity_days - a.validity_days;
-        default:
-          return 0;
-      }
-    });
+    // Sort plans by price by default
+    filtered.sort((a, b) => a.retail_price - b.retail_price);
 
     setFilteredPlans(filtered);
   };
@@ -181,7 +169,7 @@ function PlansPageContent() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-white">
+      <section className="relative pt-40 pb-20 sm:pb-32 px-4 overflow-hidden bg-white">
         {/* Decorative Blobs */}
         <div className="absolute top-10 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-cyan rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 right-10 w-64 sm:w-[500px] h-64 sm:h-[500px] bg-mint rounded-full blur-3xl"></div>
@@ -234,33 +222,6 @@ function PlansPageContent() {
       </section>
 
       <div className="container mx-auto relative z-10 max-w-7xl px-4">
-        {/* Sort Options - Simplified */}
-        <div className="mb-8 sm:mb-12">
-          <div className="flex justify-center gap-2 sm:gap-3">
-            <Button
-              onClick={() => setSortBy('price')}
-              variant={sortBy === 'price' ? 'default' : 'outline'}
-              className="font-black text-xs sm:text-sm"
-            >
-              💰 PRICE
-            </Button>
-            <Button
-              onClick={() => setSortBy('data')}
-              variant={sortBy === 'data' ? 'default' : 'outline'}
-              className="font-black text-xs sm:text-sm"
-            >
-              📊 DATA
-            </Button>
-            <Button
-              onClick={() => setSortBy('validity')}
-              variant={sortBy === 'validity' ? 'default' : 'outline'}
-              className="font-black text-xs sm:text-sm"
-            >
-              📅 DURATION
-            </Button>
-          </div>
-        </div>
-
         {/* Active Search Filter */}
         {searchQuery && (
           <div className="mb-8 sm:mb-12">

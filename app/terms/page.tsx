@@ -31,7 +31,7 @@ export default function TermsPage() {
                 website, and mobile applications (collectively, the "Services") provided by:
               </p>
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary mb-4">
-                <p className="font-bold text-sm sm:text-base">LUMBUS TELECOM LIMITED</p>
+                <p className="font-bold text-sm sm:text-base">LUMBUS TECHNOLOGIES LIMITED</p>
                 <p className="text-sm">Company Number: 16793515</p>
                 <p className="text-sm">Registered in England and Wales</p>
                 <p className="text-sm">Location: London, United Kingdom</p>
@@ -239,7 +239,7 @@ export default function TermsPage() {
               <h2 className="text-xl sm:text-2xl font-black uppercase mb-3 sm:mb-4">11. Intellectual Property</h2>
               <p className="text-sm sm:text-base leading-relaxed mb-3">
                 All content on our website and apps, including text, graphics, logos, and software, is the property
-                of Lumbus Telecom Limited or our licensors and is protected by UK and international copyright laws.
+                of Lumbus Technologies Limited or our licensors and is protected by UK and international copyright laws.
               </p>
               <p className="text-sm sm:text-base leading-relaxed">
                 You may not copy, reproduce, distribute, or create derivative works without our express written permission.
@@ -298,7 +298,7 @@ export default function TermsPage() {
                 For questions about these Terms or our Services, please contact us:
               </p>
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary">
-                <p className="font-bold text-sm sm:text-base mb-2">LUMBUS TELECOM LIMITED</p>
+                <p className="font-bold text-sm sm:text-base mb-2">LUMBUS TECHNOLOGIES LIMITED</p>
                 <p className="text-sm mb-1">Email: support@lumbus.com</p>
                 <p className="text-sm mb-1">Website: {typeof window !== 'undefined' ? window.location.origin : 'https://lumbus.com'}</p>
                 <p className="text-sm">Company Number: 16793515</p>

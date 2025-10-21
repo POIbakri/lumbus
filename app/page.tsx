@@ -617,7 +617,7 @@ export default function Home() {
                 Refund Policy
               </Link>
             </div>
-            <p className="text-sm">&copy; {new Date().getFullYear()} Lumbus Telecom Limited. Company No. 16793515. All rights reserved.</p>
+            <p className="text-sm">&copy; {new Date().getFullYear()} Lumbus Technologies Limited. Company No. 16793515. All rights reserved.</p>
           </div>
         </div>
       </footer>
