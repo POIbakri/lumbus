@@ -178,35 +178,58 @@ export default function InstallPage() {
         <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 px-4">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 leading-tight">
-              YOUR eSIM IS READY!
+            {/* Success Badge */}
+            <div className="inline-block mb-6">
+              <div className="bg-gradient-to-r from-mint to-cyan rounded-full px-6 sm:px-8 py-3 sm:py-4 border-2 sm:border-4 border-foreground shadow-xl">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl">✅</span>
+                  <span className="font-black uppercase text-sm sm:text-base md:text-lg">Payment Successful</span>
+                </div>
+              </div>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
+              YOUR eSIM IS<br className="sm:hidden" /> READY!
             </h1>
-            <p className="text-base sm:text-lg md:text-xl font-bold mb-4">
-              Connected via Lumbus — Expires in {order.plan.validityDays} days
+            <p className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-foreground/70">
+              🌐 Connected via Lumbus • Valid for {order.plan.validityDays} days
             </p>
-            <div className="mt-6 p-4 bg-red-50 border-2 border-red-500 rounded-xl inline-block max-w-md">
-              <p className="font-bold uppercase text-sm text-red-700">
-                📧 Installation instructions have been sent to your email
-              </p>
-              <p className="text-xs text-red-600 mt-1">
-                Check your inbox (and junk/spam folder) for activation details and QR code
-              </p>
+
+            {/* Important Notice - Email Backup */}
+            <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-purple to-purple/80 border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl inline-block max-w-lg shadow-xl">
+              <div className="flex items-start gap-3 text-left">
+                <span className="text-2xl sm:text-3xl flex-shrink-0">📧</span>
+                <div>
+                  <p className="font-black uppercase text-sm sm:text-base text-white mb-2">
+                    Installation instructions sent to your email
+                  </p>
+                  <p className="text-xs sm:text-sm font-bold text-white/90">
+                    Check your inbox (and spam folder) for activation details. You can install later from the email.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Auto Deep Link Notification for iOS 17.4+ */}
             {deviceInfo.supportsUniversalLink && !deepLinkTriggered && (
-              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block">
-                <p className="font-black uppercase text-sm text-primary">
-                  📲 Opening eSIM installer automatically...
-                </p>
+              <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-yellow to-yellow/80 border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl inline-block max-w-lg shadow-xl animate-pulse">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl">⚡</span>
+                  <p className="font-black uppercase text-sm sm:text-base text-foreground">
+                    Opening eSIM installer automatically...
+                  </p>
+                </div>
               </div>
             )}
 
             {deepLinkTriggered && (
-              <div className="mt-6 p-4 bg-primary/10 border-2 border-primary rounded-xl inline-block ">
-                <p className="font-black uppercase text-sm text-primary">
-                  ✓ eSIM installer opened! Follow the prompts to complete setup.
-                </p>
+              <div className="mt-6 p-4 sm:p-6 bg-gradient-to-br from-mint to-mint/80 border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl inline-block max-w-lg shadow-xl">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl sm:text-3xl">✅</span>
+                  <p className="font-black uppercase text-sm sm:text-base text-foreground">
+                    eSIM installer opened! Follow the prompts on your screen.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -243,14 +266,86 @@ export default function InstallPage() {
             platform={deviceInfo.platform}
           />
 
-          <div className="mt-8 text-center p-6 bg-yellow rounded-xl">
-            <p className="font-bold uppercase text-sm">
-              Need help? Check your email or visit our{' '}
-              <a href="/support" className="text-primary hover:underline">
-                support page
-              </a>
-              .
-            </p>
+          {/* Important Tips Section */}
+          <Card className="mt-8 bg-gradient-to-br from-yellow to-yellow/80 border-2 sm:border-4 border-foreground shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase flex items-center gap-3">
+                <span>💡</span> IMPORTANT TIPS
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="bg-white/90 p-4 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">⏰</span>
+                    <div>
+                      <h3 className="font-black uppercase text-sm mb-2">When to activate</h3>
+                      <p className="text-sm font-bold text-foreground/70">
+                        Install now, but turn on data roaming only when you arrive at your destination to start the validity period.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/90 p-4 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">📱</span>
+                    <div>
+                      <h3 className="font-black uppercase text-sm mb-2">Keep your SIM</h3>
+                      <p className="text-sm font-bold text-foreground/70">
+                        Don't remove your physical SIM! The eSIM works alongside it. Switch between them in settings.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/90 p-4 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">📸</span>
+                    <div>
+                      <h3 className="font-black uppercase text-sm mb-2">Save the QR code</h3>
+                      <p className="text-sm font-bold text-foreground/70">
+                        Take a screenshot of the QR code so you can install later if needed (also in your email).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/90 p-4 rounded-xl">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">🔄</span>
+                    <div>
+                      <h3 className="font-black uppercase text-sm mb-2">Need more data?</h3>
+                      <p className="text-sm font-bold text-foreground/70">
+                        You can purchase top-up plans from your dashboard anytime during the validity period.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Help Section */}
+          <div className="mt-8 text-center px-4">
+            <div className="inline-block w-full sm:w-auto p-6 sm:p-8 bg-gradient-to-br from-cyan to-cyan/80 border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl max-w-2xl">
+              <h3 className="font-black uppercase text-lg sm:text-xl mb-3">Need Help?</h3>
+              <p className="font-bold text-sm sm:text-base mb-4 text-foreground/80">
+                Installation instructions are in your email, or get help from our support team
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/support" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-black text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 touch-manipulation">
+                    💬 CONTACT SUPPORT
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="w-full sm:w-auto">
+                  <Button variant="outline" className="w-full sm:w-auto font-black text-sm sm:text-base px-6 sm:px-8 py-3 sm:py-4 border-2 border-foreground touch-manipulation">
+                    📊 VIEW DASHBOARD
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
         </div>
