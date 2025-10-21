@@ -21,6 +21,10 @@ export default function DestinationsPage() {
   const [userCountry, setUserCountry] = useState<string | null>(null);
   const [userLocationDetected, setUserLocationDetected] = useState(false);
 
+  // Currency state
+  const [currencySymbol, setCurrencySymbol] = useState('$');
+  const [convertedPrices, setConvertedPrices] = useState<Map<string, number>>(new Map());
+
   const countriesByContinent = getCountriesByContinent();
 
   useEffect(() => {
@@ -33,6 +37,7 @@ export default function DestinationsPage() {
       const response = await fetch('/api/currency/detect');
       if (response.ok) {
         const data = await response.json();
+        setCurrencySymbol(data.symbol);
         if (data.country) {
           setUserCountry(data.country);
           setUserLocationDetected(true);
@@ -47,11 +52,42 @@ export default function DestinationsPage() {
     try {
       const response = await fetch('/api/plans');
       const data = await response.json();
-      setPlans(data.plans || []);
+      const fetchedPlans = data.plans || [];
+      setPlans(fetchedPlans);
+
+      // Convert all prices after loading plans
+      if (fetchedPlans.length > 0) {
+        await convertAllPrices(fetchedPlans);
+      }
     } catch (error) {
       // Error handled silently
     } finally {
       setLoading(false);
+    }
+  };
+
+  const convertAllPrices = async (plansToConvert: Plan[]) => {
+    try {
+      const usdPrices = plansToConvert.map(p => p.retail_price);
+      const response = await fetch('/api/currency/detect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prices: usdPrices }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const priceMap = new Map<string, number>();
+        plansToConvert.forEach((plan, index) => {
+          if (data.prices[index]) {
+            priceMap.set(plan.id, data.prices[index].converted);
+          }
+        });
+        setConvertedPrices(priceMap);
+        setCurrencySymbol(data.symbol);
+      }
+    } catch (error) {
+      // Error handled silently
     }
   };
 
@@ -66,11 +102,18 @@ export default function DestinationsPage() {
   const allCountries = Object.values(countriesByContinent).flat();
   const countriesWithPlans = allCountries
     .filter(country => planCounts.has(country.code) && planCounts.get(country.code)! > 0)
-    .map(country => ({
-      ...country,
-      planCount: planCounts.get(country.code)!,
-      minPrice: Math.min(...plans.filter(p => p.region_code === country.code).map(p => p.retail_price))
-    }))
+    .map(country => {
+      const countryPlans = plans.filter(p => p.region_code === country.code);
+      const minPrice = Math.min(...countryPlans.map(p => {
+        const convertedPrice = convertedPrices.get(p.id);
+        return convertedPrice !== undefined ? convertedPrice : p.retail_price;
+      }));
+      return {
+        ...country,
+        planCount: planCounts.get(country.code)!,
+        minPrice
+      };
+    })
     .sort((a, b) => b.planCount - a.planCount);
 
   // Get regional plans with pricing
@@ -79,11 +122,18 @@ export default function DestinationsPage() {
       const count = planCounts.get(region.code) || 0;
       return count > 0;
     })
-    .map(region => ({
-      ...region,
-      planCount: planCounts.get(region.code)!,
-      minPrice: Math.min(...plans.filter(p => p.region_code === region.code).map(p => p.retail_price))
-    }))
+    .map(region => {
+      const regionPlans = plans.filter(p => p.region_code === region.code);
+      const minPrice = Math.min(...regionPlans.map(p => {
+        const convertedPrice = convertedPrices.get(p.id);
+        return convertedPrice !== undefined ? convertedPrice : p.retail_price;
+      }));
+      return {
+        ...region,
+        planCount: planCounts.get(region.code)!,
+        minPrice
+      };
+    })
     .sort((a, b) => b.planCount - a.planCount);
 
   // Filter by search
@@ -282,7 +332,7 @@ export default function DestinationsPage() {
                                 Starting at
                               </div>
                               <div className="font-black text-base sm:text-lg md:text-xl lg:text-2xl">
-                                ${item.minPrice.toFixed(2)}
+                                {currencySymbol}{item.minPrice.toFixed(2)}
                               </div>
                             </div>
 
