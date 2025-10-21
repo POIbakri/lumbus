@@ -30,12 +30,15 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
-    const isFreeOrder = req.headers.get('x-free-order') === 'true';
+    const internalSecret = req.headers.get('x-internal-secret');
 
     let event: Stripe.Event;
 
-    if (isFreeOrder) {
-      // Free order from internal checkout - skip signature verification
+    // Check for internal free order (100% discount bypass)
+    const isInternalCall = internalSecret === process.env.INTERNAL_WEBHOOK_SECRET;
+
+    if (isInternalCall && !signature) {
+      // Free order from internal checkout - verify secret instead of signature
       try {
         const parsedEvent = JSON.parse(body);
         // Generate a unique ID for free orders using timestamp and order ID

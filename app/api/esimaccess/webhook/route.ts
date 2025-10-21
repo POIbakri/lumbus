@@ -86,11 +86,13 @@ export async function POST(req: NextRequest) {
       ? forwardedFor.split(',')[0].trim()
       : req.headers.get('x-real-ip');
     const allowedIPs = ['3.1.131.226', '54.254.74.88', '18.136.190.97', '18.136.60.197', '18.136.19.137'];
-    // Note: In production, uncomment this if you want strict IP filtering
-    // if (clientIP && !allowedIPs.includes(clientIP)) {
-    //   console.error('eSIM Access webhook from unauthorized IP:', clientIP);
-    //   return NextResponse.json({ error: 'Unauthorized IP' }, { status: 403 });
-    // }
+
+    // Enable IP whitelist in production if ESIMACCESS_ENABLE_IP_WHITELIST=true
+    const enableIPWhitelist = process.env.ESIMACCESS_ENABLE_IP_WHITELIST === 'true';
+    if (enableIPWhitelist && clientIP && !allowedIPs.includes(clientIP)) {
+      console.error('eSIM Access webhook from unauthorized IP:', clientIP);
+      return NextResponse.json({ error: 'Unauthorized IP' }, { status: 403 });
+    }
 
     // Idempotency check: Prevent duplicate processing using notifyId
     if (payload.notifyId) {

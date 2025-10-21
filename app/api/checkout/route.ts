@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { convertToStripeAmount, type Currency } from '@/lib/currency';
 
@@ -84,17 +85,11 @@ export async function POST(req: NextRequest) {
       });
 
       if (authError) {
-        if (authError.message?.includes('already been registered') || authError.code === 'email_exists') {
-          console.error('[Mobile Checkout] User exists in auth but not in database');
-          return NextResponse.json({
-            error: 'Account already exists. Please try again or contact support.',
-          }, { status: 400 });
-        }
-        console.error('[Mobile Checkout] Auth user creation error:', authError);
+        // Generic error to prevent user enumeration
+        logger.error('[Mobile Checkout] Auth user creation error', authError);
         return NextResponse.json({
-          error: 'Failed to create user account',
-          details: authError?.message
-        }, { status: 500 });
+          error: 'Unable to process checkout. Please try again or contact support.',
+        }, { status: 400 });
       }
 
       if (!authData?.user) {

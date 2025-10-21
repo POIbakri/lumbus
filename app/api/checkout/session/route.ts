@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
 import { ensureUserProfile } from '@/lib/referral';
 import { getCurrencyForCheckout, convertToStripeAmount, formatPrice, detectCountryFromRequest } from '@/lib/currency';
+import { logger, redactEmail } from '@/lib/logger';
 import { z } from 'zod';
 
 // Lazy initialization - only create instance when needed
@@ -33,9 +34,9 @@ const checkoutSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    console.log('[Checkout] Starting checkout session...');
+    logger.info('[Checkout] Starting checkout session...');
     const body = await req.json();
-    console.log('[Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
+    logger.info('[Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
 
     const { planId, email, isTopUp, existingOrderId, iccid, discountCode, referralCode } = checkoutSchema.parse(body);
 
@@ -89,16 +90,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Email is required for new orders' }, { status: 400 });
       }
 
-      console.log('[Checkout] Looking for existing user:', email);
+      logger.info('[Checkout] Looking for existing user:', { email });
       const { data: existingUser, error: findError } = await supabase
         .from('users')
         .select('*')
         .eq('email', email.toLowerCase().trim()) // Normalize email
         .maybeSingle(); // Use maybeSingle() to handle 0 or 1 results
 
-      console.log('[Checkout] Find user result:', {
+      logger.info('[Checkout] Find user result:', {
         email: email,
-        normalized: email.toLowerCase().trim(),
         found: !!existingUser,
         userId: existingUser?.id,
         error: findError?.message
@@ -128,23 +128,11 @@ export async function POST(req: NextRequest) {
         });
 
         if (authError) {
-          // If user already exists in auth but not in users table, fetch them
-          if (authError.message?.includes('already been registered') || authError.code === 'email_exists') {
-            console.log('[Checkout] Auth user already exists, checking database...');
-
-            // This shouldn't happen since we already checked at line 93-108
-            // But if it does, return a clear error
-            console.error('[Checkout] User exists in auth but maybeSingle() at line 93 missed them');
-            return NextResponse.json({
-              error: 'Account already exists. Please try again or contact support if the issue persists.',
-            }, { status: 400 });
-          } else {
-            console.error('[Checkout] Auth user creation error:', authError);
-            return NextResponse.json({
-              error: 'Failed to create user account',
-              details: authError?.message
-            }, { status: 500 });
-          }
+          // Generic error to prevent user enumeration
+          logger.error('[Checkout] Auth user creation error', authError);
+          return NextResponse.json({
+            error: 'Unable to process checkout. Please try again or contact support.',
+          }, { status: 400 });
         }
 
         if (!authData?.user) {
@@ -338,7 +326,7 @@ export async function POST(req: NextRequest) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-free-order': 'true', // Special header to identify internal call
+            'x-internal-secret': process.env.INTERNAL_WEBHOOK_SECRET || '', // Secure internal call
           },
           body: JSON.stringify({
             type: 'checkout.session.completed',
