@@ -17,6 +17,7 @@ function PlansPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'price' | 'data' | 'validity'>('price');
+  const [activeTab, setActiveTab] = useState<'countries' | 'regions'>('countries');
 
   // Currency state
   const [currencySymbol, setCurrencySymbol] = useState('$');
@@ -42,7 +43,7 @@ function PlansPageContent() {
 
   useEffect(() => {
     filterPlans();
-  }, [plans, searchQuery, sortBy]);
+  }, [plans, searchQuery, sortBy, activeTab]);
 
   const detectCurrency = async () => {
     try {
@@ -131,6 +132,15 @@ function PlansPageContent() {
   const filterPlans = () => {
     let filtered = [...plans];
 
+    // Filter by tab (countries vs regions)
+    if (activeTab === 'countries') {
+      // Only show plans for individual countries (not regional multi-country plans)
+      filtered = filtered.filter(p => !REGIONS[p.region_code]);
+    } else {
+      // Only show regional plans
+      filtered = filtered.filter(p => REGIONS[p.region_code]);
+    }
+
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -193,7 +203,7 @@ function PlansPageContent() {
           </p>
 
           {/* Search Box */}
-          <div className="max-w-2xl mx-auto px-4">
+          <div className="max-w-2xl mx-auto px-4 mb-8">
             <Input
               type="text"
               placeholder="🔍 Search country, region, or plan name..."
@@ -201,6 +211,24 @@ function PlansPageContent() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
             />
+          </div>
+
+          {/* Tabs */}
+          <div className="flex justify-center gap-2">
+            <Button
+              onClick={() => { setActiveTab('countries'); }}
+              variant={activeTab === 'countries' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3"
+            >
+              COUNTRIES
+            </Button>
+            <Button
+              onClick={() => { setActiveTab('regions'); }}
+              variant={activeTab === 'regions' ? 'default' : 'outline'}
+              className="font-black text-xs sm:text-sm px-4 sm:px-6 py-2 sm:py-3"
+            >
+              REGIONS
+            </Button>
           </div>
         </div>
       </section>
