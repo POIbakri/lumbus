@@ -241,8 +241,8 @@ git push origin main
 Follow the detailed guide in `SEO_BACKLINK_STRATEGY.md`:
 
 **Quick Wins This Week:**
-- [ ] Claim Trustpilot profile
-- [ ] List on Companies House with website link
+- [tick] Claim Trustpilot profile
+- [tick ] List on Companies House with website link
 - [ ] Create LinkedIn company page
 - [ ] Sign up for HARO (Help a Reporter Out)
 - [ ] Submit to Product Hunt
