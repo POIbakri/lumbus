@@ -6,8 +6,12 @@ import { Button } from '@/components/ui/button';
 import { PlanCard } from '@/components/plan-card';
 import { Plan } from '@/lib/db';
 
+interface PlanWithConvertedPrice extends Plan {
+  convertedPrice?: number;
+}
+
 export function PopularPlansSection() {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plans, setPlans] = useState<PlanWithConvertedPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState('USD');
   const [currencySymbol, setCurrencySymbol] = useState('$');
@@ -33,12 +37,14 @@ export function PopularPlansSection() {
           const plansData = await plansResponse.json();
 
           if (plansData.plans && plansData.plans.length > 0) {
-            setPlans(plansData.plans.slice(0, 3));
+            const plansWithPrices = await convertPlansPrices(plansData.plans.slice(0, 3), currencyData.currency);
+            setPlans(plansWithPrices);
           } else {
             // Fallback: get any 3 popular plans
             const fallbackResponse = await fetch('/api/plans?limit=3');
             const fallbackData = await fallbackResponse.json();
-            setPlans(fallbackData.plans?.slice(0, 3) || []);
+            const plansWithPrices = await convertPlansPrices(fallbackData.plans?.slice(0, 3) || [], currencyData.currency);
+            setPlans(plansWithPrices);
           }
         }
       }
@@ -53,26 +59,32 @@ export function PopularPlansSection() {
     }
   };
 
-  // Convert prices for display
-  const convertPrice = async (usdPrice: number) => {
-    if (currency === 'USD') return usdPrice;
+  // Convert prices for all plans in one API call
+  const convertPlansPrices = async (plans: Plan[], targetCurrency: string): Promise<PlanWithConvertedPrice[]> => {
+    if (targetCurrency === 'USD') {
+      return plans.map(plan => ({ ...plan, convertedPrice: plan.retail_price }));
+    }
 
     try {
+      const prices = plans.map(p => p.retail_price);
       const response = await fetch('/api/currency/detect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prices: [usdPrice] }),
+        body: JSON.stringify({ prices }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        return data.prices[0].converted;
+        return plans.map((plan, index) => ({
+          ...plan,
+          convertedPrice: data.prices[index]?.converted || plan.retail_price,
+        }));
       }
     } catch (error) {
       console.error('Price conversion error:', error);
     }
 
-    return usdPrice;
+    return plans.map(plan => ({ ...plan, convertedPrice: plan.retail_price }));
   };
 
   if (loading) {
@@ -98,6 +110,7 @@ export function PopularPlansSection() {
             <div key={plan.id} className="" style={{animationDelay: `${index * 0.1}s`}}>
               <PlanCard
                 plan={plan}
+                displayPrice={plan.convertedPrice}
                 displaySymbol={currencySymbol}
               />
             </div>
