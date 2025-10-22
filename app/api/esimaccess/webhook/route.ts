@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         .select('id')
         .eq('provider', 'esimaccess')
         .eq('notify_id', payload.notifyId)
-        .single();
+        .maybeSingle();
 
       if (existingWebhook) {
         return NextResponse.json({ success: true, message: 'Duplicate webhook ignored' });
@@ -171,7 +171,7 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
     .from('orders')
     .select('*')
     .eq('connect_order_id', content.orderNo)
-    .single();
+    .maybeSingle();
 
   if (!order) {
     return;
@@ -217,13 +217,13 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         .from('plans')
         .select('*')
         .eq('id', order.plan_id)
-        .single();
+        .maybeSingle();
 
       const { data: user } = await supabase
         .from('users')
         .select('*')
         .eq('id', order.user_id)
-        .single();
+        .maybeSingle();
 
       if (plan && user) {
         // Format activate before date
@@ -347,7 +347,7 @@ async function handleDataUsage(content: {
     .from('orders')
     .select('*')
     .eq('iccid', content.iccid)
-    .single();
+    .maybeSingle();
 
   if (orderError || !order) {
     return;
@@ -371,13 +371,13 @@ async function handleDataUsage(content: {
       .from('plans')
       .select('*')
       .eq('id', order.plan_id)
-      .single();
+      .maybeSingle();
 
     const { data: user } = await supabase
       .from('users')
       .select('*')
       .eq('id', order.user_id)
-      .single();
+      .maybeSingle();
 
     if (plan && user && user.email) {
       // Use totalVolume from webhook instead of plan.data_gb
@@ -418,7 +418,7 @@ async function handleValidityUsage(content: {
     .from('orders')
     .select('*')
     .eq('iccid', content.iccid)
-    .single();
+    .maybeSingle();
 
   if (orderError || !order) {
     return;
@@ -431,13 +431,13 @@ async function handleValidityUsage(content: {
       .from('plans')
       .select('*')
       .eq('id', order.plan_id)
-      .single();
+      .maybeSingle();
 
     const { data: user } = await supabase
       .from('users')
       .select('*')
       .eq('id', order.user_id)
-      .single();
+      .maybeSingle();
 
     if (plan && user && user.email) {
       // Format expiry date

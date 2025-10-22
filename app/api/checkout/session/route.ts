@@ -211,7 +211,7 @@ export async function POST(req: NextRequest) {
             .from('discount_codes')
             .select('id')
             .eq('code', discountCode.toUpperCase().trim())
-            .single();
+            .maybeSingle();
 
           if (codeData) {
             discountCodeId = codeData.id;
@@ -225,7 +225,7 @@ export async function POST(req: NextRequest) {
           .from('user_profiles')
           .select('referred_by_code')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         const { count: orderCount } = await supabase
           .from('orders')

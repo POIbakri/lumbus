@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
           .eq('iccid', iccid)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         const esimTranNo = existingOrderForTopUp?.esim_tran_no;
 

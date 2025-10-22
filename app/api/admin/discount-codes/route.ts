@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       .from('discount_codes')
       .select('id')
       .eq('code', validatedData.code)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       return NextResponse.json(

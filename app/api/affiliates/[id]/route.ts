@@ -71,7 +71,7 @@ export async function PATCH(
         .select('id')
         .eq('slug', validatedData.slug)
         .neq('id', id)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         return NextResponse.json(

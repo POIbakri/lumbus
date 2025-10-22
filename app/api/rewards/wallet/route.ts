@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       .from('user_data_wallet')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     const balanceMB = wallet?.balance_mb || 0;
 

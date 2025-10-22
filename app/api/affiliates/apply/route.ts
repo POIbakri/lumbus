@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       .from('affiliates')
       .select('id, email, application_status, user_id')
       .eq('email', email.toLowerCase().trim())
-      .single();
+      .maybeSingle();
 
     if (existingAffiliate) {
       if (existingAffiliate.application_status === 'pending') {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         .from('affiliates')
         .select('id, email, application_status')
         .eq('user_id', authenticatedUserId)
-        .single();
+        .maybeSingle();
 
       if (userAffiliate) {
         return NextResponse.json(
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         .from('affiliates')
         .select('id')
         .eq('slug', finalSlug)
-        .single();
+        .maybeSingle();
 
       if (!existingSlug) break;
 

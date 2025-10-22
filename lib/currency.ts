@@ -81,34 +81,34 @@ export const COUNTRY_TO_CURRENCY: Record<string, Currency> = {
 
 // Exchange rates relative to USD (updated periodically)
 // In production, fetch from API like exchangerate-api.com or ECB
-export const EXCHANGE_RATES: Record<Currency, number> = {
+const EXCHANGE_RATES = {
   USD: 1.0,
-  GBP: 0.79,    // 1 USD = 0.79 GBP
-  EUR: 0.92,    // 1 USD = 0.92 EUR
-  CAD: 1.36,    // 1 USD = 1.36 CAD
-  AUD: 1.53,    // 1 USD = 1.53 AUD
-  JPY: 149.5,   // 1 USD = 149.5 JPY
-  SGD: 1.34,    // 1 USD = 1.34 SGD
-  HKD: 7.82,    // 1 USD = 7.82 HKD
-  NZD: 1.67,    // 1 USD = 1.67 NZD
-  CHF: 0.88,    // 1 USD = 0.88 CHF
-  SEK: 10.35,   // 1 USD = 10.35 SEK
-  NOK: 10.65,   // 1 USD = 10.65 NOK
-  DKK: 6.87,    // 1 USD = 6.87 DKK
-  MXN: 17.25,   // 1 USD = 17.25 MXN
-  BRL: 4.95,    // 1 USD = 4.95 BRL
-  INR: 83.15,   // 1 USD = 83.15 INR
-  AED: 3.67,    // 1 USD = 3.67 AED
-  SAR: 3.75,    // 1 USD = 3.75 SAR
-  ZAR: 18.25,   // 1 USD = 18.25 ZAR
-  TRY: 32.15,   // 1 USD = 32.15 TRY
-  PLN: 3.95,    // 1 USD = 3.95 PLN
-  THB: 34.50,   // 1 USD = 34.50 THB
-  MYR: 4.45,    // 1 USD = 4.45 MYR
-  IDR: 15650,   // 1 USD = 15650 IDR
-  PHP: 56.25,   // 1 USD = 56.25 PHP
-  KRW: 1330,    // 1 USD = 1330 KRW
-  CNY: 7.24,    // 1 USD = 7.24 CNY
+  GBP: 0.74,    // 1 USD = 0.74 GBP (updated from 0.79)
+  EUR: 0.86,    // 1 USD = 0.86 EUR (updated from 0.92)
+  CAD: 1.37,    // 1 USD = 1.37 CAD (updated from 1.36)
+  AUD: 1.53,    // 1 USD = 1.53 AUD (unchanged - accurate)
+  JPY: 147.5,   // 1 USD = 147.5 JPY (updated from 149.5)
+  SGD: 1.28,    // 1 USD = 1.28 SGD (updated from 1.34)
+  HKD: 7.85,    // 1 USD = 7.85 HKD (updated from 7.82)
+  NZD: 1.67,    // 1 USD = 1.67 NZD (unchanged - accurate)
+  CHF: 0.80,    // 1 USD = 0.80 CHF (updated from 0.88)
+  SEK: 9.53,    // 1 USD = 9.53 SEK (updated from 10.35)
+  NOK: 10.10,   // 1 USD = 10.10 NOK (updated from 10.65)
+  DKK: 6.35,    // 1 USD = 6.35 DKK (updated from 6.87)
+  MXN: 18.60,   // 1 USD = 18.60 MXN (updated from 17.25)
+  BRL: 5.55,    // 1 USD = 5.55 BRL (updated from 4.95)
+  INR: 86.40,   // 1 USD = 86.40 INR (updated from 83.15)
+  AED: 3.67,    // 1 USD = 3.67 AED (unchanged - pegged)
+  SAR: 3.75,    // 1 USD = 3.75 SAR (unchanged - pegged)
+  ZAR: 17.65,   // 1 USD = 17.65 ZAR (updated from 18.25)
+  TRY: 32.15,   // 1 USD = 32.15 TRY (unchanged - accurate)
+  PLN: 3.95,    // 1 USD = 3.95 PLN (unchanged - accurate)
+  THB: 32.25,   // 1 USD = 32.25 THB (updated from 34.50)
+  MYR: 4.22,    // 1 USD = 4.22 MYR (updated from 4.45)
+  IDR: 15650,   // 1 USD = 15650 IDR (unchanged - accurate)
+  PHP: 56.25,   // 1 USD = 56.25 PHP (unchanged - accurate)
+  KRW: 1376,    // 1 USD = 1376 KRW (updated from 1330)
+  CNY: 7.16,    // 1 USD = 7.16 CNY (updated from 7.24)
 };
 
 /**

@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
             .from('discount_code_usage')
             .select('id')
             .eq('order_id', orderId)
-            .single();
+            .maybeSingle();
 
           if (!existingUsage) {
             const discountAmountUSD = basePriceUSD - finalPriceUSD;
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
               .from('users')
               .select('email, referral_code')
               .eq('id', savedAttribution.referrer_user_id)
-              .single();
+              .maybeSingle();
 
             // Get referred user email
             const referredUserEmail = order.users?.email || (Array.isArray(order.users) ? order.users[0]?.email : null);
@@ -248,7 +248,7 @@ export async function POST(req: NextRequest) {
             .eq('iccid', iccid)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           const esimTranNo = existingOrderForTopUp?.esim_tran_no;
 
@@ -415,7 +415,7 @@ export async function POST(req: NextRequest) {
         .from('orders')
         .select('id')
         .eq('stripe_session_id', paymentIntent)
-        .single();
+        .maybeSingle();
 
       if (order) {
         // Void commissions and rewards

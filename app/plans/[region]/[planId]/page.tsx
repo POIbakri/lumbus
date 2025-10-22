@@ -45,6 +45,8 @@ export default function PlanDetailPage() {
   const [showCodes, setShowCodes] = useState(false);
   const [discountPercent, setDiscountPercent] = useState(0);
   const [validatingCode, setValidatingCode] = useState(false);
+  const [codeError, setCodeError] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
   const [showCountries, setShowCountries] = useState(false);
 
@@ -143,20 +145,50 @@ export default function PlanDetailPage() {
     loadRegionInfo();
   }, [plan]);
 
+  // Get or create a temporary user ID for validation
+  useEffect(() => {
+    // Try to get existing user from session, or create a temp ID
+    const tempUserId = localStorage.getItem('temp_user_id') || crypto.randomUUID();
+    localStorage.setItem('temp_user_id', tempUserId);
+    setUserId(tempUserId);
+  }, []);
+
   const validateDiscountCode = async (code: string) => {
     if (!code.trim()) {
       setDiscountPercent(0);
+      setCodeError('');
+      return;
+    }
+
+    if (!userId) {
+      // Wait for userId to be set
       return;
     }
 
     setValidatingCode(true);
+    setCodeError('');
     try {
-      // For discount code validation, we need a user ID
-      // Since we don't have a logged-in user yet, we'll validate on the backend
-      // For now, just store the code and let backend validate during checkout
-      setDiscountPercent(0); // Will be set by backend
+      const response = await fetch('/api/discount-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: code.trim(),
+          userId: userId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        setDiscountPercent(data.discountPercent);
+        setCodeError('');
+      } else {
+        setDiscountPercent(0);
+        setCodeError(data.error || 'Invalid code');
+      }
     } catch (error) {
-      // Error handled silently
+      setDiscountPercent(0);
+      setCodeError('Failed to validate code');
     } finally {
       setValidatingCode(false);
     }
@@ -233,7 +265,11 @@ export default function PlanDetailPage() {
   }
 
   const countryInfo = getCountryInfo(plan.region_code);
-  const displayPrice = convertedPrice !== null ? convertedPrice : plan.retail_price;
+  const basePrice = convertedPrice !== null ? convertedPrice : plan.retail_price;
+
+  // Calculate discounted price
+  const discount = discountPercent > 0 ? (basePrice * discountPercent) / 100 : 0;
+  const displayPrice = basePrice - discount;
   const displayData = formatDataAmount(plan.data_gb);
 
   return (
@@ -282,9 +318,19 @@ export default function PlanDetailPage() {
                       {countryInfo.name}
                     </div>
                     <div className="text-right shrink-0">
+                      {discountPercent > 0 && (
+                        <div className="text-sm sm:text-base md:text-lg font-black text-muted-foreground line-through">
+                          {currencySymbol}{basePrice.toFixed(2)}
+                        </div>
+                      )}
                       <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground leading-none">
                         {currencySymbol}{displayPrice.toFixed(2)}
                       </div>
+                      {discountPercent > 0 && (
+                        <div className="inline-block mt-1 sm:mt-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-primary text-white text-xs sm:text-sm font-black rounded shadow-lg animate-pulse-slow">
+                          {discountPercent}% OFF
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -438,10 +484,24 @@ export default function PlanDetailPage() {
                               disabled={loading || validatingCode}
                             />
                             {validatingCode && (
-                              <p className="mt-1 text-xs font-bold text-muted-foreground">Validating...</p>
+                              <p className="mt-2 text-xs sm:text-sm font-bold text-muted-foreground flex items-center gap-1.5">
+                                <span className="inline-block w-3 h-3 sm:w-4 sm:h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                                Validating...
+                              </p>
                             )}
-                            {discountPercent > 0 && (
-                              <p className="mt-1 text-xs font-black text-primary">✓ {discountPercent}% discount will be applied!</p>
+                            {codeError && (
+                              <p className="mt-2 text-xs sm:text-sm font-bold text-destructive flex items-center gap-1.5">
+                                <span className="text-sm sm:text-base">✗</span>
+                                {codeError}
+                              </p>
+                            )}
+                            {discountPercent > 0 && !codeError && (
+                              <div className="mt-2 p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/30">
+                                <p className="text-xs sm:text-sm font-black text-primary flex items-center gap-1.5">
+                                  <span className="text-sm sm:text-base">✓</span>
+                                  <span>{discountPercent}% discount applied! You save {currencySymbol}{discount.toFixed(2)}</span>
+                                </p>
+                              </div>
                             )}
                           </div>
 

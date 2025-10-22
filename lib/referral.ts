@@ -31,7 +31,7 @@ export async function generateUniqueRefCode(maxAttempts = 10): Promise<string> {
       .from('user_profiles')
       .select('ref_code')
       .eq('ref_code', code)
-      .single();
+      .maybeSingle();
 
     if (!data) {
       return code;
@@ -59,7 +59,7 @@ export async function generateUniqueSlug(baseName: string, maxAttempts = 10): Pr
       .from('affiliates')
       .select('slug')
       .eq('slug', slug)
-      .single();
+      .maybeSingle();
 
     if (!data) {
       return slug;
@@ -134,7 +134,7 @@ export async function linkReferrer(userId: string, refCode: string): Promise<boo
     .from('user_profiles')
     .select('id')
     .eq('ref_code', refCode)
-    .single();
+    .maybeSingle();
 
   if (!referrerProfile) {
     return false; // Invalid ref code
@@ -186,7 +186,7 @@ export async function trackClick(params: TrackClickParams): Promise<AffiliateCli
       .select('id')
       .eq('slug', params.affiliateSlug)
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     if (affiliate) {
       affiliateId = affiliate.id;
@@ -256,7 +256,7 @@ export async function resolveAttribution(
       .select('id, affiliate_id')
       .eq('id', clickId)
       .gte('created_at', cutoff.toISOString())
-      .single();
+      .maybeSingle();
 
     if (click && click.affiliate_id) {
       return {
@@ -273,7 +273,7 @@ export async function resolveAttribution(
       .from('user_profiles')
       .select('id')
       .eq('ref_code', cookies.rfcd)
-      .single();
+      .maybeSingle();
 
     if (referrerProfile && referrerProfile.id !== userId) {
       return {
@@ -331,7 +331,7 @@ export async function getAffiliateBySlug(slug: string): Promise<Affiliate | null
     .select('*')
     .eq('slug', slug)
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
 
   return data as Affiliate | null;
 }
@@ -344,7 +344,7 @@ export async function getAffiliateByUserId(userId: string): Promise<Affiliate | 
     .from('affiliates')
     .select('*')
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
 
   return data as Affiliate | null;
 }
@@ -369,7 +369,7 @@ export async function getUserReferralStats(userId: string): Promise<ReferralStat
     .from('user_profiles')
     .select('ref_code')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (!profile) {
     return {

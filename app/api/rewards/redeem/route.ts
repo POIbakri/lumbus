@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
       .from('user_data_wallet')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (existingWallet) {
       // Update existing wallet
