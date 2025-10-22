@@ -410,6 +410,144 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Enhanced Referral Highlight Section - MOVED BEFORE TESTIMONIALS */}
+      <section className="relative py-20 sm:py-32 px-4 bg-gradient-to-br from-yellow via-cyan to-purple overflow-hidden border-t-4 border-b-4 border-foreground">
+        {/* Animated Background Elements */}
+        <div className="absolute top-10 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+
+        <div className="container mx-auto text-center relative z-10">
+          <div className="max-w-6xl mx-auto">
+            {/* Main Card */}
+            <div className="bg-white/95 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-3xl border-4 border-foreground shadow-2xl">
+              <div className="inline-block mb-4 sm:mb-6">
+                <span className="px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
+                  <span aria-hidden="true">🎁</span> REFER & EARN
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
+                GIVE 10% OFF<br/>GET 1GB FREE
+              </h2>
+
+              <p className="text-base sm:text-lg md:text-xl font-bold mb-6 sm:mb-8 text-foreground/80 max-w-2xl mx-auto px-4">
+                Share Lumbus with friends and family. They save money, you get free data!
+              </p>
+
+              {/* Gamification Elements */}
+              <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                {/* Community Stats */}
+                <div className="bg-gradient-to-br from-mint to-cyan p-4 sm:p-6 rounded-2xl border-2 border-primary/30 shadow-lg">
+                  <div className="text-4xl sm:text-5xl mb-2">🌟</div>
+                  <div className="text-3xl sm:text-4xl font-black text-primary mb-2 animate-pulse">
+                    1,234
+                  </div>
+                  <div className="text-xs sm:text-sm font-black uppercase text-muted-foreground">
+                    GB Earned By Community
+                  </div>
+                </div>
+
+                {/* Leaderboard Preview */}
+                <div className="bg-gradient-to-br from-yellow to-orange-300 p-4 sm:p-6 rounded-2xl border-2 border-secondary/30 shadow-lg">
+                  <div className="text-4xl sm:text-5xl mb-2">🏆</div>
+                  <div className="text-xl sm:text-2xl font-black text-foreground mb-2">
+                    TOP REFERRER
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-foreground/70">
+                    User #8472 - 127 Referrals
+                  </div>
+                </div>
+
+                {/* Milestones */}
+                <div className="bg-gradient-to-br from-purple to-primary p-4 sm:p-6 rounded-2xl border-2 border-accent/30 shadow-lg">
+                  <div className="text-4xl sm:text-5xl mb-2">💎</div>
+                  <div className="text-xl sm:text-2xl font-black text-foreground mb-2">
+                    UNLOCK BADGES
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-foreground/70">
+                    Bronze → Silver → Gold → Platinum
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Milestones */}
+              <div className="bg-gradient-to-r from-primary/10 via-cyan/10 to-yellow/10 p-4 sm:p-6 rounded-2xl border-2 border-primary/20 mb-6 sm:mb-8">
+                <h3 className="text-base sm:text-lg font-black uppercase mb-4 text-foreground">
+                  🎯 REFERRAL MILESTONES
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="bg-white p-3 rounded-xl border-2 border-orange-400/30 text-center">
+                    <div className="text-2xl mb-1">🥉</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground mb-1">Bronze</div>
+                    <div className="text-sm font-bold text-foreground">1 Friend</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border-2 border-gray-400/30 text-center">
+                    <div className="text-2xl mb-1">🥈</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground mb-1">Silver</div>
+                    <div className="text-sm font-bold text-foreground">5 Friends</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border-2 border-yellow/50 text-center">
+                    <div className="text-2xl mb-1">🥇</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground mb-1">Gold</div>
+                    <div className="text-sm font-bold text-foreground">10 Friends</div>
+                  </div>
+                  <div className="bg-white p-3 rounded-xl border-2 border-cyan/50 text-center">
+                    <div className="text-2xl mb-1">💎</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground mb-1">Platinum</div>
+                    <div className="text-sm font-bold text-foreground">25 Friends</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* How It Works */}
+              <div className="grid sm:grid-cols-3 gap-4 mb-6 sm:mb-8 text-left">
+                <div className="bg-mint p-4 rounded-xl border-2 border-primary/20">
+                  <div className="text-3xl mb-2">1️⃣</div>
+                  <div className="text-sm font-black uppercase mb-2">SHARE YOUR LINK</div>
+                  <div className="text-xs font-bold text-foreground/70">
+                    Get your unique referral link from your dashboard
+                  </div>
+                </div>
+                <div className="bg-cyan p-4 rounded-xl border-2 border-primary/20">
+                  <div className="text-3xl mb-2">2️⃣</div>
+                  <div className="text-sm font-black uppercase mb-2">FRIEND PURCHASES</div>
+                  <div className="text-xs font-bold text-foreground/70">
+                    They get 10% off their first eSIM order
+                  </div>
+                </div>
+                <div className="bg-yellow p-4 rounded-xl border-2 border-secondary/20">
+                  <div className="text-3xl mb-2">3️⃣</div>
+                  <div className="text-sm font-black uppercase mb-2">YOU GET 1GB FREE</div>
+                  <div className="text-xs font-bold text-foreground/70">
+                    Data credited instantly to your account
+                  </div>
+                </div>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-6 sm:mb-8">
+                <Link href="/affiliate-program" className="w-full sm:w-auto">
+                  <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl shadow-xl font-black border-2 border-foreground">
+                    LEARN MORE
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="w-full sm:w-auto">
+                  <Button className="w-full bg-primary text-foreground border-4 border-foreground hover:bg-primary/90 hover:scale-105 transition-transform text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl font-black shadow-xl">
+                    GET YOUR LINK
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Bottom Banner */}
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow via-cyan to-yellow border-2 border-foreground px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg">
+                <span className="text-xl sm:text-2xl" aria-hidden="true">🚀</span>
+                <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
       <section className="relative py-32 px-4 bg-white overflow-hidden">
         <div className="container mx-auto relative z-10">
@@ -493,41 +631,6 @@ export default function Home() {
                   <div className="text-xs sm:text-sm font-bold opacity-70">Birmingham, UK</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Referral Highlight Section */}
-      <section className="relative py-20 sm:py-32 px-4 bg-yellow overflow-hidden border-t-4 border-b-4 border-foreground">
-        <div className="container mx-auto text-center relative z-10">
-          <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-3xl border-4 border-foreground shadow-2xl">
-            <div className="inline-block mb-4 sm:mb-6">
-              <span className="px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
-                <span aria-hidden="true">🎁</span> REFER & EARN
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
-              GIVE 10% OFF<br/>GET 1GB FREE
-            </h2>
-            <p className="text-base sm:text-lg md:text-xl font-bold mb-6 sm:mb-8 text-foreground/80 max-w-2xl mx-auto px-4">
-              Share Lumbus with friends and family. They save money, you get free data!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center mb-6 sm:mb-8">
-              <Link href="/affiliate-program" className="w-full sm:w-auto">
-                <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl shadow-xl font-black border-2 border-foreground">
-                  LEARN MORE
-                </Button>
-              </Link>
-              <Link href="/dashboard" className="w-full sm:w-auto">
-                <Button className="w-full bg-primary text-foreground border-4 border-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-12 py-5 sm:py-6 rounded-xl font-black shadow-xl">
-                  GET YOUR LINK
-                </Button>
-              </Link>
-            </div>
-            <div className="inline-flex items-center gap-2 bg-yellow/50 border-2 border-foreground px-4 sm:px-6 py-2 sm:py-3 rounded-full">
-              <span className="text-xl sm:text-2xl" aria-hidden="true">🚀</span>
-              <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
             </div>
           </div>
         </div>

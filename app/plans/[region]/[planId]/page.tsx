@@ -357,6 +357,26 @@ export default function PlanDetailPage() {
                   </ul>
                 </div>
 
+                {/* Referral CTA Banner - ABOVE checkout form */}
+                <div className="bg-gradient-to-r from-yellow via-cyan to-yellow border-4 border-foreground rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-2xl mb-6 sm:mb-8 animate-pulse-slow">
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl mb-2">💰</div>
+                    <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase mb-2 text-foreground leading-tight">
+                      GOT REFERRED? ENTER CODE FOR 10% OFF!
+                    </h3>
+                    <p className="text-sm sm:text-base font-bold text-foreground/80 mb-3">
+                      Want to earn free data too? Share after purchase!
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black text-foreground/70">
+                      <span>🎁</span>
+                      <span>1 FRIEND = 1GB FREE DATA</span>
+                      <span>•</span>
+                      <span>UNLIMITED REFERRALS</span>
+                      <span>🚀</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="border-t-2 border-primary pt-4 sm:pt-5 md:pt-6">
                   <h3 className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl mb-3 sm:mb-4">COMPLETE YOUR PURCHASE</h3>
                   <div className="space-y-3 sm:space-y-4">

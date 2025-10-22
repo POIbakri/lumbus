@@ -13,6 +13,7 @@ import { Order, Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
 import { authenticatedGet } from '@/lib/api-client';
+import { ReferralWidget } from '@/components/referral-widget';
 
 // Format plan data amounts (for "What You Bought" - shows marketing numbers)
 function formatPlanData(dataGB: number): string {
@@ -955,21 +956,103 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Referral Section */}
+          {/* Enhanced Referral Section with Gamification */}
           {referralStats && (
             <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.4s'}}>
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-3 sm:mb-4 md:mb-6">REFER & EARN</h2>
-              <Card className="bg-purple border-2 sm:border-4 border-accent shadow-xl">
-                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
+              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">REFER & EARN</h2>
+                {(() => {
+                  const getMilestone = (referrals: number) => {
+                    if (referrals >= 25) return { badge: '💎 PLATINUM', color: 'bg-gradient-to-r from-cyan to-primary' };
+                    if (referrals >= 10) return { badge: '🥇 GOLD', color: 'bg-yellow' };
+                    if (referrals >= 5) return { badge: '🥈 SILVER', color: 'bg-gray-300' };
+                    if (referrals >= 1) return { badge: '🥉 BRONZE', color: 'bg-orange-400' };
+                    return { badge: '⭐ STARTER', color: 'bg-purple' };
+                  };
+                  const milestone = getMilestone(referralStats.total_referrals);
+                  return (
+                    <Badge className={`${milestone.color} text-foreground font-black text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-foreground`}>
+                      {milestone.badge}
+                    </Badge>
+                  );
+                })()}
+              </div>
+              <Card className="bg-gradient-to-br from-purple via-primary to-cyan border-2 sm:border-4 border-accent shadow-xl overflow-hidden relative">
+                {/* Animated Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+
+                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6 relative z-10">
                   <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-                    {/* Left: Share Section */}
+                    {/* Left: Share Section with Gamification */}
                     <div>
                       <div className="mb-6">
-                        <div className="text-4xl sm:text-5xl mb-4">🎁</div>
+                        <div className="text-4xl sm:text-5xl mb-4 animate-bounce">🎁</div>
                         <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-3">SHARE & GET REWARDED</h3>
                         <p className="text-sm sm:text-base font-bold text-foreground/70 mb-4">
                           Give your friends 10% off their first order. Get 1GB of free data when they make a purchase!
                         </p>
+
+                        {/* Progress Bar to Next Badge */}
+                        {(() => {
+                          const getNextMilestone = (referrals: number) => {
+                            if (referrals >= 25) return null;
+                            if (referrals >= 10) return { next: 25, badge: '💎 Platinum' };
+                            if (referrals >= 5) return { next: 10, badge: '🥇 Gold' };
+                            if (referrals >= 1) return { next: 5, badge: '🥈 Silver' };
+                            return { next: 1, badge: '🥉 Bronze' };
+                          };
+                          const nextMilestone = getNextMilestone(referralStats.total_referrals);
+
+                          if (nextMilestone) {
+                            const progress = (referralStats.total_referrals / nextMilestone.next) * 100;
+                            const needed = nextMilestone.next - referralStats.total_referrals;
+                            return (
+                              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-4 border-2 border-foreground/20">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-xs font-black uppercase text-muted-foreground">
+                                    Progress to {nextMilestone.badge}
+                                  </span>
+                                  <span className="text-xs sm:text-sm font-black text-primary">
+                                    {needed} more {needed === 1 ? 'referral' : 'referrals'}!
+                                  </span>
+                                </div>
+                                <div className="w-full bg-foreground/10 rounded-full h-4 overflow-hidden border-2 border-foreground/20">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-primary via-cyan to-yellow transition-all duration-500 flex items-center justify-end pr-2"
+                                    style={{ width: `${Math.min(progress, 100)}%` }}
+                                  >
+                                    {progress > 20 && (
+                                      <span className="text-xs font-black text-foreground">
+                                        {Math.round(progress)}%
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+
+                        {/* Value Comparison */}
+                        <div className="bg-gradient-to-r from-yellow to-cyan rounded-xl p-4 mb-4 border-2 border-foreground/20">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-xs font-black uppercase text-foreground/70 mb-1">
+                                Your Rewards Value
+                              </div>
+                              <div className="text-2xl sm:text-3xl font-black text-foreground">
+                                ${((referralStats.earned_rewards / 1024) * 5).toFixed(2)}
+                              </div>
+                            </div>
+                            <div className="text-4xl">💰</div>
+                          </div>
+                          <div className="text-xs font-bold text-foreground/70 mt-2">
+                            {referralStats.total_referrals === 0
+                              ? '🚀 Start earning today!'
+                              : `That's ${(referralStats.earned_rewards / 1024).toFixed(1)}GB worth of data!`}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Referral Link */}
@@ -1013,59 +1096,108 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Right: Stats Section */}
+                    {/* Right: Enhanced Stats Section with Achievements */}
                     <div>
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-4">YOUR STATS</h3>
                       <div className="space-y-3 sm:space-y-4">
-                        <div className="bg-white rounded-xl p-4 sm:p-6">
+                        {/* Achievement Badges Grid */}
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-foreground/20">
+                          <div className="text-xs font-black uppercase text-muted-foreground mb-3 text-center">
+                            🏆 ACHIEVEMENT BADGES
+                          </div>
+                          <div className="grid grid-cols-4 gap-2">
+                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 1 ? 'bg-orange-400 scale-110' : 'bg-gray-200 opacity-50'}`}>
+                              <div className="text-2xl">🥉</div>
+                              <div className="text-xs font-bold mt-1">Bronze</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 5 ? 'bg-gray-300 scale-110' : 'bg-gray-200 opacity-50'}`}>
+                              <div className="text-2xl">🥈</div>
+                              <div className="text-xs font-bold mt-1">Silver</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 10 ? 'bg-yellow scale-110' : 'bg-gray-200 opacity-50'}`}>
+                              <div className="text-2xl">🥇</div>
+                              <div className="text-xs font-bold mt-1">Gold</div>
+                            </div>
+                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 25 ? 'bg-gradient-to-r from-cyan to-primary scale-110' : 'bg-gray-200 opacity-50'}`}>
+                              <div className="text-2xl">💎</div>
+                              <div className="text-xs font-bold mt-1">Platinum</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Total Clicks */}
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 border-foreground/20">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                              Total Clicks
+                              👆 Total Clicks
                             </span>
                             <span className="text-2xl sm:text-3xl font-black">
                               {referralStats.total_clicks}
                             </span>
                           </div>
+                          <div className="text-xs font-bold text-foreground/60">
+                            {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion rate`}
+                          </div>
                         </div>
 
-                        <div className="bg-white rounded-xl p-4 sm:p-6">
+                        {/* Friends Referred with Animation */}
+                        <div className="bg-gradient-to-br from-mint to-cyan rounded-xl p-4 sm:p-6 border-2 border-primary/30">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                              Friends Referred
+                            <span className="font-black uppercase text-xs sm:text-sm text-foreground">
+                              👥 Friends Referred
                             </span>
-                            <span className="text-2xl sm:text-3xl font-black text-primary">
+                            <span className="text-2xl sm:text-3xl font-black text-primary animate-pulse">
                               {referralStats.total_referrals}
                             </span>
                           </div>
-                        </div>
-
-                        <div className="bg-white rounded-xl p-4 sm:p-6">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
-                              Data Earned
-                            </span>
-                            <span className="text-2xl sm:text-3xl font-black text-primary">
-                              {(referralStats.earned_rewards / 1024).toFixed(1)} GB
-                            </span>
+                          <div className="text-xs font-bold text-foreground/70">
+                            {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `Amazing! You've helped ${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'}!`}
                           </div>
                         </div>
 
+                        {/* Data Earned with Celebration */}
+                        <div className="bg-gradient-to-br from-yellow to-orange-300 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-black uppercase text-xs sm:text-sm text-foreground">
+                              💎 Data Earned
+                            </span>
+                            <span className="text-2xl sm:text-3xl font-black text-foreground">
+                              {(referralStats.earned_rewards / 1024).toFixed(1)} GB
+                            </span>
+                          </div>
+                          <div className="text-xs font-bold text-foreground/70">
+                            {referralStats.earned_rewards === 0 ? 'Start earning free data!' : `Worth $${((referralStats.earned_rewards / 1024) * 5).toFixed(2)}!`}
+                          </div>
+                        </div>
+
+                        {/* Pending Rewards */}
                         {referralStats.pending_rewards > 0 && (
-                          <div className="bg-yellow rounded-xl p-4 sm:p-6 border-2 border-secondary">
+                          <div className="bg-gradient-to-br from-purple to-primary rounded-xl p-4 sm:p-6 border-2 border-accent animate-pulse">
                             <div className="flex justify-between items-center mb-2">
-                              <span className="font-black uppercase text-xs sm:text-sm">
-                                Pending Data
+                              <span className="font-black uppercase text-xs sm:text-sm text-white">
+                                ⏳ Pending Data
                               </span>
-                              <span className="text-2xl sm:text-3xl font-black">
+                              <span className="text-2xl sm:text-3xl font-black text-white">
                                 {(referralStats.pending_rewards / 1024).toFixed(1)} GB
                               </span>
                             </div>
-                            <p className="text-xs font-bold text-muted-foreground mt-2">
-                              Will be credited once your friends' orders are completed
+                            <p className="text-xs font-bold text-white/80 mt-2">
+                              Almost there! Will be credited once orders complete
                             </p>
                           </div>
                         )}
                       </div>
+
+                      {/* Motivational CTA */}
+                      {referralStats.total_referrals === 0 && (
+                        <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-primary/20 text-center">
+                          <div className="text-3xl mb-2">🚀</div>
+                          <div className="text-sm font-black uppercase mb-2">GET STARTED!</div>
+                          <div className="text-xs font-bold text-foreground/70">
+                            Share your link and earn your first GB today!
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -1073,6 +1205,11 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Floating Referral Widget (Mobile FAB) */}
+      <div className="md:hidden">
+        <ReferralWidget floating={true} />
       </div>
     </div>
   );
