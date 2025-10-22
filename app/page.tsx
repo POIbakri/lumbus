@@ -434,9 +434,27 @@ export default function Home() {
                 Share Lumbus with friends and family. They save money, you get free data!
               </p>
 
-              {/* Gamification Elements */}
+              {/* TODO: Implement Gamification Backend - See docs/referral-gamification-implementation.md */}
+              {/*
+              COMMENTED OUT - NO BACKEND SUPPORT YET
+
+              Gamification Elements:
+              - Community Stats (Total GB earned)
+              - Leaderboard (Top referrers)
+              - Badges System (Bronze/Silver/Gold/Platinum)
+              - Milestones Tracking
+
+              These require:
+              1. Database tables for badges and milestones
+              2. API endpoints for stats aggregation
+              3. Dashboard integration
+              4. Real-time tracking
+
+              See implementation guide: docs/referral-gamification-implementation.md
+              */}
+
+              {/*
               <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                {/* Community Stats */}
                 <div className="bg-gradient-to-br from-mint to-cyan p-4 sm:p-6 rounded-2xl border-2 border-primary/30 shadow-lg">
                   <div className="text-4xl sm:text-5xl mb-2">🌟</div>
                   <div className="text-3xl sm:text-4xl font-black text-primary mb-2 animate-pulse">
@@ -447,7 +465,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Leaderboard Preview */}
                 <div className="bg-gradient-to-br from-yellow to-orange-300 p-4 sm:p-6 rounded-2xl border-2 border-secondary/30 shadow-lg">
                   <div className="text-4xl sm:text-5xl mb-2">🏆</div>
                   <div className="text-xl sm:text-2xl font-black text-foreground mb-2">
@@ -458,7 +475,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Milestones */}
                 <div className="bg-gradient-to-br from-purple to-primary p-4 sm:p-6 rounded-2xl border-2 border-accent/30 shadow-lg">
                   <div className="text-4xl sm:text-5xl mb-2">💎</div>
                   <div className="text-xl sm:text-2xl font-black text-foreground mb-2">
@@ -470,7 +486,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Progress Milestones */}
               <div className="bg-gradient-to-r from-primary/10 via-cyan/10 to-yellow/10 p-4 sm:p-6 rounded-2xl border-2 border-primary/20 mb-6 sm:mb-8">
                 <h3 className="text-base sm:text-lg font-black uppercase mb-4 text-foreground">
                   🎯 REFERRAL MILESTONES
@@ -498,6 +513,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+              */}
 
               {/* How It Works */}
               <div className="grid sm:grid-cols-3 gap-4 mb-6 sm:mb-8 text-left">
