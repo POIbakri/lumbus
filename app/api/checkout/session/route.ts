@@ -5,6 +5,7 @@ import { ensureUserProfile } from '@/lib/referral';
 import { getCurrencyForCheckout, convertToStripeAmount, formatPrice, detectCountryFromRequest } from '@/lib/currency';
 import { logger, redactEmail } from '@/lib/logger';
 import { z } from 'zod';
+import { generateOrderAccessToken } from '@/lib/order-token';
 
 // Lazy initialization - only create instance when needed
 let stripe: Stripe | null = null;
@@ -369,10 +370,13 @@ export async function POST(req: NextRequest) {
         console.error('[Checkout] Failed to trigger provisioning:', webhookError);
       }
 
+      // Generate secure token for order access
+      const accessToken = generateOrderAccessToken(order.id, user.id);
+
       // Return success URL directly (no Stripe session)
       const successUrl = isTopUp
         ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
-        : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?free=true`;
+        : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?token=${accessToken}`;
 
       console.log('[Checkout] Free order success! Redirecting to:', successUrl);
       return NextResponse.json({
@@ -410,9 +414,12 @@ export async function POST(req: NextRequest) {
       },
     ];
 
+    // Generate secure token for order access (for new users who aren't logged in yet)
+    const accessToken = generateOrderAccessToken(order.id, user.id);
+
     const successUrl = isTopUp
       ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
-      : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}`;
+      : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}&token=${accessToken}`;
 
     console.log('[Checkout] Calling Stripe API...');
     console.log('[Checkout] Stripe params:', {

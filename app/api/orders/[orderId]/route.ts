@@ -1,20 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, type Plan } from '@/lib/db';
 import { requireUserAuth } from '@/lib/server-auth';
+import { verifyOrderAccessToken } from '@/lib/order-token';
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
-    // Require authentication
-    const auth = await requireUserAuth(req);
-    if (auth.error) {
-      return auth.error;
-    }
-
-    const userId = auth.user.id;
     const { orderId } = await params;
+    const url = new URL(req.url);
+    const token = url.searchParams.get('token');
+
+    // Try to get authenticated user first
+    const auth = await requireUserAuth(req);
+    let userId = auth.error ? null : auth.user.id;
+
+    // If no authenticated user, require valid token
+    if (!userId) {
+      if (!token) {
+        return NextResponse.json({ error: 'Unauthorized - Authentication or valid token required' }, { status: 401 });
+      }
+
+      const tokenPayload = verifyOrderAccessToken(token);
+      if (!tokenPayload) {
+        return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+      }
+
+      // Verify token is for this specific order
+      if (tokenPayload.orderId !== orderId) {
+        return NextResponse.json({ error: 'Token does not match order' }, { status: 403 });
+      }
+
+      userId = tokenPayload.userId;
+      console.log('[Order API] Access granted via secure token for order:', orderId);
+    }
 
     const { data: order, error } = await supabase
       .from('orders')
@@ -41,9 +61,9 @@ export async function GET(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // Verify the order belongs to the authenticated user
+    // Verify ownership - userId is now from either auth or token
     if (order.user_id !== userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized - Order does not belong to this user' }, { status: 403 });
     }
 
     // **NEW: If order is provisioning, try to fetch activation details from eSIM Access**

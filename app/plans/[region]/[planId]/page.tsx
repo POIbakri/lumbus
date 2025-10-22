@@ -46,6 +46,7 @@ export default function PlanDetailPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [validatingCode, setValidatingCode] = useState(false);
   const [codeError, setCodeError] = useState('');
+  const [codeSuccess, setCodeSuccess] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
   const [showCountries, setShowCountries] = useState(false);
@@ -153,26 +154,26 @@ export default function PlanDetailPage() {
     setUserId(tempUserId);
   }, []);
 
-  const validateDiscountCode = async (code: string) => {
-    if (!code.trim()) {
-      setDiscountPercent(0);
-      setCodeError('');
+  const validateDiscountCode = async () => {
+    if (!discountCode.trim()) {
+      setCodeError('Please enter a discount code');
       return;
     }
 
     if (!userId) {
-      // Wait for userId to be set
+      setCodeError('Please wait...');
       return;
     }
 
     setValidatingCode(true);
     setCodeError('');
+    setCodeSuccess('');
     try {
       const response = await fetch('/api/discount-codes/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: code.trim(),
+          code: discountCode.trim(),
           userId: userId,
         }),
       });
@@ -182,13 +183,16 @@ export default function PlanDetailPage() {
       if (data.valid) {
         setDiscountPercent(data.discountPercent);
         setCodeError('');
+        setCodeSuccess(`${data.discountPercent}% discount applied! You save ${currencySymbol}${((basePrice * data.discountPercent) / 100).toFixed(2)}`);
       } else {
         setDiscountPercent(0);
-        setCodeError(data.error || 'Invalid code');
+        setCodeSuccess('');
+        setCodeError(data.error || 'Invalid discount code');
       }
     } catch (error) {
       setDiscountPercent(0);
-      setCodeError('Failed to validate code');
+      setCodeSuccess('');
+      setCodeError('Failed to validate code. Please try again.');
     } finally {
       setValidatingCode(false);
     }
@@ -470,19 +474,39 @@ export default function PlanDetailPage() {
                             <label htmlFor="discountCode" className="block font-bold uppercase text-xs mb-2">
                               Discount Code
                             </label>
-                            <input
-                              id="discountCode"
-                              type="text"
-                              value={discountCode}
-                              onChange={(e) => {
-                                const value = e.target.value.toUpperCase();
-                                setDiscountCode(value);
-                                validateDiscountCode(value);
-                              }}
-                              placeholder="SUMMER20"
-                              className="w-full px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
-                              disabled={loading || validatingCode}
-                            />
+                            <div className="flex gap-2">
+                              <input
+                                id="discountCode"
+                                type="text"
+                                value={discountCode}
+                                onChange={(e) => {
+                                  const value = e.target.value.toUpperCase();
+                                  setDiscountCode(value);
+                                  setCodeError('');
+                                  setCodeSuccess('');
+                                  if (!value.trim()) {
+                                    setDiscountPercent(0);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    validateDiscountCode();
+                                  }
+                                }}
+                                placeholder="SUMMER20"
+                                className="flex-1 px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
+                                disabled={loading || validatingCode}
+                              />
+                              <Button
+                                type="button"
+                                onClick={validateDiscountCode}
+                                disabled={loading || validatingCode || !discountCode.trim()}
+                                className="px-4 py-2.5 bg-primary text-white font-black uppercase text-xs rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {validatingCode ? '...' : 'APPLY'}
+                              </Button>
+                            </div>
                             {validatingCode && (
                               <p className="mt-2 text-xs sm:text-sm font-bold text-muted-foreground flex items-center gap-1.5">
                                 <span className="inline-block w-3 h-3 sm:w-4 sm:h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
@@ -495,11 +519,11 @@ export default function PlanDetailPage() {
                                 {codeError}
                               </p>
                             )}
-                            {discountPercent > 0 && !codeError && (
+                            {codeSuccess && (
                               <div className="mt-2 p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/30">
                                 <p className="text-xs sm:text-sm font-black text-primary flex items-center gap-1.5">
                                   <span className="text-sm sm:text-base">✓</span>
-                                  <span>{discountPercent}% discount applied! You save {currencySymbol}{discount.toFixed(2)}</span>
+                                  <span>{codeSuccess}</span>
                                 </p>
                               </div>
                             )}

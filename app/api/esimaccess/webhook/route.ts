@@ -70,15 +70,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, message: 'Health check OK' });
     }
 
-    // Verify webhook secret for all non-health check requests
-    const webhookSecret = process.env.ESIMACCESS_WEBHOOK_SECRET;
-    if (webhookSecret) {
-      const providedSecret = req.headers.get('x-webhook-secret');
-
-      if (providedSecret !== webhookSecret) {
-        return NextResponse.json({ error: 'Invalid secret' }, { status: 401 });
-      }
-    }
+    // Note: eSIM Access does not send webhook secrets in headers
+    // They only provide AccessCode and SecretKey for API authentication
+    // Security is provided by IP whitelist instead (optional)
 
     // IP whitelist verification (handle comma-separated x-forwarded-for)
     const forwardedFor = req.headers.get('x-forwarded-for');

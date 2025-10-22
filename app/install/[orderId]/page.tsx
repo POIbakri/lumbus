@@ -39,11 +39,32 @@ export default function InstallPage() {
 
   const loadOrder = useCallback(async () => {
     try {
-      const data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
+      // Extract token from URL if present
+      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const token = urlParams?.get('token');
+
+      // Try authenticated request first, fall back to token-based access
+      let data: OrderData;
+      try {
+        data = await authenticatedGet<OrderData>(`/api/orders/${params.orderId}`);
+      } catch (authError) {
+        // If authentication fails, use token if available
+        if (token) {
+          const response = await fetch(`/api/orders/${params.orderId}?token=${token}`);
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ error: 'Failed to load order' }));
+            throw new Error(errorData.error || 'Failed to load order');
+          }
+          data = await response.json();
+        } else {
+          throw new Error('Unauthorized - Please log in to view this order');
+        }
+      }
       setOrder(data);
       setLoading(false); // Always stop loading after first fetch
     } catch (err) {
-      setError('Failed to load order. Please check your email for activation details.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load order';
+      setError(`${errorMessage} Please check your email for activation details.`);
       setLoading(false);
     }
   }, [params.orderId]);
@@ -127,9 +148,33 @@ export default function InstallPage() {
                   <p className="text-lg font-bold mb-2">
                     Setting up your eSIM...
                   </p>
-                  <p className="text-sm font-bold text-muted-foreground mb-6">
-                    This usually takes 10-30 seconds. You'll receive an email with installation instructions once ready.
-                  </p>
+                  {!user ? (
+                    <div className="space-y-4">
+                      <p className="text-sm font-bold text-muted-foreground mb-6">
+                        This usually takes 10-30 seconds. You'll receive an email with installation instructions once ready.
+                      </p>
+                      <div className="p-4 bg-gradient-to-r from-purple to-purple/80 border-3 border-foreground rounded-xl shadow-lg">
+                        <p className="text-white font-black text-base mb-2">
+                          📧 CHECK YOUR EMAIL!
+                        </p>
+                        <p className="text-white/90 font-bold text-sm">
+                          We'll send you:
+                        </p>
+                        <ul className="text-white/90 font-bold text-sm space-y-1 mt-2 text-left max-w-sm mx-auto">
+                          <li>• Your eSIM activation QR code</li>
+                          <li>• Installation instructions</li>
+                          <li>• Account setup link (to set your password)</li>
+                        </ul>
+                      </div>
+                      <p className="text-xs font-bold text-muted-foreground mt-4">
+                        💡 This page will automatically update when your eSIM is ready. Keep this tab open or check your email!
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-bold text-muted-foreground mb-6">
+                      This usually takes 10-30 seconds. You'll receive an email with installation instructions once ready.
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6 p-4 bg-white rounded-xl space-y-3">
