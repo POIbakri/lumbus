@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { topUpEsim, assignEsim } from '@/lib/esimaccess';
+import { sendTopUpConfirmationEmail } from '@/lib/email';
 
 const validateReceiptSchema = z.object({
   receipt: z.string(), // Base64 encoded receipt from Apple
   orderId: z.string().uuid(),
   transactionId: z.string().optional(), // Apple transaction ID
+  isTopUp: z.boolean().optional(), // Whether this is a top-up purchase
+  iccid: z.string().optional(), // ICCID for top-up purchases
 });
 
 /**
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
       transactionId: body.transactionId
     });
 
-    const { receipt, orderId, transactionId } = validateReceiptSchema.parse(body);
+    const { receipt, orderId, transactionId, isTopUp, iccid } = validateReceiptSchema.parse(body);
 
     // Get order details
     console.log('[IAP Validate] Fetching order:', orderId);
@@ -50,6 +54,12 @@ export async function POST(req: NextRequest) {
     if (orderError || !order) {
       console.error('[IAP Validate] Order not found:', orderError);
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    // Validate top-up request has ICCID
+    if (isTopUp && !iccid) {
+      console.error('[IAP Validate] Top-up request missing ICCID');
+      return NextResponse.json({ error: 'ICCID required for top-up' }, { status: 400 });
     }
 
     // Check if already processed
@@ -102,47 +112,104 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
     }
 
-    // Trigger eSIM provisioning
-    console.log('[IAP Validate] Triggering eSIM provisioning...');
-    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/stripe/webhook`;
+    // Trigger eSIM provisioning or top-up
+    console.log('[IAP Validate] Triggering eSIM provisioning/top-up...');
 
     try {
-      // Call internal webhook to provision eSIM
-      // We reuse the Stripe webhook handler since it has all the provisioning logic
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.INTERNAL_WEBHOOK_SECRET || '',
-        },
-        body: JSON.stringify({
-          type: 'checkout.session.completed',
-          data: {
-            object: {
-              id: 'apple_' + order.id,
-              customer_email: user.email,
-              amount_total: appleValidation.amountCents || 0,
-              currency: order.currency || 'USD',
-              payment_status: 'paid',
-              metadata: {
-                orderId: order.id,
-                planId: plan.id,
-                userId: user.id,
-                userEmail: user.email,
-                needsPasswordSetup: 'false', // User already created
-                source: 'apple_iap',
-                appleTransactionId: appleValidation.transactionId,
-                appleProductId: appleValidation.productId,
-              },
-            },
-          },
-        }),
-      });
+      if (isTopUp && iccid) {
+        // Top-up existing eSIM
+        console.log('[IAP Validate] Processing top-up for ICCID:', iccid);
 
-      console.log('[IAP Validate] Provisioning triggered successfully');
+        // Get existing order to retrieve esimTranNo
+        const { data: existingOrderForTopUp } = await supabase
+          .from('orders')
+          .select('esim_tran_no, iccid')
+          .eq('user_id', user.id)
+          .eq('iccid', iccid)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        const esimTranNo = existingOrderForTopUp?.esim_tran_no;
+
+        // Generate unique transaction ID
+        const topUpTransactionId = `apple_topup_${orderId}_${Date.now()}`;
+
+        const topUpResponse = await topUpEsim({
+          iccid: esimTranNo ? undefined : iccid, // Use iccid only if no esimTranNo
+          esimTranNo: esimTranNo || undefined,
+          packageCode: plan.supplier_sku,
+          transactionId: topUpTransactionId,
+          amount: plan.retail_price.toString(),
+        });
+
+        if (topUpResponse.success) {
+          // Update order with top-up details
+          await supabase
+            .from('orders')
+            .update({
+              status: 'completed',
+              iccid: topUpResponse.iccid,
+              data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+              data_usage_bytes: topUpResponse.orderUsage,
+              last_usage_update: new Date().toISOString(),
+            })
+            .eq('id', orderId);
+
+          // Send top-up confirmation email
+          try {
+            await sendTopUpConfirmationEmail({
+              to: user.email,
+              planName: plan.name,
+              dataAdded: plan.data_gb,
+              validityDays: plan.validity_days,
+              iccid: topUpResponse.iccid,
+            });
+          } catch (emailError) {
+            console.error('[IAP Validate] Failed to send top-up email:', emailError);
+            // Don't fail the request
+          }
+
+          console.log('[IAP Validate] Top-up completed successfully');
+        } else {
+          throw new Error('Top-up failed');
+        }
+      } else {
+        // Assign new eSIM
+        console.log('[IAP Validate] Provisioning new eSIM...');
+
+        const esimResponse = await assignEsim({
+          packageId: plan.supplier_sku,
+          email: user.email,
+          reference: orderId,
+        });
+
+        // Update order with initial eSIM details
+        // Status is 'provisioning' until we get activation details from ORDER_STATUS webhook
+        await supabase
+          .from('orders')
+          .update({
+            status: 'provisioning',
+            connect_order_id: esimResponse.orderId,
+            iccid: esimResponse.iccid || null,
+          })
+          .eq('id', orderId);
+
+        console.log('[IAP Validate] New eSIM provisioning initiated');
+      }
     } catch (provisionError) {
-      console.error('[IAP Validate] Failed to trigger provisioning:', provisionError);
-      // Don't fail the request - provisioning will be retried
+      console.error('[IAP Validate] Failed to provision/top-up:', provisionError);
+
+      // Mark order as failed
+      await supabase
+        .from('orders')
+        .update({ status: 'failed' })
+        .eq('id', orderId);
+
+      return NextResponse.json({
+        error: 'Provisioning failed',
+        details: provisionError instanceof Error ? provisionError.message : 'Unknown error'
+      }, { status: 500 });
     }
 
     console.log('[IAP Validate] Success! Receipt validated and order processed');
