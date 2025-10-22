@@ -9,6 +9,8 @@ import { Nav } from '@/components/nav';
 import { Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
+import { ProductSchema } from '@/components/structured-data';
+import { PaymentLogosCompact } from '@/components/payment-logos';
 import Link from 'next/link';
 
 // Format data amounts to clean values
@@ -236,6 +238,9 @@ export default function PlanDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      {plan && <ProductSchema plan={plan} />}
+
       {/* Navigation */}
       <Nav />
 
@@ -461,10 +466,12 @@ export default function PlanDetailPage() {
                       {loading ? 'PROCESSING...' : 'PROCEED TO CHECKOUT'}
                     </Button>
 
+                    {/* Payment Trust Badges */}
+                    <div className="py-4">
+                      <PaymentLogosCompact />
+                    </div>
+
                     <div className="space-y-2">
-                      <p className="text-xs sm:text-sm text-center font-bold uppercase text-muted-foreground">
-                        🔒 Secure payment via Stripe
-                      </p>
                       <p className="text-xs text-center text-muted-foreground leading-relaxed">
                         By proceeding, you agree to our{' '}
                         <Link href="/terms" target="_blank" className="text-primary hover:underline font-bold">

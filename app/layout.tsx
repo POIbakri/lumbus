@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data";
 import { Analytics } from "@vercel/analytics/next";
 import { WelcomePopup } from "@/components/welcome-popup";
+import { CookieConsent } from "@/components/cookie-consent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -152,6 +153,7 @@ export default function RootLayout({
           {children}
         </AuthProvider>
         <WelcomePopup />
+        <CookieConsent />
         <Analytics />
         <script
           dangerouslySetInnerHTML={{

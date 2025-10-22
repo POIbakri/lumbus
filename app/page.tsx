@@ -6,6 +6,7 @@ import { LocationBanner } from '@/components/location-banner';
 import { PopularPlansSection } from '@/components/popular-plans-section';
 import { Nav } from '@/components/nav';
 import { AuthRecoveryHandler } from '@/components/auth-recovery-handler';
+import { PaymentLogos, PaymentLogosCompact } from '@/components/payment-logos';
 
 export default function Home() {
 
@@ -48,9 +49,9 @@ export default function Home() {
           {/* Home Usage Badge - Visual Element */}
           <div className="mb-8 px-4" style={{animationDelay: '0.25s'}}>
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-yellow border-2 border-foreground shadow-lg">
-              <span className="text-base sm:text-lg">🏠</span>
+              <span className="text-base sm:text-lg" aria-hidden="true">🏠</span>
               <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Also Works At Home</span>
-              <span className="text-base sm:text-lg">📱</span>
+              <span className="text-base sm:text-lg" aria-hidden="true">📱</span>
             </div>
           </div>
 
@@ -73,26 +74,37 @@ export default function Home() {
             </Link>
           </div>
 
+          {/* Device Compatibility Callout */}
+          <div className="mt-8 px-4" style={{animationDelay: '0.4s'}}>
+            <Link href="/device" className="group inline-block">
+              <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl bg-white border-2 border-primary/30 hover:border-primary shadow-lg hover:shadow-xl transition-all">
+                <span className="text-xl sm:text-2xl" aria-hidden="true">📱</span>
+                <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Check Device Compatibility</span>
+                <span className="text-sm sm:text-base group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            </Link>
+          </div>
+
           {/* Trust Indicators */}
           <div className="mt-16 flex flex-wrap justify-center gap-8 items-center opacity-60 " style={{animationDelay: '0.5s'}}>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">⭐</div>
+              <div className="text-2xl" aria-hidden="true">⭐</div>
               <span className="font-bold text-sm">5.0 Rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">✨</div>
+              <div className="text-2xl" aria-hidden="true">✨</div>
               <span className="font-bold text-sm">No Signup Required</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">🔒</div>
+              <div className="text-2xl" aria-hidden="true">🔒</div>
               <span className="font-bold text-sm">Secure Checkout</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">🚀</div>
+              <div className="text-2xl" aria-hidden="true">🚀</div>
               <span className="font-bold text-sm">Instant Delivery</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl">🏠</div>
+              <div className="text-2xl" aria-hidden="true">🏠</div>
               <span className="font-bold text-sm">Works At Home</span>
             </div>
           </div>
@@ -135,6 +147,11 @@ export default function Home() {
               HOW IT WORKS
             </h2>
             <p className="text-xl font-bold opacity-70">Three steps to global connectivity</p>
+          </div>
+
+          {/* Payment Methods & Trust Seals */}
+          <div className="mb-16">
+            <PaymentLogos />
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 max-w-6xl mx-auto">
@@ -191,7 +208,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
               <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
-                ⚡ Quick Start
+                <span aria-hidden="true">⚡</span> Quick Start
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
@@ -360,7 +377,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             <Card className="bg-mint border-2 border-foreground/5 rounded-3xl   overflow-hidden">
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6">⚡</div>
+                <div className="text-6xl mb-6" aria-hidden="true">⚡</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">INSTANT</h3>
                 <p className="font-bold opacity-70">Activate in seconds, not hours</p>
               </CardContent>
@@ -368,7 +385,7 @@ export default function Home() {
 
             <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.1s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6">🌍</div>
+                <div className="text-6xl mb-6" aria-hidden="true">🌍</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">GLOBAL</h3>
                 <p className="font-bold opacity-70">Works abroad & at home</p>
               </CardContent>
@@ -376,7 +393,7 @@ export default function Home() {
 
             <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.2s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6">💳</div>
+                <div className="text-6xl mb-6" aria-hidden="true">💳</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">FLEXIBLE</h3>
                 <p className="font-bold opacity-70">Use as backup data anytime</p>
               </CardContent>
@@ -384,7 +401,7 @@ export default function Home() {
 
             <Card className="bg-purple border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.3s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6">🔒</div>
+                <div className="text-6xl mb-6" aria-hidden="true">🔒</div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SECURE</h3>
                 <p className="font-bold opacity-70">Bank-level encryption</p>
               </CardContent>
@@ -399,7 +416,7 @@ export default function Home() {
           <div className="text-center mb-20 ">
             <div className="inline-block mb-4">
               <span className="px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
-                ⭐ Trusted by Travelers
+                <span aria-hidden="true">⭐</span> Trusted by Travelers
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
@@ -411,12 +428,12 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
             {/* Testimonial 1 */}
             <div className="bg-mint p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 ">
-              <div className="flex gap-1 mb-4">
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
+              <div className="flex gap-1 mb-4" aria-label="5 star rating">
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "Saved me hundreds on my Europe trip! Setup was instant and worked perfectly in every country."
@@ -434,12 +451,12 @@ export default function Home() {
 
             {/* Testimonial 2 */}
             <div className="bg-cyan p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 " style={{animationDelay: '0.1s'}}>
-              <div className="flex gap-1 mb-4">
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
+              <div className="flex gap-1 mb-4" aria-label="5 star rating">
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "Best travel purchase ever. No more hunting for WiFi or paying crazy roaming fees!"
@@ -457,12 +474,12 @@ export default function Home() {
 
             {/* Testimonial 3 */}
             <div className="bg-yellow p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
-              <div className="flex gap-1 mb-4">
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
-                <span className="text-xl sm:text-2xl">⭐</span>
+              <div className="flex gap-1 mb-4" aria-label="5 star rating">
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "So easy! Bought before my flight, activated when I landed. Connected in seconds!"
@@ -487,7 +504,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-3xl border-4 border-foreground shadow-2xl">
             <div className="inline-block mb-4 sm:mb-6">
               <span className="px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
-                🎁 REFER & EARN
+                <span aria-hidden="true">🎁</span> REFER & EARN
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight px-2">
@@ -509,7 +526,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="inline-flex items-center gap-2 bg-yellow/50 border-2 border-foreground px-4 sm:px-6 py-2 sm:py-3 rounded-full">
-              <span className="text-xl sm:text-2xl">🚀</span>
+              <span className="text-xl sm:text-2xl" aria-hidden="true">🚀</span>
               <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
             </div>
           </div>
@@ -522,7 +539,7 @@ export default function Home() {
           <div className="">
             <div className="inline-block mb-6 sm:mb-8">
               <span className="px-4 sm:px-6 py-2 rounded-full bg-white/20 border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
-                🚀 JOIN 10,000+ HAPPY TRAVELERS
+                <span aria-hidden="true">🚀</span> JOIN 10,000+ HAPPY TRAVELERS
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight">
@@ -555,10 +572,11 @@ export default function Home() {
               <Link href="/" className="inline-block mb-4">
                 <Image
                   src="/logo.jpg"
-                  alt="Lumbus"
+                  alt="Lumbus - Global eSIM Provider"
                   width={300}
                   height={80}
                   className="h-16 w-auto sm:h-20 md:h-24 lg:h-28"
+                  loading="lazy"
                 />
               </Link>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>

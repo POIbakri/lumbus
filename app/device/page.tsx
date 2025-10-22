@@ -44,7 +44,7 @@ export default function DevicePage() {
         <div className="container mx-auto text-center">
           <div className="inline-block mb-4 sm:mb-6">
             <span className="px-4 sm:px-6 py-2 rounded-full bg-white/30 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
-              📱 eSIM Compatible
+              <span aria-hidden="true">📱</span> eSIM Compatible
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
@@ -73,7 +73,9 @@ export default function DevicePage() {
             {/* iPhone Check */}
             <Card className="bg-mint border-2 border-foreground/10 ">
               <CardContent className="p-8">
-                <div className="text-6xl mb-6 text-center">🍎</div>
+                <div className="flex justify-center mb-6">
+                  <Image src="/apple-logo.jpg" alt="Apple" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                </div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For iPhone</h3>
                 <div className="space-y-4">
                   <div className="flex gap-4">
@@ -104,7 +106,9 @@ export default function DevicePage() {
             {/* Android Check */}
             <Card className="bg-yellow border-2 border-foreground/10 ">
               <CardContent className="p-8">
-                <div className="text-6xl mb-6 text-center">🤖</div>
+                <div className="flex justify-center mb-6">
+                  <Image src="/android-logo.png" alt="Android" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                </div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For Android</h3>
                 <div className="space-y-4">
                   <div className="flex gap-4">
@@ -151,8 +155,10 @@ export default function DevicePage() {
             {/* Apple Devices */}
             <Card className="border-2 border-foreground/10">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">🍎</div>
-                <h3 className="font-black text-xl mb-6 uppercase">Apple Devices</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <Image src="/apple-logo.jpg" alt="Apple" width={40} height={40} className="w-10 h-10 object-contain" />
+                  <h3 className="font-black text-xl uppercase">Apple Devices</h3>
+                </div>
                 <ul className="space-y-3">
                   {appleDevices.map((device) => (
                     <li key={device} className="flex gap-3">
@@ -167,8 +173,10 @@ export default function DevicePage() {
             {/* Android Devices */}
             <Card className="border-2 border-foreground/10">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">🤖</div>
-                <h3 className="font-black text-xl mb-6 uppercase">Android Devices</h3>
+                <div className="flex items-center gap-3 mb-4">
+                  <Image src="/android-logo.png" alt="Android" width={40} height={40} className="w-10 h-10 object-contain" />
+                  <h3 className="font-black text-xl uppercase">Android Devices</h3>
+                </div>
                 <ul className="space-y-3">
                   {androidDevices.map((device) => (
                     <li key={device} className="flex gap-3">
@@ -183,7 +191,7 @@ export default function DevicePage() {
             {/* Other Devices */}
             <Card className="border-2 border-foreground/10">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">💻</div>
+                <div className="text-5xl mb-4" aria-hidden="true">💻</div>
                 <h3 className="font-black text-xl mb-6 uppercase">Other Devices</h3>
                 <ul className="space-y-3">
                   {otherDevices.map((device) => (
@@ -216,7 +224,7 @@ export default function DevicePage() {
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="bg-purple border-2 border-foreground/10">
               <CardContent className="p-8">
-                <div className="text-4xl mb-4">✓</div>
+                <div className="text-4xl mb-4" aria-hidden="true">✓</div>
                 <h3 className="font-black text-xl mb-4 uppercase">Required</h3>
                 <ul className="space-y-3">
                   <li className="flex gap-3">
@@ -237,7 +245,7 @@ export default function DevicePage() {
 
             <Card className="bg-mint border-2 border-foreground/10">
               <CardContent className="p-8">
-                <div className="text-4xl mb-4">ⓘ</div>
+                <div className="text-4xl mb-4" aria-hidden="true">ⓘ</div>
                 <h3 className="font-black text-xl mb-4 uppercase">Important Notes</h3>
                 <ul className="space-y-3">
                   <li className="flex gap-3">
@@ -291,10 +299,11 @@ export default function DevicePage() {
               <Link href="/" className="inline-block mb-4">
                 <Image
                   src="/logo.jpg"
-                  alt="Lumbus"
+                  alt="Lumbus - Global eSIM Provider"
                   width={300}
                   height={80}
                   className="h-16 w-auto sm:h-20 md:h-24 lg:h-28"
+                  loading="lazy"
                 />
               </Link>
               <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
