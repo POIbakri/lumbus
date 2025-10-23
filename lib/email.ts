@@ -39,10 +39,17 @@ function createEmailTemplate(params: {
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
+        /* Tablet and medium screens */
+        @media screen and (max-width: 768px) {
+            .mobile-padding { padding: 30px 40px !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+        }
+
+        /* Mobile phones */
         @media screen and (max-width: 600px) {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             h3 { font-size: 18px !important; }
@@ -61,6 +68,8 @@ function createEmailTemplate(params: {
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .code-box { font-size: 11px !important; padding: 12px !important; }
+            .qr-image { max-width: 250px !important; }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
@@ -71,10 +80,23 @@ function createEmailTemplate(params: {
             .stat-value { font-size: 28px !important; }
             .big-number { font-size: 36px !important; }
         }
+
+        /* Very small phones */
+        @media screen and (max-width: 400px) {
+            .mobile-padding { padding: 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+            h3 { font-size: 16px !important; }
+            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
+            .code-box { font-size: 10px !important; padding: 10px !important; }
+            .qr-image { max-width: 200px !important; }
+            .big-number { font-size: 32px !important; }
+            .stat-value { font-size: 24px !important; }
+        }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
@@ -96,7 +118,7 @@ function createEmailTemplate(params: {
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                             Need help? Contact us at <a href="mailto:support@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@lumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
@@ -202,9 +224,9 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
   const { to, orderDetails, activationDetails, installUrl } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">✅ Your eSIM is Ready!</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Your eSIM is Ready!</h2>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Your Lumbus eSIM has been activated and is ready to use!
     </p>
 
@@ -212,7 +234,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       <h3 style="margin: 0 0 15px; font-size: 20px; font-weight: 700; color: #1A1A1A;">${orderDetails.planName}</h3>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
-          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
             <strong>📊 Data:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -220,7 +242,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
           </td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
             <strong>⏰ Valid for:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -239,9 +261,9 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       </ol>
     </div>
 
-    <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #F9FAFB; border-radius: 12px;">
+    <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
       <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Scan this QR Code</h3>
-      <img src="${activationDetails.qrUrl}" alt="eSIM QR Code" style="max-width: 300px; width: 100%; height: auto;" />
+      <img src="${activationDetails.qrUrl}" alt="eSIM QR Code" class="qr-image" style="max-width: 300px; width: 100%; height: auto;" />
     </div>
 
     <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -254,39 +276,39 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       </tr>
     </table>
 
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Or enter manually:</h3>
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Or enter manually:</h3>
 
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">SM-DP+ Address</p>
-        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">SM-DP+ Address</p>
+        <div class="code-box" style="background: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; overflow-wrap: break-word; word-wrap: break-word; color: #1A1A1A;">
           ${activationDetails.smdp}
         </div>
       </div>
 
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">Activation Code</p>
-        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">Activation Code</p>
+        <div class="code-box" style="background: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; overflow-wrap: break-word; word-wrap: break-word; color: #1A1A1A;">
           ${activationDetails.activationCode}
         </div>
       </div>
 
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">LPA String</p>
-        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 12px; word-break: break-all; color: #1A1A1A;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">LPA String</p>
+        <div class="code-box" style="background: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 12px; overflow-wrap: break-word; word-wrap: break-word; color: #1A1A1A;">
           ${activationDetails.lpaString}
         </div>
       </div>
     </div>
 
     ${activationDetails.iccid || activationDetails.activateBeforeDate || activationDetails.apn ? `
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1d1d1f;">Technical Details:</h3>
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+      <h3 style="margin: 0 0 20px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Technical Details:</h3>
 
       ${activationDetails.iccid ? `
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">ICCID</p>
-        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">ICCID</p>
+        <div class="code-box" style="background: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; overflow-wrap: break-word; word-wrap: break-word; color: #1A1A1A;">
           ${activationDetails.iccid}
         </div>
       </div>
@@ -294,11 +316,11 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
 
       ${activationDetails.activateBeforeDate ? `
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">Activate Before</p>
-        <div style="background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 8px; padding: 15px; font-size: 14px; color: #1A1A1A; font-weight: 600;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">Activate Before</p>
+        <div style="background: #FDFD74; border: 2px solid #1A1A1A; border-radius: 8px; padding: 15px; font-size: 14px; color: #1A1A1A; font-weight: 600;">
           ⏰ ${activationDetails.activateBeforeDate}
         </div>
-        <p style="margin: 8px 0 0; font-size: 12px; color: #86868b;">
+        <p style="margin: 8px 0 0; font-size: 12px; color: #666666;">
           Please activate your eSIM before this date to ensure it works properly
         </p>
       </div>
@@ -306,11 +328,11 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
 
       ${activationDetails.apn ? `
       <div style="margin: 0 0 20px;">
-        <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; font-weight: 700; text-transform: uppercase;">APN (Access Point Name)</p>
-        <div style="background: #F3F4F6; border: 2px solid #e5e5e7; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; word-break: break-all; color: #1A1A1A;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">APN (Access Point Name)</p>
+        <div class="code-box" style="background: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px; padding: 15px; font-family: monospace; font-size: 13px; overflow-wrap: break-word; word-wrap: break-word; color: #1A1A1A;">
           ${activationDetails.apn}
         </div>
-        <p style="margin: 8px 0 0; font-size: 12px; color: #86868b;">
+        <p style="margin: 8px 0 0; font-size: 12px; color: #666666;">
           Usually configured automatically. Manual setup is rarely needed.
         </p>
       </div>
@@ -357,9 +379,9 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
   const alertEmoji = isUrgent ? '🚨' : isWarning ? '⚠️' : 'ℹ️';
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">${alertEmoji} Data Usage ${alertLevel}</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">${alertEmoji} Data Usage ${alertLevel}</h2>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       This is a ${alertLevel.toLowerCase()} about your data usage for <strong>${planName}</strong>.
     </p>
 
@@ -377,15 +399,15 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
     <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin: 0 0 30px;">
       <tr>
         <td class="stat-card mobile-stack" width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
-          <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Data Used</p>
+          <p style="margin: 0 0 5px; font-size: 12px; color: #666666; text-transform: uppercase; font-weight: 700;">Data Used</p>
           <p class="stat-value" style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataUsedGB.toFixed(2)} GB</p>
-          <p style="margin: 0; font-size: 14px; color: #515154;">of ${totalDataGB.toFixed(2)} GB</p>
+          <p style="margin: 0; font-size: 14px; color: #666666;">of ${totalDataGB.toFixed(2)} GB</p>
         </td>
         <td class="mobile-hide" width="4%"></td>
         <td class="stat-card mobile-stack" width="48%" style="padding: 20px; background: #E0FEF7; border-radius: 12px; text-align: center;">
-          <p style="margin: 0 0 5px; font-size: 12px; color: #86868b; text-transform: uppercase; font-weight: 700;">Remaining</p>
+          <p style="margin: 0 0 5px; font-size: 12px; color: #666666; text-transform: uppercase; font-weight: 700;">Remaining</p>
           <p class="stat-value" style="margin: 0 0 5px; font-size: 32px; font-weight: 900; color: #1A1A1A;">${dataRemainingGB.toFixed(2)} GB</p>
-          <p style="margin: 0; font-size: 14px; color: #515154;">${(100 - usagePercent).toFixed(0)}% left</p>
+          <p style="margin: 0; font-size: 14px; color: #666666;">${(100 - usagePercent).toFixed(0)}% left</p>
         </td>
       </tr>
     </table>
@@ -398,16 +420,16 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
         </p>
       </div>
     ` : isWarning ? `
-      <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 2px solid #1A1A1A;">
         <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">⚠️ WARNING: HIGH DATA USAGE</p>
-        <p style="margin: 0; font-size: 14px; color: #515154; font-weight: 600; line-height: 1.6;">
+        <p style="margin: 0; font-size: 14px; color: #666666; font-weight: 600; line-height: 1.6;">
           You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You may want to monitor your usage or purchase a top-up soon.
         </p>
       </div>
     ` : `
       <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
         <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">ℹ️ NOTICE: DATA USAGE UPDATE</p>
-        <p style="margin: 0; font-size: 14px; color: #515154; font-weight: 600; line-height: 1.6;">
+        <p style="margin: 0; font-size: 14px; color: #666666; font-weight: 600; line-height: 1.6;">
           You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You still have plenty of data remaining.
         </p>
       </div>
@@ -423,13 +445,13 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
       </tr>
     </table>
 
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
       <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 Tips to manage your data:</p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Use Wi-Fi when available</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Disable automatic app updates over cellular</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Monitor streaming quality settings</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Check background app refresh settings</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Use Wi-Fi when available</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Disable automatic app updates over cellular</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Monitor streaming quality settings</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Check background app refresh settings</p></td></tr>
       </table>
     </div>
   `;
@@ -465,16 +487,16 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
   const { to, planName, daysRemaining, expiryDate } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">⏰ Plan Expiring Soon</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">⏰ Plan Expiring Soon</h2>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Your <strong>${planName}</strong> plan is expiring soon.
     </p>
 
-    <div style="margin: 0 0 30px; padding: 30px; background: #FEF3C7; border: 3px solid #F59E0B; border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Expires In</p>
+    <div style="margin: 0 0 30px; padding: 30px; background: #FDFD74; border: 3px solid #1A1A1A; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Expires In</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</p>
-      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">Expiry Date: ${expiryDate}</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Expiry Date: ${expiryDate}</p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
@@ -494,13 +516,13 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
       </tr>
     </table>
 
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
       <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">What happens when my plan expires?</p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data connectivity will stop</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> You can still top-up your eSIM with a new plan</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM profile will remain on your device</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> No action needed if you're done traveling</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data connectivity will stop</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> You can still top-up your eSIM with a new plan</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM profile will remain on your device</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> No action needed if you're done traveling</p></td></tr>
       </table>
     </div>
   `;
@@ -536,22 +558,22 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
   const { to, referredUserEmail, rewardAmount, referralCode } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">🎉 Referral Reward!</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">🎉 Referral Reward!</h2>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Great news! Someone used your referral code and made their first purchase. You've earned a reward!
     </p>
 
     <div style="margin: 0 0 30px; padding: 30px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">You Earned</p>
+      <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">You Earned</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${rewardAmount}</p>
-      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">🎊 Added to your wallet!</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">🎊 Added to your wallet!</p>
     </div>
 
-    <div style="margin: 0 0 30px; padding: 20px; background-color: #F3F4F6; border-radius: 12px;">
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
-          <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
             <strong>Referred user:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
@@ -559,7 +581,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
           </td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
             <strong>Your referral code:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700; font-family: monospace;">
@@ -569,7 +591,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
       </table>
     </div>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Your reward has been added to your Lumbus wallet and can be used on your next purchase!
     </p>
 
@@ -583,9 +605,9 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
       </tr>
     </table>
 
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
       <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A; text-align: center;">Keep sharing and earning!</p>
-      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #515154; text-align: center;">
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
         Share your referral code <strong>${referralCode}</strong> with friends and family. You'll earn rewards for every purchase they make, and they'll get a discount too!
       </p>
     </div>
@@ -622,23 +644,23 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
   const { to, planName, dataAdded, validityDays, iccid } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">✅ Top-Up Successful!</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Top-Up Successful!</h2>
 
-    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Great news! Your eSIM has been successfully topped up with additional data.
     </p>
 
     <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Data Added</p>
+      <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Data Added</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
-      <p style="margin: 0; font-size: 16px; color: #515154; font-weight: 600;">📶 Ready to use!</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">📶 Ready to use!</p>
     </div>
 
-    <div style="margin: 0 0 30px; padding: 25px; background-color: #F3F4F6; border-radius: 12px;">
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
       <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Top-Up Details</h3>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
-          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
             <strong>Plan:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -646,7 +668,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
           </td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
             <strong>Data Added:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -654,7 +676,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
           </td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; font-size: 15px; color: #515154;">
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
             <strong>Validity:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -671,9 +693,9 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
       </p>
     </div>
 
-    <div style="margin: 0 0 20px; padding: 15px; background-color: #F9FAFB; border: 2px solid #e5e5e7; border-radius: 8px;">
-      <p style="margin: 0 0 8px; font-size: 14px; color: #86868b; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">ICCID</p>
-      <p style="margin: 0; font-size: 12px; color: #1A1A1A; font-family: monospace; word-break: break-all;">
+    <div class="code-box" style="margin: 0 0 20px; padding: 15px; background-color: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px;">
+      <p style="margin: 0 0 8px; font-size: 14px; color: #666666; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">ICCID</p>
+      <p style="margin: 0; font-size: 12px; color: #1A1A1A; font-family: monospace; overflow-wrap: break-word; word-wrap: break-word;">
         ${iccid}
       </p>
     </div>
@@ -688,17 +710,17 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
       </tr>
     </table>
 
-    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
       <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 How it works:</p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data is added to your existing eSIM instantly</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Validity period resets from the top-up date</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> No need to scan a new QR code or reinstall</p></td></tr>
-        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #515154;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM continues working seamlessly</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data is added to your existing eSIM instantly</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Validity period resets from the top-up date</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> No need to scan a new QR code or reinstall</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Your eSIM continues working seamlessly</p></td></tr>
       </table>
     </div>
 
-    <p style="margin: 30px 0 0; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+    <p style="margin: 30px 0 0; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Need more data? Visit your <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="color: #2EFECC; font-weight: 700; text-decoration: none;">dashboard</a> to top up again!
     </p>
   `;
@@ -754,10 +776,17 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
+        /* Tablet and medium screens */
+        @media screen and (max-width: 768px) {
+            .mobile-padding { padding: 30px 40px !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+        }
+
+        /* Mobile phones */
         @media screen and (max-width: 600px) {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             h3 { font-size: 18px !important; }
@@ -776,6 +805,8 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .code-box { font-size: 11px !important; padding: 12px !important; }
+            .qr-image { max-width: 250px !important; }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
@@ -786,10 +817,23 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
             .stat-value { font-size: 28px !important; }
             .big-number { font-size: 36px !important; }
         }
+
+        /* Very small phones */
+        @media screen and (max-width: 400px) {
+            .mobile-padding { padding: 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+            h3 { font-size: 16px !important; }
+            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
+            .code-box { font-size: 10px !important; padding: 10px !important; }
+            .qr-image { max-width: 200px !important; }
+            .big-number { font-size: 32px !important; }
+            .stat-value { font-size: 24px !important; }
+        }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
@@ -802,31 +846,31 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
 
                     <tr>
                         <td class="mobile-padding" style="padding: 40px 60px;">
-                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">Application Received!</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Received!</h2>
 
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Hi ${displayName}! 👋
                             </p>
 
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Thank you for applying to the Lumbus Affiliate Program! We've received your application and will review it within 1-2 business days.
                             </p>
 
                             <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
                                 <p style="margin: 0 0 10px; font-size: 14px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">Application Details</p>
-                                <p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                <p style="margin: 5px 0; font-size: 14px; color: #666666;">
                                     <strong>Name/Brand:</strong> ${displayName}
                                 </p>
-                                ${website ? `<p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                ${website ? `<p style="margin: 5px 0; font-size: 14px; color: #666666;">
                                     <strong>Website:</strong> ${website}
                                 </p>` : ''}
-                                <p style="margin: 5px 0; font-size: 14px; color: #515154;">
+                                <p style="margin: 5px 0; font-size: 14px; color: #666666;">
                                     <strong>Email:</strong> ${applicantEmail}
                                 </p>
                             </div>
 
-                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1d1d1f; text-align: center;">
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1A1A1A; text-align: center;">
                                     What Happens Next?
                                 </h3>
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -838,7 +882,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">1</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">We'll review your application within 1-2 business days</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">We'll review your application within 1-2 business days</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -852,7 +896,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">2</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">You'll receive an email with our decision</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">You'll receive an email with our decision</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -866,7 +910,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">3</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">If approved, you'll get access to your affiliate dashboard</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">If approved, you'll get access to your affiliate dashboard</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -882,7 +926,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                             Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
@@ -943,10 +987,17 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
+        /* Tablet and medium screens */
+        @media screen and (max-width: 768px) {
+            .mobile-padding { padding: 30px 40px !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+        }
+
+        /* Mobile phones */
         @media screen and (max-width: 600px) {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             h3 { font-size: 18px !important; }
@@ -965,6 +1016,8 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .code-box { font-size: 11px !important; padding: 12px !important; }
+            .qr-image { max-width: 250px !important; }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
@@ -975,10 +1028,23 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
             .stat-value { font-size: 28px !important; }
             .big-number { font-size: 36px !important; }
         }
+
+        /* Very small phones */
+        @media screen and (max-width: 400px) {
+            .mobile-padding { padding: 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+            h3 { font-size: 16px !important; }
+            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
+            .code-box { font-size: 10px !important; padding: 10px !important; }
+            .qr-image { max-width: 200px !important; }
+            .big-number { font-size: 32px !important; }
+            .stat-value { font-size: 24px !important; }
+        }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
@@ -991,9 +1057,9 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
 
                     <tr>
                         <td class="mobile-padding" style="padding: 40px 60px;">
-                            <h2 style="margin: 0 0 20px; font-size: 32px; font-weight: 600; color: #1d1d1f; text-align: center;">🎉 You're Approved!</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 32px; font-weight: 600; color: #1A1A1A; text-align: center;">🎉 You're Approved!</h2>
 
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Congratulations ${displayName}! We're excited to welcome you to the Lumbus Affiliate Program.
                             </p>
 
@@ -1001,7 +1067,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                 <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-align: center;">Your Affiliate Details</h3>
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">
                                             <strong>Commission Rate:</strong>
                                         </td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -1009,7 +1075,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">
                                             <strong>Cookie Duration:</strong>
                                         </td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -1017,7 +1083,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="padding: 8px 0; font-size: 14px; color: #515154;">
+                                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">
                                             <strong>Your Slug:</strong>
                                         </td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 700;">
@@ -1027,8 +1093,8 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                 </table>
                             </div>
 
-                            <div style="margin: 0 0 30px; padding: 20px; background-color: #FFF; border-radius: 12px; border: 2px solid #e5e5e7;">
-                                <p style="margin: 0 0 10px; font-size: 14px; color: #86868b; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
+                            <div style="margin: 0 0 30px; padding: 20px; background-color: #FFF; border-radius: 12px; border: 2px solid #E5E5E5;">
+                                <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">
                                     Your Affiliate Link
                                 </p>
                                 <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; word-break: break-all;">
@@ -1046,8 +1112,8 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                 </tr>
                             </table>
 
-                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1d1d1f; text-align: center;">
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1A1A1A; text-align: center;">
                                     Get Started
                                 </h3>
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -1059,7 +1125,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Copy your affiliate link and share it on your platforms</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Copy your affiliate link and share it on your platforms</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -1073,7 +1139,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Track your performance in real-time from your dashboard</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Track your performance in real-time from your dashboard</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -1087,7 +1153,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Earn ${commissionRate}% commission on every sale</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Earn ${commissionRate}% commission on every sale</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -1103,7 +1169,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                             Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
@@ -1162,10 +1228,17 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
 
+        /* Tablet and medium screens */
+        @media screen and (max-width: 768px) {
+            .mobile-padding { padding: 30px 40px !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+        }
+
+        /* Mobile phones */
         @media screen and (max-width: 600px) {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             h3 { font-size: 18px !important; }
@@ -1184,6 +1257,8 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
             .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
+            .code-box { font-size: 11px !important; padding: 12px !important; }
+            .qr-image { max-width: 250px !important; }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
@@ -1194,10 +1269,23 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
             .stat-value { font-size: 28px !important; }
             .big-number { font-size: 36px !important; }
         }
+
+        /* Very small phones */
+        @media screen and (max-width: 400px) {
+            .mobile-padding { padding: 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+            h3 { font-size: 16px !important; }
+            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
+            .code-box { font-size: 10px !important; padding: 10px !important; }
+            .qr-image { max-width: 200px !important; }
+            .big-number { font-size: 32px !important; }
+            .stat-value { font-size: 24px !important; }
+        }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellspacing="0" cellpadding="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
@@ -1210,29 +1298,29 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
 
                     <tr>
                         <td class="mobile-padding" style="padding: 40px 60px;">
-                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">Application Update</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Update</h2>
 
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Hi ${displayName},
                             </p>
 
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Thank you for your interest in the Lumbus Affiliate Program. After careful review, we're unable to approve your application at this time.
                             </p>
 
-                            ${reason ? `<div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+                            ${reason ? `<div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 2px solid #1A1A1A;">
                                 <p style="margin: 0 0 10px; font-size: 14px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">Reason</p>
-                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6;">
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6;">
                                     ${reason}
                                 </p>
                             </div>` : ''}
 
-                            <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 We appreciate your interest and encourage you to reapply in the future as your audience grows.
                             </p>
 
-                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-                                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+                                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                     You can still enjoy Lumbus eSIMs for your own travels! Check out our plans at <a href="${process.env.NEXT_PUBLIC_APP_URL}/plans" style="color: #2EFECC; font-weight: 700; text-decoration: none;">lumbus.com/plans</a>
                                 </p>
                             </div>
@@ -1244,7 +1332,7 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                             Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
@@ -1310,23 +1398,23 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus Admin</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: #FFFFFF; font-weight: 600;">New Affiliate Application</p>
+                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus Admin</h1>
+                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">New Affiliate Application</p>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="mobile-padding" style="padding: 40px 60px;">
-                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #1d1d1f;">New Application Received</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #1A1A1A;">New Application Received</h2>
 
-                            <div style="margin: 0 0 25px; padding: 20px; background-color: #F3F4F6; border-radius: 12px;">
+                            <div style="margin: 0 0 25px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                     <tr>
                                         <td style="padding: 8px 0; font-size: 14px; color: #666;">
@@ -1349,7 +1437,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                                             <strong>Website:</strong>
                                         </td>
                                         <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; word-break: break-all;">
-                                            <a href="${applicant.website}" style="color: #3B82F6; text-decoration: none;">${applicant.website}</a>
+                                            <a href="${applicant.website}" style="color: #2EFECC; text-decoration: none;">${applicant.website}</a>
                                         </td>
                                     </tr>` : ''}
                                     <tr>
@@ -1365,21 +1453,21 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
 
                             <div style="margin: 0 0 20px;">
                                 <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Audience Description:</p>
-                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6; padding: 12px; background: #F5F5F5; border-radius: 8px;">
                                     ${applicant.audienceDescription}
                                 </p>
                             </div>
 
                             <div style="margin: 0 0 20px;">
                                 <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Traffic Sources:</p>
-                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6; padding: 12px; background: #F5F5F5; border-radius: 8px;">
                                     ${applicant.trafficSources}
                                 </p>
                             </div>
 
                             <div style="margin: 0 0 30px;">
                                 <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">Promotional Methods:</p>
-                                <p style="margin: 0; font-size: 14px; color: #515154; line-height: 1.6; padding: 12px; background: #F9FAFB; border-radius: 8px;">
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6; padding: 12px; background: #F5F5F5; border-radius: 8px;">
                                     ${applicant.promotionalMethods}
                                 </p>
                             </div>
@@ -1387,7 +1475,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center" style="padding: 0 0 20px;">
-                                        <a href="${reviewLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #8B5CF6; color: #FFFFFF; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.4);">
+                                        <a href="${reviewLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
                                             Review in Admin Panel
                                         </a>
                                     </td>
@@ -1397,7 +1485,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                     </tr>
 
                     <tr>
-                        <td style="padding: 20px; background-color: #F9FAFB; text-align: center;">
+                        <td style="padding: 20px; background-color: #F5F5F5; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: #666666;">
                                 © ${new Date().getFullYear()} Lumbus. All rights reserved.
                             </p>

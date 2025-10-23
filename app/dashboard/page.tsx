@@ -956,26 +956,11 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Enhanced Referral Section with Gamification */}
+          {/* Referral Section */}
           {referralStats && (
             <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.4s'}}>
-              <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6">
+              <div className="mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">REFER & EARN</h2>
-                {(() => {
-                  const getMilestone = (referrals: number) => {
-                    if (referrals >= 25) return { badge: '💎 PLATINUM', color: 'bg-gradient-to-r from-cyan to-primary' };
-                    if (referrals >= 10) return { badge: '🥇 GOLD', color: 'bg-yellow' };
-                    if (referrals >= 5) return { badge: '🥈 SILVER', color: 'bg-gray-300' };
-                    if (referrals >= 1) return { badge: '🥉 BRONZE', color: 'bg-orange-400' };
-                    return { badge: '⭐ STARTER', color: 'bg-purple' };
-                  };
-                  const milestone = getMilestone(referralStats.total_referrals);
-                  return (
-                    <Badge className={`${milestone.color} text-foreground font-black text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-foreground`}>
-                      {milestone.badge}
-                    </Badge>
-                  );
-                })()}
               </div>
               <Card className="bg-gradient-to-br from-purple via-primary to-cyan border-2 sm:border-4 border-accent shadow-xl overflow-hidden relative">
                 {/* Animated Background */}
@@ -991,68 +976,6 @@ export default function DashboardPage() {
                         <p className="text-sm sm:text-base font-bold text-foreground/70 mb-4">
                           Give your friends 10% off their first order. Get 1GB of free data when they make a purchase!
                         </p>
-
-                        {/* Progress Bar to Next Badge */}
-                        {(() => {
-                          const getNextMilestone = (referrals: number) => {
-                            if (referrals >= 25) return null;
-                            if (referrals >= 10) return { next: 25, badge: '💎 Platinum' };
-                            if (referrals >= 5) return { next: 10, badge: '🥇 Gold' };
-                            if (referrals >= 1) return { next: 5, badge: '🥈 Silver' };
-                            return { next: 1, badge: '🥉 Bronze' };
-                          };
-                          const nextMilestone = getNextMilestone(referralStats.total_referrals);
-
-                          if (nextMilestone) {
-                            const progress = (referralStats.total_referrals / nextMilestone.next) * 100;
-                            const needed = nextMilestone.next - referralStats.total_referrals;
-                            return (
-                              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 mb-4 border-2 border-foreground/20">
-                                <div className="flex justify-between items-center mb-2">
-                                  <span className="text-xs font-black uppercase text-muted-foreground">
-                                    Progress to {nextMilestone.badge}
-                                  </span>
-                                  <span className="text-xs sm:text-sm font-black text-primary">
-                                    {needed} more {needed === 1 ? 'referral' : 'referrals'}!
-                                  </span>
-                                </div>
-                                <div className="w-full bg-foreground/10 rounded-full h-4 overflow-hidden border-2 border-foreground/20">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-primary via-cyan to-yellow transition-all duration-500 flex items-center justify-end pr-2"
-                                    style={{ width: `${Math.min(progress, 100)}%` }}
-                                  >
-                                    {progress > 20 && (
-                                      <span className="text-xs font-black text-foreground">
-                                        {Math.round(progress)}%
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })()}
-
-                        {/* Value Comparison */}
-                        <div className="bg-gradient-to-r from-yellow to-cyan rounded-xl p-4 mb-4 border-2 border-foreground/20">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-xs font-black uppercase text-foreground/70 mb-1">
-                                Your Rewards Value
-                              </div>
-                              <div className="text-2xl sm:text-3xl font-black text-foreground">
-                                ${((referralStats.earned_rewards / 1024) * 5).toFixed(2)}
-                              </div>
-                            </div>
-                            <div className="text-4xl">💰</div>
-                          </div>
-                          <div className="text-xs font-bold text-foreground/70 mt-2">
-                            {referralStats.total_referrals === 0
-                              ? '🚀 Start earning today!'
-                              : `That's ${(referralStats.earned_rewards / 1024).toFixed(1)}GB worth of data!`}
-                          </div>
-                        </div>
                       </div>
 
                       {/* Referral Link */}
@@ -1096,35 +1019,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {/* Right: Enhanced Stats Section with Achievements */}
+                    {/* Right: Stats Section */}
                     <div>
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-4">YOUR STATS</h3>
                       <div className="space-y-3 sm:space-y-4">
-                        {/* Achievement Badges Grid */}
-                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-foreground/20">
-                          <div className="text-xs font-black uppercase text-muted-foreground mb-3 text-center">
-                            🏆 ACHIEVEMENT BADGES
-                          </div>
-                          <div className="grid grid-cols-4 gap-2">
-                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 1 ? 'bg-orange-400 scale-110' : 'bg-gray-200 opacity-50'}`}>
-                              <div className="text-2xl">🥉</div>
-                              <div className="text-xs font-bold mt-1">Bronze</div>
-                            </div>
-                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 5 ? 'bg-gray-300 scale-110' : 'bg-gray-200 opacity-50'}`}>
-                              <div className="text-2xl">🥈</div>
-                              <div className="text-xs font-bold mt-1">Silver</div>
-                            </div>
-                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 10 ? 'bg-yellow scale-110' : 'bg-gray-200 opacity-50'}`}>
-                              <div className="text-2xl">🥇</div>
-                              <div className="text-xs font-bold mt-1">Gold</div>
-                            </div>
-                            <div className={`p-2 rounded-lg text-center transition-all ${referralStats.total_referrals >= 25 ? 'bg-gradient-to-r from-cyan to-primary scale-110' : 'bg-gray-200 opacity-50'}`}>
-                              <div className="text-2xl">💎</div>
-                              <div className="text-xs font-bold mt-1">Platinum</div>
-                            </div>
-                          </div>
-                        </div>
-
                         {/* Total Clicks */}
                         <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 border-foreground/20">
                           <div className="flex justify-between items-center mb-2">

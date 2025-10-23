@@ -26,11 +26,17 @@
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
         
-        /* Mobile styles */
+        /* Tablet and medium screens */
+        @media screen and (max-width: 768px) {
+            .mobile-padding { padding: 30px 40px !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+        }
+
+        /* Mobile phones */
         @media screen and (max-width: 600px) {
             .mobile-padding { padding: 20px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; }
+            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
             h1 { font-size: 24px !important; }
             h2 { font-size: 22px !important; }
             h3 { font-size: 18px !important; }
@@ -43,12 +49,23 @@
             }
             .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
             .mobile-large-text { font-size: 36px !important; }
+            .url-box { font-size: 12px !important; padding: 15px !important; }
             p { font-size: 14px !important; }
+        }
+
+        /* Very small phones */
+        @media screen and (max-width: 400px) {
+            .mobile-padding { padding: 15px !important; }
+            h1 { font-size: 20px !important; }
+            h2 { font-size: 18px !important; }
+            h3 { font-size: 16px !important; }
+            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
+            .url-box { font-size: 11px !important; padding: 12px !important; }
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f7;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
@@ -63,13 +80,13 @@
                     <!-- Content -->
                     <tr>
                         <td class="mobile-padding" style="padding: 40px 60px;">
-                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1d1d1f; text-align: center;">Confirm Your Email</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Confirm Your Email</h2>
                             
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Hi there! 👋
                             </p>
                             
-                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #515154; text-align: center;">
+                            <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Thanks for signing up for Lumbus. We're excited to have you on board! Please confirm your email address to get started with seamless global connectivity.
                             </p>
                             
@@ -84,8 +101,8 @@
                                 </tr>
                             </table>
                             
-                            <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC; text-align: center;">
-                                <p style="margin: 0 0 10px; font-size: 14px; color: #86868b;">
+                            <div class="url-box" style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC; text-align: center;">
+                                <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                     Or copy and paste this link into your browser:
                                 </p>
                                 <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; word-break: break-all;">
@@ -93,13 +110,13 @@
                                 </p>
                             </div>
                             
-                            <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #86868b; text-align: center;">
+                            <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
                                 This confirmation link will expire in 24 hours. If you didn't create an account with Lumbus, you can safely ignore this email.
                             </p>
                             
                             <!-- Benefits Section -->
-                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #e5e5e7;">
-                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1d1d1f; text-align: center;">
+                            <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+                                <h3 style="margin: 0 0 20px; font-size: 20px; font-weight: 600; color: #1A1A1A; text-align: center;">
                                     What's Next?
                                 </h3>
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -111,7 +128,7 @@
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Browse our global eSIM plans</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Browse our global eSIM plans</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -125,7 +142,7 @@
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Choose your destination</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Choose your destination</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -139,7 +156,7 @@
                                                         <span style="color: #2EFECC; font-size: 18px; font-weight: 900;">✓</span>
                                                     </td>
                                                     <td style="padding-left: 10px;">
-                                                        <p style="margin: 0; font-size: 15px; color: #515154;">Install and connect instantly</p>
+                                                        <p style="margin: 0; font-size: 15px; color: #666666;">Install and connect instantly</p>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -156,7 +173,7 @@
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #515154;">
+                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
                                             Need help? Contact us at <a href="mailto:support@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@lumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
