@@ -220,6 +220,29 @@ export interface SendAdminNewAffiliateApplicationParams {
   applicationId: string;
 }
 
+export interface SendAccountDeletionParams {
+  to: string;
+  userEmail: string;
+}
+
+export interface SendDataDeletionRequestParams {
+  userEmail: string;
+  specificData?: string;
+  reason?: string;
+}
+
+export interface SendAdminAccountDeletionNotificationParams {
+  userEmail: string;
+  userId: string;
+  scheduledDate: string;
+}
+
+export interface SendAdminDataDeletionNotificationParams {
+  userEmail: string;
+  specificData?: string;
+  reason?: string;
+}
+
 export async function sendOrderConfirmationEmail(params: SendOrderConfirmationParams) {
   const { to, orderDetails, activationDetails, installUrl } = params;
 
@@ -1508,6 +1531,446 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
     return data;
   } catch (error) {
     console.error('Failed to send admin notification email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send account deletion confirmation email
+ */
+export async function sendAccountDeletionEmail(params: SendAccountDeletionParams) {
+  const { to, userEmail } = params;
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">⚠️ Account Deletion Request Received</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      We've received your request to delete your Lumbus account. This email confirms that your deletion request has been submitted.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #FEF2F2; border: 3px solid #EF4444; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 48px;">🗑️</p>
+      <p style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">DELETION IN PROGRESS</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Your account will be deleted within 30 days</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #FFF7ED; border-radius: 12px; border: 2px solid #F59E0B;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ What Happens Next</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>1️⃣ Processing Period:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            Up to 30 days
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>2️⃣ Account Status:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            Scheduled for deletion
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>3️⃣ Data Removal:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            Permanent
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 What Will Be Deleted</h3>
+      <ul style="margin: 0; padding: 0 0 0 20px; font-size: 14px; line-height: 2; color: #666666;">
+        <li><strong>Account Information:</strong> Email, profile, and settings</li>
+        <li><strong>eSIM Orders:</strong> Purchase history and order details</li>
+        <li><strong>Referral Data:</strong> Rewards, referral codes, and stats</li>
+        <li><strong>Data Wallet:</strong> Unused data credits</li>
+      </ul>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 2px solid #2EFECC; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">✅ Active eSIMs</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
+        <strong>Good news:</strong> Any active eSIMs will continue to work until their expiry date, even after your account is deleted. You won't lose access to your current connectivity.
+      </p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">❗ Changed Your Mind?</h3>
+      <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #666666;">
+        If you didn't request this deletion or want to cancel it, please contact our support team immediately:
+      </p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td align="center">
+            <a href="mailto:support@getlumbus.com" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+              CONTACT SUPPORT
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      <strong>Account Email:</strong> ${userEmail}
+    </p>
+
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      We're sorry to see you go. If there's anything we could have done better, we'd love to hear from you.
+    </p>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+      <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #1A1A1A; text-align: center;">Questions or concerns?</p>
+      <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #666666; text-align: center;">
+        Contact us at <a href="mailto:support@getlumbus.com" style="color: #2EFECC; text-decoration: none; font-weight: 700;">support@getlumbus.com</a>
+      </p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      to: [to],
+      subject: 'Account Deletion Request Received - Lumbus',
+      html: createEmailTemplate({
+        title: 'Account Deletion Request',
+        subtitle: 'Confirmation',
+        content,
+        headerGradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send account deletion email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send admin notification for account deletion request
+ */
+export async function sendAdminAccountDeletionNotification(params: SendAdminAccountDeletionNotificationParams) {
+  const { userEmail, userId, scheduledDate } = params;
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">🗑️ Account Deletion Request</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      A user has requested to delete their account.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #FEF2F2; border: 3px solid #EF4444; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">User Details</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>Email:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${userEmail}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>User ID:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600; font-family: monospace;">
+            ${userId}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>Scheduled Deletion:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${new Date(scheduledDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>Request Time:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${new Date().toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background: #FFF7ED; border: 2px solid #F59E0B; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ Action Required</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
+        The account has been marked for deletion and will be permanently removed after 30 days unless the user contacts support to cancel.
+      </p>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      This is an automated notification from the Lumbus deletion system.
+    </p>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      to: ['delete@getlumbus.com'],
+      subject: `Account Deletion Request - ${userEmail}`,
+      html: createEmailTemplate({
+        title: 'Account Deletion Request',
+        subtitle: 'Admin Notification',
+        content,
+        headerGradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send admin account deletion notification:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send admin notification for data deletion request
+ */
+export async function sendAdminDataDeletionNotification(params: SendAdminDataDeletionNotificationParams) {
+  const { userEmail, specificData, reason } = params;
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">📧 Data Deletion Request</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      A user has requested deletion of specific personal data (GDPR request).
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Request Details</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>User Email:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${userEmail}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>Request Time:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            ${new Date().toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    ${specificData ? `
+    <div style="margin: 0 0 30px; padding: 25px; background: #FFF7ED; border: 2px solid #F59E0B; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 Specific Data Requested</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
+        ${specificData}
+      </p>
+    </div>
+    ` : ''}
+
+    ${reason ? `
+    <div style="margin: 0 0 30px; padding: 25px; background: #F5F5F5; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">💬 Reason Provided</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
+        ${reason}
+      </p>
+    </div>
+    ` : ''}
+
+    <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ Timeline</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
+        <strong>GDPR Compliance:</strong> Must respond within 30 days. Process the deletion request and send confirmation to the user.
+      </p>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      This is an automated notification from the Lumbus deletion system.
+    </p>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      to: ['delete@getlumbus.com'],
+      subject: `Data Deletion Request - ${userEmail}`,
+      html: createEmailTemplate({
+        title: 'Data Deletion Request',
+        subtitle: 'GDPR Request - Admin Notification',
+        content,
+        headerGradient: 'linear-gradient(135deg, #2EFECC 0%, #00D9A5 100%)',
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send admin data deletion notification:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send user confirmation for data deletion request
+ */
+export async function sendDataDeletionRequestConfirmation(params: SendDataDeletionRequestParams) {
+  const { userEmail, specificData, reason } = params;
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Data Deletion Request Received</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      We've received your request to delete specific personal data from your Lumbus account.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 48px;">📧</p>
+      <p style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">REQUEST SUBMITTED</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">We'll process your request within 30 days</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #FFF7ED; border-radius: 12px; border: 2px solid #F59E0B;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ What Happens Next</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>1️⃣ Confirmation:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            24-48 hours
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>2️⃣ Identity Verification:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            1-2 days
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>3️⃣ Data Deletion:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            Up to 30 days
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666666;">
+            <strong>4️⃣ Final Confirmation:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
+            Email sent
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    ${specificData ? `
+    <div style="margin: 0 0 30px; padding: 25px; background: #F5F5F5; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 Your Request</h3>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
+        ${specificData}
+      </p>
+    </div>
+    ` : ''}
+
+    <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">❓ Questions?</h3>
+      <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #666666;">
+        If you have any questions about this request or need to provide additional information:
+      </p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td align="center">
+            <a href="mailto:support@getlumbus.com" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+              CONTACT SUPPORT
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      <strong>Your Email:</strong> ${userEmail}
+    </p>
+
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      Your privacy is important to us. We'll keep you informed throughout the process.
+    </p>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+      <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #1A1A1A; text-align: center;">Questions or concerns?</p>
+      <p style="margin: 0; font-size: 12px; line-height: 1.6; color: #666666; text-align: center;">
+        Contact us at <a href="mailto:support@getlumbus.com" style="color: #2EFECC; text-decoration: none; font-weight: 700;">support@getlumbus.com</a>
+      </p>
+    </div>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      to: [userEmail],
+      subject: 'Data Deletion Request Received - Lumbus',
+      html: createEmailTemplate({
+        title: 'Data Deletion Request',
+        subtitle: 'Confirmation',
+        content,
+        headerGradient: 'linear-gradient(135deg, #2EFECC 0%, #00D9A5 100%)',
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send data deletion request confirmation:', error);
     throw error;
   }
 }
