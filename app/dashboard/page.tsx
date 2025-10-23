@@ -962,125 +962,131 @@ export default function DashboardPage() {
               <div className="mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">REFER & EARN</h2>
               </div>
-              <Card className="bg-gradient-to-br from-purple via-primary to-cyan border-2 sm:border-4 border-accent shadow-xl overflow-hidden relative">
-                {/* Animated Background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+              <Card className="bg-white border-2 sm:border-4 border-foreground shadow-xl rounded-2xl sm:rounded-3xl">
+                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6 pb-4 sm:pb-6">
+                  {/* Header Badge */}
+                  <div className="text-center mb-4 sm:mb-6">
+                    <div className="inline-block mb-2 sm:mb-3">
+                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest">
+                        🎁 REFER & EARN
+                      </span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-2 leading-tight">GIVE 10% OFF<br/>GET 1GB FREE</h3>
+                    <p className="text-xs sm:text-sm md:text-base font-bold text-foreground/70">
+                      Share with friends, get rewarded
+                    </p>
+                  </div>
 
-                <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6 relative z-10">
-                  <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-                    {/* Left: Share Section with Gamification */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+                    {/* Left: Share Section */}
                     <div>
-                      <div className="mb-6">
-                        <div className="text-4xl sm:text-5xl mb-4 animate-bounce">🎁</div>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-3">SHARE & GET REWARDED</h3>
-                        <p className="text-sm sm:text-base font-bold text-foreground/70 mb-4">
-                          Give your friends 10% off their first order. Get 1GB of free data when they make a purchase!
-                        </p>
-                      </div>
 
                       {/* Referral Link */}
-                      <div className="bg-white rounded-xl p-3 sm:p-4 mb-4">
+                      <div className="bg-mint/30 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-2 border-primary/10">
                         <div className="font-black uppercase text-xs mb-2 text-muted-foreground">
                           Your Referral Link
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                          <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-mint rounded-lg font-mono text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex-1 px-3 py-2 sm:px-4 sm:py-3 bg-white rounded-lg font-mono text-xs break-all border-2 border-foreground/10">
                             {referralStats.referral_link}
                           </div>
                           <Button
                             onClick={copyReferralLink}
-                            className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 "
+                            className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-3 text-sm sm:text-base"
                           >
-                            {copiedLink ? '✓ COPIED' : 'COPY'}
+                            {copiedLink ? '✓ COPIED!' : '📋 COPY LINK'}
                           </Button>
                         </div>
                       </div>
 
                       {/* Share Buttons */}
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         <Button
                           onClick={shareViaWhatsApp}
-                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4  flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
                         >
-                          <span className="text-xl">💬</span> SHARE VIA WHATSAPP
+                          <span className="text-lg sm:text-xl">💬</span>
+                          <span className="hidden xs:inline">SHARE VIA </span>WHATSAPP
                         </Button>
                         <Button
                           onClick={shareViaTwitter}
-                          className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4  flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
                         >
-                          <span className="text-xl">🐦</span> SHARE ON TWITTER
+                          <span className="text-lg sm:text-xl">🐦</span>
+                          <span className="hidden xs:inline">SHARE ON </span>TWITTER
                         </Button>
                         <Button
                           onClick={shareViaEmail}
-                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4  flex items-center justify-center gap-2"
+                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
                         >
-                          <span className="text-xl">✉️</span> SHARE VIA EMAIL
+                          <span className="text-lg sm:text-xl">✉️</span>
+                          <span className="hidden xs:inline">SHARE VIA </span>EMAIL
                         </Button>
                       </div>
                     </div>
 
                     {/* Right: Stats Section */}
                     <div>
-                      <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-4">YOUR STATS</h3>
-                      <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase mb-3 sm:mb-4">YOUR STATS</h3>
+                      <div className="space-y-2 sm:space-y-3">
                         {/* Total Clicks */}
-                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 sm:p-6 border-2 border-foreground/20">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs sm:text-sm text-muted-foreground">
+                        <div className="bg-mint rounded-xl p-3 sm:p-4 md:p-5 border-2 border-primary/20">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-black uppercase text-xs text-muted-foreground">
                               👆 Total Clicks
                             </span>
-                            <span className="text-2xl sm:text-3xl font-black">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black">
                               {referralStats.total_clicks}
                             </span>
                           </div>
                           <div className="text-xs font-bold text-foreground/60">
-                            {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion rate`}
+                            {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion`}
                           </div>
                         </div>
 
-                        {/* Friends Referred with Animation */}
-                        <div className="bg-gradient-to-br from-mint to-cyan rounded-xl p-4 sm:p-6 border-2 border-primary/30">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs sm:text-sm text-foreground">
+                        {/* Friends Referred */}
+                        <div className="bg-cyan rounded-xl p-3 sm:p-4 md:p-5 border-2 border-primary/20">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-black uppercase text-xs text-foreground">
                               👥 Friends Referred
                             </span>
-                            <span className="text-2xl sm:text-3xl font-black text-primary animate-pulse">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
                               {referralStats.total_referrals}
                             </span>
                           </div>
                           <div className="text-xs font-bold text-foreground/70">
-                            {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `Amazing! You've helped ${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'}!`}
+                            {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'} joined!`}
                           </div>
                         </div>
 
-                        {/* Data Earned with Celebration */}
-                        <div className="bg-gradient-to-br from-yellow to-orange-300 rounded-xl p-4 sm:p-6 border-2 border-secondary/30">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-black uppercase text-xs sm:text-sm text-foreground">
+                        {/* Data Earned */}
+                        <div className="bg-yellow rounded-xl p-3 sm:p-4 md:p-5 border-2 border-secondary/20">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-black uppercase text-xs text-foreground">
                               💎 Data Earned
                             </span>
-                            <span className="text-2xl sm:text-3xl font-black text-foreground">
+                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
                               {(referralStats.earned_rewards / 1024).toFixed(1)} GB
                             </span>
                           </div>
                           <div className="text-xs font-bold text-foreground/70">
-                            {referralStats.earned_rewards === 0 ? 'Start earning free data!' : `Worth $${((referralStats.earned_rewards / 1024) * 5).toFixed(2)}!`}
+                            {referralStats.earned_rewards === 0 ? 'Start earning free data!' : `${(referralStats.earned_rewards / 1024).toFixed(1)} GB earned!`}
                           </div>
                         </div>
 
                         {/* Pending Rewards */}
                         {referralStats.pending_rewards > 0 && (
-                          <div className="bg-gradient-to-br from-purple to-primary rounded-xl p-4 sm:p-6 border-2 border-accent animate-pulse">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="font-black uppercase text-xs sm:text-sm text-white">
+                          <div className="bg-purple rounded-xl p-3 sm:p-4 md:p-5 border-2 border-accent/20">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="font-black uppercase text-xs text-foreground">
                                 ⏳ Pending Data
                               </span>
-                              <span className="text-2xl sm:text-3xl font-black text-white">
+                              <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
                                 {(referralStats.pending_rewards / 1024).toFixed(1)} GB
                               </span>
                             </div>
-                            <p className="text-xs font-bold text-white/80 mt-2">
-                              Almost there! Will be credited once orders complete
+                            <p className="text-xs font-bold text-foreground/70 mt-1">
+                              Almost there! Credited when orders complete
                             </p>
                           </div>
                         )}
@@ -1088,9 +1094,9 @@ export default function DashboardPage() {
 
                       {/* Motivational CTA */}
                       {referralStats.total_referrals === 0 && (
-                        <div className="mt-4 bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-primary/20 text-center">
-                          <div className="text-3xl mb-2">🚀</div>
-                          <div className="text-sm font-black uppercase mb-2">GET STARTED!</div>
+                        <div className="mt-3 sm:mt-4 bg-white rounded-xl p-3 sm:p-4 border-2 border-primary/20 text-center">
+                          <div className="text-2xl sm:text-3xl mb-2">🚀</div>
+                          <div className="text-xs sm:text-sm font-black uppercase mb-1 sm:mb-2">GET STARTED!</div>
                           <div className="text-xs font-bold text-foreground/70">
                             Share your link and earn your first GB today!
                           </div>
