@@ -47,25 +47,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  // Get all countries with plans
-  const countriesByContinent = getCountriesByContinent()
-  const allCountries = Object.values(countriesByContinent).flat()
-
-  // Generate destination URLs for countries
-  const countryUrls: MetadataRoute.Sitemap = allCountries.map((country) => ({
-    url: `${baseUrl}/plans?region=${country.code}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.75,
-  }))
-
-  // Generate regional plan URLs
-  const regionUrls: MetadataRoute.Sitemap = Object.values(REGIONS).map((region) => ({
-    url: `${baseUrl}/plans?region=${region.code}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  // NOTE: We don't include /plans?region=XX URLs in sitemap to avoid duplicate content issues
+  // These are filtered views of /plans page and should not be indexed separately
+  // Users can still access them via the /plans page filters
 
   return [
     // Homepage - Highest priority
@@ -143,12 +127,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
-
-    // Regional plans
-    ...regionUrls,
-
-    // Country destination pages
-    ...countryUrls,
 
     // Individual plan pages (top per region)
     ...Array.from(planUrlsByRegion.values()),
