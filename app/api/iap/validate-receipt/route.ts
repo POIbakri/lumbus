@@ -101,7 +101,10 @@ export async function POST(req: NextRequest) {
       .from('orders')
       .update({
         status: 'paid',
-        stripe_session_id: appleValidation.transactionId, // Store Apple transaction ID
+        stripe_session_id: appleValidation.transactionId, // Legacy field
+        apple_transaction_id: appleValidation.transactionId, // CRITICAL: Store for webhook matching
+        apple_product_id: appleValidation.productId,
+        payment_method: 'apple_iap',
         amount_cents: appleValidation.amountCents || 0, // Apple doesn't provide amount in sandbox
         paid_at: new Date().toISOString(),
       })
