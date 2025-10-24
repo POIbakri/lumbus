@@ -965,15 +965,23 @@ export default function DashboardPage() {
               <Card className="bg-white border-2 sm:border-4 border-foreground shadow-xl rounded-2xl sm:rounded-3xl">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6 pb-4 sm:pb-6">
                   {/* Header Badge */}
-                  <div className="text-center mb-4 sm:mb-6">
-                    <div className="inline-block mb-2 sm:mb-3">
-                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest">
-                        🎁 REFER & EARN
-                      </span>
+                  <div className="text-center mb-6 sm:mb-8">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-3 sm:mb-4 leading-tight">
+                      REFER FRIENDS
+                    </h3>
+                    <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
+                      <div className="bg-primary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">
+                        <div className="text-xs font-bold text-foreground/70 mb-1">THEY GET</div>
+                        <div className="text-xl sm:text-2xl font-black">10% OFF</div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl">+</div>
+                      <div className="bg-secondary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">
+                        <div className="text-xs font-bold text-foreground/70 mb-1">YOU GET</div>
+                        <div className="text-xl sm:text-2xl font-black">1GB FREE</div>
+                      </div>
                     </div>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-2 leading-tight">GIVE 10% OFF<br/>GET 1GB FREE</h3>
-                    <p className="text-xs sm:text-sm md:text-base font-bold text-foreground/70">
-                      Share with friends, get rewarded
+                    <p className="text-xs sm:text-sm md:text-base font-bold text-foreground/60">
+                      Share your link, earn data rewards
                     </p>
                   </div>
 
@@ -982,126 +990,144 @@ export default function DashboardPage() {
                     <div>
 
                       {/* Referral Link */}
-                      <div className="bg-mint/30 rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 border-2 border-primary/10">
-                        <div className="font-black uppercase text-xs mb-2 text-muted-foreground">
-                          Your Referral Link
+                      <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-4 sm:p-5 mb-4 border-2 border-foreground/20 shadow-lg">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xl">🔗</span>
+                          <div className="font-black uppercase text-sm">
+                            Your Referral Link
+                          </div>
                         </div>
-                        <div className="flex flex-col gap-2">
-                          <div className="flex-1 px-3 py-2 sm:px-4 sm:py-3 bg-white rounded-lg font-mono text-xs break-all border-2 border-foreground/10">
+                        <div className="flex flex-col gap-3">
+                          <div className="px-4 py-3 bg-white rounded-xl font-mono text-xs sm:text-sm break-all border-2 border-foreground/10 shadow-sm">
                             {referralStats.referral_link}
                           </div>
                           <Button
                             onClick={copyReferralLink}
-                            className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-3 text-sm sm:text-base"
+                            className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 hover:scale-105 font-black py-4 text-base border-2 border-foreground shadow-lg transition-transform"
                           >
-                            {copiedLink ? '✓ COPIED!' : '📋 COPY LINK'}
+                            {copiedLink ? (
+                              <>
+                                <span className="text-xl mr-2">✓</span>
+                                COPIED!
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-xl mr-2">📋</span>
+                                COPY LINK
+                              </>
+                            )}
                           </Button>
                         </div>
                       </div>
 
                       {/* Share Buttons */}
-                      <div className="space-y-2 sm:space-y-3">
+                      <div className="space-y-3">
+                        <div className="font-black uppercase text-xs text-foreground/60 mb-2">
+                          SHARE YOUR LINK
+                        </div>
                         <Button
                           onClick={shareViaWhatsApp}
-                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
+                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
                         >
-                          <span className="text-lg sm:text-xl">💬</span>
-                          <span className="hidden xs:inline">SHARE VIA </span>WHATSAPP
+                          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                          </svg>
+                          <span>WHATSAPP</span>
                         </Button>
                         <Button
                           onClick={shareViaTwitter}
-                          className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
+                          className="w-full btn-lumbus bg-white hover:bg-gray-100 hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
                         >
-                          <span className="text-lg sm:text-xl">🐦</span>
-                          <span className="hidden xs:inline">SHARE ON </span>TWITTER
+                          <svg className="w-6 h-6 flex-shrink-0 text-black" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                          </svg>
+                          <span className="text-black font-black">X</span>
                         </Button>
                         <Button
                           onClick={shareViaEmail}
-                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-3 sm:py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20"
+                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
                         >
-                          <span className="text-lg sm:text-xl">✉️</span>
-                          <span className="hidden xs:inline">SHARE VIA </span>EMAIL
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                          </svg>
+                          <span>EMAIL</span>
                         </Button>
                       </div>
                     </div>
 
                     {/* Right: Stats Section */}
                     <div>
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase mb-3 sm:mb-4">YOUR STATS</h3>
-                      <div className="space-y-2 sm:space-y-3">
+                      <div className="space-y-3">
                         {/* Total Clicks */}
-                        <div className="bg-mint rounded-xl p-3 sm:p-4 md:p-5 border-2 border-primary/20">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="font-black uppercase text-xs text-muted-foreground">
-                              👆 Total Clicks
-                            </span>
-                            <span className="text-xl sm:text-2xl md:text-3xl font-black">
-                              {referralStats.total_clicks}
-                            </span>
-                          </div>
-                          <div className="text-xs font-bold text-foreground/60">
-                            {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion`}
+                        <div className="bg-cyan rounded-2xl p-4 sm:p-5 border-2 border-primary shadow-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-black uppercase text-xs text-foreground/70 mb-1">
+                                TOTAL CLICKS
+                              </div>
+                              <div className="text-3xl sm:text-4xl font-black text-foreground">
+                                {referralStats.total_clicks}
+                              </div>
+                              <div className="text-xs font-bold text-foreground/70 mt-2">
+                                {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion rate`}
+                              </div>
+                            </div>
                           </div>
                         </div>
 
                         {/* Friends Referred */}
-                        <div className="bg-cyan rounded-xl p-3 sm:p-4 md:p-5 border-2 border-primary/20">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="font-black uppercase text-xs text-foreground">
-                              👥 Friends Referred
-                            </span>
-                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
-                              {referralStats.total_referrals}
-                            </span>
-                          </div>
-                          <div className="text-xs font-bold text-foreground/70">
-                            {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'} joined!`}
+                        <div className="bg-mint rounded-2xl p-4 sm:p-5 border-2 border-primary shadow-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-black uppercase text-xs text-foreground/70 mb-1">
+                                FRIENDS JOINED
+                              </div>
+                              <div className="text-3xl sm:text-4xl font-black text-foreground">
+                                {referralStats.total_referrals}
+                              </div>
+                              <div className="text-xs font-bold text-foreground/70 mt-2">
+                                {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'} signed up`}
+                              </div>
+                            </div>
                           </div>
                         </div>
 
                         {/* Data Earned */}
-                        <div className="bg-yellow rounded-xl p-3 sm:p-4 md:p-5 border-2 border-secondary/20">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="font-black uppercase text-xs text-foreground">
-                              💎 Data Earned
-                            </span>
-                            <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
-                              {(referralStats.earned_rewards / 1024).toFixed(1)} GB
-                            </span>
-                          </div>
-                          <div className="text-xs font-bold text-foreground/70">
-                            {referralStats.earned_rewards === 0 ? 'Start earning free data!' : `${(referralStats.earned_rewards / 1024).toFixed(1)} GB earned!`}
+                        <div className="bg-yellow rounded-2xl p-4 sm:p-5 border-2 border-secondary shadow-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="font-black uppercase text-xs text-foreground/70 mb-1">
+                                DATA EARNED
+                              </div>
+                              <div className="text-3xl sm:text-4xl font-black text-foreground">
+                                {(referralStats.earned_rewards / 1024).toFixed(1)} GB
+                              </div>
+                              <div className="text-xs font-bold text-foreground/70 mt-2">
+                                {referralStats.earned_rewards === 0 ? 'Start earning free data!' : 'Keep sharing to earn more!'}
+                              </div>
+                            </div>
                           </div>
                         </div>
 
                         {/* Pending Rewards */}
                         {referralStats.pending_rewards > 0 && (
-                          <div className="bg-purple rounded-xl p-3 sm:p-4 md:p-5 border-2 border-accent/20">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="font-black uppercase text-xs text-foreground">
-                                ⏳ Pending Data
-                              </span>
-                              <span className="text-xl sm:text-2xl md:text-3xl font-black text-foreground">
-                                {(referralStats.pending_rewards / 1024).toFixed(1)} GB
-                              </span>
+                          <div className="bg-purple rounded-2xl p-4 sm:p-5 border-2 border-accent shadow-lg">
+                            <div className="flex justify-between items-center">
+                              <div className="flex-1">
+                                <div className="font-black uppercase text-xs text-white/90 mb-1">
+                                  PENDING DATA
+                                </div>
+                                <div className="text-3xl sm:text-4xl font-black text-white">
+                                  {(referralStats.pending_rewards / 1024).toFixed(1)} GB
+                                </div>
+                                <div className="text-xs font-bold text-white/90 mt-2">
+                                  Credited when orders complete
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-xs font-bold text-foreground/70 mt-1">
-                              Almost there! Credited when orders complete
-                            </p>
                           </div>
                         )}
                       </div>
-
-                      {/* Motivational CTA */}
-                      {referralStats.total_referrals === 0 && (
-                        <div className="mt-3 sm:mt-4 bg-white rounded-xl p-3 sm:p-4 border-2 border-primary/20 text-center">
-                          <div className="text-2xl sm:text-3xl mb-2">🚀</div>
-                          <div className="text-xs sm:text-sm font-black uppercase mb-1 sm:mb-2">GET STARTED!</div>
-                          <div className="text-xs font-bold text-foreground/70">
-                            Share your link and earn your first GB today!
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </CardContent>
