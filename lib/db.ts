@@ -19,7 +19,7 @@ if (!supabaseKey) {
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Database types
-export type OrderStatus = 'pending' | 'paid' | 'provisioning' | 'completed' | 'active' | 'depleted' | 'expired' | 'cancelled' | 'revoked' | 'failed';
+export type OrderStatus = 'pending' | 'paid' | 'provisioning' | 'completed' | 'active' | 'depleted' | 'expired' | 'cancelled' | 'revoked' | 'failed' | 'refunded';
 export type CommissionStatus = 'PENDING' | 'APPROVED' | 'PAID' | 'VOID';
 export type RewardStatus = 'PENDING' | 'APPLIED' | 'EXPIRED' | 'VOID';
 export type PayoutStatus = 'CREATED' | 'PROCESSING' | 'PAID' | 'FAILED';
@@ -75,6 +75,8 @@ export interface Order {
   currency?: string;
   paid_at?: string | null;
   country_code?: string | null;
+  refunded_at?: string | null;
+  refund_reason?: string | null;
   created_at: string;
   updated_at?: string;
 }
@@ -219,5 +221,33 @@ export interface DiscountCodeUsage {
   original_price_usd: number;
   discount_amount_usd: number;
   final_price_usd: number;
+  created_at: string;
+}
+
+export interface AppleServerNotification {
+  id: string;
+  notification_uuid: string;
+  notification_type: string;
+  subtype: string | null;
+  transaction_id: string | null;
+  original_transaction_id: string | null;
+  web_order_line_item_id: string | null;
+  order_id: string | null;
+  signed_payload: string;
+  decoded_payload: Record<string, unknown>;
+  processed: boolean;
+  processing_error: string | null;
+  notification_sent_date: string | null;
+  created_at: string;
+  processed_at: string | null;
+}
+
+export interface AppleNotificationProcessingLog {
+  id: string;
+  notification_id: string;
+  attempt_number: number;
+  success: boolean;
+  error_message: string | null;
+  processing_duration_ms: number | null;
   created_at: string;
 }
