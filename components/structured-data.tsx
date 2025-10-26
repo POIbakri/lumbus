@@ -23,9 +23,9 @@ export function OrganizationSchema() {
     url: 'https://getlumbus.com',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://getlumbus.com/logo.jpg',
-      width: 500,
-      height: 200,
+      url: 'https://getlumbus.com/logo-512.png',
+      width: 512,
+      height: 512,
     },
     description: 'Fast eSIM provider offering instant digital SIM cards for 150+ countries. Up to 10x cheaper than roaming with instant activation.',
     foundingDate: '2025',
