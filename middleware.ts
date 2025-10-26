@@ -28,14 +28,14 @@ export function middleware(request: NextRequest) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://accounts.google.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com",
-      "frame-src 'self' https://js.stripe.com",
+      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://accounts.google.com https://appleid.apple.com",
+      "frame-src 'self' https://js.stripe.com https://accounts.google.com https://appleid.apple.com",
       "base-uri 'self'",
-      "form-action 'self'",
+      "form-action 'self' https://accounts.google.com https://appleid.apple.com",
     ].join('; ')
   )
 
