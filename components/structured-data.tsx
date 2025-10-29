@@ -23,7 +23,7 @@ export function OrganizationSchema() {
     url: 'https://getlumbus.com',
     logo: {
       '@type': 'ImageObject',
-      url: 'https://getlumbus.com/logo-512.png',
+      url: 'https://getlumbus.com/logotrans.png',
       width: 512,
       height: 512,
     },

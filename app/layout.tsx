@@ -28,26 +28,81 @@ export const metadata: Metadata = {
   authors: [{ name: 'Lumbus Technologies Limited', url: 'https://getlumbus.com' }],
   generator: 'Next.js',
   keywords: [
-    'eSIM',
-    'travel eSIM',
-    'international data',
-    'mobile data',
-    'prepaid eSIM',
-    'cheap roaming',
-    'travel SIM card',
-    'Europe eSIM',
-    'Asia eSIM',
-    'USA eSIM',
-    'global eSIM',
-    'digital SIM',
-    'instant eSIM',
-    'eSIM plans',
-    'data roaming',
-    'travel internet',
-    'international SIM',
-    'eSIM activation',
-    'virtual SIM',
-    'eSIM provider',
+    // Brand variations - Core identity
+    'Lumbus', 'Lumbus eSIM', 'Get Lumbus', 'getLumbus', 'lumbus esim', 'lumbus travel', 'Lumbus app', 'Lumbus store',
+
+    // Core eSIM terms - Primary searches
+    'eSIM', 'esim', 'e-SIM', 'e sim', 'ESIM', 'travel eSIM', 'international eSIM', 'global eSIM', 'digital SIM',
+    'virtual SIM', 'embedded SIM', 'programmable SIM', 'soft SIM', 'cloud SIM', 'electronic SIM',
+
+    // Purchase intent keywords
+    'buy eSIM', 'buy esim online', 'purchase eSIM', 'get eSIM', 'order eSIM', 'eSIM online', 'instant eSIM',
+    'eSIM store', 'eSIM shop', 'where to buy eSIM', 'eSIM website', 'eSIM marketplace',
+
+    // Price-focused keywords
+    'cheap eSIM', 'affordable eSIM', 'cheapest eSIM', 'best price eSIM', 'discount eSIM', 'cheap roaming',
+    'cheap international data', 'budget eSIM', 'low cost eSIM', 'inexpensive eSIM', 'best value eSIM',
+
+    // Quality-focused keywords
+    'best eSIM', 'best eSIM provider', 'top eSIM', 'reliable eSIM', 'fast eSIM', 'best travel eSIM',
+    'recommended eSIM', 'trusted eSIM', 'premium eSIM', 'high quality eSIM',
+
+    // Competitor alternatives - Major brands
+    'alternative to Airalo', 'Airalo alternative', 'cheaper than Airalo', 'better than Airalo', 'vs Airalo',
+    'alternative to Holafly', 'Holafly alternative', 'cheaper than Holafly', 'better than Holafly', 'vs Holafly',
+    'alternative to Nomad', 'Nomad eSIM alternative', 'vs Nomad',
+    'alternative to Ubigi', 'Ubigi alternative', 'vs Ubigi',
+    'alternative to Flexiroam', 'Flexiroam alternative', 'vs Flexiroam',
+    'alternative to GigSky', 'GigSky alternative', 'vs GigSky',
+    'alternative to Truphone', 'Truphone alternative', 'vs Truphone',
+    'alternative to KnowRoaming', 'KnowRoaming alternative', 'vs KnowRoaming',
+    'alternative to Maya Mobile', 'Maya alternative', 'vs Maya',
+    'alternative to Surfroam', 'Surfroam alternative', 'vs Surfroam',
+
+    // Comparison keywords
+    'eSIM comparison', 'compare eSIM providers', 'eSIM reviews', 'eSIM vs roaming', 'eSIM or physical SIM',
+    'which eSIM is best', 'eSIM provider comparison', 'best eSIM app',
+
+    // Regional eSIMs - Popular destinations
+    'Europe eSIM', 'Asia eSIM', 'USA eSIM', 'UK eSIM', 'Spain eSIM', 'France eSIM', 'Italy eSIM', 'Germany eSIM',
+    'Japan eSIM', 'China eSIM', 'Thailand eSIM', 'Singapore eSIM', 'Dubai eSIM', 'Turkey eSIM', 'Greece eSIM',
+    'Portugal eSIM', 'Mexico eSIM', 'Canada eSIM', 'Australia eSIM', 'New Zealand eSIM', 'Brazil eSIM',
+    'India eSIM', 'Vietnam eSIM', 'Indonesia eSIM', 'Philippines eSIM', 'South Korea eSIM', 'Taiwan eSIM',
+
+    // Multi-country keywords
+    'multi country eSIM', 'worldwide eSIM', 'global coverage eSIM', 'regional eSIM', 'multiple countries eSIM',
+    'international travel eSIM', 'cross border eSIM', 'roaming eSIM',
+
+    // Data & connectivity keywords
+    'international data', 'travel data', 'mobile data', 'data plan', 'prepaid data', 'data roaming',
+    'travel internet', 'international internet', 'abroad internet', 'wifi abroad', 'internet overseas',
+    'mobile hotspot', 'portable wifi', '4G data', '5G data', 'LTE data', 'high speed data',
+
+    // Travel-specific keywords
+    'travel SIM', 'tourist SIM', 'vacation SIM', 'holiday internet', 'travel phone plan', 'international phone plan',
+    'roaming solution', 'avoid roaming charges', 'no roaming fees', 'cheap roaming', 'international roaming',
+
+    // Use case keywords
+    'eSIM for travel', 'eSIM for tourists', 'eSIM for business travel', 'eSIM for vacation', 'eSIM for expats',
+    'eSIM for digital nomads', 'eSIM for students', 'eSIM for backpackers', 'student travel eSIM',
+    'business traveler eSIM', 'cruise ship internet', 'study abroad internet',
+
+    // Technical/setup keywords
+    'eSIM activation', 'how to install eSIM', 'eSIM setup', 'eSIM compatible phones', 'iPhone eSIM',
+    'Android eSIM', 'eSIM QR code', 'instant activation', 'quick setup eSIM', 'easy eSIM',
+
+    // Problem-solving keywords
+    'avoid roaming charges', 'international data solution', 'stay connected abroad', 'internet while traveling',
+    'no contract data', 'no commitment data', 'prepaid international data', 'temporary data plan',
+    'short term data plan', 'emergency data', 'backup internet',
+
+    // Service features
+    'instant eSIM', 'no signup eSIM', 'prepaid eSIM', 'pay as you go eSIM', 'unlimited data eSIM',
+    'eSIM top up', 'refillable eSIM', 'reusable eSIM', 'flexible eSIM', 'on demand eSIM',
+
+    // Mobile operator alternatives
+    'mobile data plan', 'international mobile plan', 'global SIM card', 'world SIM card', 'traveler SIM',
+    'portable data', 'temporary phone plan', 'vacation phone plan',
   ],
   referrer: 'origin-when-cross-origin',
   creator: 'Lumbus',
