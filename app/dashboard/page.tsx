@@ -304,7 +304,7 @@ export default function DashboardPage() {
   const shareViaWhatsApp = () => {
     if (referralStats?.referral_link) {
       const message = encodeURIComponent(
-        `Get 10% off your first eSIM purchase with Lumbus! Use my referral link: ${referralStats.referral_link}`
+        `Get 10% OFF + 1GB FREE data on your first eSIM purchase with Lumbus! Use my referral link: ${referralStats.referral_link}`
       );
       window.open(`https://wa.me/?text=${message}`, '_blank');
     }
@@ -313,7 +313,7 @@ export default function DashboardPage() {
   const shareViaTwitter = () => {
     if (referralStats?.referral_link) {
       const text = encodeURIComponent(
-        `Get 10% off your first eSIM with @LumbusTravel! Stay connected in 150+ countries. Use my link:`
+        `Get 10% OFF + 1GB FREE data with your first eSIM from Lumbus! Stay connected in 150+ countries. Use my link:`
       );
       window.open(
         `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(referralStats.referral_link)}`,
@@ -324,9 +324,9 @@ export default function DashboardPage() {
 
   const shareViaEmail = () => {
     if (referralStats?.referral_link) {
-      const subject = encodeURIComponent('Get 10% off Lumbus eSIM');
+      const subject = encodeURIComponent('Get 10% OFF + 1GB FREE data with Lumbus eSIM');
       const body = encodeURIComponent(
-        `Hey! I've been using Lumbus for my international travel connectivity and thought you might like it too.\n\nUse my referral link to get 10% off your first eSIM purchase:\n${referralStats.referral_link}\n\nStay connected in 150+ countries without roaming fees!`
+        `Hey! I've been using Lumbus for my international travel connectivity and thought you might like it too.\n\nUse my referral link to get 10% OFF + 1GB FREE data on your first eSIM purchase:\n${referralStats.referral_link}\n\nYou get 10% off plus 1GB free data, and I get 1GB free data too! Stay connected in 150+ countries without roaming fees!`
       );
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
@@ -497,11 +497,6 @@ export default function DashboardPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Data Wallet Section */}
-          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.2s'}}>
-            <DataWallet />
           </div>
 
           {/* Active eSIMs */}
@@ -962,6 +957,11 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* Data Wallet Section */}
+          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.3s'}}>
+            <DataWallet />
+          </div>
+
           {/* Referral Section */}
           {referralStats && (
             <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.4s'}}>
@@ -978,7 +978,8 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
                       <div className="bg-primary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">
                         <div className="text-xs font-bold text-foreground/70 mb-1">THEY GET</div>
-                        <div className="text-xl sm:text-2xl font-black">10% OFF</div>
+                        <div className="text-lg sm:text-xl font-black">10% OFF</div>
+                        <div className="text-lg sm:text-xl font-black">+ 1GB FREE</div>
                       </div>
                       <div className="text-2xl sm:text-3xl">+</div>
                       <div className="bg-secondary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">

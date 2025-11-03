@@ -163,9 +163,11 @@ Complete in-house affiliate and referral tracking system built for Lumbus eSIM p
 - **States**: PENDING → APPROVED → PAID (or VOID)
 
 #### Referral Rewards
-- **Referrer Reward**: 1GB free data on friend's first purchase
-- **Friend Discount**: 10% off first order
-- **Eligibility**: Only first paid order counts
+- **Referrer Reward**: 1GB free data when friend makes first purchase
+- **Friend Reward**: 1GB free data for using referral code (first-time buyers only)
+- **Eligibility**: Only first-time buyers can use referral codes
+- **Manual Redemption**: Both users must manually claim their pending rewards
+- **User Choice**: Users select which eSIM to apply their free data to
 - **Monthly Cap**: 10 successful referrals per user
 - **States**: PENDING → APPLIED (or VOID)
 

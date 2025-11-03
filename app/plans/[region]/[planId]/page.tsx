@@ -48,6 +48,10 @@ export default function PlanDetailPage() {
   const [codeError, setCodeError] = useState('');
   const [codeSuccess, setCodeSuccess] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
+  const [referralValidating, setReferralValidating] = useState(false);
+  const [referralError, setReferralError] = useState('');
+  const [referralSuccess, setReferralSuccess] = useState('');
+  const [referralValid, setReferralValid] = useState(false);
   const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
   const [showCountries, setShowCountries] = useState(false);
 
@@ -184,6 +188,13 @@ export default function PlanDetailPage() {
         setDiscountPercent(data.discountPercent);
         setCodeError('');
         setCodeSuccess(`${data.discountPercent}% discount applied! You save ${currencySymbol}${((basePrice * data.discountPercent) / 100).toFixed(2)}`);
+        // Clear referral code if discount code is valid (discount overrides referral)
+        if (referralCode) {
+          setReferralCode('');
+          setReferralError('');
+          setReferralSuccess('');
+          setReferralValid(false);
+        }
       } else {
         setDiscountPercent(0);
         setCodeSuccess('');
@@ -195,6 +206,59 @@ export default function PlanDetailPage() {
       setCodeError('Failed to validate code. Please try again.');
     } finally {
       setValidatingCode(false);
+    }
+  };
+
+  const validateReferralCode = async () => {
+    if (!referralCode.trim()) {
+      setReferralError('Please enter a referral code');
+      return;
+    }
+
+    if (referralCode.trim().length !== 8) {
+      setReferralError('Referral codes must be exactly 8 characters');
+      return;
+    }
+
+    setReferralValidating(true);
+    setReferralError('');
+    setReferralSuccess('');
+    try {
+      const response = await fetch('/api/referral-codes/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: referralCode.trim(),
+          userId: userId || undefined,
+          email: email || undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid) {
+        setReferralValid(true);
+        setReferralError('');
+        setReferralSuccess(data.benefits.message);
+        // Apply 10% referral discount
+        setDiscountPercent(10);
+        // Clear discount code if referral is valid (user must choose one)
+        if (discountCode) {
+          setDiscountCode('');
+          setCodeError('');
+          setCodeSuccess('');
+        }
+      } else {
+        setReferralValid(false);
+        setReferralSuccess('');
+        setReferralError(data.error || 'Invalid referral code');
+      }
+    } catch (error) {
+      setReferralValid(false);
+      setReferralSuccess('');
+      setReferralError('Failed to validate code. Please try again.');
+    } finally {
+      setReferralValidating(false);
     }
   };
 
@@ -412,16 +476,16 @@ export default function PlanDetailPage() {
                   <div className="text-center">
                     <div className="text-3xl sm:text-4xl mb-2">💰</div>
                     <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase mb-2 text-foreground leading-tight">
-                      GOT REFERRED? ENTER CODE FOR 10% OFF!
+                      GOT REFERRED? ENTER CODE FOR 10% OFF + 1GB FREE!
                     </h3>
                     <p className="text-sm sm:text-base font-bold text-foreground/80 mb-3">
-                      Want to earn free data too? Share after purchase!
+                      Both you and your friend get 1GB FREE data!
                     </p>
                     <div className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black text-foreground/70">
                       <span>🎁</span>
-                      <span>1 FRIEND = 1GB FREE DATA</span>
+                      <span>10% OFF + 1GB FREE</span>
                       <span>•</span>
-                      <span>UNLIMITED REFERRALS</span>
+                      <span>FIRST-TIME BUYERS</span>
                       <span>🚀</span>
                     </div>
                   </div>
@@ -531,25 +595,81 @@ export default function PlanDetailPage() {
 
                           <div>
                             <label htmlFor="referralCode" className="block font-bold uppercase text-xs mb-2">
-                              Referral Code
+                              Referral Code (First-time buyers only)
                             </label>
-                            <input
-                              id="referralCode"
-                              type="text"
-                              value={referralCode}
-                              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                              placeholder="ABC12345"
-                              className="w-full px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
-                              disabled={loading}
-                            />
-                            <p className="mt-1 text-xs font-bold text-muted-foreground">
-                              Get 10% off your first order with a friend's referral code
-                            </p>
+                            <div className="flex gap-2">
+                              <input
+                                id="referralCode"
+                                type="text"
+                                value={referralCode}
+                                onChange={(e) => {
+                                  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+                                  setReferralCode(value);
+                                  setReferralError('');
+                                  setReferralSuccess('');
+                                  if (!value.trim()) {
+                                    setReferralValid(false);
+                                    // Clear discount if referral code is cleared
+                                    if (discountPercent === 10 && !discountCode) {
+                                      setDiscountPercent(0);
+                                    }
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    validateReferralCode();
+                                  }
+                                }}
+                                placeholder="ABC12345"
+                                maxLength={8}
+                                className="flex-1 px-3 py-2.5 text-sm border-2 border-foreground/20 rounded-lg focus:outline-none focus:border-primary font-bold uppercase"
+                                disabled={loading || referralValidating || discountPercent > 0}
+                              />
+                              <Button
+                                type="button"
+                                onClick={validateReferralCode}
+                                disabled={loading || referralValidating || !referralCode.trim() || referralCode.length !== 8 || discountPercent > 0}
+                                className="px-4 py-2.5 bg-primary text-white font-black uppercase text-xs rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {referralValidating ? '...' : 'VERIFY'}
+                              </Button>
+                            </div>
+                            {discountPercent > 0 && (
+                              <p className="mt-2 text-xs font-bold text-muted-foreground">
+                                ⚠️ Discount code is active. Remove it to use a referral code instead.
+                              </p>
+                            )}
+                            {referralValidating && (
+                              <p className="mt-2 text-xs sm:text-sm font-bold text-muted-foreground flex items-center gap-1.5">
+                                <span className="inline-block w-3 h-3 sm:w-4 sm:h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+                                Verifying referral code...
+                              </p>
+                            )}
+                            {referralError && (
+                              <p className="mt-2 text-xs sm:text-sm font-bold text-destructive flex items-start gap-1.5">
+                                <span className="text-sm sm:text-base">✗</span>
+                                <span>{referralError}</span>
+                              </p>
+                            )}
+                            {referralSuccess && (
+                              <div className="mt-2 p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/30">
+                                <p className="text-xs sm:text-sm font-black text-primary flex items-start gap-1.5">
+                                  <span className="text-sm sm:text-base">✓</span>
+                                  <span>{referralSuccess}</span>
+                                </p>
+                              </div>
+                            )}
+                            {!referralSuccess && !referralError && !discountPercent && (
+                              <p className="mt-1 text-xs font-bold text-muted-foreground">
+                                Get 10% OFF + 1GB FREE data! Your friend gets 1GB FREE too!
+                              </p>
+                            )}
                           </div>
 
                           <div className="p-2 sm:p-3 bg-cyan/10 rounded-lg border border-cyan/20">
                             <p className="text-xs font-bold text-foreground/80">
-                              💡 <strong>Note:</strong> If you have both codes, the discount code will take priority. Referral discounts only apply to first-time orders.
+                              💡 <strong>Note:</strong> Discount codes apply instantly. Referral codes give 10% OFF + 1GB FREE data (first-time buyers only). You can only use one type of code per order.
                             </p>
                           </div>
                         </div>

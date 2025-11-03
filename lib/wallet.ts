@@ -6,15 +6,13 @@
 import { supabase } from './db';
 
 /**
- * Calculate how many data credits can be applied to a purchase
+ * Get available free data for a user
  * @param userId - User ID
- * @param orderAmountUSD - Order amount in USD
- * @returns Credits to apply and equivalent USD discount
+ * @returns Available data in MB
  */
-export async function calculateDataCreditDiscount(
-  userId: string,
-  orderAmountUSD: number
-): Promise<{ creditsToUseMB: number; discountUSD: number; discountCents: number }> {
+export async function getAvailableData(
+  userId: string
+): Promise<number> {
   // Get user's wallet balance
   const { data: wallet } = await supabase
     .from('user_data_wallet')
@@ -22,168 +20,52 @@ export async function calculateDataCreditDiscount(
     .eq('user_id', userId)
     .maybeSingle();
 
-  if (!wallet || wallet.balance_mb === 0) {
-    return { creditsToUseMB: 0, discountUSD: 0, discountCents: 0 };
-  }
-
-  // Conversion rate: 1GB = $2 USD (adjustable)
-  const MB_TO_USD_RATE = 0.002; // $0.002 per MB = $2 per GB
-
-  // Calculate maximum discount possible from wallet
-  const maxDiscountFromWallet = wallet.balance_mb * MB_TO_USD_RATE;
-
-  // Calculate actual discount (min of order amount and wallet value)
-  const actualDiscountUSD = Math.min(orderAmountUSD, maxDiscountFromWallet);
-
-  // Calculate credits to use
-  const creditsToUseMB = Math.ceil(actualDiscountUSD / MB_TO_USD_RATE);
-
-  // Ensure we don't use more credits than available
-  const finalCreditsToUse = Math.min(creditsToUseMB, wallet.balance_mb);
-  const finalDiscount = finalCreditsToUse * MB_TO_USD_RATE;
-  const finalDiscountCents = Math.round(finalDiscount * 100);
-
-  return {
-    creditsToUseMB: finalCreditsToUse,
-    discountUSD: Number(finalDiscount.toFixed(2)),
-    discountCents: finalDiscountCents
-  };
+  return wallet?.balance_mb || 0;
 }
 
 /**
- * Apply data credits to an order
+ * Add free data to user's balance
  * @param userId - User ID
- * @param orderId - Order ID
- * @param creditsMB - Amount of credits to use in MB
- * @param discountCents - Value of the discount in cents
+ * @param dataMB - Amount of data to add in MB
+ * @param source - Source of the data (e.g., 'referral_reward', 'promo')
  */
-export async function applyDataCredits(
+export async function addFreeData(
   userId: string,
-  orderId: string,
-  creditsMB: number,
-  discountCents: number
+  dataMB: number,
+  source: string = 'referral_reward'
 ): Promise<boolean> {
   try {
-    // Start a transaction
-    // 1. Deduct from wallet
-    const { data: wallet, error: walletError } = await supabase
+    // Get current wallet balance
+    const { data: wallet } = await supabase
       .from('user_data_wallet')
       .select('balance_mb')
       .eq('user_id', userId)
       .maybeSingle();
 
-    if (walletError || !wallet || wallet.balance_mb < creditsMB) {
-      console.error('Insufficient wallet balance');
-      return false;
-    }
-
-    // Update wallet balance
-    const newBalance = wallet.balance_mb - creditsMB;
-    const { error: updateError } = await supabase
-      .from('user_data_wallet')
-      .update({
-        balance_mb: newBalance,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', userId);
-
-    if (updateError) {
-      console.error('Failed to update wallet:', updateError);
-      return false;
-    }
-
-    // 2. Record transaction
-    const discountUSD = (discountCents / 100).toFixed(2);
-    await supabase
-      .from('wallet_transactions')
-      .insert({
-        user_id: userId,
-        type: 'DEBIT',
-        amount_mb: creditsMB,
-        source: 'ORDER_PAYMENT',
-        source_id: orderId,
-        description: `Used ${(creditsMB / 1024).toFixed(2)}GB for eSIM purchase (saved $${discountUSD})`
-      });
-
-    // 3. Record credit usage on order (optional metadata)
-    await supabase
-      .from('orders')
-      .update({
-        data_credits_used_mb: creditsMB,
-        data_credit_discount_cents: discountCents
-      })
-      .eq('id', orderId);
-
-    console.log(`Applied ${creditsMB}MB credits ($${discountUSD} discount) to order ${orderId}`);
-    return true;
-  } catch (error) {
-    console.error('Failed to apply data credits:', error);
-    return false;
-  }
-}
-
-/**
- * Refund data credits when an order is refunded
- * @param orderId - Order ID
- */
-export async function refundDataCredits(orderId: string): Promise<boolean> {
-  try {
-    // Get order details
-    const { data: order } = await supabase
-      .from('orders')
-      .select('user_id, data_credits_used_mb, data_credit_discount_cents')
-      .eq('id', orderId)
-      .maybeSingle();
-
-    if (!order || !order.data_credits_used_mb) {
-      return true; // No credits to refund
-    }
-
-    // Get current wallet balance
-    const { data: wallet } = await supabase
-      .from('user_data_wallet')
-      .select('balance_mb')
-      .eq('user_id', order.user_id)
-      .maybeSingle();
-
-    const currentBalance = wallet?.balance_mb || 0;
-    const newBalance = currentBalance + order.data_credits_used_mb;
-
-    // Update wallet balance
     if (wallet) {
+      // Update existing wallet
+      const newBalance = wallet.balance_mb + dataMB;
       await supabase
         .from('user_data_wallet')
         .update({
           balance_mb: newBalance,
           updated_at: new Date().toISOString()
         })
-        .eq('user_id', order.user_id);
+        .eq('user_id', userId);
     } else {
-      // Create wallet if doesn't exist
+      // Create new wallet
       await supabase
         .from('user_data_wallet')
         .insert({
-          user_id: order.user_id,
-          balance_mb: order.data_credits_used_mb
+          user_id: userId,
+          balance_mb: dataMB
         });
     }
 
-    // Record refund transaction
-    await supabase
-      .from('wallet_transactions')
-      .insert({
-        user_id: order.user_id,
-        type: 'CREDIT',
-        amount_mb: order.data_credits_used_mb,
-        source: 'ORDER_REFUND',
-        source_id: orderId,
-        description: `Refunded ${(order.data_credits_used_mb / 1024).toFixed(2)}GB from cancelled order`
-      });
-
-    console.log(`Refunded ${order.data_credits_used_mb}MB to user ${order.user_id}`);
+    console.log(`Added ${dataMB}MB (${(dataMB / 1024).toFixed(1)}GB) to user ${userId}'s data balance`);
     return true;
   } catch (error) {
-    console.error('Failed to refund data credits:', error);
+    console.error('Failed to add free data:', error);
     return false;
   }
 }

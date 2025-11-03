@@ -126,9 +126,21 @@ export async function ensureUserProfile(userId: string): Promise<UserProfile> {
 }
 
 /**
- * Link a user to their referrer
+ * Link a user to their referrer (only for first-time users)
  */
 export async function linkReferrer(userId: string, refCode: string): Promise<boolean> {
+  // Check if user has any completed orders (existing users cannot use referral codes)
+  const { count: orderCount } = await supabase
+    .from('orders')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .in('status', ['paid', 'completed']);
+
+  if ((orderCount || 0) > 0) {
+    console.log(`User ${userId} is not a first-time buyer - cannot use referral code`);
+    return false; // Existing users cannot use referral codes
+  }
+
   // Find the referrer
   const { data: referrerProfile } = await supabase
     .from('user_profiles')
@@ -145,7 +157,7 @@ export async function linkReferrer(userId: string, refCode: string): Promise<boo
     return false;
   }
 
-  // Update user's profile
+  // Update user's profile (only for first-time users)
   const { error } = await supabase
     .from('user_profiles')
     .update({ referred_by_code: refCode })

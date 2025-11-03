@@ -301,8 +301,8 @@ export async function applyReferralReward(rewardId: string): Promise<boolean> {
     return false;
   }
 
-  // Add data credits to user's wallet
-  const dataCreditsMB = reward.reward_value; // e.g., 1024 MB = 1 GB
+  // Add free data to user's wallet
+  const dataMB = reward.reward_value; // 1024 MB = 1 GB
   const userId = reward.referrer_user_id;
 
   // Check if wallet entry exists
@@ -317,7 +317,7 @@ export async function applyReferralReward(rewardId: string): Promise<boolean> {
     await supabase
       .from('user_data_wallet')
       .update({
-        balance_mb: existingWallet.balance_mb + dataCreditsMB,
+        balance_mb: existingWallet.balance_mb + dataMB,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId);
@@ -327,23 +327,11 @@ export async function applyReferralReward(rewardId: string): Promise<boolean> {
       .from('user_data_wallet')
       .insert({
         user_id: userId,
-        balance_mb: dataCreditsMB,
+        balance_mb: dataMB,
       });
   }
 
-  // Log the transaction
-  await supabase
-    .from('wallet_transactions')
-    .insert({
-      user_id: userId,
-      type: 'CREDIT',
-      amount_mb: dataCreditsMB,
-      source: 'REFERRAL_REWARD',
-      source_id: rewardId,
-      description: `Referral reward: ${dataCreditsMB}MB free data`,
-    });
-
-  console.log(`Applied reward ${rewardId}: ${reward.reward_type} ${reward.reward_value}MB credited to user ${userId}`);
+  console.log(`Applied reward ${rewardId}: ${(dataMB / 1024).toFixed(1)}GB free data added to user ${userId}`);
 
   return true;
 }
@@ -371,10 +359,12 @@ export async function voidReferralReward(orderId: string): Promise<boolean> {
 
 /**
  * Process attribution and create commissions/rewards for a paid order
+ * @param skipRewards - Skip creating free data rewards (used when discount codes override referral benefits)
  */
 export async function processOrderAttribution(
   order: Order,
-  attribution: OrderAttribution
+  attribution: OrderAttribution,
+  skipRewards = false
 ): Promise<{
   commission?: AffiliateCommission;
   reward?: ReferralReward;
@@ -401,19 +391,64 @@ export async function processOrderAttribution(
     }
   }
 
-  // Handle referral reward
-  if (attribution.source_type === 'REFERRAL' && attribution.referrer_user_id) {
-    const reward = await createReferralReward(
-      order.id,
-      attribution.referrer_user_id,
-      order.user_id,
-      'FREE_DATA',
-      DEFAULT_REWARD_CONFIG.REFERRAL_GIVE_MB
-    );
+  // Handle referral reward - BOTH users get 1GB as pending rewards
+  // Skip rewards if a discount code was used (discount codes override referral benefits)
+  if (!skipRewards && attribution.source_type === 'REFERRAL' && attribution.referrer_user_id) {
+    // Check if rewards already exist for this order
+    const { data: existingRewards } = await supabase
+      .from('referral_rewards')
+      .select('*')
+      .eq('order_id', order.id);
 
-    if (reward) {
-      result.reward = reward;
+    const referrerRewardExists = existingRewards?.some(r => r.referrer_user_id === attribution.referrer_user_id);
+    const buyerRewardExists = existingRewards?.some(r => r.referrer_user_id === order.user_id);
+
+    // Check if this is the buyer's first order (required for any referral rewards)
+    const isFirstOrder = await isEligibleForReferralReward(order.id, order.user_id);
+
+    // Only create rewards if this is the buyer's first purchase
+    if (isFirstOrder) {
+      // 1. Create reward for the referrer (1GB) - needs manual claim
+      if (!referrerRewardExists) {
+        const referrerReward = await createReferralReward(
+          order.id,
+          attribution.referrer_user_id,
+          order.user_id,
+          'FREE_DATA',
+          1024 // 1GB of actual data
+        );
+
+        if (referrerReward) {
+          result.reward = referrerReward;
+        }
+      }
+
+      // 2. Create reward for the person who used the code (1GB) - also needs manual claim
+      if (!buyerRewardExists) {
+        // Create a reward for the first-time buyer
+        const { data: buyerReward } = await supabase
+          .from('referral_rewards')
+          .insert({
+            order_id: order.id,
+            referrer_user_id: order.user_id, // The buyer gets their own reward
+            referred_user_id: order.user_id, // Self-referral indicates they used a code
+            reward_type: 'FREE_DATA',
+            reward_value: 1024, // 1GB
+            status: 'PENDING',
+            notes: 'First-time buyer bonus for using referral code'
+          })
+          .select()
+          .single();
+
+        if (buyerReward) {
+          console.log(`Created 1GB pending reward for first-time buyer ${order.user_id} for using referral code`);
+        }
+      }
+    } else {
+      console.log(`Skipping referral rewards - user ${order.user_id} is not a first-time buyer`);
     }
+  } else if (skipRewards && attribution.source_type === 'REFERRAL') {
+    console.log(`Skipping referral rewards for order ${order.id} - discount code was used (overrides referral benefits)`);
   }
 
   return result;
