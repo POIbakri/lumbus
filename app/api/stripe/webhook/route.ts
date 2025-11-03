@@ -6,6 +6,7 @@ import { resolveAttribution, saveOrderAttribution } from '@/lib/referral';
 import { processOrderAttribution, voidCommission, voidReferralReward } from '@/lib/commission';
 import { runFraudChecks } from '@/lib/fraud';
 import { sendReferralRewardEmail, sendTopUpConfirmationEmail } from '@/lib/email';
+import { applyDataCredits, refundDataCredits } from '@/lib/wallet';
 import type { AttributionCookies } from '@/lib/referral';
 
 // Lazy initialization - only create instance when needed
@@ -98,6 +99,8 @@ export async function POST(req: NextRequest) {
       const discountPercent = parseInt(session.metadata?.discountPercent || '0', 10);
       const basePriceUSD = parseFloat(session.metadata?.basePriceUSD || '0');
       const finalPriceUSD = parseFloat(session.metadata?.finalPriceUSD || '0');
+      const dataCreditsUsedMB = parseInt(session.metadata?.dataCreditsUsedMB || '0', 10);
+      const dataCreditDiscountCents = parseInt(session.metadata?.dataCreditDiscountCents || '0', 10);
 
       if (!orderId) {
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
@@ -132,6 +135,12 @@ export async function POST(req: NextRequest) {
 
       if (orderError || !order) {
         return NextResponse.json({ error: 'Order update failed' }, { status: 500 });
+      }
+
+      // Apply data credits if used
+      if (dataCreditsUsedMB > 0) {
+        console.log(`[Webhook] Applying ${dataCreditsUsedMB}MB data credits to order ${orderId}`);
+        await applyDataCredits(order.user_id, orderId, dataCreditsUsedMB, dataCreditDiscountCents);
       }
 
       // Send password setup email for new users
@@ -421,6 +430,9 @@ export async function POST(req: NextRequest) {
         // Void commissions and rewards
         await voidCommission(order.id);
         await voidReferralReward(order.id);
+
+        // Refund data credits if used
+        await refundDataCredits(order.id);
 
         // Update order status
         await supabase

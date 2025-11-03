@@ -6,6 +6,7 @@ import { getCurrencyForCheckout, convertToStripeAmount, formatPrice, detectCount
 import { logger, redactEmail } from '@/lib/logger';
 import { z } from 'zod';
 import { generateOrderAccessToken } from '@/lib/order-token';
+import { calculateDataCreditDiscount, applyDataCredits } from '@/lib/wallet';
 
 // Lazy initialization - only create instance when needed
 let stripe: Stripe | null = null;
@@ -113,7 +114,28 @@ export async function POST(req: NextRequest) {
         // Ensure user profile exists (creates ref_code if existing user without profile)
         console.log('[Checkout] Ensuring user profile...');
         await ensureUserProfile(user.id);
+
+        // Check for existing users who might have a referral code from cookie
+        // This handles the case where user might have visited with a referral link before signing up
+        if (rfcd) {
+          console.log('[Checkout] Checking if existing user needs referral linking...');
+          const { data: userProfile } = await supabase
+            .from('user_profiles')
+            .select('referred_by_code')
+            .eq('id', existingUser.id)
+            .maybeSingle();
+
+          // If they don't have a referral code set yet, link it now
+          if (userProfile && !userProfile.referred_by_code) {
+            const { linkReferrer } = await import('@/lib/referral');
+            const linked = await linkReferrer(existingUser.id, rfcd);
+            if (linked) {
+              console.log('[Checkout] Linked referral code for existing user');
+            }
+          }
+        }
       } else {
+
         // For new users, create auth account WITHOUT password (passwordless)
         // They'll set password later via "setup account" email after payment
         console.log('[Checkout] Creating new user (no password yet)...');
@@ -169,11 +191,12 @@ export async function POST(req: NextRequest) {
         console.log('[Checkout] Creating user profile...');
         await ensureUserProfile(user.id);
 
-        // Link referral code if provided
-        if (referralCode) {
-          console.log('[Checkout] Linking referral code:', referralCode);
+        // Link referral code if provided in body OR from cookie
+        const referralToLink = referralCode || rfcd;
+        if (referralToLink) {
+          console.log('[Checkout] Linking referral code:', referralToLink);
           const { linkReferrer } = await import('@/lib/referral');
-          const linked = await linkReferrer(user.id, referralCode);
+          const linked = await linkReferrer(user.id, referralToLink);
           if (linked) {
             console.log('[Checkout] Referral code linked successfully');
           } else {
@@ -253,7 +276,26 @@ export async function POST(req: NextRequest) {
     // Calculate price with discount if applicable (in USD)
     const basePriceUSD = plan.retail_price;
     const discountMultiplier = applyDiscount ? (100 - discountPercent) / 100 : 1;
-    const finalPriceUSD = basePriceUSD * discountMultiplier;
+    let finalPriceUSD = basePriceUSD * discountMultiplier;
+
+    // Check for data credits (only for non-topup orders)
+    let dataCreditsUsedMB = 0;
+    let dataCreditDiscountUSD = 0;
+    let dataCreditDiscountCents = 0;
+    if (!isTopUp && finalPriceUSD > 0) {
+      console.log('[Checkout] Checking data wallet for credits...');
+      const creditCalculation = await calculateDataCreditDiscount(user.id, finalPriceUSD);
+
+      if (creditCalculation.creditsToUseMB > 0) {
+        dataCreditsUsedMB = creditCalculation.creditsToUseMB;
+        dataCreditDiscountUSD = creditCalculation.discountUSD;
+        dataCreditDiscountCents = creditCalculation.discountCents;
+        finalPriceUSD = finalPriceUSD - dataCreditDiscountUSD;
+
+        console.log(`[Checkout] Applying ${dataCreditsUsedMB}MB credits ($${dataCreditDiscountUSD} discount)`);
+        console.log(`[Checkout] Final price after credits: $${finalPriceUSD}`);
+      }
+    }
 
     // Convert to user's currency for Stripe
     const stripeAmount = convertToStripeAmount(finalPriceUSD, userCurrency);
@@ -278,9 +320,15 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Checkout] Order created:', order.id);
 
-    // Handle 100% discount - bypass Stripe entirely
-    if (finalPriceUSD === 0 && applyDiscount && discountPercent === 100) {
-      console.log('[Checkout] 100% discount detected - bypassing Stripe');
+    // Handle 100% discount OR full data credit coverage - bypass Stripe entirely
+    if (finalPriceUSD === 0) {
+      console.log('[Checkout] Free order detected (100% discount or data credits) - bypassing Stripe');
+
+      // Apply data credits if used
+      if (dataCreditsUsedMB > 0) {
+        console.log(`[Checkout] Applying ${dataCreditsUsedMB}MB data credits`);
+        await applyDataCredits(user.id, order.id, dataCreditsUsedMB, dataCreditDiscountCents);
+      }
 
       // Mark order as paid with $0
       const { error: updateError } = await supabase
@@ -400,6 +448,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Add data credit description if applicable
+    if (dataCreditsUsedMB > 0) {
+      const dataCreditsGB = (dataCreditsUsedMB / 1024).toFixed(2);
+      discountDescription += ` + ${dataCreditsGB}GB Data Credits Applied (-$${dataCreditDiscountUSD})`;
+    }
+
     const lineItems = [
       {
         price_data: {
@@ -461,6 +515,8 @@ export async function POST(req: NextRequest) {
         currency: userCurrency,
         basePriceUSD: basePriceUSD.toString(),
         finalPriceUSD: finalPriceUSD.toString(),
+        dataCreditsUsedMB: dataCreditsUsedMB.toString(),
+        dataCreditDiscountCents: dataCreditDiscountCents.toString(),
       },
       payment_intent_data: {
         metadata: {

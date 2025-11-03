@@ -14,6 +14,7 @@ import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
 import { authenticatedGet } from '@/lib/api-client';
 import { ReferralWidget } from '@/components/referral-widget';
+import { DataWallet } from '@/components/data-wallet';
 
 // Format plan data amounts (for "What You Bought" - shows marketing numbers)
 function formatPlanData(dataGB: number): string {
@@ -496,6 +497,11 @@ export default function DashboardPage() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Data Wallet Section */}
+          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.2s'}}>
+            <DataWallet />
           </div>
 
           {/* Active eSIMs */}
