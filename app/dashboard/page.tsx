@@ -957,14 +957,9 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Data Wallet Section */}
-          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.3s'}}>
-            <DataWallet />
-          </div>
-
           {/* Referral Section */}
           {referralStats && (
-            <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.4s'}}>
+            <div id="refer-earn" className="mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.3s'}}>
               <div className="mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">REFER & EARN</h2>
               </div>
@@ -1141,6 +1136,11 @@ export default function DashboardPage() {
               </Card>
             </div>
           )}
+
+          {/* Data Wallet Section */}
+          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.4s'}}>
+            <DataWallet />
+          </div>
         </div>
       </div>
 
