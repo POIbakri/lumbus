@@ -74,7 +74,7 @@ export default function DevicePage() {
             <Card className="bg-mint border-2 border-foreground/10 ">
               <CardContent className="p-8">
                 <div className="flex justify-center mb-6">
-                  <Image src="/apple-logo.jpg" alt="Apple" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                  <Image src="/apple-logo.svg" alt="Apple" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
                 </div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For iPhone</h3>
                 <div className="space-y-4">
@@ -107,7 +107,7 @@ export default function DevicePage() {
             <Card className="bg-yellow border-2 border-foreground/10 ">
               <CardContent className="p-8">
                 <div className="flex justify-center mb-6">
-                  <Image src="/android-logo.png" alt="Android" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+                  <Image src="/android-logo.svg" alt="Android" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
                 </div>
                 <h3 className="font-black text-2xl mb-6 uppercase text-center">For Android</h3>
                 <div className="space-y-4">
@@ -156,7 +156,7 @@ export default function DevicePage() {
             <Card className="border-2 border-foreground/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <Image src="/apple-logo.jpg" alt="Apple" width={40} height={40} className="w-10 h-10 object-contain" />
+                  <Image src="/apple-logo.svg" alt="Apple" width={40} height={40} className="w-10 h-10 object-contain" />
                   <h3 className="font-black text-xl uppercase">Apple Devices</h3>
                 </div>
                 <ul className="space-y-3">
@@ -174,7 +174,7 @@ export default function DevicePage() {
             <Card className="border-2 border-foreground/10">
               <CardContent className="p-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <Image src="/android-logo.png" alt="Android" width={40} height={40} className="w-10 h-10 object-contain" />
+                  <Image src="/android-logo.svg" alt="Android" width={40} height={40} className="w-10 h-10 object-contain" />
                   <h3 className="font-black text-xl uppercase">Android Devices</h3>
                 </div>
                 <ul className="space-y-3">
