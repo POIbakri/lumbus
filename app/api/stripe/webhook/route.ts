@@ -126,6 +126,7 @@ export async function POST(req: NextRequest) {
           amount_cents: amountCents,
           currency: existingOrder.plans?.currency || 'USD',
           paid_at: new Date().toISOString(),
+          payment_method: 'stripe',
         })
         .eq('id', orderId)
         .select('*, plans(*), users(*)')
@@ -357,6 +358,7 @@ export async function POST(req: NextRequest) {
         .update({
           status: 'paid',
           paid_at: new Date().toISOString(),
+          payment_method: 'stripe',
         })
         .eq('id', orderId)
         .select('*, plans(*), users(*)')
