@@ -45,23 +45,37 @@ export function InstallPanel({
   const defaultTab = platform === 'ios' ? 'ios' : 'android';
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-3">INSTALLATION INSTRUCTIONS</h2>
-        <p className="text-base sm:text-lg font-bold text-muted-foreground">Choose your installation method below</p>
-      </div>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Section Header */}
+      <Card className="bg-gradient-to-r from-purple to-purple/80 border-3 sm:border-4 border-foreground shadow-xl">
+        <CardContent className="py-4 sm:py-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <span className="text-3xl sm:text-4xl">📲</span>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black uppercase">INSTALLATION INSTRUCTIONS</h2>
+            </div>
+            <p className="text-sm sm:text-base font-bold text-white/90">Choose your device type below to get started</p>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-mint border-2 sm:border-3 md:border-4 border-primary p-1 sm:p-1.5">
-          <TabsTrigger value="ios" className="font-bold uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-white px-2 sm:px-4 py-2 sm:py-3">
-            <span className="flex items-center gap-1.5 sm:gap-2">
+        <TabsList className="grid w-full grid-cols-2 bg-gradient-to-r from-mint to-cyan border-3 sm:border-4 border-foreground p-1.5 sm:p-2 shadow-lg">
+          <TabsTrigger
+            value="ios"
+            className="font-black uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary/90 data-[state=active]:text-white data-[state=active]:shadow-lg px-2 sm:px-4 py-3 sm:py-4 rounded-lg transition-all"
+          >
+            <span className="flex items-center justify-center gap-1.5 sm:gap-2">
               <Image src="/apple-logo.svg" alt="Apple" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               <span className="hidden sm:inline">iPhone / iPad</span>
-              <span className="sm:hidden">iOS</span>
+              <span className="sm:hidden">Apple</span>
             </span>
           </TabsTrigger>
-          <TabsTrigger value="android" className="font-bold uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-yellow data-[state=active]:text-foreground px-2 sm:px-4 py-2 sm:py-3">
-            <span className="flex items-center gap-1.5 sm:gap-2">
+          <TabsTrigger
+            value="android"
+            className="font-black uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow data-[state=active]:to-yellow/90 data-[state=active]:text-foreground data-[state=active]:shadow-lg px-2 sm:px-4 py-3 sm:py-4 rounded-lg transition-all"
+          >
+            <span className="flex items-center justify-center gap-1.5 sm:gap-2">
               <Image src="/android-logo.svg" alt="Android" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               <span>Android</span>
             </span>

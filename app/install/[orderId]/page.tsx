@@ -98,13 +98,19 @@ export default function InstallPage() {
   //   }
   // }, [order, deepLinkTriggered, deviceInfo]);
 
-  // Show referral modal after success (5 seconds delay)
+  // Show referral modal after success (5 seconds delay) - only once per order
   useEffect(() => {
     if (order?.hasActivationDetails && user && !showReferralModal) {
-      const timer = setTimeout(() => {
-        setShowReferralModal(true);
-      }, 5000);
-      return () => clearTimeout(timer);
+      // Check if user has already dismissed this modal for this order
+      const dismissedKey = `referral_modal_dismissed_${order.id}`;
+      const alreadyDismissed = localStorage.getItem(dismissedKey);
+
+      if (!alreadyDismissed) {
+        const timer = setTimeout(() => {
+          setShowReferralModal(true);
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [order, user, showReferralModal]);
 
@@ -256,26 +262,41 @@ export default function InstallPage() {
             </div>
           </div>
 
-          <Card className="bg-mint border-2 border-primary shadow-xl mb-8">
-            <CardHeader>
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase">PLAN DETAILS</CardTitle>
+          <Card className="bg-gradient-to-br from-mint to-cyan border-3 sm:border-4 border-foreground shadow-xl mb-8">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase flex items-center gap-3">
+                <span className="text-3xl">📋</span>
+                PLAN DETAILS
+              </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="p-4 bg-white rounded-xl">
-                <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Plan</p>
-                <p className="font-black text-base sm:text-lg">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">📦</span>
+                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Plan</p>
+                </div>
+                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
               </div>
-              <div className="p-4 bg-white rounded-xl">
-                <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Region</p>
-                <p className="font-black text-base sm:text-lg">{order.plan.region}</p>
+              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🌍</span>
+                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Region</p>
+                </div>
+                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.region}</p>
               </div>
-              <div className="p-4 bg-white rounded-xl">
-                <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Data</p>
-                <p className="font-black text-base sm:text-lg">{order.plan.dataGb} GB</p>
+              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">📊</span>
+                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Data Included</p>
+                </div>
+                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.dataGb} GB</p>
               </div>
-              <div className="p-4 bg-white rounded-xl">
-                <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Valid for</p>
-                <p className="font-black text-base sm:text-lg">{order.plan.validityDays} days</p>
+              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">⏱️</span>
+                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Validity Period</p>
+                </div>
+                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.validityDays} Days</p>
               </div>
             </CardContent>
           </Card>
@@ -369,10 +390,14 @@ export default function InstallPage() {
       </div>
 
       {/* Referral Share Modal */}
-      {showReferralModal && user && (
+      {showReferralModal && user && order && (
         <ReferralShareModal
           userId={user.id}
-          onClose={() => setShowReferralModal(false)}
+          onClose={() => {
+            setShowReferralModal(false);
+            // Mark as dismissed so it doesn't show again
+            localStorage.setItem(`referral_modal_dismissed_${order.id}`, 'true');
+          }}
         />
       )}
     </div>

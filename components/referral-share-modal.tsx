@@ -79,11 +79,11 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
-        <Card className="max-w-lg w-full">
-          <CardContent className="pt-6 text-center">
-            <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-            <p className="font-bold">Loading...</p>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 md:p-6">
+        <Card className="max-w-[95vw] sm:max-w-md md:max-w-lg w-full">
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <div className="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-primary mb-3 sm:mb-4"></div>
+            <p className="font-bold text-sm sm:text-base">Loading...</p>
           </CardContent>
         </Card>
       </div>
@@ -92,26 +92,26 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
-        <Card className="max-w-lg w-full">
-          <CardContent className="pt-6 text-center">
-            <div className="text-6xl mb-4">⚠️</div>
-            <h3 className="heading-sm mb-3">Oops!</h3>
-            <p className="text-destructive mb-6 font-bold">{error}</p>
-            <div className="flex gap-3">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 md:p-6">
+        <Card className="max-w-[95vw] sm:max-w-md md:max-w-lg w-full">
+          <CardContent className="pt-4 sm:pt-6 text-center">
+            <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">⚠️</div>
+            <h3 className="text-xl sm:text-2xl font-black uppercase mb-2 sm:mb-3">Oops!</h3>
+            <p className="text-destructive mb-4 sm:mb-6 font-bold text-sm sm:text-base">{error}</p>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Button
                 onClick={() => {
                   setError('');
                   setLoading(true);
                   loadReferralInfo();
                 }}
-                className="flex-1 btn-lumbus bg-primary text-white font-black"
+                className="flex-1 btn-lumbus bg-primary text-white font-black text-sm sm:text-base py-3"
               >
                 TRY AGAIN
               </Button>
               <Button
                 onClick={onClose}
-                className="flex-1 btn-lumbus bg-foreground/20 text-foreground font-black"
+                className="flex-1 btn-lumbus bg-foreground/20 text-foreground font-black text-sm sm:text-base py-3"
               >
                 CLOSE
               </Button>
@@ -123,82 +123,89 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 ">
-      <Card className="max-w-lg w-full bg-purple border-4 border-accent shadow-2xl ">
-        <CardContent className="pt-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 md:p-6">
+      <Card className="max-w-[95vw] sm:max-w-md md:max-w-lg w-full bg-purple border-2 sm:border-3 md:border-4 border-accent shadow-2xl max-h-[95vh] overflow-y-auto">
+        <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6 px-4 sm:px-6">
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-2xl font-black  "
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 text-xl sm:text-2xl font-black hover:opacity-70 transition-opacity z-10"
+            aria-label="Close"
           >
             ✕
           </button>
 
           {/* Header */}
-          <div className="text-center mb-6">
-            <div className="text-6xl mb-4 ">🎁</div>
-            <h2 className="heading-md mb-3">SHARE & EARN!</h2>
-            <p className="text-lg font-bold text-foreground/80">
+          <div className="text-center mb-4 sm:mb-6">
+            <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 animate-bounce">🎁</div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-2 sm:mb-3 leading-tight">SHARE & EARN!</h2>
+            <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/80 leading-relaxed px-2">
               Your friends get 10% off. You get 1GB of free data when they make their first purchase!
             </p>
           </div>
 
           {/* Referral Code Display */}
-          <div className="bg-white rounded-xl p-4 mb-6">
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
             <div className="text-center mb-3">
-              <p className="font-black uppercase text-xs text-muted-foreground mb-2">
+              <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground mb-2">
                 Your Referral Code
               </p>
-              <p className="text-4xl font-black text-primary tracking-wider">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black text-primary tracking-wider break-all">
                 {refCode}
               </p>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1 px-3 py-2 bg-mint rounded-lg font-mono text-xs overflow-hidden text-ellipsis whitespace-nowrap">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex-1 px-2 sm:px-3 py-2 bg-mint rounded-lg font-mono text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                 {referralLink}
               </div>
               <Button
                 onClick={copyLink}
-                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black "
+                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-2 sm:py-2.5 shrink-0"
               >
-                {copied ? '✓' : 'COPY'}
+                {copied ? '✓ COPIED' : 'COPY LINK'}
               </Button>
             </div>
           </div>
 
           {/* Share Buttons */}
-          <div className="space-y-3 mb-6">
+          <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
             <Button
               onClick={shareViaWhatsApp}
-              className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black py-4  flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-xl">💬</span> SHARE ON WHATSAPP
+              <span className="text-lg sm:text-xl">💬</span>
+              <span className="hidden xs:inline">SHARE ON WHATSAPP</span>
+              <span className="xs:hidden">WHATSAPP</span>
             </Button>
             <Button
               onClick={shareViaTwitter}
-              className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black py-4  flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-xl">🐦</span> SHARE ON TWITTER
+              <span className="text-lg sm:text-xl">🐦</span>
+              <span className="hidden xs:inline">SHARE ON TWITTER</span>
+              <span className="xs:hidden">TWITTER</span>
             </Button>
             <Button
               onClick={shareViaEmail}
-              className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black py-4  flex items-center justify-center gap-2"
+              className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-xl">✉️</span> SHARE VIA EMAIL
+              <span className="text-lg sm:text-xl">✉️</span>
+              <span className="hidden xs:inline">SHARE VIA EMAIL</span>
+              <span className="xs:hidden">EMAIL</span>
             </Button>
           </div>
 
           {/* Skip Button */}
           <Button
             onClick={onClose}
-            className="w-full bg-transparent border-2 border-foreground/20 hover:bg-foreground/5 font-black text-foreground/60 py-3 "
+            className="w-full bg-transparent border-2 border-foreground/20 hover:bg-foreground/5 font-black text-foreground/60 text-sm sm:text-base py-2.5 sm:py-3 rounded-lg sm:rounded-xl"
           >
             MAYBE LATER
           </Button>
 
           {/* Info */}
-          <div className="mt-6 p-4 bg-yellow rounded-xl">
-            <p className="text-xs font-bold text-center">
+          <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-yellow/90 rounded-lg sm:rounded-xl">
+            <p className="text-xs sm:text-sm font-bold text-center leading-relaxed">
               You can always find your referral link in your dashboard
             </p>
           </div>
