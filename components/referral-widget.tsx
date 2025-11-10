@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { triggerHaptic } from '@/lib/device-detection';
 import { useAuth } from '@/lib/auth-context';
 import { authenticatedGet } from '@/lib/api-client';
+import Image from 'next/image';
 
 interface ReferralStats {
   ref_code: string;
@@ -231,14 +232,14 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
               className="bg-[#25D366] hover:bg-[#128C7E] text-white font-black py-3 text-xs rounded-xl border-2 border-foreground"
               aria-label="Share on WhatsApp"
             >
-              💬
+              <Image src="/whatsapp-logo.svg" alt="WhatsApp" width={16} height={16} className="w-4 h-4" />
             </Button>
             <Button
               onClick={shareViaTwitter}
               className="bg-[#1DA1F2] hover:bg-[#0d8bd9] text-white font-black py-3 text-xs rounded-xl border-2 border-foreground"
               aria-label="Share on Twitter"
             >
-              🐦
+              <Image src="/twitter-logo.svg" alt="Twitter" width={16} height={16} className="w-4 h-4" />
             </Button>
             <Button
               onClick={copyLink}

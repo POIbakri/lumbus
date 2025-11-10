@@ -262,41 +262,30 @@ export default function InstallPage() {
             </div>
           </div>
 
-          <Card className="bg-gradient-to-br from-mint to-cyan border-3 sm:border-4 border-foreground shadow-xl mb-8">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase flex items-center gap-3">
-                <span className="text-3xl">📋</span>
+          <Card className="bg-white border-4 border-foreground shadow-2xl mb-8">
+            <CardHeader className="bg-gradient-to-r from-primary via-cyan to-mint border-b-4 border-foreground pb-4 sm:pb-6">
+              <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-foreground">
                 PLAN DETAILS
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">📦</span>
-                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Plan</p>
+            <CardContent className="p-6 sm:p-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="bg-gradient-to-br from-mint to-mint/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">PLAN</p>
+                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
                 </div>
-                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
-              </div>
-              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">🌍</span>
-                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Region</p>
+                <div className="bg-gradient-to-br from-cyan to-cyan/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">REGION</p>
+                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.region}</p>
                 </div>
-                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.region}</p>
-              </div>
-              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">📊</span>
-                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Data Included</p>
+                <div className="bg-gradient-to-br from-yellow to-yellow/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">DATA INCLUDED</p>
+                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.dataGb} GB</p>
                 </div>
-                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.dataGb} GB</p>
-              </div>
-              <div className="p-4 sm:p-5 bg-white rounded-xl border-2 border-foreground/10 shadow-md hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">⏱️</span>
-                  <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground">Validity Period</p>
+                <div className="bg-gradient-to-br from-purple to-purple/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-sm sm:text-base text-white/80 mb-2">VALIDITY PERIOD</p>
+                  <p className="font-black text-lg sm:text-xl md:text-2xl text-white leading-tight">{order.plan.validityDays} Days</p>
                 </div>
-                <p className="font-black text-base sm:text-lg md:text-xl text-foreground">{order.plan.validityDays} Days</p>
               </div>
             </CardContent>
           </Card>

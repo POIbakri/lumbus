@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { triggerHaptic } from '@/lib/device-detection';
+import Image from 'next/image';
 
 interface PostPurchaseReferralProps {
   /** User's referral link (if they have an account) */
@@ -200,7 +201,7 @@ export function PostPurchaseReferral({
                 onClick={shareViaWhatsApp}
                 className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-black py-5 text-base sm:text-lg flex items-center justify-center gap-3 border-2 border-foreground/20 shadow-xl"
               >
-                <span className="text-2xl">💬</span>
+                <Image src="/whatsapp-logo.svg" alt="WhatsApp" width={24} height={24} className="w-6 h-6" />
                 SHARE ON WHATSAPP
               </Button>
               <div className="grid grid-cols-2 gap-3">
@@ -208,14 +209,14 @@ export function PostPurchaseReferral({
                   onClick={shareViaTwitter}
                   className="w-full bg-[#1DA1F2] hover:bg-[#0d8bd9] text-white font-black py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20 shadow-xl"
                 >
-                  <span className="text-xl">🐦</span>
+                  <Image src="/twitter-logo.svg" alt="Twitter" width={20} height={20} className="w-5 h-5" />
                   TWITTER
                 </Button>
                 <Button
                   onClick={shareViaEmail}
                   className="w-full bg-foreground hover:bg-foreground/90 text-white font-black py-4 text-sm sm:text-base flex items-center justify-center gap-2 border-2 border-foreground/20 shadow-xl"
                 >
-                  <span className="text-xl">✉️</span>
+                  <Image src="/email-logo.svg" alt="Email" width={20} height={20} className="w-5 h-5" />
                   EMAIL
                 </Button>
               </div>

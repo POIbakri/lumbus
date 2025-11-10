@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { triggerHaptic } from '@/lib/device-detection';
 import { authenticatedGet } from '@/lib/api-client';
+import Image from 'next/image';
 
 interface ReferralShareModalProps {
   userId: string;
@@ -173,7 +174,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
               onClick={shareViaWhatsApp}
               className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-lg sm:text-xl">💬</span>
+              <Image src="/whatsapp-logo.svg" alt="WhatsApp" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="hidden xs:inline">SHARE ON WHATSAPP</span>
               <span className="xs:hidden">WHATSAPP</span>
             </Button>
@@ -181,7 +182,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
               onClick={shareViaTwitter}
               className="w-full btn-lumbus bg-[#1DA1F2] text-white hover:bg-[#0d8bd9] font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-lg sm:text-xl">🐦</span>
+              <Image src="/twitter-logo.svg" alt="Twitter" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="hidden xs:inline">SHARE ON TWITTER</span>
               <span className="xs:hidden">TWITTER</span>
             </Button>
@@ -189,7 +190,7 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
               onClick={shareViaEmail}
               className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-3 sm:py-4 flex items-center justify-center gap-2 rounded-lg sm:rounded-xl"
             >
-              <span className="text-lg sm:text-xl">✉️</span>
+              <Image src="/email-logo.svg" alt="Email" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6" />
               <span className="hidden xs:inline">SHARE VIA EMAIL</span>
               <span className="xs:hidden">EMAIL</span>
             </Button>
