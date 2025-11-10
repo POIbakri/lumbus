@@ -263,28 +263,28 @@ export default function InstallPage() {
           </div>
 
           <Card className="bg-white border-4 border-foreground shadow-2xl mb-8">
-            <CardHeader className="bg-gradient-to-r from-primary via-cyan to-mint border-b-4 border-foreground pb-4 sm:pb-6">
+            <CardHeader className="bg-primary border-b-4 border-foreground pb-4 sm:pb-6">
               <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-foreground">
                 PLAN DETAILS
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 sm:p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="bg-gradient-to-br from-mint to-mint/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">PLAN</p>
-                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
+                <div className="bg-mint p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">PLAN</p>
+                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
                 </div>
-                <div className="bg-gradient-to-br from-cyan to-cyan/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">REGION</p>
-                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.region}</p>
+                <div className="bg-cyan p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">REGION</p>
+                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.region}</p>
                 </div>
-                <div className="bg-gradient-to-br from-yellow to-yellow/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-sm sm:text-base text-foreground/70 mb-2">DATA INCLUDED</p>
-                  <p className="font-black text-lg sm:text-xl md:text-2xl text-foreground leading-tight">{order.plan.dataGb} GB</p>
+                <div className="bg-yellow p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">DATA INCLUDED</p>
+                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.dataGb} GB</p>
                 </div>
-                <div className="bg-gradient-to-br from-purple to-purple/80 p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-sm sm:text-base text-white/80 mb-2">VALIDITY PERIOD</p>
-                  <p className="font-black text-lg sm:text-xl md:text-2xl text-white leading-tight">{order.plan.validityDays} Days</p>
+                <div className="bg-purple p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">VALIDITY PERIOD</p>
+                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.validityDays} Days</p>
                 </div>
               </div>
             </CardContent>

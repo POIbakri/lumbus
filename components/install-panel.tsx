@@ -48,11 +48,11 @@ export function InstallPanel({
     <div className="space-y-6 sm:space-y-8">
       {/* Section Header */}
       <Card className="bg-white border-4 border-foreground shadow-2xl">
-        <CardHeader className="bg-gradient-to-r from-purple via-purple/90 to-purple/80 border-b-4 border-foreground pb-4 sm:pb-6">
-          <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-white">
+        <CardHeader className="bg-purple border-b-4 border-foreground pb-4 sm:pb-6">
+          <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-foreground">
             INSTALLATION INSTRUCTIONS
           </CardTitle>
-          <p className="text-sm sm:text-base md:text-lg font-bold text-white/90 text-center mt-2">
+          <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/80 text-center mt-2">
             Choose your device type below to get started
           </p>
         </CardHeader>
@@ -62,7 +62,7 @@ export function InstallPanel({
         <TabsList className="grid w-full grid-cols-2 gap-3 sm:gap-4 bg-transparent p-0 h-auto mb-6 sm:mb-8">
           <TabsTrigger
             value="ios"
-            className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-cyan data-[state=active]:text-foreground data-[state=active]:border-4 data-[state=active]:shadow-2xl data-[state=active]:scale-105 bg-white/50 border-3 border-foreground/30 hover:border-foreground/50 px-4 sm:px-6 py-4 sm:py-6 md:py-8 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-102"
+            className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl data-[state=active]:bg-primary data-[state=active]:text-foreground data-[state=active]:border-4 data-[state=active]:border-foreground data-[state=active]:shadow-2xl data-[state=active]:scale-105 bg-muted border-3 border-foreground/30 text-foreground/40 hover:border-foreground/50 hover:text-foreground/60 px-4 sm:px-6 py-4 sm:py-6 md:py-8 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-102"
           >
             <span className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <Image src="/apple-logo.svg" alt="Apple" width={32} height={32} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
@@ -72,7 +72,7 @@ export function InstallPanel({
           </TabsTrigger>
           <TabsTrigger
             value="android"
-            className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl data-[state=active]:bg-gradient-to-br data-[state=active]:from-yellow data-[state=active]:to-mint data-[state=active]:text-foreground data-[state=active]:border-4 data-[state=active]:shadow-2xl data-[state=active]:scale-105 bg-white/50 border-3 border-foreground/30 hover:border-foreground/50 px-4 sm:px-6 py-4 sm:py-6 md:py-8 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-102"
+            className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl data-[state=active]:bg-yellow data-[state=active]:text-foreground data-[state=active]:border-4 data-[state=active]:border-foreground data-[state=active]:shadow-2xl data-[state=active]:scale-105 bg-muted border-3 border-foreground/30 text-foreground/40 hover:border-foreground/50 hover:text-foreground/60 px-4 sm:px-6 py-4 sm:py-6 md:py-8 rounded-xl sm:rounded-2xl transition-all duration-300 hover:scale-102"
           >
             <span className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <Image src="/android-logo.svg" alt="Android" width={32} height={32} className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 object-contain" />
@@ -84,7 +84,7 @@ export function InstallPanel({
       <TabsContent value="ios" className="space-y-3 sm:space-y-4 md:space-y-6">
         {/* Method 1: One-Tap Install (iOS 17.4+) */}
         {supportsUniversalLink && (
-          <Card className="bg-gradient-to-br from-purple to-purple/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+          <Card className="bg-purple border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
             <CardHeader>
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
@@ -133,7 +133,7 @@ export function InstallPanel({
         )}
 
         {/* Method 2: QR Code */}
-        <Card className="bg-gradient-to-br from-cyan to-cyan/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+        <Card className="bg-cyan border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
               {supportsUniversalLink ? 'METHOD 2:' : 'METHOD 1:'} SCAN QR CODE
@@ -186,7 +186,7 @@ export function InstallPanel({
         </Card>
 
         {/* Method 3: Manual Entry */}
-        <Card className="bg-gradient-to-br from-yellow to-yellow/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+        <Card className="bg-yellow border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
               {supportsUniversalLink ? 'METHOD 3:' : 'METHOD 2:'} MANUAL ENTRY
@@ -279,7 +279,7 @@ export function InstallPanel({
 
       <TabsContent value="android" className="space-y-3 sm:space-y-4 md:space-y-6">
         {/* Method 1: QR Code Scan */}
-        <Card className="bg-gradient-to-br from-yellow to-yellow/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+        <Card className="bg-yellow border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
           <CardHeader>
             <div className="flex items-center justify-between flex-wrap gap-2">
               <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
@@ -340,7 +340,7 @@ export function InstallPanel({
         </Card>
 
         {/* Method 2: Manual Entry */}
-        <Card className="bg-gradient-to-br from-cyan to-cyan/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+        <Card className="bg-cyan border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
           <CardHeader>
             <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
               METHOD 2: MANUAL ENTRY
