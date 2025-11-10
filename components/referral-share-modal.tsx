@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { triggerHaptic } from '@/lib/device-detection';
+import { authenticatedGet } from '@/lib/api-client';
 
 interface ReferralShareModalProps {
   userId: string;
@@ -19,21 +20,19 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
   const loadReferralInfo = useCallback(async () => {
     try {
-      const response = await fetch(`/api/referrals/me?user_id=${userId}`);
-      if (!response.ok) {
-        setError('Failed to load referral information. Please try again.');
-        return;
-      }
-      const data = await response.json();
+      const data = await authenticatedGet<{
+        referral_link: string;
+        ref_code: string;
+      }>('/api/referrals/me');
       setReferralLink(data.referral_link);
       setRefCode(data.ref_code);
     } catch (error) {
       console.error('Failed to load referral info:', error);
-      setError('Network error. Please check your connection and try again.');
+      setError(error instanceof Error ? error.message : 'Failed to load referral information. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     loadReferralInfo();

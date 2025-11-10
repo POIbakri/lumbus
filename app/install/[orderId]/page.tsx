@@ -122,10 +122,10 @@ export default function InstallPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Loading order...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-primary mb-4"></div>
+          <p className="text-base sm:text-lg font-bold text-foreground">Loading order...</p>
         </div>
       </div>
     );
@@ -226,8 +226,8 @@ export default function InstallPage() {
           <div className="text-center mb-8 sm:mb-12 px-4">
             {/* Success Badge */}
             <div className="inline-block mb-4 sm:mb-6">
-              <div className="bg-gradient-to-r from-mint to-cyan rounded-full px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
-                <span className="font-black uppercase text-xs sm:text-sm md:text-base lg:text-lg">Payment Successful</span>
+              <div className="bg-mint rounded-full px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 border-3 sm:border-4 border-foreground shadow-xl">
+                <span className="font-black uppercase text-xs sm:text-sm md:text-base lg:text-lg text-foreground">✓ Payment Successful</span>
               </div>
             </div>
 
@@ -239,15 +239,18 @@ export default function InstallPage() {
             </p>
 
             {/* Important Notice - Email Backup - Mobile First */}
-            <div className="mt-4 sm:mt-6 mx-4">
-              <div className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-purple to-purple/80 border-2 sm:border-3 md:border-4 border-foreground rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl max-w-lg mx-auto">
-                <div className="text-left space-y-2 sm:space-y-3">
-                  <p className="font-black uppercase text-sm sm:text-base md:text-lg text-white">
-                    Installation instructions sent to your email
-                  </p>
-                  <p className="text-xs sm:text-sm md:text-base font-bold text-white/95">
-                    Check your inbox <span className="text-red-400 font-black">(and spam folder)</span> for activation details. You can install later from the email.
-                  </p>
+            <div className="mt-4 sm:mt-6 mx-auto max-w-2xl px-4">
+              <div className="p-5 sm:p-6 md:p-8 bg-purple border-3 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="text-3xl sm:text-4xl flex-shrink-0">✉️</div>
+                  <div className="space-y-2 sm:space-y-3 flex-1">
+                    <p className="font-black uppercase text-base sm:text-lg md:text-xl text-foreground leading-tight">
+                      Installation instructions sent to your email
+                    </p>
+                    <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/80 leading-relaxed">
+                      Check your inbox <span className="bg-yellow px-2 py-1 rounded font-black">(and spam folder)</span> for activation details. You can install later from the email.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,38 +289,50 @@ export default function InstallPage() {
           />
 
           {/* Important Tips Section */}
-          <Card className="mt-6 sm:mt-8 bg-gradient-to-br from-yellow to-yellow/80 border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
+          <Card className="mt-6 sm:mt-8 bg-yellow border-3 sm:border-4 border-foreground shadow-xl">
             <CardHeader>
-              <CardTitle className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black uppercase">
+              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-foreground">
                 IMPORTANT TIPS
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="bg-white/90 p-3 sm:p-4 rounded-lg sm:rounded-xl">
-                  <h3 className="font-black uppercase text-xs sm:text-sm mb-2">When to activate</h3>
-                  <p className="text-xs sm:text-sm font-bold text-foreground/70">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-white p-4 sm:p-5 rounded-xl border-2 border-foreground/10">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-2xl flex-shrink-0">⏰</span>
+                    <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">When to activate</h3>
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
                     Install now, but turn on data roaming only when you arrive at your destination to start the validity period.
                   </p>
                 </div>
 
-                <div className="bg-white/90 p-3 sm:p-4 rounded-lg sm:rounded-xl">
-                  <h3 className="font-black uppercase text-xs sm:text-sm mb-2">Keep your SIM</h3>
-                  <p className="text-xs sm:text-sm font-bold text-foreground/70">
+                <div className="bg-white p-4 sm:p-5 rounded-xl border-2 border-foreground/10">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-2xl flex-shrink-0">📱</span>
+                    <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Keep your SIM</h3>
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
                     Don't remove your physical SIM! The eSIM works alongside it. Switch between them in settings.
                   </p>
                 </div>
 
-                <div className="bg-white/90 p-3 sm:p-4 rounded-lg sm:rounded-xl">
-                  <h3 className="font-black uppercase text-xs sm:text-sm mb-2">Save the QR code</h3>
-                  <p className="text-xs sm:text-sm font-bold text-foreground/70">
+                <div className="bg-white p-4 sm:p-5 rounded-xl border-2 border-foreground/10">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-2xl flex-shrink-0">📸</span>
+                    <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Save the QR code</h3>
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
                     Take a screenshot of the QR code so you can install later if needed (also in your email).
                   </p>
                 </div>
 
-                <div className="bg-white/90 p-3 sm:p-4 rounded-lg sm:rounded-xl">
-                  <h3 className="font-black uppercase text-xs sm:text-sm mb-2">Need more data?</h3>
-                  <p className="text-xs sm:text-sm font-bold text-foreground/70">
+                <div className="bg-white p-4 sm:p-5 rounded-xl border-2 border-foreground/10">
+                  <div className="flex items-start gap-3 mb-2">
+                    <span className="text-2xl flex-shrink-0">➕</span>
+                    <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Need more data?</h3>
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
                     You can purchase top-up plans from your dashboard anytime during the validity period.
                   </p>
                 </div>
@@ -326,20 +341,23 @@ export default function InstallPage() {
           </Card>
 
           {/* Help Section */}
-          <div className="mt-6 sm:mt-8 text-center">
-            <div className="p-5 sm:p-6 md:p-8 bg-gradient-to-br from-cyan to-cyan/80 border-2 sm:border-3 md:border-4 border-foreground rounded-lg sm:rounded-xl md:rounded-2xl shadow-xl max-w-2xl mx-auto">
-              <h3 className="font-black uppercase text-base sm:text-lg md:text-xl mb-2 sm:mb-3">Need Help?</h3>
-              <p className="font-bold text-xs sm:text-sm md:text-base mb-3 sm:mb-4 text-foreground/80">
+          <div className="mt-6 sm:mt-8">
+            <div className="p-5 sm:p-6 md:p-8 bg-cyan border-3 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl max-w-2xl mx-auto">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <span className="text-3xl sm:text-4xl">💬</span>
+                <h3 className="font-black uppercase text-xl sm:text-2xl md:text-3xl text-foreground">Need Help?</h3>
+              </div>
+              <p className="font-bold text-sm sm:text-base md:text-lg mb-5 sm:mb-6 text-foreground/80 text-center leading-relaxed">
                 Installation instructions are in your email, or get help from our support team
               </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                 <Link href="/support" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-black text-xs sm:text-sm md:text-base px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 touch-manipulation">
+                  <Button className="w-full sm:w-auto bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-black text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 rounded-xl touch-manipulation shadow-xl border-2 border-foreground">
                     CONTACT SUPPORT
                   </Button>
                 </Link>
                 <Link href="/dashboard" className="w-full sm:w-auto">
-                  <Button variant="outline" className="w-full sm:w-auto font-black text-xs sm:text-sm md:text-base px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 border-2 border-foreground touch-manipulation">
+                  <Button variant="outline" className="w-full sm:w-auto font-black text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 border-3 border-foreground rounded-xl touch-manipulation bg-white hover:bg-mint text-foreground">
                     VIEW DASHBOARD
                   </Button>
                 </Link>

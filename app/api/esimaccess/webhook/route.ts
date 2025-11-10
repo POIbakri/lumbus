@@ -313,10 +313,46 @@ async function handleEsimStatus(content: {
 
   const newStatus = statusMap[content.esimStatus] || 'unknown';
 
-  await supabase
+  console.log(`[eSIM Status Webhook] Processing status change: ${content.esimStatus} → ${newStatus}`, {
+    orderNo: content.orderNo,
+    iccid: content.iccid,
+    esimTranNo: content.esimTranNo
+  });
+
+  // Try to update by ICCID first
+  const { data: updatedByIccid, error: iccidError } = await supabase
     .from('orders')
     .update({ status: newStatus })
-    .eq('iccid', content.iccid);
+    .eq('iccid', content.iccid)
+    .select();
+
+  if (updatedByIccid && updatedByIccid.length > 0) {
+    console.log(`[eSIM Status Webhook] ✅ Successfully updated order ${updatedByIccid[0].id} by ICCID to status: ${newStatus}`);
+    return;
+  }
+
+  // If ICCID match failed, try matching by connect_order_id (orderNo)
+  // This handles cases where the order hasn't been fully provisioned yet
+  console.log(`[eSIM Status Webhook] ICCID match failed, trying orderNo fallback`);
+
+  const { data: updatedByOrderNo, error: orderNoError } = await supabase
+    .from('orders')
+    .update({
+      status: newStatus,
+      iccid: content.iccid // Also set ICCID if it wasn't set yet
+    })
+    .eq('connect_order_id', content.orderNo)
+    .select();
+
+  if (updatedByOrderNo && updatedByOrderNo.length > 0) {
+    console.log(`[eSIM Status Webhook] ✅ Successfully updated order ${updatedByOrderNo[0].id} by orderNo to status: ${newStatus}`);
+    return;
+  }
+
+  // If both methods failed, log an error
+  console.error(`[eSIM Status Webhook] ❌ Failed to find order with ICCID: ${content.iccid} or orderNo: ${content.orderNo}`);
+  console.error('[eSIM Status Webhook] ICCID error:', iccidError);
+  console.error('[eSIM Status Webhook] OrderNo error:', orderNoError);
 }
 
 /**

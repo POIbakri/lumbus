@@ -55,14 +55,14 @@ export function InstallPanel({
         <TabsList className="grid w-full grid-cols-2 bg-mint border-2 sm:border-3 md:border-4 border-primary p-1 sm:p-1.5">
           <TabsTrigger value="ios" className="font-bold uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-primary data-[state=active]:text-white px-2 sm:px-4 py-2 sm:py-3">
             <span className="flex items-center gap-1.5 sm:gap-2">
-              <Image src="/apple-logo.jpg" alt="Apple" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+              <Image src="/apple-logo.svg" alt="Apple" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               <span className="hidden sm:inline">iPhone / iPad</span>
               <span className="sm:hidden">iOS</span>
             </span>
           </TabsTrigger>
           <TabsTrigger value="android" className="font-bold uppercase text-xs sm:text-sm md:text-base data-[state=active]:bg-yellow data-[state=active]:text-foreground px-2 sm:px-4 py-2 sm:py-3">
             <span className="flex items-center gap-1.5 sm:gap-2">
-              <Image src="/android-logo.png" alt="Android" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+              <Image src="/android-logo.svg" alt="Android" width={20} height={20} className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               <span>Android</span>
             </span>
           </TabsTrigger>
@@ -83,26 +83,26 @@ export function InstallPanel({
               </div>
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
-              <div className="bg-white/90 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-2 sm:space-y-3">
-                <p className="font-black text-xs sm:text-sm md:text-base uppercase text-center">
+              <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-3 sm:space-y-4 border-2 border-foreground/10">
+                <p className="font-black text-sm sm:text-base md:text-lg uppercase text-center text-foreground">
                   For iOS 17.4 or newer
                 </p>
-                <ol className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base font-bold">
-                  <li className="flex gap-2 sm:gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">1</span>
-                    <span>Tap the button below to open Settings automatically</span>
+                <ol className="space-y-3 sm:space-y-4 text-sm sm:text-base md:text-lg font-bold text-foreground">
+                  <li className="flex gap-3 sm:gap-4 items-start">
+                    <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">1</span>
+                    <span className="flex-1 pt-0.5">Tap the button below to open Settings automatically</span>
                   </li>
-                  <li className="flex gap-2 sm:gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">2</span>
-                    <span>Tap "Continue" when prompted</span>
+                  <li className="flex gap-3 sm:gap-4 items-start">
+                    <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">2</span>
+                    <span className="flex-1 pt-0.5">Tap "Continue" when prompted</span>
                   </li>
-                  <li className="flex gap-2 sm:gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">3</span>
-                    <span>Label your eSIM (e.g., "Travel Data")</span>
+                  <li className="flex gap-3 sm:gap-4 items-start">
+                    <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">3</span>
+                    <span className="flex-1 pt-0.5">Label your eSIM (e.g., "Travel Data")</span>
                   </li>
-                  <li className="flex gap-2 sm:gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">4</span>
-                    <span>Done! Your eSIM is installed</span>
+                  <li className="flex gap-3 sm:gap-4 items-start">
+                    <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">4</span>
+                    <span className="flex-1 pt-0.5">Done! Your eSIM is installed</span>
                   </li>
                 </ol>
               </div>
@@ -127,26 +127,26 @@ export function InstallPanel({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4">
-            <div className="bg-white/90 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-2 sm:space-y-3">
-              <p className="font-black text-xs sm:text-sm md:text-base uppercase text-center">
+            <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-3 sm:space-y-4 border-2 border-foreground/10">
+              <p className="font-black text-sm sm:text-base md:text-lg uppercase text-center text-foreground">
                 For all iPhones
               </p>
-              <ol className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base font-bold">
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">1</span>
-                  <span>Long-press the QR code below with your camera app</span>
+              <ol className="space-y-3 sm:space-y-4 text-sm sm:text-base md:text-lg font-bold text-foreground">
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">1</span>
+                  <span className="flex-1 pt-0.5">Long-press the QR code below with your camera app</span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">2</span>
-                  <span>Tap "Set Up Cellular Plan" or "Add eSIM"</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">2</span>
+                  <span className="flex-1 pt-0.5">Tap "Set Up Cellular Plan" or "Add eSIM"</span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">3</span>
-                  <span>Follow the on-screen prompts</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">3</span>
+                  <span className="flex-1 pt-0.5">Follow the on-screen prompts</span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">4</span>
-                  <span>Label your eSIM and tap "Done"</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">4</span>
+                  <span className="flex-1 pt-0.5">Label your eSIM and tap "Done"</span>
                 </li>
               </ol>
             </div>
@@ -185,66 +185,66 @@ export function InstallPanel({
                 <AccordionTrigger className="font-black uppercase text-xs sm:text-sm md:text-base px-3 sm:px-4 hover:no-underline">
                   Show Manual Entry Instructions
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3 sm:space-y-4 px-3 sm:px-4 pb-3 sm:pb-4">
-                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base font-bold mb-3 sm:mb-4">
-                    <p className="font-black uppercase text-center">Follow these steps:</p>
-                    <ol className="space-y-2">
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">1</span>
-                        <span>Go to: <strong>Settings → Cellular → Add eSIM</strong></span>
+                <AccordionContent className="space-y-4 sm:space-y-5 px-3 sm:px-4 pb-4 sm:pb-5">
+                  <div className="space-y-3 sm:space-y-4 text-sm sm:text-base font-bold mb-4">
+                    <p className="font-black uppercase text-center text-foreground text-base sm:text-lg">Follow these steps:</p>
+                    <ol className="space-y-3 sm:space-y-4 text-foreground">
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">1</span>
+                        <span className="flex-1 pt-0.5">Go to: <strong>Settings → Cellular → Add eSIM</strong></span>
                       </li>
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">2</span>
-                        <span>Select <strong>"Enter Details Manually"</strong></span>
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">2</span>
+                        <span className="flex-1 pt-0.5">Select <strong>"Enter Details Manually"</strong></span>
                       </li>
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">3</span>
-                        <span>Copy and paste the codes below</span>
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">3</span>
+                        <span className="flex-1 pt-0.5">Copy and paste the codes below</span>
                       </li>
                     </ol>
                   </div>
 
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">SM-DP+ Address:</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">SM-DP+ Address:</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {smdp}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(smdp, 'smdp')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'smdp' ? '✓' : 'COPY'}
                         </Button>
                       </div>
                     </div>
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">Activation Code:</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">Activation Code:</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {activationCode}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(activationCode, 'activation')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'activation' ? '✓' : 'COPY'}
                         </Button>
                       </div>
                     </div>
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">LPA String (Complete):</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">LPA String (Complete):</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {lpaString}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(lpaString, 'lpa')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'lpa' ? '✓' : 'COPY'}
                         </Button>
@@ -278,30 +278,30 @@ export function InstallPanel({
             </div>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4">
-            <div className="bg-white/90 p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-2 sm:space-y-3">
-              <p className="font-black text-xs sm:text-sm md:text-base uppercase text-center">
+            <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-3 sm:space-y-4 border-2 border-foreground/10">
+              <p className="font-black text-sm sm:text-base md:text-lg uppercase text-center text-foreground">
                 For all Android phones
               </p>
-              <ol className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base font-bold">
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">1</span>
-                  <span>Go to: <strong>Settings → Network & Internet → SIMs</strong></span>
+              <ol className="space-y-3 sm:space-y-4 text-sm sm:text-base md:text-lg font-bold text-foreground">
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">1</span>
+                  <span className="flex-1 pt-0.5">Go to: <strong>Settings → Network & Internet → SIMs</strong></span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">2</span>
-                  <span>Tap <strong>"Add eSIM"</strong> or the <strong>"+"</strong> button</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">2</span>
+                  <span className="flex-1 pt-0.5">Tap <strong>"Add eSIM"</strong> or the <strong>"+"</strong> button</span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">3</span>
-                  <span>Select <strong>"Scan QR code"</strong></span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">3</span>
+                  <span className="flex-1 pt-0.5">Select <strong>"Scan QR code"</strong></span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">4</span>
-                  <span>Point your camera at the QR code below</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">4</span>
+                  <span className="flex-1 pt-0.5">Point your camera at the QR code below</span>
                 </li>
-                <li className="flex gap-2 sm:gap-3">
-                  <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">5</span>
-                  <span>Follow prompts to activate your eSIM</span>
+                <li className="flex gap-3 sm:gap-4 items-start">
+                  <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">5</span>
+                  <span className="flex-1 pt-0.5">Follow prompts to activate your eSIM</span>
                 </li>
               </ol>
             </div>
@@ -339,70 +339,70 @@ export function InstallPanel({
                 <AccordionTrigger className="font-black uppercase text-xs sm:text-sm md:text-base px-3 sm:px-4 hover:no-underline">
                   Show Manual Entry Instructions
                 </AccordionTrigger>
-                <AccordionContent className="space-y-3 sm:space-y-4 px-3 sm:px-4 pb-3 sm:pb-4">
-                  <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm md:text-base font-bold mb-3 sm:mb-4">
-                    <p className="font-black uppercase text-center">Follow these steps:</p>
-                    <ol className="space-y-2">
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">1</span>
-                        <span>Go to: <strong>Settings → Network & Internet → SIMs</strong></span>
+                <AccordionContent className="space-y-4 sm:space-y-5 px-3 sm:px-4 pb-4 sm:pb-5">
+                  <div className="space-y-3 sm:space-y-4 text-sm sm:text-base font-bold mb-4">
+                    <p className="font-black uppercase text-center text-foreground text-base sm:text-lg">Follow these steps:</p>
+                    <ol className="space-y-3 sm:space-y-4 text-foreground">
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">1</span>
+                        <span className="flex-1 pt-0.5">Go to: <strong>Settings → Network & Internet → SIMs</strong></span>
                       </li>
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">2</span>
-                        <span>Tap <strong>"Add eSIM"</strong> or <strong>"+"</strong></span>
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">2</span>
+                        <span className="flex-1 pt-0.5">Tap <strong>"Add eSIM"</strong> or <strong>"+"</strong></span>
                       </li>
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">3</span>
-                        <span>Select <strong>"Enter activation code"</strong> or <strong>"Enter manually"</strong></span>
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">3</span>
+                        <span className="flex-1 pt-0.5">Select <strong>"Enter activation code"</strong> or <strong>"Enter manually"</strong></span>
                       </li>
-                      <li className="flex gap-2 sm:gap-3">
-                        <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-primary text-white rounded-full flex items-center justify-center font-black text-xs">4</span>
-                        <span>Copy and paste the codes below</span>
+                      <li className="flex gap-3 sm:gap-4 items-start">
+                        <span className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-primary text-white rounded-full flex items-center justify-center font-black text-sm">4</span>
+                        <span className="flex-1 pt-0.5">Copy and paste the codes below</span>
                       </li>
                     </ol>
                   </div>
 
-                  <div className="space-y-2 sm:space-y-3">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">SM-DP+ Address:</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">SM-DP+ Address:</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {smdp}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(smdp, 'smdp-android')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'smdp-android' ? '✓' : 'COPY'}
                         </Button>
                       </div>
                     </div>
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">Activation Code:</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">Activation Code:</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {activationCode}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(activationCode, 'activation-android')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'activation-android' ? '✓' : 'COPY'}
                         </Button>
                       </div>
                     </div>
                     <div>
-                      <label className="font-black uppercase text-xs sm:text-sm block mb-2">LPA String (Complete):</label>
+                      <label className="font-black uppercase text-sm sm:text-base block mb-2 text-foreground">LPA String (Complete):</label>
                       <div className="flex gap-2">
-                        <code className="flex-1 p-3 bg-white border-2 border-foreground/20 rounded-lg text-xs break-all font-mono">
+                        <code className="flex-1 p-3 sm:p-4 bg-white border-2 border-foreground/20 rounded-lg text-xs sm:text-sm break-all font-mono text-foreground">
                           {lpaString}
                         </code>
                         <Button
                           size="sm"
                           onClick={() => handleCopy(lpaString, 'lpa-android')}
-                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] touch-manipulation"
+                          className="bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 font-bold shrink-0 min-w-[70px] sm:min-w-[80px] text-sm sm:text-base py-3 sm:py-4 touch-manipulation"
                         >
                           {copiedField === 'lpa-android' ? '✓' : 'COPY'}
                         </Button>

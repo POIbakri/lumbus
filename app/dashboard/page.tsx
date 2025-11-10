@@ -390,8 +390,11 @@ export default function DashboardPage() {
     const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
     const expired = isOrderExpired(o);
 
-    // Show completed, provisioning, or active orders that aren't depleted or expired
-    return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired;
+    // Explicitly exclude cancelled, revoked, or failed orders
+    const isInvalidStatus = ['cancelled', 'revoked', 'failed', 'unknown'].includes(status);
+
+    // Show completed, provisioning, or active orders that aren't depleted, expired, or invalid
+    return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired && !isInvalidStatus;
   });
 
   // Past orders: Show depleted OR expired eSIMs
