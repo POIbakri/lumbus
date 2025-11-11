@@ -10,20 +10,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://getlumbus.com'
   const currentDate = new Date()
 
-  // Fetch all active plans from database with error handling
+  // Fetch all active plans from database with error handling and pagination
   let plans: any[] = []
   try {
-    const { data, error } = await supabase
-      .from('plans')
-      .select('region_code, id, updated_at, name')
-      .eq('is_active', true)
-      .order('updated_at', { ascending: false })
+    let from = 0
+    const pageSize = 1000
 
-    if (error) {
-      console.error('Sitemap: Error fetching plans:', error)
-    } else {
-      plans = data || []
+    while (true) {
+      const { data, error } = await supabase
+        .from('plans')
+        .select('region_code, id, updated_at, name')
+        .eq('is_active', true)
+        .order('updated_at', { ascending: false })
+        .range(from, from + pageSize - 1)
+
+      if (error) {
+        console.error('Sitemap: Error fetching plans:', error)
+        break
+      }
+
+      if (!data || data.length === 0) break
+
+      plans = [...plans, ...data]
+
+      if (data.length < pageSize) break
+      from += pageSize
     }
+
+    console.log(`Sitemap: Fetched ${plans.length} plans`)
   } catch (err) {
     console.error('Sitemap: Failed to fetch plans:', err)
   }
