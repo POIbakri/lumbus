@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Nav } from '@/components/nav';
 import { Card, CardContent } from '@/components/ui/card';
 import { FAQSchema } from '@/components/structured-data';
+import { openTawkToChat } from '@/components/tawk-to';
 
 const faqs = [
   {
@@ -283,7 +284,10 @@ export default function HelpPage() {
                 <p className="font-bold text-sm text-foreground/70 mb-4">
                   Chat with us in real-time
                 </p>
-                <button className="text-primary font-black text-sm hover:underline">
+                <button
+                  onClick={openTawkToChat}
+                  className="text-primary font-black text-sm hover:underline"
+                >
                   Start Chat
                 </button>
               </CardContent>

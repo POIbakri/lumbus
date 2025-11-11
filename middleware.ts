@@ -28,12 +28,12 @@ export function middleware(request: NextRequest) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://accounts.google.com https://embed.tawk.to https://*.tawk.to https://va.vercel-scripts.com",
+      "style-src 'self' 'unsafe-inline' https://embed.tawk.to https://*.tawk.to",
       "img-src 'self' data: https: blob:",
-      "font-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://accounts.google.com https://appleid.apple.com",
-      "frame-src 'self' https://js.stripe.com https://accounts.google.com https://appleid.apple.com",
+      "font-src 'self' data: https://fonts.gstatic.com https://*.tawk.to",
+      "connect-src 'self' https://*.supabase.co https://api.stripe.com https://accounts.google.com https://appleid.apple.com https://embed.tawk.to https://va.tawk.to https://tawk.to https://vitals.vercel-insights.com https://va.vercel-scripts.com wss://*.tawk.to",
+      "frame-src 'self' https://js.stripe.com https://accounts.google.com https://appleid.apple.com https://tawk.to https://*.tawk.to",
       "base-uri 'self'",
       "form-action 'self' https://accounts.google.com https://appleid.apple.com",
     ].join('; ')

@@ -6,6 +6,7 @@ import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data"
 import { Analytics } from "@vercel/analytics/next";
 import { WelcomePopup } from "@/components/welcome-popup";
 import { CookieConsent } from "@/components/cookie-consent";
+import { TawkTo } from "@/components/tawk-to";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -223,6 +224,7 @@ export default function RootLayout({
         </AuthProvider>
         <WelcomePopup />
         <CookieConsent />
+        <TawkTo />
         <Analytics />
         <script
           dangerouslySetInnerHTML={{

@@ -28,6 +28,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // Only handle same-origin requests - let external requests pass through
+  if (url.origin !== location.origin) {
+    return;
+  }
+
   // Only cache GET requests for install pages
   if (request.method !== 'GET') {
     return;
@@ -53,6 +58,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for everything else
+  // Network-first for everything else (same-origin only)
   event.respondWith(fetch(request));
 });
