@@ -24,7 +24,7 @@ export function TawkTo() {
             (function(){
               var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
               s1.async=true;
-              s1.src='https://embed.tawk.to/6913619083160d195a17498b/25bd5f474400d6abb53bc8b0fbb116e0d85bfaf5';
+              s1.src='https://embed.tawk.to/6913619083160d195a17498b/1j9pra7j0';
               s1.charset='UTF-8';
               s1.setAttribute('crossorigin','*');
               s0.parentNode.insertBefore(s1,s0);
