@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .from('plans')
         .select('region_code, id, updated_at, name')
         .eq('is_active', true)
+        .gte('data_gb', 0.5) // Only include plans >= 500MB
         .order('updated_at', { ascending: false })
         .range(from, from + pageSize - 1)
 

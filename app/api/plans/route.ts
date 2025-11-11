@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
         .from('plans')
         .select('*')
         .eq('is_active', true)
+        .gte('data_gb', 0.5) // Only show plans >= 500MB
         .order('retail_price', { ascending: true })
         .range(from, from + pageSize - 1);
 
