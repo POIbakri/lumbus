@@ -23,6 +23,15 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   const canonicalUrl = `https://getlumbus.com${url.pathname}`
 
+  // Prevent indexing of filtered/paginated URLs to avoid duplicate content
+  const hasQueryParams = url.search && url.search.length > 0
+  const isPlansPage = url.pathname === '/plans'
+
+  if (isPlansPage && hasQueryParams) {
+    // Set noindex for filtered views like /plans?region=US
+    headers.set('X-Robots-Tag', 'noindex, follow')
+  }
+
   // Content Security Policy (adjust as needed)
   headers.set(
     'Content-Security-Policy',
