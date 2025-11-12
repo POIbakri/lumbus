@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'eSIM Plans - 1700+ Plans in 150+ Countries | Lumbus',
-  description: '1700+ eSIM plans across 150+ countries. Compare prices, data amounts, and validity periods. Instant activation, no contracts.',
+  title: 'Buy eSIM Plans Online - 1700+ Cheap eSIM Plans for 150+ Countries | Best Prices 2025',
+  description: 'Buy cheap eSIM plans online for travel. 1700+ plans in 150+ countries. Compare prices & find best eSIM deals. Instant activation, no signup. Cheapest eSIM provider 2025.',
   alternates: {
     canonical: 'https://getlumbus.com/plans',
   },

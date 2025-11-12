@@ -39,8 +39,8 @@ export async function generateMetadata({
     const dataAmount = formatDataAmount(plan.data_gb);
 
     return {
-      title: `${dataAmount} eSIM for ${countryInfo.name} - ${plan.validity_days} Days | Lumbus`,
-      description: `Get ${dataAmount} of high-speed data in ${countryInfo.name} for ${plan.validity_days} days. Instant activation, no contracts. Only $${plan.retail_price.toFixed(2)}.`,
+      title: `Buy ${dataAmount} eSIM for ${countryInfo.name} - ${plan.validity_days} Days $${plan.retail_price.toFixed(2)} | Best Price`,
+      description: `Buy cheap ${countryInfo.name} eSIM online. ${dataAmount} data for ${plan.validity_days} days. Only $${plan.retail_price.toFixed(2)}. Instant activation, no signup. Best ${countryInfo.name} travel eSIM 2025.`,
       alternates: {
         canonical: canonicalUrl,
       },

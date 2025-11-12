@@ -9,7 +9,7 @@ import { Nav } from '@/components/nav';
 import { Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
-import { ProductSchema } from '@/components/structured-data';
+import { ProductSchema, BreadcrumbSchema } from '@/components/structured-data';
 import { PaymentLogosCompact } from '@/components/payment-logos';
 import Link from 'next/link';
 
@@ -343,7 +343,18 @@ export default function PlanDetailPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Structured Data for SEO */}
-      {plan && <ProductSchema plan={plan} />}
+      {plan && (
+        <>
+          <ProductSchema plan={plan} />
+          <BreadcrumbSchema
+            items={[
+              { name: 'Home', url: 'https://getlumbus.com' },
+              { name: 'eSIM Plans', url: 'https://getlumbus.com/plans' },
+              { name: `${regionInfo?.isMultiCountry ? 'Multi-Country' : getCountryInfo(plan.region_code).name} eSIM`, url: `https://getlumbus.com/plans/${plan.region_code}/${plan.id}` },
+            ]}
+          />
+        </>
+      )}
 
       {/* Navigation */}
       <Nav />

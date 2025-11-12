@@ -7,11 +7,16 @@ import { PopularPlansSection } from '@/components/popular-plans-section';
 import { Nav } from '@/components/nav';
 import { AuthRecoveryHandler } from '@/components/auth-recovery-handler';
 import { PaymentLogos, PaymentLogosCompact } from '@/components/payment-logos';
+import { ServiceSchema, HowToSchema } from '@/components/structured-data';
 
 export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Enhanced SEO with Service and HowTo schemas */}
+      <ServiceSchema />
+      <HowToSchema />
+
       {/* Handle password recovery redirects */}
       <AuthRecoveryHandler />
 
