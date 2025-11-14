@@ -33,82 +33,180 @@ function createEmailTemplate(params: {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+        /* Reset styles for better email client compatibility */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
         table { border-collapse: collapse !important; }
-        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; }
+
+        /* Force Outlook to provide "view in browser" button */
+        #outlook a { padding: 0; }
+
+        /* Prevent Webkit and Windows Mobile from changing default font sizes */
+        .ReadMsgBody { width: 100%; }
+        .ExternalClass { width: 100%; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+
+        /* Make sure the container is always responsive */
+        .container {
+            width: 100% !important;
+            max-width: 600px !important;
+            margin: 0 auto !important;
+        }
+
+        /* Ensure wrapper takes full width */
+        .wrapper {
+            width: 100% !important;
+            table-layout: fixed !important;
+            -webkit-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+        }
+
+        /* Desktop and larger screens (default) */
+        @media screen and (min-width: 601px) {
+            .container { width: 600px !important; }
+        }
 
         /* Tablet and medium screens */
         @media screen and (max-width: 768px) {
-            .mobile-padding { padding: 30px 40px !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+            .mobile-padding { padding: 30px 20px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 10px !important;
+            }
+            .inner-padding { padding: 30px 25px !important; }
+            h1 { font-size: 28px !important; }
+            h2 { font-size: 24px !important; }
+            h3 { font-size: 20px !important; }
         }
 
         /* Mobile phones */
         @media screen and (max-width: 600px) {
-            .mobile-padding { padding: 20px !important; }
+            .mobile-padding { padding: 20px 15px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
-            h1 { font-size: 24px !important; }
-            h2 { font-size: 22px !important; }
-            h3 { font-size: 18px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .inner-padding { padding: 20px 15px !important; }
+            h1 { font-size: 24px !important; line-height: 1.2 !important; }
+            h2 { font-size: 20px !important; line-height: 1.3 !important; }
+            h3 { font-size: 18px !important; line-height: 1.3 !important; }
+            p { font-size: 14px !important; line-height: 1.5 !important; }
             .mobile-button {
                 display: block !important;
                 width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 16px 20px !important;
                 font-size: 14px !important;
                 box-sizing: border-box !important;
+                text-align: center !important;
             }
             .mobile-stack {
                 display: block !important;
                 width: 100% !important;
+                padding: 0 !important;
             }
             .mobile-hide { display: none !important; }
-            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
-            .mobile-large-text { font-size: 36px !important; }
-            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
-            .code-box { font-size: 11px !important; padding: 12px !important; }
-            .qr-image { max-width: 250px !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.5 !important; }
+            .mobile-large-text { font-size: 32px !important; }
+            .mobile-code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .qr-image {
+                max-width: 250px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
                 display: block !important;
                 width: 100% !important;
                 margin-bottom: 15px !important;
+                box-sizing: border-box !important;
             }
-            .stat-value { font-size: 28px !important; }
-            .big-number { font-size: 36px !important; }
+            .stat-value { font-size: 26px !important; }
+            .big-number { font-size: 32px !important; }
+            /* Fix for table cells */
+            td[class="mobile-stack"] {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Small phones */
+        @media screen and (max-width: 480px) {
+            .mobile-padding { padding: 15px 10px !important; }
+            .inner-padding { padding: 15px 10px !important; }
+            h1 { font-size: 22px !important; }
+            h2 { font-size: 19px !important; }
+            h3 { font-size: 17px !important; }
+            p { font-size: 13px !important; }
+            .mobile-button {
+                padding: 14px 16px !important;
+                font-size: 13px !important;
+            }
+            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 28px !important; }
         }
 
         /* Very small phones */
-        @media screen and (max-width: 400px) {
-            .mobile-padding { padding: 15px !important; }
+        @media screen and (max-width: 360px) {
+            .mobile-padding { padding: 12px 8px !important; }
+            .inner-padding { padding: 12px 8px !important; }
             h1 { font-size: 20px !important; }
             h2 { font-size: 18px !important; }
             h3 { font-size: 16px !important; }
-            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
-            .code-box { font-size: 10px !important; padding: 10px !important; }
+            p { font-size: 12px !important; }
+            .mobile-button {
+                padding: 12px 14px !important;
+                font-size: 12px !important;
+            }
+            .code-box {
+                font-size: 10px !important;
+                padding: 10px 6px !important;
+            }
             .qr-image { max-width: 200px !important; }
-            .big-number { font-size: 32px !important; }
-            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 26px !important; }
+            .stat-value { font-size: 22px !important; }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            /* Optional: Add dark mode styles if needed */
         }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
+    <!--[if mso]>
+    <center>
+    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+            <td align="center" style="padding: 20px 10px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: ${headerGradient};">
+                        <td align="center" class="mobile-padding" style="padding: 40px 20px 20px; background: ${headerGradient};">
                             <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">LUMBUS</h1>
                             ${subtitle ? `<p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">${subtitle}</p>` : ''}
                         </td>
                     </tr>
 
                     <tr>
-                        <td class="mobile-padding" style="padding: 40px 60px;">
+                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
                             ${content}
                         </td>
                     </tr>
@@ -133,6 +231,12 @@ function createEmailTemplate(params: {
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+    </td>
+    </tr>
+    </table>
+    </center>
+    <![endif]-->
 </body>
 </html>
   `;
@@ -793,73 +897,171 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+        /* Reset styles for better email client compatibility */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
         table { border-collapse: collapse !important; }
-        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; }
+
+        /* Force Outlook to provide "view in browser" button */
+        #outlook a { padding: 0; }
+
+        /* Prevent Webkit and Windows Mobile from changing default font sizes */
+        .ReadMsgBody { width: 100%; }
+        .ExternalClass { width: 100%; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+
+        /* Make sure the container is always responsive */
+        .container {
+            width: 100% !important;
+            max-width: 600px !important;
+            margin: 0 auto !important;
+        }
+
+        /* Ensure wrapper takes full width */
+        .wrapper {
+            width: 100% !important;
+            table-layout: fixed !important;
+            -webkit-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+        }
+
+        /* Desktop and larger screens (default) */
+        @media screen and (min-width: 601px) {
+            .container { width: 600px !important; }
+        }
 
         /* Tablet and medium screens */
         @media screen and (max-width: 768px) {
-            .mobile-padding { padding: 30px 40px !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+            .mobile-padding { padding: 30px 20px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 10px !important;
+            }
+            .inner-padding { padding: 30px 25px !important; }
+            h1 { font-size: 28px !important; }
+            h2 { font-size: 24px !important; }
+            h3 { font-size: 20px !important; }
         }
 
         /* Mobile phones */
         @media screen and (max-width: 600px) {
-            .mobile-padding { padding: 20px !important; }
+            .mobile-padding { padding: 20px 15px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
-            h1 { font-size: 24px !important; }
-            h2 { font-size: 22px !important; }
-            h3 { font-size: 18px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .inner-padding { padding: 20px 15px !important; }
+            h1 { font-size: 24px !important; line-height: 1.2 !important; }
+            h2 { font-size: 20px !important; line-height: 1.3 !important; }
+            h3 { font-size: 18px !important; line-height: 1.3 !important; }
+            p { font-size: 14px !important; line-height: 1.5 !important; }
             .mobile-button {
                 display: block !important;
                 width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 16px 20px !important;
                 font-size: 14px !important;
                 box-sizing: border-box !important;
+                text-align: center !important;
             }
             .mobile-stack {
                 display: block !important;
                 width: 100% !important;
+                padding: 0 !important;
             }
             .mobile-hide { display: none !important; }
-            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
-            .mobile-large-text { font-size: 36px !important; }
-            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
-            .code-box { font-size: 11px !important; padding: 12px !important; }
-            .qr-image { max-width: 250px !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.5 !important; }
+            .mobile-large-text { font-size: 32px !important; }
+            .mobile-code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .qr-image {
+                max-width: 250px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
                 display: block !important;
                 width: 100% !important;
                 margin-bottom: 15px !important;
+                box-sizing: border-box !important;
             }
-            .stat-value { font-size: 28px !important; }
-            .big-number { font-size: 36px !important; }
+            .stat-value { font-size: 26px !important; }
+            .big-number { font-size: 32px !important; }
+            /* Fix for table cells */
+            td[class="mobile-stack"] {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Small phones */
+        @media screen and (max-width: 480px) {
+            .mobile-padding { padding: 15px 10px !important; }
+            .inner-padding { padding: 15px 10px !important; }
+            h1 { font-size: 22px !important; }
+            h2 { font-size: 19px !important; }
+            h3 { font-size: 17px !important; }
+            p { font-size: 13px !important; }
+            .mobile-button {
+                padding: 14px 16px !important;
+                font-size: 13px !important;
+            }
+            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 28px !important; }
         }
 
         /* Very small phones */
-        @media screen and (max-width: 400px) {
-            .mobile-padding { padding: 15px !important; }
+        @media screen and (max-width: 360px) {
+            .mobile-padding { padding: 12px 8px !important; }
+            .inner-padding { padding: 12px 8px !important; }
             h1 { font-size: 20px !important; }
             h2 { font-size: 18px !important; }
             h3 { font-size: 16px !important; }
-            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
-            .code-box { font-size: 10px !important; padding: 10px !important; }
+            p { font-size: 12px !important; }
+            .mobile-button {
+                padding: 12px 14px !important;
+                font-size: 12px !important;
+            }
+            .code-box {
+                font-size: 10px !important;
+                padding: 10px 6px !important;
+            }
             .qr-image { max-width: 200px !important; }
-            .big-number { font-size: 32px !important; }
-            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 26px !important; }
+            .stat-value { font-size: 22px !important; }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            /* Optional: Add dark mode styles if needed */
         }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
+    <!--[if mso]>
+    <center>
+    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+            <td align="center" style="padding: 20px 10px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
                             <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
@@ -868,7 +1070,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                     </tr>
 
                     <tr>
-                        <td class="mobile-padding" style="padding: 40px 60px;">
+                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
                             <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Received!</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
@@ -964,6 +1166,12 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+    </td>
+    </tr>
+    </table>
+    </center>
+    <![endif]-->
 </body>
 </html>
       `,
@@ -1004,73 +1212,171 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+        /* Reset styles for better email client compatibility */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
         table { border-collapse: collapse !important; }
-        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; }
+
+        /* Force Outlook to provide "view in browser" button */
+        #outlook a { padding: 0; }
+
+        /* Prevent Webkit and Windows Mobile from changing default font sizes */
+        .ReadMsgBody { width: 100%; }
+        .ExternalClass { width: 100%; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+
+        /* Make sure the container is always responsive */
+        .container {
+            width: 100% !important;
+            max-width: 600px !important;
+            margin: 0 auto !important;
+        }
+
+        /* Ensure wrapper takes full width */
+        .wrapper {
+            width: 100% !important;
+            table-layout: fixed !important;
+            -webkit-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+        }
+
+        /* Desktop and larger screens (default) */
+        @media screen and (min-width: 601px) {
+            .container { width: 600px !important; }
+        }
 
         /* Tablet and medium screens */
         @media screen and (max-width: 768px) {
-            .mobile-padding { padding: 30px 40px !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+            .mobile-padding { padding: 30px 20px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 10px !important;
+            }
+            .inner-padding { padding: 30px 25px !important; }
+            h1 { font-size: 28px !important; }
+            h2 { font-size: 24px !important; }
+            h3 { font-size: 20px !important; }
         }
 
         /* Mobile phones */
         @media screen and (max-width: 600px) {
-            .mobile-padding { padding: 20px !important; }
+            .mobile-padding { padding: 20px 15px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
-            h1 { font-size: 24px !important; }
-            h2 { font-size: 22px !important; }
-            h3 { font-size: 18px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .inner-padding { padding: 20px 15px !important; }
+            h1 { font-size: 24px !important; line-height: 1.2 !important; }
+            h2 { font-size: 20px !important; line-height: 1.3 !important; }
+            h3 { font-size: 18px !important; line-height: 1.3 !important; }
+            p { font-size: 14px !important; line-height: 1.5 !important; }
             .mobile-button {
                 display: block !important;
                 width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 16px 20px !important;
                 font-size: 14px !important;
                 box-sizing: border-box !important;
+                text-align: center !important;
             }
             .mobile-stack {
                 display: block !important;
                 width: 100% !important;
+                padding: 0 !important;
             }
             .mobile-hide { display: none !important; }
-            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
-            .mobile-large-text { font-size: 36px !important; }
-            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
-            .code-box { font-size: 11px !important; padding: 12px !important; }
-            .qr-image { max-width: 250px !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.5 !important; }
+            .mobile-large-text { font-size: 32px !important; }
+            .mobile-code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .qr-image {
+                max-width: 250px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
                 display: block !important;
                 width: 100% !important;
                 margin-bottom: 15px !important;
+                box-sizing: border-box !important;
             }
-            .stat-value { font-size: 28px !important; }
-            .big-number { font-size: 36px !important; }
+            .stat-value { font-size: 26px !important; }
+            .big-number { font-size: 32px !important; }
+            /* Fix for table cells */
+            td[class="mobile-stack"] {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Small phones */
+        @media screen and (max-width: 480px) {
+            .mobile-padding { padding: 15px 10px !important; }
+            .inner-padding { padding: 15px 10px !important; }
+            h1 { font-size: 22px !important; }
+            h2 { font-size: 19px !important; }
+            h3 { font-size: 17px !important; }
+            p { font-size: 13px !important; }
+            .mobile-button {
+                padding: 14px 16px !important;
+                font-size: 13px !important;
+            }
+            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 28px !important; }
         }
 
         /* Very small phones */
-        @media screen and (max-width: 400px) {
-            .mobile-padding { padding: 15px !important; }
+        @media screen and (max-width: 360px) {
+            .mobile-padding { padding: 12px 8px !important; }
+            .inner-padding { padding: 12px 8px !important; }
             h1 { font-size: 20px !important; }
             h2 { font-size: 18px !important; }
             h3 { font-size: 16px !important; }
-            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
-            .code-box { font-size: 10px !important; padding: 10px !important; }
+            p { font-size: 12px !important; }
+            .mobile-button {
+                padding: 12px 14px !important;
+                font-size: 12px !important;
+            }
+            .code-box {
+                font-size: 10px !important;
+                padding: 10px 6px !important;
+            }
             .qr-image { max-width: 200px !important; }
-            .big-number { font-size: 32px !important; }
-            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 26px !important; }
+            .stat-value { font-size: 22px !important; }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            /* Optional: Add dark mode styles if needed */
         }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
+    <!--[if mso]>
+    <center>
+    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+            <td align="center" style="padding: 20px 10px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
                             <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
@@ -1079,7 +1385,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                     </tr>
 
                     <tr>
-                        <td class="mobile-padding" style="padding: 40px 60px;">
+                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
                             <h2 style="margin: 0 0 20px; font-size: 32px; font-weight: 600; color: #1A1A1A; text-align: center;">🎉 You're Approved!</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
@@ -1207,6 +1513,12 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+    </td>
+    </tr>
+    </table>
+    </center>
+    <![endif]-->
 </body>
 </html>
       `,
@@ -1245,73 +1557,171 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+        /* Reset styles for better email client compatibility */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
         table { border-collapse: collapse !important; }
-        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; }
+
+        /* Force Outlook to provide "view in browser" button */
+        #outlook a { padding: 0; }
+
+        /* Prevent Webkit and Windows Mobile from changing default font sizes */
+        .ReadMsgBody { width: 100%; }
+        .ExternalClass { width: 100%; }
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
+
+        /* Make sure the container is always responsive */
+        .container {
+            width: 100% !important;
+            max-width: 600px !important;
+            margin: 0 auto !important;
+        }
+
+        /* Ensure wrapper takes full width */
+        .wrapper {
+            width: 100% !important;
+            table-layout: fixed !important;
+            -webkit-text-size-adjust: 100% !important;
+            -ms-text-size-adjust: 100% !important;
+        }
+
+        /* Desktop and larger screens (default) */
+        @media screen and (min-width: 601px) {
+            .container { width: 600px !important; }
+        }
 
         /* Tablet and medium screens */
         @media screen and (max-width: 768px) {
-            .mobile-padding { padding: 30px 40px !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 320px !important; }
+            .mobile-padding { padding: 30px 20px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 10px !important;
+            }
+            .inner-padding { padding: 30px 25px !important; }
+            h1 { font-size: 28px !important; }
+            h2 { font-size: 24px !important; }
+            h3 { font-size: 20px !important; }
         }
 
         /* Mobile phones */
         @media screen and (max-width: 600px) {
-            .mobile-padding { padding: 20px !important; }
+            .mobile-padding { padding: 20px 15px !important; }
             .mobile-center { text-align: center !important; }
-            .container { width: 100% !important; max-width: 100% !important; min-width: 280px !important; }
-            h1 { font-size: 24px !important; }
-            h2 { font-size: 22px !important; }
-            h3 { font-size: 18px !important; }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            .inner-padding { padding: 20px 15px !important; }
+            h1 { font-size: 24px !important; line-height: 1.2 !important; }
+            h2 { font-size: 20px !important; line-height: 1.3 !important; }
+            h3 { font-size: 18px !important; line-height: 1.3 !important; }
+            p { font-size: 14px !important; line-height: 1.5 !important; }
             .mobile-button {
                 display: block !important;
                 width: 100% !important;
-                padding: 18px 20px !important;
+                padding: 16px 20px !important;
                 font-size: 14px !important;
                 box-sizing: border-box !important;
+                text-align: center !important;
             }
             .mobile-stack {
                 display: block !important;
                 width: 100% !important;
+                padding: 0 !important;
             }
             .mobile-hide { display: none !important; }
-            .mobile-text { font-size: 14px !important; line-height: 1.6 !important; }
-            .mobile-large-text { font-size: 36px !important; }
-            .mobile-code-box { font-size: 11px !important; padding: 12px !important; }
-            .code-box { font-size: 11px !important; padding: 12px !important; }
-            .qr-image { max-width: 250px !important; }
+            .mobile-text { font-size: 14px !important; line-height: 1.5 !important; }
+            .mobile-large-text { font-size: 32px !important; }
+            .mobile-code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .code-box {
+                font-size: 11px !important;
+                padding: 12px 8px !important;
+                word-break: break-all !important;
+            }
+            .qr-image {
+                max-width: 250px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
             .progress-bar { height: 40px !important; }
             .progress-bar-text { font-size: 14px !important; }
             .stat-card {
                 display: block !important;
                 width: 100% !important;
                 margin-bottom: 15px !important;
+                box-sizing: border-box !important;
             }
-            .stat-value { font-size: 28px !important; }
-            .big-number { font-size: 36px !important; }
+            .stat-value { font-size: 26px !important; }
+            .big-number { font-size: 32px !important; }
+            /* Fix for table cells */
+            td[class="mobile-stack"] {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Small phones */
+        @media screen and (max-width: 480px) {
+            .mobile-padding { padding: 15px 10px !important; }
+            .inner-padding { padding: 15px 10px !important; }
+            h1 { font-size: 22px !important; }
+            h2 { font-size: 19px !important; }
+            h3 { font-size: 17px !important; }
+            p { font-size: 13px !important; }
+            .mobile-button {
+                padding: 14px 16px !important;
+                font-size: 13px !important;
+            }
+            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 28px !important; }
         }
 
         /* Very small phones */
-        @media screen and (max-width: 400px) {
-            .mobile-padding { padding: 15px !important; }
+        @media screen and (max-width: 360px) {
+            .mobile-padding { padding: 12px 8px !important; }
+            .inner-padding { padding: 12px 8px !important; }
             h1 { font-size: 20px !important; }
             h2 { font-size: 18px !important; }
             h3 { font-size: 16px !important; }
-            .mobile-button { padding: 15px 18px !important; font-size: 13px !important; }
-            .code-box { font-size: 10px !important; padding: 10px !important; }
+            p { font-size: 12px !important; }
+            .mobile-button {
+                padding: 12px 14px !important;
+                font-size: 12px !important;
+            }
+            .code-box {
+                font-size: 10px !important;
+                padding: 10px 6px !important;
+            }
             .qr-image { max-width: 200px !important; }
-            .big-number { font-size: 32px !important; }
-            .stat-value { font-size: 24px !important; }
+            .big-number { font-size: 26px !important; }
+            .stat-value { font-size: 22px !important; }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            /* Optional: Add dark mode styles if needed */
         }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <!--[if mso]>
+    <center>
+    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellspacing="0" cellpadding="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                <table class="container" border="0" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
                             <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
@@ -1320,7 +1730,7 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
                     </tr>
 
                     <tr>
-                        <td class="mobile-padding" style="padding: 40px 60px;">
+                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
                             <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Update</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
@@ -1370,6 +1780,12 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+    </td>
+    </tr>
+    </table>
+    </center>
+    <![endif]-->
 </body>
 </html>
       `,
@@ -1422,10 +1838,16 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
+    <!--[if mso]>
+    <center>
+    <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
+    <tr>
+    <td align="center" valign="top" width="600">
+    <![endif]-->
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+            <td align="center" style="padding: 20px 10px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
                     <tr>
                         <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
                             <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus Admin</h1>
@@ -1434,7 +1856,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                     </tr>
 
                     <tr>
-                        <td class="mobile-padding" style="padding: 40px 60px;">
+                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
                             <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #1A1A1A;">New Application Received</h2>
 
                             <div style="margin: 0 0 25px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
@@ -1518,6 +1940,12 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
             </td>
         </tr>
     </table>
+    <!--[if mso]>
+    </td>
+    </tr>
+    </table>
+    </center>
+    <![endif]-->
 </body>
 </html>
       `,
