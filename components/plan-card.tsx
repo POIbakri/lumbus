@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Plan } from '@/lib/db';
 import { getCountryInfo } from '@/lib/countries';
+import { useRegion } from '@/contexts/regions-context';
 
 interface PlanCardProps {
   plan: Plan;
@@ -47,25 +48,9 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
 
   const displayData = formatDataAmount(plan.data_gb);
 
-  const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
+  // Use the regions context to get region info without making individual API calls
+  const { regionInfo } = useRegion(plan.region_code);
   const [showCountries, setShowCountries] = useState(false);
-
-  // Load region information to check if it's a multi-country plan
-  useEffect(() => {
-    const loadRegionInfo = async () => {
-      try {
-        const response = await fetch(`/api/regions/${plan.region_code}`);
-        if (response.ok) {
-          const data = await response.json();
-          setRegionInfo(data);
-        }
-      } catch (error) {
-        // Silently fail - it's ok if region info isn't available
-      }
-    };
-
-    loadRegionInfo();
-  }, [plan.region_code]);
 
   return (
     <Card className={`group ${colorClass} border-4 border-foreground/10 shadow-xl    overflow-hidden relative`}>

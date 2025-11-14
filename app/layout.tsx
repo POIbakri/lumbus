@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { RegionsProvider } from "@/contexts/regions-context";
 import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data";
 import { Analytics } from "@vercel/analytics/next";
 import { WelcomePopup } from "@/components/welcome-popup";
@@ -220,7 +221,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          {children}
+          <RegionsProvider>
+            {children}
+          </RegionsProvider>
         </AuthProvider>
         <WelcomePopup />
         <CookieConsent />
