@@ -212,7 +212,14 @@ async function main() {
   let fixed = 0;
   let failed = 0;
 
-  for (const order of stuckOrders as StuckOrder[]) {
+  // Map the raw data to match StuckOrder interface
+  const ordersToProcess: StuckOrder[] = stuckOrders.map((order: any) => ({
+    ...order,
+    users: Array.isArray(order.users) ? order.users[0] : order.users,
+    plans: Array.isArray(order.plans) ? order.plans[0] : order.plans,
+  }));
+
+  for (const order of ordersToProcess) {
     const success = await fixOrder(order);
     if (success) {
       fixed++;
