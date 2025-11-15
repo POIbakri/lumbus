@@ -361,7 +361,7 @@ export default function Home() {
 
           {/* CTA Below Comparison */}
           <div className="text-center mt-8 sm:mt-12 ">
-            <Link href="/plans" className="w-full sm:w-auto inline-block">
+            <Link href="/destinations" className="w-full sm:w-auto inline-block">
               <Button className="w-full sm:w-auto bg-primary text-foreground hover:bg-primary/90 font-black text-base sm:text-xl px-8 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl">
                 START SAVING NOW
               </Button>
@@ -673,9 +673,9 @@ export default function Home() {
               Join thousands of travelers staying connected worldwide
             </p>
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-stretch sm:items-center px-4">
-              <Link href="/plans" className="w-full sm:w-auto">
+              <Link href="/destinations" className="w-full sm:w-auto">
                 <Button className="w-full bg-foreground text-white hover:bg-foreground/90 text-base sm:text-lg md:text-xl px-10 sm:px-16 py-6 sm:py-8 rounded-xl shadow-2xl font-black border-2 border-foreground">
-                  <span className="relative z-10">BROWSE PLANS</span>
+                  <span className="relative z-10">BROWSE DESTINATIONS</span>
                 </Button>
               </Link>
               <Link href="/help" className="w-full sm:w-auto">
@@ -725,8 +725,8 @@ export default function Home() {
                 <Link href="/help" className="block text-gray-400 hover:text-white">
                   Help Center
                 </Link>
-                <Link href="/plans" className="block text-gray-400 hover:text-white">
-                  Plans
+                <Link href="/destinations" className="block text-gray-400 hover:text-white">
+                  Destinations
                 </Link>
                 <Link href="/support" className="block text-gray-400 hover:text-white">
                   Contact Us
