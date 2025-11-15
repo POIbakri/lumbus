@@ -11,7 +11,7 @@ import { sendOrderConfirmationEmail } from '@/lib/email';
  * {
  *   "crons": [{
  *     "path": "/api/cron/fix-stuck-orders",
- *     "schedule": "*/5 * * * *"
+ *     "schedule": "*\/5 * * * *"
  *   }]
  * }
  */

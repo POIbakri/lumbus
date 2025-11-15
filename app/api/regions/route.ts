@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
     // Get current cache status for TTL
     const currentCacheStatus = regionsCache.getCacheStatus();
-    if (currentCacheStatus.ttl !== null) {
+    if (currentCacheStatus.ttl !== null && currentCacheStatus.ttl !== undefined) {
       headers.set('X-Cache-TTL', currentCacheStatus.ttl.toString());
     }
     headers.set('X-Total-Regions', regions.length.toString());

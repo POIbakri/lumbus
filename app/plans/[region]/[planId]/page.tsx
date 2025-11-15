@@ -12,6 +12,7 @@ import { getCountryInfo } from '@/lib/countries';
 import { ProductSchema, BreadcrumbSchema } from '@/components/structured-data';
 import { PaymentLogosCompact } from '@/components/payment-logos';
 import Link from 'next/link';
+import { useRegion } from '@/contexts/regions-context';
 
 // Format data amounts to clean values
 function formatDataAmount(dataGB: number): string {
@@ -52,8 +53,10 @@ export default function PlanDetailPage() {
   const [referralError, setReferralError] = useState('');
   const [referralSuccess, setReferralSuccess] = useState('');
   const [referralValid, setReferralValid] = useState(false);
-  const [regionInfo, setRegionInfo] = useState<{ isMultiCountry: boolean; subLocationList: Array<{ code: string; name: string }> } | null>(null);
   const [showCountries, setShowCountries] = useState(false);
+
+  // Use the RegionsProvider cache for region info
+  const { regionInfo } = useRegion(plan?.region_code || '');
 
   const loadPlan = useCallback(async () => {
     try {
@@ -130,25 +133,6 @@ export default function PlanDetailPage() {
   useEffect(() => {
     loadPlan();
   }, [loadPlan]);
-
-  // Load region information to check if it's a multi-country plan
-  useEffect(() => {
-    const loadRegionInfo = async () => {
-      if (!plan) return;
-
-      try {
-        const response = await fetch(`/api/regions/${plan.region_code}`);
-        if (response.ok) {
-          const data = await response.json();
-          setRegionInfo(data);
-        }
-      } catch (error) {
-        // Error handled silently
-      }
-    };
-
-    loadRegionInfo();
-  }, [plan]);
 
   // Get or create a temporary user ID for validation
   useEffect(() => {
