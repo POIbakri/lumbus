@@ -26,7 +26,19 @@ interface WalletData {
     free_data_added_mb: number;
     created_at: string;
     expires_at: string | null;
+    region_code: string | null;
   }>;
+}
+
+interface RewardPackage {
+  id: string;
+  name: string;
+  supplier_sku: string;
+  data_gb: number;
+  validity_days: number;
+  region_code: string | null;
+  retail_price: number;
+  currency: string;
 }
 
 export function DataWallet() {
@@ -36,6 +48,9 @@ export function DataWallet() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [applyingData, setApplyingData] = useState<string | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<Record<string, number>>({});
+  const [packages, setPackages] = useState<RewardPackage[] | null>(null);
+  const [packagesLoading, setPackagesLoading] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState<Record<string, string>>({});
 
   const fetchWalletData = async () => {
     try {
@@ -50,6 +65,23 @@ export function DataWallet() {
 
   useEffect(() => {
     fetchWalletData();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setPackagesLoading(true);
+      const response = await authenticatedGet<{ packages: RewardPackage[] }>('/api/rewards/available-packages');
+      setPackages(response.packages || []);
+    } catch (error) {
+      console.error('Failed to fetch reward packages:', error);
+      toast.error('Unable to load 1GB packages. Please try again later.');
+    } finally {
+      setPackagesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPackages();
   }, []);
 
   const redeemReward = async (rewardId: string) => {
@@ -94,6 +126,13 @@ export function DataWallet() {
       return;
     }
 
+    const packageSku = selectedPackage[orderId];
+
+    if (!packageSku && (packages?.length || 0) > 0) {
+      toast.error('Please select a 1GB package before adding data.');
+      return;
+    }
+
     setApplyingData(orderId);
     try {
       const result = await authenticatedPost<{
@@ -103,6 +142,7 @@ export function DataWallet() {
       }>('/api/rewards/apply-data', {
         orderId,
         amountMB,
+        packageSku,
       });
 
       if (result.success) {
@@ -245,14 +285,21 @@ export function DataWallet() {
             {/* Apply Data to Active eSIMs */}
             {hasBalance && hasActiveEsims && (
               <div>
-                <h3 className="text-sm font-black uppercase mb-2 text-muted-foreground">
+                <h3 className="text-sm font-black uppercase mb-1 text-muted-foreground">
                   Add Data to eSIMs
                 </h3>
+                {packagesLoading && (
+                  <div className="text-[10px] sm:text-xs font-bold text-muted-foreground mb-2">
+                    Loading available 1GB packages...
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   {walletData.active_esims.map((esim) => {
                     const dataRemainingGB = (esim.data_remaining_bytes / (1024 * 1024 * 1024)).toFixed(1);
                     const maxAvailableGB = Math.floor(walletData.balance_mb / 1024);
+                    const eligiblePackages =
+                      (packages || []).filter(pkg => !pkg.region_code || pkg.region_code === esim.region_code);
 
                     return (
                       <div
@@ -270,7 +317,36 @@ export function DataWallet() {
                           </div>
 
                           {maxAvailableGB > 0 && (
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <div className="flex-1">
+                                <div className="font-black uppercase text-[10px] text-muted-foreground mb-1">
+                                  Select 1GB Package
+                                </div>
+                                <Select
+                                  value={selectedPackage[esim.id] || ''}
+                                  onValueChange={(value) =>
+                                    setSelectedPackage(prev => ({ ...prev, [esim.id]: value }))
+                                  }
+                                  disabled={applyingData === esim.id || packagesLoading}
+                                >
+                                  <SelectTrigger className="w-full font-black text-xs bg-mint border-foreground/20 rounded-lg">
+                                    <SelectValue placeholder={packagesLoading ? 'Loading...' : 'Choose package'} />
+                                  </SelectTrigger>
+                                <SelectContent>
+                                  {(eligiblePackages.length ? eligiblePackages : (packages || [])).map(pkg => (
+                                      <SelectItem key={pkg.supplier_sku} value={pkg.supplier_sku}>
+                                        <span className="font-black text-xs">
+                                          {pkg.name}
+                                        </span>
+                                        <span className="ml-1 text-[10px] uppercase text-muted-foreground">
+                                          {pkg.region_code || 'Global'} • {pkg.data_gb.toFixed(1)}GB
+                                        </span>
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
                               <Select
                                 value={selectedAmount[esim.id]?.toString() || '1024'}
                                 onValueChange={(value) =>
@@ -278,7 +354,7 @@ export function DataWallet() {
                                 }
                                 disabled={applyingData === esim.id}
                               >
-                                <SelectTrigger className="w-24 font-black text-xs">
+                                <SelectTrigger className="w-24 font-black text-xs bg-yellow border-foreground/20 rounded-lg">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -297,7 +373,7 @@ export function DataWallet() {
                               <Button
                                 onClick={() => applyDataToEsim(esim.id)}
                                 disabled={applyingData === esim.id || maxAvailableGB === 0}
-                                className="flex-1 bg-primary text-foreground hover:bg-primary/90 font-black text-xs px-3 py-2 rounded-lg"
+                                className="flex-1 bg-primary text-foreground hover:bg-primary/90 font-black text-xs px-3 py-2 rounded-lg border-2 border-foreground"
                               >
                                 {applyingData === esim.id ? 'ADDING...' : 'ADD DATA'}
                               </Button>

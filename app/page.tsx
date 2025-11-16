@@ -538,7 +538,7 @@ export default function Home() {
                 </div>
                 <div className="bg-yellow p-4 rounded-xl border-2 border-secondary/20">
                   <div className="text-3xl mb-2">3️⃣</div>
-                  <div className="text-sm font-black uppercase mb-2">YOU GET 1GB FREE</div>
+                  <div className="text-sm font-black uppercase mb-2">YOU & FRIEND GET 1GB FREE</div>
                   <div className="text-xs font-bold text-foreground/70">
                     Data credited instantly to your account
                   </div>

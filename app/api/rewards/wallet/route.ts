@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     // Get active eSIMs (orders that are completed and have data or are not expired)
     const { data: activeEsims } = await supabase
       .from('orders')
-      .select('id, plan_id, data_remaining_bytes, free_data_added_mb, created_at, expires_at, plans(name)')
+      .select('id, plan_id, data_remaining_bytes, free_data_added_mb, created_at, expires_at, plans(name, region_code)')
       .eq('user_id', userId)
       .eq('status', 'completed')
       .order('created_at', { ascending: false });
@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
         free_data_added_mb: esim.free_data_added_mb || 0,
         created_at: esim.created_at,
         expires_at: esim.expires_at,
+        region_code: plan?.region_code || null,
       };
     }).filter(esim => {
       // Only show eSIMs that are active (have data or not expired)
