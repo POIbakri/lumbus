@@ -197,15 +197,22 @@ export async function POST(req: NextRequest) {
         if (result.reward) {
           // Send email notification to referrer about their reward
           try {
-            // Get referrer user details
+            // Get referrer profile (for referral code) and user (for email)
+            const { data: referrerProfile } = await supabase
+              .from('user_profiles')
+              .select('ref_code')
+              .eq('id', savedAttribution.referrer_user_id)
+              .maybeSingle();
+
             const { data: referrerUser } = await supabase
               .from('users')
-              .select('email, referral_code')
+              .select('email')
               .eq('id', savedAttribution.referrer_user_id)
               .maybeSingle();
 
             // Get referred user email
-            const referredUserEmail = order.users?.email || (Array.isArray(order.users) ? order.users[0]?.email : null);
+            const referredUserEmail =
+              order.users?.email || (Array.isArray(order.users) ? order.users[0]?.email : null);
 
             if (referrerUser && referrerUser.email && referredUserEmail) {
               const rewardMB = result.reward.reward_value;
@@ -215,7 +222,7 @@ export async function POST(req: NextRequest) {
                 to: referrerUser.email,
                 referredUserEmail: referredUserEmail,
                 rewardAmount: `${rewardGB} GB`,
-                referralCode: referrerUser.referral_code || '',
+                referralCode: referrerProfile?.ref_code || '',
               });
             }
           } catch (emailError) {

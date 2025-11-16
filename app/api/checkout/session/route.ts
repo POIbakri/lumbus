@@ -6,6 +6,7 @@ import { getCurrencyForCheckout, convertToStripeAmount, formatPrice, detectCount
 import { logger, redactEmail } from '@/lib/logger';
 import { z } from 'zod';
 import { generateOrderAccessToken } from '@/lib/order-token';
+import { getSystemConfig } from '@/lib/commission';
 
 // Lazy initialization - only create instance when needed
 let stripe: Stripe | null = null;
@@ -192,6 +193,14 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Checkout] User ready:', user.id);
 
+    // Load referral configuration (discount %, monthly caps, etc.)
+    const systemConfig = await getSystemConfig();
+    const cfgReferralDiscount = systemConfig.REFERRAL_FRIEND_DISCOUNT_PCT as unknown;
+    const referralDiscountPercent =
+      typeof cfgReferralDiscount === 'number'
+        ? cfgReferralDiscount
+        : Number(cfgReferralDiscount as string) || 10;
+
     // Discount logic: Priority 1 = Promo code, Priority 2 = Referral
     // Top-ups never get discounts
     let applyDiscount = false;
@@ -242,7 +251,7 @@ export async function POST(req: NextRequest) {
           .from('orders')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .in('status', ['paid', 'completed']);
+          .in('status', ['paid', 'completed', 'provisioning']);
 
         const isFirstOrder = (orderCount || 0) === 0;
         const hasReferral = userProfile?.referred_by_code !== null && userProfile?.referred_by_code !== undefined;
@@ -250,7 +259,7 @@ export async function POST(req: NextRequest) {
         // Only new users (first order) can use referral discounts
         if (isFirstOrder && hasReferral) {
           applyDiscount = true;
-          discountPercent = 10;
+          discountPercent = referralDiscountPercent;
           discountSource = 'referral';
         }
       }

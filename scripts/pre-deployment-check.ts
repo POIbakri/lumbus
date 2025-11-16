@@ -7,6 +7,10 @@
  * Usage: npx ts-node scripts/pre-deployment-check.ts
  */
 
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
 interface EnvCheck {
   key: string;
   required: boolean;
@@ -290,8 +294,6 @@ function printManualChecklist() {
 
 function main() {
   // Check if .env.local exists
-  const fs = require('fs');
-  const path = require('path');
   const envPath = path.join(process.cwd(), '.env.local');
 
   if (!fs.existsSync(envPath)) {
@@ -302,7 +304,7 @@ function main() {
   }
 
   // Load environment variables from .env.local
-  require('dotenv').config({ path: envPath });
+  dotenv.config({ path: envPath });
 
   // Check environment variables
   const result = checkEnvironmentVariables();

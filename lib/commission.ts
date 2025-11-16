@@ -374,6 +374,19 @@ export async function processOrderAttribution(
     reward?: ReferralReward;
   } = {};
 
+  // Load referral reward configuration so discount percentages and reward MB stay in sync with system_config
+  const systemConfig = await getSystemConfig();
+  const cfgRewardMB = systemConfig.REFERRAL_GIVE_MB as unknown;
+  const rewardValueMB =
+    typeof cfgRewardMB === 'number'
+      ? cfgRewardMB
+      : Number(cfgRewardMB as string) || DEFAULT_REWARD_CONFIG.REFERRAL_GIVE_MB;
+  const rewardConfig: RewardConfig = {
+    REFERRAL_GIVE_MB: rewardValueMB,
+    REFERRAL_FRIEND_DISCOUNT_PCT: DEFAULT_REWARD_CONFIG.REFERRAL_FRIEND_DISCOUNT_PCT,
+    REFERRAL_MONTHLY_CAP: DEFAULT_REWARD_CONFIG.REFERRAL_MONTHLY_CAP,
+  };
+
   // Handle affiliate commission
   if (attribution.source_type === 'AFFILIATE' && attribution.affiliate_id) {
     const { data: affiliate } = await supabase
@@ -408,14 +421,15 @@ export async function processOrderAttribution(
 
     // Only create rewards if this is the buyer's first purchase
     if (isFirstOrder) {
-      // 1. Create reward for the referrer (1GB) - needs manual claim
+      // 1. Create reward for the referrer - needs manual claim
       if (!referrerRewardExists) {
         const referrerReward = await createReferralReward(
           order.id,
           attribution.referrer_user_id,
           order.user_id,
           'FREE_DATA',
-          1024 // 1GB of actual data
+          rewardValueMB,
+          rewardConfig
         );
 
         if (referrerReward) {
@@ -423,7 +437,7 @@ export async function processOrderAttribution(
         }
       }
 
-      // 2. Create reward for the person who used the code (1GB) - also needs manual claim
+      // 2. Create reward for the person who used the code - also needs manual claim
       if (!buyerRewardExists) {
         // Create a reward for the first-time buyer
         const { data: buyerReward } = await supabase
@@ -433,7 +447,7 @@ export async function processOrderAttribution(
             referrer_user_id: order.user_id, // The buyer gets their own reward
             referred_user_id: order.user_id, // Self-referral indicates they used a code
             reward_type: 'FREE_DATA',
-            reward_value: 1024, // 1GB
+            reward_value: rewardValueMB,
             status: 'PENDING',
             notes: 'First-time buyer bonus for using referral code'
           })

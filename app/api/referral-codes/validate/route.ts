@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
+import { getSystemConfig } from '@/lib/commission';
 import { z } from 'zod';
 
 const validateSchema = z.object({
@@ -13,11 +14,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { code, userId, email } = validateSchema.parse(body);
 
-    // Step 1: Check if referral code exists and is valid
+    const normalizedCode = code.toUpperCase().trim();
+
+    // Step 1: Check if referral code exists and is valid (using user_profiles.ref_code as source of truth)
+    const { data: referrerProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('ref_code', normalizedCode)
+      .maybeSingle();
+
+    if (profileError || !referrerProfile) {
+      return NextResponse.json({
+        valid: false,
+        error: 'Invalid referral code. Please check and try again.',
+      });
+    }
+
+    // Fetch referrer user to get email
     const { data: referrer, error: referrerError } = await supabase
       .from('users')
-      .select('id, email, referral_code')
-      .eq('referral_code', code.toUpperCase().trim())
+      .select('id, email')
+      .eq('id', referrerProfile.id)
       .maybeSingle();
 
     if (referrerError || !referrer) {
@@ -84,7 +101,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Step 6: Check monthly cap for the referrer
+    // Step 6: Check monthly cap for the referrer (uses system_config with sensible default)
     const now = new Date();
     const startOfMonth = new Date(Date.UTC(
       now.getUTCFullYear(),
@@ -100,7 +117,13 @@ export async function POST(request: NextRequest) {
       .gte('created_at', startOfMonth.toISOString())
       .in('status', ['PENDING', 'APPLIED']); // Count both pending and applied rewards
 
-    const MONTHLY_CAP = 10;
+    const systemConfig = await getSystemConfig();
+    const cfgCap = systemConfig.REFERRAL_MONTHLY_CAP as unknown;
+    const MONTHLY_CAP =
+      typeof cfgCap === 'number'
+        ? cfgCap
+        : Number(cfgCap as string) || 10;
+
     if ((monthlyRewards || 0) >= MONTHLY_CAP) {
       return NextResponse.json({
         valid: false,
