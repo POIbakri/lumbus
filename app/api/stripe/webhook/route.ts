@@ -295,13 +295,16 @@ export async function POST(req: NextRequest) {
           // Generate unique transaction ID
           const transactionId = `topup_${orderId}_${Date.now()}`;
 
+          // Check if user is a test user (for mocking eSIM provision)
+          const isTestUser = (user as any).is_test_user === true;
+
           const topUpResponse = await topUpEsim({
-            iccid: esimTranNo ? undefined : iccid, // Use iccid only if no esimTranNo
+            iccid: iccid, // Always pass ICCID (safe: topUpEsim prefers esimTranNo for real API, but needs iccid for mock return)
             esimTranNo: esimTranNo || undefined,
             packageCode: plan.supplier_sku,
             transactionId,
             amount: plan.retail_price.toString(),
-          });
+          }, isTestUser);
 
           if (topUpResponse.success) {
             // Update order with top-up details and new expiry/volume from API response
@@ -334,12 +337,15 @@ export async function POST(req: NextRequest) {
             throw new Error('Top-up failed');
           }
         } else {
-          // Assign new eSIM via eSIM Access API
-          const esimResponse = await assignEsim({
-            packageId: plan.supplier_sku,
-            email: user.email,
-            reference: orderId,
-          });
+        // Check if user is a test user (for mocking eSIM provision)
+        const isTestUser = (user as any).is_test_user === true;
+
+        // Assign new eSIM via eSIM Access API
+        const esimResponse = await assignEsim({
+          packageId: plan.supplier_sku,
+          email: user.email,
+          reference: orderId,
+        }, isTestUser);
 
           // Update order with initial eSIM details
           // Status is 'provisioning' until we get activation details from ORDER_STATUS webhook
@@ -422,12 +428,15 @@ export async function POST(req: NextRequest) {
           throw new Error('Plan or user data missing from order');
         }
 
+        // Check if user is a test user (for mocking eSIM provision)
+        const isTestUser = (user as any).is_test_user === true;
+
         // Assign new eSIM via eSIM Access API
         const esimResponse = await assignEsim({
           packageId: plan.supplier_sku,
           email: user.email,
           reference: orderId,
-        });
+        }, isTestUser);
 
         // Update order with initial eSIM details
         await supabase

@@ -280,9 +280,27 @@ export async function listPackages(regionCode?: string): Promise<EsimAccessPacka
  * }
  */
 export async function assignEsim(
-  request: EsimAccessAssignRequest
+  request: EsimAccessAssignRequest,
+  isTestMode = false
 ): Promise<EsimAccessAssignResponse> {
   try {
+    // If test mode (for app reviewers), mock successful response
+    // This prevents charging real money for reviewer tests
+    if (isTestMode) {
+      console.log('[eSIM Access] Test mode detected - returning mock success response');
+      // Generate random mock ICCID (89 + 17 random digits) to allow multiple distinct test orders
+      const randomIccid = '89' + Array.from({ length: 17 }, () => Math.floor(Math.random() * 10)).join('');
+      
+      return {
+        orderId: `test_order_${Date.now()}`,
+        iccid: randomIccid, 
+        smdpAddress: 'rsp.truphone.com', // Standard SM-DP+ address
+        activationCode: 'TEST-ACTIVATION-CODE',
+        qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=LPA:1$rsp.truphone.com$TEST-ACTIVATION-CODE`,
+        status: 'active', // Auto-active for testing
+      };
+    }
+
     const requestBody: any = {
       packageInfoList: [
         {
@@ -507,7 +525,7 @@ export async function topUpEsim(params: {
   packageCode: string;
   transactionId: string;
   amount?: string;
-}): Promise<{
+}, isTestMode = false): Promise<{
   success: boolean;
   transactionId: string;
   iccid: string;
@@ -517,6 +535,22 @@ export async function topUpEsim(params: {
   orderUsage: number;
 }> {
   try {
+    // Mock response for test users
+    if (isTestMode) {
+      console.log('[eSIM Access] Test mode detected - returning mock top-up response');
+      return {
+        success: true,
+        transactionId: params.transactionId,
+        // Use the provided ICCID (or esimTranNo if that was passed, though mock relies on ICCID)
+        // Fallback to test ICCID only if none provided (which shouldn't happen in valid top-up)
+        iccid: params.iccid || '89000000000000000000',
+        expiredTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days
+        totalVolume: 5 * 1024 * 1024 * 1024, // 5GB
+        totalDuration: 30,
+        orderUsage: 0,
+      };
+    }
+
     const { iccid, esimTranNo, packageCode, transactionId, amount } = params;
 
     // Require either iccid or esimTranNo
