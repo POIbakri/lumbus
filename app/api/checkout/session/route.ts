@@ -8,20 +8,50 @@ import { z } from 'zod';
 import { generateOrderAccessToken } from '@/lib/order-token';
 import { getSystemConfig } from '@/lib/commission';
 
-// Lazy initialization - only create instance when needed
-let stripe: Stripe | null = null;
+// Lazy initialization - separate Stripe clients for live vs test mode
+let stripeLive: Stripe | null = null;
+let stripeTest: Stripe | null = null;
 
-function getStripeClient() {
-  if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY?.replace(/\s+/g, '');
-    if (!apiKey) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
+type StripeMode = 'live' | 'test';
+
+function getStripeClient(mode: StripeMode = 'live') {
+  // IMPORTANT:
+  // - Live mode MUST use STRIPE_SECRET_KEY and must NOT fall back to test keys.
+  // - Test mode MUST use STRIPE_SECRET_KEY_TEST and must NOT fall back to live keys.
+  let rawKey: string | undefined;
+
+  if (mode === 'test') {
+    rawKey = process.env.STRIPE_SECRET_KEY_TEST;
+  } else {
+    rawKey = process.env.STRIPE_SECRET_KEY;
+  }
+
+  const apiKey = rawKey?.replace(/\s+/g, '');
+
+  if (!apiKey) {
+    const baseMessage = 'Stripe secret key is not configured';
+    const detail =
+      mode === 'test'
+        ? 'Expected STRIPE_SECRET_KEY_TEST for test mode'
+        : 'Expected STRIPE_SECRET_KEY for live mode';
+    throw new Error(`${baseMessage}: ${detail}`);
+  }
+
+  if (mode === 'test') {
+    if (!stripeTest) {
+      stripeTest = new Stripe(apiKey, {
+        apiVersion: '2025-02-24.acacia',
+      });
     }
-    stripe = new Stripe(apiKey, {
+    return stripeTest;
+  }
+
+  if (!stripeLive) {
+    stripeLive = new Stripe(apiKey, {
       apiVersion: '2025-02-24.acacia',
     });
   }
-  return stripe;
+  return stripeLive;
 }
 
 const checkoutSchema = z.object({
@@ -408,6 +438,7 @@ export async function POST(req: NextRequest) {
 
     // Create Stripe Checkout Session with user's local currency
     console.log('[Checkout] Creating Stripe session...');
+    const stripeMode: StripeMode = (user as any).is_test_user ? 'test' : 'live';
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';
 
     // Build discount description
@@ -441,15 +472,16 @@ export async function POST(req: NextRequest) {
       ? `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?topup=success&order=${order.id}`
       : `${process.env.NEXT_PUBLIC_APP_URL}/install/${order.id}?session_id={CHECKOUT_SESSION_ID}&token=${accessToken}`;
 
-    console.log('[Checkout] Calling Stripe API...');
-    console.log('[Checkout] Stripe params:', {
+    console.log('[Checkout] Calling Stripe API...', {
       currency: userCurrency.toLowerCase(),
       amount: stripeAmount,
       customerEmail: user.email,
       planName: plan.name,
+      stripeMode,
+      userId: user.id,
     });
 
-    const session = await getStripeClient().checkout.sessions.create({
+    const session = await getStripeClient(stripeMode).checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
@@ -481,6 +513,7 @@ export async function POST(req: NextRequest) {
         currency: userCurrency,
         basePriceUSD: basePriceUSD.toString(),
         finalPriceUSD: finalPriceUSD.toString(),
+        stripeMode,
       },
       payment_intent_data: {
         metadata: {

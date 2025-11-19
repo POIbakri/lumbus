@@ -5,20 +5,50 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { convertToStripeAmount, type Currency } from '@/lib/currency';
 
-// Lazy initialization - only create instance when needed
-let stripe: Stripe | null = null;
+// Lazy initialization - create separate clients for live vs test
+let stripeLive: Stripe | null = null;
+let stripeTest: Stripe | null = null;
 
-function getStripeClient() {
-  if (!stripe) {
-    const apiKey = process.env.STRIPE_SECRET_KEY?.replace(/\s+/g, '');
-    if (!apiKey) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
+type StripeMode = 'live' | 'test';
+
+function getStripeClient(mode: StripeMode = 'live') {
+  // IMPORTANT:
+  // - Live mode MUST use STRIPE_SECRET_KEY and must NOT fall back to test keys.
+  // - Test mode MUST use STRIPE_SECRET_KEY_TEST and must NOT fall back to live keys.
+  let rawKey: string | undefined;
+
+  if (mode === 'test') {
+    rawKey = process.env.STRIPE_SECRET_KEY_TEST;
+  } else {
+    rawKey = process.env.STRIPE_SECRET_KEY;
+  }
+
+  const apiKey = rawKey?.replace(/\s+/g, '');
+
+  if (!apiKey) {
+    const baseMessage = 'Stripe secret key is not configured';
+    const detail =
+      mode === 'test'
+        ? 'Expected STRIPE_SECRET_KEY_TEST for test mode'
+        : 'Expected STRIPE_SECRET_KEY for live mode';
+    throw new Error(`${baseMessage}: ${detail}`);
+  }
+
+  if (mode === 'test') {
+    if (!stripeTest) {
+      stripeTest = new Stripe(apiKey, {
+        apiVersion: '2025-02-24.acacia',
+      });
     }
-    stripe = new Stripe(apiKey, {
+    return stripeTest;
+  }
+
+  if (!stripeLive) {
+    stripeLive = new Stripe(apiKey, {
       apiVersion: '2025-02-24.acacia',
     });
   }
-  return stripe;
+  return stripeLive;
 }
 
 const checkoutSchema = z.object({
@@ -144,8 +174,18 @@ export async function POST(req: NextRequest) {
     // Convert price from USD to user's currency
     const amount = convertToStripeAmount(plan.retail_price, currency as Currency);
 
-    console.log('[Mobile Checkout] Creating Payment Intent...', { currency, amount });
-    const paymentIntent = await getStripeClient().paymentIntents.create({
+    // Route specific users (e.g. App Store / Play Store reviewers) through Stripe TEST mode
+    const stripeMode: StripeMode = (user as any).is_test_user ? 'test' : 'live';
+
+    console.log('[Mobile Checkout] Creating Payment Intent...', {
+      currency,
+      amount,
+      stripeMode,
+      userId: user.id,
+      userEmail: user.email,
+    });
+
+    const paymentIntent = await getStripeClient(stripeMode).paymentIntents.create({
       amount: amount,
       currency: currency.toLowerCase(),
       receipt_email: user.email,
@@ -156,6 +196,7 @@ export async function POST(req: NextRequest) {
         userEmail: user.email,
         needsPasswordSetup: isNewUser ? 'true' : 'false',
         source: 'mobile',
+        stripeMode,
       },
       automatic_payment_methods: {
         enabled: true,
@@ -174,9 +215,34 @@ export async function POST(req: NextRequest) {
       .eq('id', order.id);
 
     console.log('[Mobile Checkout] Success! Returning client secret');
+
+    // Return the correct publishable key so the mobile app can initialize the right Stripe mode
+    const publishableKey =
+      stripeMode === 'test'
+        ? process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST
+        : process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+    if (!publishableKey) {
+      console.error(`[Mobile Checkout] Publishable key missing for ${stripeMode} mode`);
+      // Fallback to live key if test key missing (safer than undefined)
+      // but really this should be an error or alert
+      if (stripeMode === 'test') {
+        console.warn('[Mobile Checkout] Falling back to live key for test user due to missing config');
+        // NOTE: This might cause a client-side error if they try to use a test PaymentIntent with live PK
+        // but it's better than returning undefined.
+        // Ideally we should just error out here.
+      }
+      return NextResponse.json({
+        error: 'Configuration error',
+        message: 'Payment configuration missing. Please contact support.'
+      }, { status: 500 });
+    }
+
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
       orderId: order.id,
+      publishableKey,
+      stripeMode, 
     });
   } catch (error) {
     console.error('[Mobile Checkout] Error:', error);

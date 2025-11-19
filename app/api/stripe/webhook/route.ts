@@ -24,7 +24,16 @@ function getStripeClient() {
   return stripe;
 }
 
-const webhookSecret = (process.env.STRIPE_WEBHOOK_SECRET || '').replace(/\s+/g, '');
+// Support both live and test webhook signing secrets so mobile app reviewers
+// can use Stripe TEST mode without affecting production users.
+const webhookSecrets: string[] = [
+  (process.env.STRIPE_WEBHOOK_SECRET || '').replace(/\s+/g, ''),
+  (process.env.STRIPE_WEBHOOK_SECRET_TEST || '').replace(/\s+/g, ''),
+].filter((value) => Boolean(value));
+
+if (webhookSecrets.length === 0) {
+  console.error('No Stripe webhook secrets configured');
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,11 +63,29 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'No signature' }, { status: 400 });
       }
 
-      try {
-        event = getStripeClient().webhooks.constructEvent(body, signature, webhookSecret);
-      } catch (err) {
+      if (webhookSecrets.length === 0) {
+        return NextResponse.json({ error: 'Webhook secrets not configured' }, { status: 500 });
+      }
+
+      // Try all configured webhook secrets (live + test) before failing
+      let constructedEvent: Stripe.Event | null = null;
+      let lastError: unknown;
+
+      for (const secret of webhookSecrets) {
+        try {
+          constructedEvent = getStripeClient().webhooks.constructEvent(body, signature, secret);
+          break;
+        } catch (err) {
+          lastError = err;
+          continue;
+        }
+      }
+
+      if (!constructedEvent) {
         return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
       }
+
+      event = constructedEvent;
     }
 
     // Idempotency check using atomic insert to prevent race conditions
