@@ -64,7 +64,7 @@ export default function AffiliateReferencePage() {
     <div className="min-h-screen bg-white">
       <Nav />
 
-      <div className="relative pt-32 sm:pt-40 pb-20 sm:pb-32 px-4 bg-mint overflow-hidden">
+      <div className="relative pt-32 sm:pt-40 md:pt-48 pb-20 sm:pb-32 px-4 bg-mint overflow-hidden">
         {/* Floating Background Elements */}
         <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>

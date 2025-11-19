@@ -133,7 +133,7 @@ export default function HelpPage() {
       <Nav />
 
       {/* Hero Section */}
-      <section className="pt-32 sm:pt-40 pb-16 sm:pb-20 px-4 bg-purple">
+      <section className="pt-32 sm:pt-40 md:pt-48 pb-16 sm:pb-20 px-4 bg-purple">
         <div className="container mx-auto text-center">
           <div className="inline-block mb-4 sm:mb-6">
             <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">

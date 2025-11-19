@@ -76,7 +76,7 @@ export default function DeleteAccountPage() {
     <div className="min-h-screen bg-white">
       <Nav />
 
-      <div className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4">
+      <div className="pt-32 sm:pt-40 md:pt-48 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4">
         <div className="container mx-auto max-w-2xl">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
