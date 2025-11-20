@@ -82,21 +82,43 @@ export default function InstallPage() {
     return () => clearInterval(interval);
   }, [loadOrder, order?.hasActivationDetails]);
 
-  // Auto-trigger deep link for iOS 17.4+ when activation details are ready
-  // COMMENTED OUT: Let users click the button instead for better UX
-  // useEffect(() => {
-  //   if (order?.hasActivationDetails && !deepLinkTriggered && deviceInfo.supportsUniversalLink && order.smdp && order.activationCode) {
-  //     // Delay by 2 seconds to give user time to see the ready message
-  //     setTimeout(() => {
-  //       // Type guard ensures we have non-null values
-  //       if (order.smdp && order.activationCode) {
-  //         const deepLink = buildIOSUniversalLink(order.smdp, order.activationCode);
-  //         window.location.href = deepLink;
-  //         setDeepLinkTriggered(true);
-  //       }
-  //     }, 2000);
-  //   }
-  // }, [order, deepLinkTriggered, deviceInfo]);
+  // Auto-trigger deep link for iOS 17.4+ (ONCE ONLY)
+  useEffect(() => {
+    if (
+      order?.hasActivationDetails && 
+      !deepLinkTriggered && 
+      deviceInfo.supportsUniversalLink && 
+      order.smdp && 
+      order.activationCode
+    ) {
+      // Check if we already auto-triggered this specific order
+      const storageKey = `auto_install_triggered_${order.id}`;
+      if (localStorage.getItem(storageKey)) {
+        return; // Already done, don't annoy user
+      }
+
+      // Delay by 3 seconds to let them see the "Success" state first
+      const timer = setTimeout(() => {
+        if (order.smdp && order.activationCode) {
+          // Mark as done BEFORE redirecting to prevent loops
+          localStorage.setItem(storageKey, 'true');
+          setDeepLinkTriggered(true);
+          
+          const deepLink = buildIOSUniversalLink(order.smdp, order.activationCode);
+          window.location.href = deepLink;
+        }
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    order?.hasActivationDetails, 
+    order?.id, 
+    order?.smdp, 
+    order?.activationCode, 
+    deviceInfo.supportsUniversalLink
+  ]); // Only re-run if critical data changes, ignoring object reference updates
 
   // Show referral modal after success (5 seconds delay) - only once per order
   useEffect(() => {
