@@ -655,6 +655,11 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - Verify domain is added: `getlumbus.com` (no www)
 - Ensure return URL is exact: `https://qflokprwpxeynodcndbc.supabase.co/auth/v1/callback`
 
+**Error: "Returned aud (com.example.app) does not match configured client ID"**
+- This happens when Supabase expects the Service ID (`.web`) but receives the App Bundle ID (`.app`).
+- **Fix:** Add your iOS Bundle ID (e.g., `com.getlumbus.app`) to the "Client IDs" list in Supabase Apple Provider settings.
+- You can add multiple IDs separated by commas in Supabase.
+
 **Error: "Invalid JWT"**
 - Secret key expires every 6 months - regenerate it
 - Check Team ID, Service ID, and Key ID are correct

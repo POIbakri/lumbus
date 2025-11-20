@@ -89,6 +89,16 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // iOS Apple App Site Association (AASA) - required to be application/json
+      {
+        source: '/.well-known/apple-app-site-association',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
 

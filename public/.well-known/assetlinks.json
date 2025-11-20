@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.lumbus.app",
+      "sha256_cert_fingerprints": [
+        "16:FF:81:B3:DF:19:08:87:1D:AC:81:B5:7D:4E:EF:85:E7:05:51:25:E0:F0:BC:9B:85:95:94:D0:08:D6:F4:3D"
+      ]
+    }
+  }
+]
