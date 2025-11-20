@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { WelcomePopup } from "@/components/welcome-popup";
 import { CookieConsent } from "@/components/cookie-consent";
 import { TawkTo } from "@/components/tawk-to";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -152,9 +153,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: 'https://getlumbus.com',
-  },
   category: 'technology',
   classification: 'Travel Technology, Telecommunications',
   manifest: "/manifest.json",
@@ -229,6 +227,7 @@ export default function RootLayout({
         <CookieConsent />
         <TawkTo />
         <Analytics />
+        <Footer />
         <script
           dangerouslySetInnerHTML={{
             __html: `

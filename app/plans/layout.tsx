@@ -3,6 +3,18 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Buy eSIM Plans Online - 1700+ Cheap eSIM Plans for 150+ Countries | Best Prices 2025',
   description: 'Buy cheap eSIM plans online for travel. 1700+ plans in 150+ countries. Compare prices & find best eSIM deals. Instant activation, no signup. Cheapest eSIM provider 2025.',
+  keywords: [
+    'eSIM plans',
+    'buy data plan',
+    'prepaid eSIM',
+    'international data plans',
+    'travel internet',
+    'cheap data packages',
+    'no contract eSIM',
+    'pay as you go data',
+    'eSIM deals',
+    'best eSIM prices',
+  ],
   alternates: {
     canonical: 'https://getlumbus.com/plans',
   },
