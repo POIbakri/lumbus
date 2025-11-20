@@ -199,10 +199,10 @@ export default function SupportPage() {
                   Check your order confirmation email for specific activation details
                 </p>
                 <Link
-                  href="/plans"
+                  href="/help"
                   className="inline-block btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base"
                 >
-                  BROWSE PLANS →
+                  GET MORE HELP →
                 </Link>
               </CardContent>
             </Card>
