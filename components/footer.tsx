@@ -1,7 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Don't show footer on dashboard pages
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <footer className="bg-foreground text-white py-12 px-4">
       <div className="container mx-auto">

@@ -1144,6 +1144,120 @@ export default function DashboardPage() {
           <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.4s'}}>
             <DataWallet />
           </div>
+
+          {/* Account Settings Section */}
+          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.5s'}}>
+            <Card className="bg-purple border-2 sm:border-3 md:border-4 border-accent shadow-xl rounded-2xl sm:rounded-3xl">
+              <CardHeader className="border-b-2 border-accent/20 px-4 sm:px-6">
+                <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase flex items-center gap-2 sm:gap-3">
+                  <span className="text-2xl sm:text-3xl">⚙️</span>
+                  <span className="break-all">ACCOUNT SETTINGS</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4 sm:pt-6 px-3 sm:px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {/* Privacy Policy */}
+                  <Link href="/privacy" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">📜</span>
+                        <span className="truncate">PRIVACY POLICY</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </Link>
+
+                  {/* Terms of Service */}
+                  <Link href="/terms" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">📋</span>
+                        <span className="truncate">TERMS OF SERVICE</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </Link>
+
+                  {/* Request Data Deletion */}
+                  <Link href="/deletedata" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">📝</span>
+                        <span className="truncate">DATA DELETION</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </Link>
+
+                  {/* Help Center */}
+                  <Link href="/help" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">💬</span>
+                        <span className="truncate">HELP CENTER</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </Link>
+
+                  {/* Support Email */}
+                  <a href="mailto:support@getlumbus.com" className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">✉️</span>
+                        <span className="truncate">CONTACT SUPPORT</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </a>
+
+                  {/* Delete Account - Danger Zone */}
+                  <Link href="/delete-account" className="block sm:col-span-2 lg:col-span-1">
+                    <Button
+                      variant="outline"
+                      className="w-full btn-lumbus bg-destructive text-white hover:bg-destructive/90 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      onClick={() => triggerHaptic('heavy')}
+                    >
+                      <span className="flex items-center gap-1 sm:gap-2">
+                        <span className="text-base sm:text-lg">🗑️</span>
+                        <span className="truncate">DELETE ACCOUNT</span>
+                      </span>
+                      <span className="ml-1">→</span>
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Account Info */}
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <p className="text-xs font-bold text-white/70 mb-1">EMAIL</p>
+                      <p className="text-xs sm:text-sm font-bold text-white break-all">{user?.email || 'Loading...'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-white/70 mb-1">USER ID</p>
+                      <p className="text-xs sm:text-sm font-mono text-white break-all">{user?.id || 'Loading...'}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
