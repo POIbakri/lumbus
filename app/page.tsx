@@ -8,6 +8,9 @@ import { Nav } from '@/components/nav';
 import { AuthRecoveryHandler } from '@/components/auth-recovery-handler';
 import { PaymentLogos, PaymentLogosCompact } from '@/components/payment-logos';
 import { ServiceSchema, HowToSchema } from '@/components/structured-data';
+import { AppDownloadBanner } from '@/components/app-download-banner';
+import { AppStoreBadges } from '@/components/app-store-badges';
+import { SocialMediaLinks } from '@/components/social-media-links';
 
 export default function Home() {
 
@@ -79,6 +82,18 @@ export default function Home() {
             </Link>
           </div>
 
+          {/* App Store Badges in Hero */}
+          <div className="mt-8 sm:mt-10 md:mt-12 px-4" style={{animationDelay: '0.35s'}}>
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <p className="text-xs sm:text-sm md:text-base font-bold text-foreground/70 uppercase tracking-wide">
+                Download Our App
+              </p>
+              <div className="w-full max-w-sm sm:max-w-md">
+                <AppStoreBadges className="justify-center scale-90 sm:scale-100" />
+              </div>
+            </div>
+          </div>
+
           {/* Device Compatibility Callout */}
           <div className="mt-8 px-4" style={{animationDelay: '0.4s'}}>
             <Link href="/device" className="group inline-block">
@@ -112,6 +127,14 @@ export default function Home() {
               <div className="text-2xl" aria-hidden="true">🏠</div>
               <span className="font-bold text-sm">Works At Home</span>
             </div>
+          </div>
+
+          {/* Social Media Links in Hero */}
+          <div className="mt-10 sm:mt-12" style={{animationDelay: '0.55s'}}>
+            <p className="text-xs sm:text-sm font-bold text-foreground/60 uppercase tracking-wide mb-3">
+              Follow Us
+            </p>
+            <SocialMediaLinks variant="hero" />
           </div>
         </div>
       </section>

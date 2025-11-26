@@ -15,6 +15,8 @@ import { getCountryInfo } from '@/lib/countries';
 import { authenticatedGet } from '@/lib/api-client';
 import { ReferralWidget } from '@/components/referral-widget';
 import { DataWallet } from '@/components/data-wallet';
+import { AppDownloadBanner } from '@/components/app-download-banner';
+import { SocialMediaLinks } from '@/components/social-media-links';
 
 // Format plan data amounts (for "What You Bought" - shows marketing numbers)
 function formatPlanData(dataGB: number): string {
@@ -1140,6 +1142,11 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* App Download Banner */}
+          <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.35s'}}>
+            <AppDownloadBanner variant="dashboard" dismissible={true} />
+          </div>
+
           {/* Data Wallet Section */}
           <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.4s'}}>
             <DataWallet />
@@ -1254,6 +1261,12 @@ export default function DashboardPage() {
                       <p className="text-xs sm:text-sm font-mono text-white break-all">{user?.id || 'Loading...'}</p>
                     </div>
                   </div>
+                </div>
+
+                {/* Social Media Follow Section */}
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl">
+                  <p className="text-xs font-bold text-white/70 mb-3 uppercase">Follow Us On Social Media</p>
+                  <SocialMediaLinks variant="dashboard" />
                 </div>
               </CardContent>
             </Card>

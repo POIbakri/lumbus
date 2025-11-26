@@ -18,6 +18,18 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'tools.applemediaservices.com',
+        pathname: '/api/badges/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'play.google.com',
+        pathname: '/intl/**',
+      },
+    ],
   },
 
   // Enable strict mode for better React performance

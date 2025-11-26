@@ -368,9 +368,11 @@ async function handleDataUsage(content: {
   orderUsage: number;
   remain: number;
   lastUpdateTime: string;
-  remainThreshold: 0.5 | 0.8 | 0.9;
+  remainThreshold: 0.5 | 0.2 | 0.1; // Represents % remaining: 50%, 20%, or 10%
 }) {
-  const usagePercent = content.remainThreshold * 100;
+  // remainThreshold is the percentage REMAINING (0.5 = 50% left, 0.2 = 20% left, 0.1 = 10% left)
+  // Convert to usage percentage: 50% remaining = 50% used, 20% remaining = 80% used, 10% remaining = 90% used
+  const usagePercent = (1 - content.remainThreshold) * 100;
 
   // Get order details (avoid joins)
   const { data: order, error: orderError } = await supabase

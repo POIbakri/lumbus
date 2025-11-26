@@ -9,6 +9,7 @@ import { WelcomePopup } from "@/components/welcome-popup";
 import { CookieConsent } from "@/components/cookie-consent";
 import { TawkTo } from "@/components/tawk-to";
 import { Footer } from "@/components/footer";
+import { AppPromoBanner, AppPromoFloatingButton } from "@/components/app-promo-banner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -227,6 +228,8 @@ export default function RootLayout({
         <CookieConsent />
         <TawkTo />
         <Analytics />
+        <AppPromoBanner />
+        <AppPromoFloatingButton />
         <Footer />
         <script
           dangerouslySetInnerHTML={{

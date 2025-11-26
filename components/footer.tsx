@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { AppStoreBadges } from './app-store-badges';
+import { SocialMediaLinks } from './social-media-links';
 
 export function Footer() {
   const pathname = usePathname();
@@ -27,7 +29,18 @@ export function Footer() {
                 loading="lazy"
               />
             </Link>
-            <p className="text-gray-400">Fast eSIMs for travelers worldwide</p>
+            <p className="text-sm sm:text-base text-gray-400 mb-4">Fast eSIMs for travelers worldwide</p>
+
+            {/* Social Media Links */}
+            <div className="mb-4">
+              <h5 className="font-bold text-xs sm:text-sm uppercase mb-3 text-white">Follow Us</h5>
+              <SocialMediaLinks variant="default" />
+            </div>
+
+            <div className="mb-4">
+              <h5 className="font-bold text-xs sm:text-sm uppercase mb-3 text-white">Download Our App</h5>
+              <AppStoreBadges variant="compact" className="scale-90 sm:scale-100 origin-left" />
+            </div>
           </div>
           <div>
             <h4 className="font-bold uppercase mb-4">Pages</h4>

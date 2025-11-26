@@ -1,8 +1,11 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+
+const POPUP_DELAY_MS = 15000;
 
 export function WelcomePopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,14 +15,14 @@ export function WelcomePopup() {
     // Check if user has seen the popup before
     const hasSeenPopup = localStorage.getItem('hasSeenWelcomePopup');
 
-    if (!hasSeenPopup) {
-      // Show popup after a short delay (1 second)
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 1000);
+    if (hasSeenPopup) return;
 
-      return () => clearTimeout(timer);
-    }
+    // Give visitors time to browse before surfacing the offer
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+    }, POPUP_DELAY_MS);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
@@ -132,10 +135,12 @@ export function WelcomePopup() {
 
             {/* CTA Button */}
             <Button
-              onClick={handleClose}
+              asChild
               className="w-full bg-primary text-foreground hover:bg-primary/90 font-black text-sm sm:text-base px-6 py-4 sm:py-5 rounded-lg shadow-xl transition-all border-2 border-foreground"
             >
-              START SHOPPING →
+              <Link href="/destinations" onClick={handleClose}>
+                SEARCH DESTINATIONS NOW →
+              </Link>
             </Button>
           </div>
         </Card>
