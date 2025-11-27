@@ -1,7 +1,7 @@
 // App Store Configuration
 export const APP_STORE_LINKS = {
-  ios: 'https://apps.apple.com/app/lumbus-esim/id[YOUR_APP_ID]', // Update with your actual App Store ID
-  android: 'https://play.google.com/store/apps/details?id=com.lumbus.app', // Update with your actual package name
+  ios: 'https://apps.apple.com/app/id6754379325',
+  android: 'https://play.google.com/store/apps/details?id=com.lumbus.app&pcampaignid=web_share',
 };
 
 export const APP_DOWNLOAD_CTA = {
