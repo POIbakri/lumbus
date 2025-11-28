@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { track } from '@vercel/analytics';
 import { APP_STORE_LINKS } from '@/lib/app-store-config';
 
 const BADGE_PRESETS = {
@@ -37,6 +38,7 @@ export function AppStoreBadges({ className = '', variant = 'default', showQR = f
         rel="noopener noreferrer"
         className="inline-block hover:opacity-90 transition-opacity"
         aria-label="Download on the App Store"
+        onClick={() => track('App Store Click', { store: 'ios' })}
       >
         <div className={shellClass}>
           <Image
@@ -57,6 +59,7 @@ export function AppStoreBadges({ className = '', variant = 'default', showQR = f
         rel="noopener noreferrer"
         className="inline-block hover:opacity-90 transition-opacity"
         aria-label="Get it on Google Play"
+        onClick={() => track('App Store Click', { store: 'android' })}
       >
         <div className={shellClass}>
           <Image
@@ -103,6 +106,7 @@ export function AppStoreBadgesInline({ className = '', variant = 'default' }: Ap
         rel="noopener noreferrer"
         className="inline-block hover:opacity-90 transition-opacity"
         aria-label="Download on the App Store"
+        onClick={() => track('App Store Click', { store: 'ios' })}
       >
         <div className={shellClass}>
           <svg viewBox="0 0 120 40" className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -128,6 +132,7 @@ export function AppStoreBadgesInline({ className = '', variant = 'default' }: Ap
         rel="noopener noreferrer"
         className="inline-block hover:opacity-90 transition-opacity"
         aria-label="Get it on Google Play"
+        onClick={() => track('App Store Click', { store: 'android' })}
       >
         <div className={shellClass}>
           <svg viewBox="0 0 135 40" className="h-full w-full" xmlns="http://www.w3.org/2000/svg">

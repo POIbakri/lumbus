@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { track } from '@vercel/analytics';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -138,7 +139,11 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
       </CardContent>
 
       <CardFooter className="relative z-10 pt-0">
-        <Link href={`/plans/${plan.region_code.toLowerCase()}/${plan.id}`} className="w-full block">
+        <Link
+          href={`/plans/${plan.region_code.toLowerCase()}/${plan.id}`}
+          className="w-full block"
+          onClick={() => track('Plan Click', { region: plan.region_code, planId: plan.id, price: price, dataGB: plan.data_gb })}
+        >
           <Button className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base md:text-lg py-5 sm:py-6 md:py-7 shadow-xl  ">
             BUY NOW →
           </Button>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { track } from '@vercel/analytics';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Nav } from '@/components/nav';
@@ -46,6 +47,7 @@ export default function SignUpPage() {
       setLoading(false);
       triggerHaptic('heavy');
     } else {
+      track('Signup', { method: 'email' });
       setSuccess(true);
       triggerHaptic('light');
       // Welcome email is sent from auth callback after email confirmation
@@ -65,6 +67,7 @@ export default function SignUpPage() {
       setLoading(false);
       triggerHaptic('heavy');
     }
+    // Tracking happens in /auth/callback after successful OAuth redirect
   };
 
   const handleAppleSignUp = async () => {
@@ -77,6 +80,7 @@ export default function SignUpPage() {
       setLoading(false);
       triggerHaptic('heavy');
     }
+    // Tracking happens in /auth/callback after successful OAuth redirect
   };
 
   if (success) {

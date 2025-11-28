@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { track } from '@vercel/analytics';
 import { Nav } from '@/components/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -296,6 +297,7 @@ export default function DestinationsPage() {
                       key={item.code}
                       href={`/plans?region=${item.code}`}
                       className="block group"
+                      onClick={() => track('Destination Click', { type: activeTab === 'countries' ? 'country' : 'region', code: item.code, name: item.name })}
                     >
                       <Card className={`h-full cursor-pointer border-2 sm:border-3 md:border-4 border-foreground ${bgColor} hover:scale-105 active:scale-105 hover:shadow-2xl active:shadow-2xl transition-all duration-300 overflow-hidden relative touch-manipulation`}>
                         {/* Shine Effect on Hover/Active */}

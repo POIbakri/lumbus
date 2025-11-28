@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { track } from '@vercel/analytics';
 import { supabaseClient } from '@/lib/supabase-client';
 
 /**
@@ -86,6 +87,12 @@ export default function AuthCallbackPage() {
                 const userName = user.user_metadata?.full_name || user.user_metadata?.name;
                 // Fire-and-forget - uses sendBeacon/keepalive so navigation won't cancel it
                 sendWelcomeEmail(user.id, user.email, userName);
+
+                // Track OAuth signup only (email signups are tracked in signup page)
+                const provider = user.app_metadata?.provider;
+                if (provider && provider !== 'email') {
+                  track('Signup', { method: provider });
+                }
               }
 
               // Redirect to dashboard
