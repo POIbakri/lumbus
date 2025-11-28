@@ -48,6 +48,7 @@ export default function SignUpPage() {
     } else {
       setSuccess(true);
       triggerHaptic('light');
+      // Welcome email is sent from auth callback after email confirmation
       setTimeout(() => {
         router.push('/dashboard');
       }, 2000);

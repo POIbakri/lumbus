@@ -1,5 +1,39 @@
 import { Resend } from 'resend';
 
+// App Store Links
+const APP_STORE_URL = 'https://apps.apple.com/app/id6754379325';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.lumbus.app';
+
+/**
+ * Reusable app store links section for emails
+ */
+function getAppStoreSection() {
+  return `
+    <div style="margin: 30px 0 0; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A; text-align: center;">Download the Lumbus App</p>
+      <p style="margin: 0 0 15px; font-size: 14px; color: #666666; text-align: center;">
+        Manage your eSIM, track data usage, and top up on the go.
+      </p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td align="center" style="padding: 5px 0;">
+            <a href="${APP_STORE_URL}" style="display: inline-block; margin: 0 5px;">
+              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" style="height: 40px; width: auto;" />
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding: 5px 0;">
+            <a href="${PLAY_STORE_URL}" style="display: inline-block; margin: 0 5px;">
+              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; width: auto;" />
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+}
+
 // Lazy initialization - only create instance when needed
 let resend: Resend | null = null;
 
@@ -466,11 +500,13 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       ` : ''}
     </div>
     ` : ''}
+
+    ${getAppStoreSection()}
   `;
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       bcc: ['getlumbus.com+d39cc9736f@invite.trustpilot.com'], // Trustpilot review automation
       subject: `Your Lumbus eSIM is ready! - ${orderDetails.planName}`,
@@ -573,7 +609,7 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
     </table>
 
     <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
-      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 Tips to manage your data:</p>
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">Tips to manage your data:</p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Use Wi-Fi when available</p></td></tr>
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Disable automatic app updates over cellular</p></td></tr>
@@ -581,11 +617,13 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Check background app refresh settings</p></td></tr>
       </table>
     </div>
+
+    ${getAppStoreSection()}
   `;
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: `${alertLevel}: ${usagePercent.toFixed(0)}% of your data used - ${planName}`,
       html: createEmailTemplate({
@@ -652,11 +690,13 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> No action needed if you're done traveling</p></td></tr>
       </table>
     </div>
+
+    ${getAppStoreSection()}
   `;
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: `Your eSIM plan expires soon - ${planName}`,
       html: createEmailTemplate({
@@ -738,13 +778,15 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
         Share your referral code <strong>${referralCode}</strong> with friends and family. You'll earn rewards for every purchase they make, and they'll get a discount too!
       </p>
     </div>
+
+    ${getAppStoreSection()}
   `;
 
   try {
     const { data, error} = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
-      subject: `You earned a reward! 🎉 - ${rewardAmount}`,
+      subject: `You earned a reward! - ${rewardAmount}`,
       html: createEmailTemplate({
         title: 'Referral Reward Earned',
         subtitle: 'Congratulations!',
@@ -850,11 +892,13 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     <p style="margin: 30px 0 0; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Need more data? Visit your <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="color: #2EFECC; font-weight: 700; text-decoration: none;">dashboard</a> to top up again!
     </p>
+
+    ${getAppStoreSection()}
   `;
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: `Your eSIM top-up is complete! - ${dataAdded}GB added`,
       html: createEmailTemplate({
@@ -884,7 +928,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [applicantEmail],
       subject: 'Application Received - Lumbus Affiliate Program',
       html: `
@@ -1199,7 +1243,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: '🎉 Welcome to Lumbus Affiliate Program - Application Approved!',
       html: `
@@ -1544,7 +1588,7 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: 'Update on Your Affiliate Application - Lumbus',
       html: `
@@ -1812,7 +1856,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@lumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [adminEmail],
       subject: `🆕 New Affiliate Application - ${applicant.displayName}`,
       html: `
@@ -2063,7 +2107,7 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
       subject: 'Account Deletion Request Received - Lumbus',
       html: createEmailTemplate({
@@ -2161,7 +2205,7 @@ export async function sendAdminAccountDeletionNotification(params: SendAdminAcco
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: ['delete@getlumbus.com'],
       subject: `Account Deletion Request - ${userEmail}`,
       html: createEmailTemplate({
@@ -2257,7 +2301,7 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: ['delete@getlumbus.com'],
       subject: `Data Deletion Request - ${userEmail}`,
       html: createEmailTemplate({
@@ -2380,7 +2424,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
 
   try {
     const { data, error } = await getResendClient().emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'hello@getlumbus.com',
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [userEmail],
       subject: 'Data Deletion Request Received - Lumbus',
       html: createEmailTemplate({
@@ -2399,6 +2443,98 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
     return data;
   } catch (error) {
     console.error('Failed to send data deletion request confirmation:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send welcome email to new users who sign up without purchasing
+ */
+export interface SendWelcomeEmailParams {
+  to: string;
+  userName?: string;
+}
+
+export async function sendWelcomeEmail(params: SendWelcomeEmailParams) {
+  const { to, userName } = params;
+
+  const greeting = userName ? `Hi ${userName},` : 'Hi there,';
+  const plansUrl = 'https://getlumbus.com/plans';
+
+  const content = `
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Welcome to Lumbus</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666;">
+      ${greeting}
+    </p>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666;">
+      Thanks for creating your Lumbus account. You're now ready to stay connected wherever you travel with affordable eSIM data plans in 150+ countries.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">What you can do with Lumbus:</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A;">
+            <strong>Instant activation</strong> - Get connected in seconds
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A;">
+            <strong>150+ countries</strong> - One app, global coverage
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A;">
+            <strong>No contracts</strong> - Pay only for what you need
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A;">
+            <strong>Easy top-ups</strong> - Add more data anytime
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${plansUrl}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+            BROWSE PLANS
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    ${getAppStoreSection()}
+
+    <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      Questions? We're here to help at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
+    </p>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
+      to: [to],
+      subject: 'Welcome to Lumbus - Stay Connected Anywhere',
+      html: createEmailTemplate({
+        title: 'Welcome to Lumbus',
+        subtitle: 'Your journey starts here',
+        content,
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
     throw error;
   }
 }
