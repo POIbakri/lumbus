@@ -82,6 +82,21 @@ export default function InstallPage() {
     return () => clearInterval(interval);
   }, [loadOrder, order?.hasActivationDetails]);
 
+  // Replace Stripe checkout in browser history so users return here (not Stripe) after eSIM setup
+  useEffect(() => {
+    if (order?.id && typeof window !== 'undefined') {
+      // Remove Stripe session_id from URL and replace history entry
+      const url = new URL(window.location.href);
+      const hasStripeParams = url.searchParams.has('session_id');
+
+      if (hasStripeParams) {
+        url.searchParams.delete('session_id');
+        // Replace current history entry (Stripe redirect) with clean install page URL
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [order?.id]);
+
   // Auto-trigger deep link for iOS 17.4+ (ONCE ONLY)
   useEffect(() => {
     if (
