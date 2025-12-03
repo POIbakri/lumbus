@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { checkEsimUsage } from '@/lib/esimaccess';
 import { requireUserAuth } from '@/lib/server-auth';
+import { simulateTestUserUsage } from '@/lib/test-simulation';
 
 interface RouteParams {
   params: Promise<{
@@ -49,6 +50,92 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     // Verify the order belongs to the authenticated user
     if (order.user_id !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // Check if user is a test user (for data simulation)
+    const { data: userData } = await supabase
+      .from('users')
+      .select('is_test_user')
+      .eq('id', userId)
+      .single();
+
+    const isTestUser = userData?.is_test_user === true;
+
+    // For test users, return simulated usage data instead of calling real API
+    if (isTestUser) {
+      // Get order details for simulation (single source of truth for plan data)
+      const { data: fullOrder } = await supabase
+        .from('orders')
+        .select('id, status, created_at, smdp, activation_code, plans(data_gb, validity_days)')
+        .eq('id', orderId)
+        .single();
+
+      if (fullOrder) {
+        const simPlan = Array.isArray(fullOrder.plans) ? fullOrder.plans[0] : fullOrder.plans;
+        const orderForSim = {
+          ...fullOrder,
+          plan: simPlan,
+        };
+
+        // Use plan data from this query for all calculations
+        const totalDataBytes = (simPlan?.data_gb || 0) * 1024 * 1024 * 1024;
+        const simulation = simulateTestUserUsage(orderForSim);
+
+        if (simulation) {
+          const dataUsedBytes = simulation.data_usage_bytes;
+          const dataRemainingBytes = simulation.data_remaining_bytes;
+          const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
+          const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
+          const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
+          const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
+
+          console.log('[Usage API] Returning simulated data for test user');
+
+          return NextResponse.json({
+            success: true,
+            simulated: true,
+            data_usage_bytes: dataUsedBytes,
+            data_remaining_bytes: dataRemainingBytes,
+            data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
+            data_total_gb: parseFloat(totalDataGB.toFixed(2)),
+            data_remaining_gb: parseFloat(dataRemainingGB.toFixed(2)),
+            usage_percent: parseFloat(usagePercent.toFixed(1)),
+            last_update: simulation.last_usage_update,
+            updated_at: new Date().toISOString(),
+          });
+        }
+
+        // Fallback if simulation returns null (no activation details yet)
+        return NextResponse.json({
+          success: true,
+          simulated: true,
+          data_usage_bytes: 0,
+          data_remaining_bytes: totalDataBytes,
+          data_used_gb: 0,
+          data_total_gb: parseFloat((totalDataBytes / (1024 * 1024 * 1024)).toFixed(2)),
+          data_remaining_gb: parseFloat((totalDataBytes / (1024 * 1024 * 1024)).toFixed(2)),
+          usage_percent: 0,
+          last_update: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      // Fallback if fullOrder query fails - use first query's plan data
+      const fallbackPlan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+      const fallbackTotalBytes = (fallbackPlan?.data_gb || 0) * 1024 * 1024 * 1024;
+
+      return NextResponse.json({
+        success: true,
+        simulated: true,
+        data_usage_bytes: 0,
+        data_remaining_bytes: fallbackTotalBytes,
+        data_used_gb: 0,
+        data_total_gb: parseFloat((fallbackTotalBytes / (1024 * 1024 * 1024)).toFixed(2)),
+        data_remaining_gb: parseFloat((fallbackTotalBytes / (1024 * 1024 * 1024)).toFixed(2)),
+        usage_percent: 0,
+        last_update: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     }
 
     // Check if order has esim_tran_no (required for usage query)

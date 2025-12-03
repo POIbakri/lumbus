@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { requireUserAuth } from '@/lib/server-auth';
+import { applyTestSimulationToOrders } from '@/lib/test-simulation';
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,6 +25,15 @@ export async function GET(req: NextRequest) {
     const userId = auth.user.id;
     console.log('[User Orders API] Fetching orders for user:', userId);
 
+    // Check if user is a test user (for data simulation)
+    const { data: userData } = await supabase
+      .from('users')
+      .select('is_test_user')
+      .eq('id', userId)
+      .single();
+
+    const isTestUser = userData?.is_test_user === true;
+
     // Fetch all orders for the user with plan details joined
     const { data: orders, error } = await supabase
       .from('orders')
@@ -35,6 +45,7 @@ export async function GET(req: NextRequest) {
         smdp,
         activation_code,
         iccid,
+        activated_at,
         data_usage_bytes,
         data_remaining_bytes,
         last_usage_update,
@@ -73,9 +84,17 @@ export async function GET(req: NextRequest) {
       plans: undefined, // Remove the plans array
     })) || [];
 
+    // Apply simulated data usage for test users (app store reviewers)
+    // This allows reviewers to see realistic data consumption without affecting real users
+    const finalOrders = applyTestSimulationToOrders(formattedOrders, isTestUser);
+
+    if (isTestUser) {
+      console.log('[User Orders API] Applied test simulation for reviewer account');
+    }
+
     return NextResponse.json({
-      orders: formattedOrders,
-      count: formattedOrders.length,
+      orders: finalOrders,
+      count: finalOrders.length,
     });
 
   } catch (error) {
