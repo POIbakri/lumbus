@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
         plans(data_gb, validity_days)
       `)
       .in('user_id', testUserIds)
-      .in('status', ['completed', 'provisioning']);
+      .in('status', ['completed', 'provisioning', 'active']);
 
     if (ordersError) {
       console.error('[Test Simulation Cron] Failed to fetch orders:', ordersError);
@@ -140,9 +140,11 @@ export async function GET(req: NextRequest) {
       }
 
       // Update order with simulated data
+      // Also set status to 'active' when activated (for mobile app compatibility)
       const { error: updateError } = await supabase
         .from('orders')
         .update({
+          status: activatedAt ? 'active' : order.status, // Set to 'active' when activated
           activated_at: activatedAt,
           data_usage_bytes: simulatedUsage,
           data_remaining_bytes: simulatedRemaining,
