@@ -112,6 +112,35 @@ export async function GET(
       }
     }
 
+    // For test users: Mark order as "activated" when they view install page with activation details
+    // This simulates the user installing the eSIM so dashboard shows "Active & Using"
+    if (order.smdp && order.activation_code) {
+      // Check if user is a test user
+      const { data: userData } = await supabase
+        .from('users')
+        .select('is_test_user')
+        .eq('id', userId)
+        .single();
+
+      if (userData?.is_test_user === true) {
+        // Check if order already has activated_at set
+        const { data: orderCheck } = await supabase
+          .from('orders')
+          .select('activated_at')
+          .eq('id', orderId)
+          .single();
+
+        // If not yet activated, set activated_at to now (simulates user installing the eSIM)
+        if (orderCheck && !orderCheck.activated_at) {
+          console.log('[Order API] Test user viewing install page - marking order as activated');
+          await supabase
+            .from('orders')
+            .update({ activated_at: new Date().toISOString() })
+            .eq('id', orderId);
+        }
+      }
+    }
+
     // Sanitize response (never expose internal IDs, secrets, or full URLs)
     // Supabase returns plans as an object or array depending on relationship type
     const plan = (Array.isArray(order.plans) ? order.plans[0] : order.plans) as Plan | null;
