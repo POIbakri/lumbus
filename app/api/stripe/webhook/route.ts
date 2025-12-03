@@ -349,19 +349,30 @@ export async function POST(req: NextRequest) {
 
           // For test users, mock response includes activation details immediately
           // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
-          const hasActivationDetails = !!(esimResponse.smdpAddress && esimResponse.activationCode);
-
-          await supabase
-            .from('orders')
-            .update({
-              status: hasActivationDetails ? 'completed' : 'provisioning',
-              connect_order_id: esimResponse.orderId,
-              iccid: esimResponse.iccid || null,
-              smdp: esimResponse.smdpAddress || null,
-              activation_code: esimResponse.activationCode || null,
-              qr_url: esimResponse.qrCode || null,
-            })
-            .eq('id', orderId);
+          if (isTestUser) {
+            // Test user: save mock activation details and mark as completed
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                connect_order_id: esimResponse.orderId,
+                iccid: esimResponse.iccid || null,
+                smdp: esimResponse.smdpAddress || null,
+                activation_code: esimResponse.activationCode || null,
+                qr_url: esimResponse.qrCode || null,
+              })
+              .eq('id', orderId);
+          } else {
+            // Real user: only save standard fields, wait for ORDER_STATUS webhook
+            await supabase
+              .from('orders')
+              .update({
+                status: 'provisioning',
+                connect_order_id: esimResponse.orderId,
+                iccid: esimResponse.iccid || null,
+              })
+              .eq('id', orderId);
+          }
 
           // Note: For real orders, email will be sent by eSIM Access webhook handler when ORDER_STATUS arrives
           // For test orders, activation details are already available
@@ -446,20 +457,30 @@ export async function POST(req: NextRequest) {
 
         // For test users, mock response includes activation details immediately
         // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
-        const hasActivationDetails = !!(esimResponse.smdpAddress && esimResponse.activationCode);
-
-        // Update order with eSIM details
-        await supabase
-          .from('orders')
-          .update({
-            status: hasActivationDetails ? 'completed' : 'provisioning',
-            connect_order_id: esimResponse.orderId,
-            iccid: esimResponse.iccid || null,
-            smdp: esimResponse.smdpAddress || null,
-            activation_code: esimResponse.activationCode || null,
-            qr_url: esimResponse.qrCode || null,
-          })
-          .eq('id', orderId);
+        if (isTestUser) {
+          // Test user: save mock activation details and mark as completed
+          await supabase
+            .from('orders')
+            .update({
+              status: 'completed',
+              connect_order_id: esimResponse.orderId,
+              iccid: esimResponse.iccid || null,
+              smdp: esimResponse.smdpAddress || null,
+              activation_code: esimResponse.activationCode || null,
+              qr_url: esimResponse.qrCode || null,
+            })
+            .eq('id', orderId);
+        } else {
+          // Real user: only save standard fields, wait for ORDER_STATUS webhook
+          await supabase
+            .from('orders')
+            .update({
+              status: 'provisioning',
+              connect_order_id: esimResponse.orderId,
+              iccid: esimResponse.iccid || null,
+            })
+            .eq('id', orderId);
+        }
       } catch (error) {
         await supabase
           .from('orders')
