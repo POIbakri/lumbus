@@ -6,6 +6,10 @@
  * Fetches real-time data usage from eSIM Access API and updates database.
  * Users can refresh their dashboard to see current usage.
  *
+ * For test users: Uses cron-populated data from DB, with on-the-fly
+ * simulation as fallback if cron hasn't run yet.
+ * For real users: Fetches from eSIM Access API
+ *
  * Note: eSIM Access updates usage data every 2-3 hours, so "real-time"
  * means latest available data from their system, not instant usage.
  */
@@ -33,7 +37,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const userId = auth.user.id;
     const { orderId } = await params;
 
-    // Get order with esim_tran_no
+    // Get order with usage data
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select('id, user_id, esim_tran_no, iccid, plan_id, data_usage_bytes, data_remaining_bytes, last_usage_update, plans(data_gb)')
@@ -52,7 +56,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Check if user is a test user (for data simulation)
+    // Check if user is a test user
     const { data: userData } = await supabase
       .from('users')
       .select('is_test_user')
@@ -61,82 +65,77 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     const isTestUser = userData?.is_test_user === true;
 
-    // For test users, return simulated usage data instead of calling real API
+    // For test users: return DB data if available, otherwise calculate on-the-fly
+    // This avoids calling the real eSIM Access API for mock orders
     if (isTestUser) {
-      // Get order details for simulation (single source of truth for plan data)
-      const { data: fullOrder } = await supabase
-        .from('orders')
-        .select('id, status, created_at, smdp, activation_code, plans(data_gb, validity_days)')
-        .eq('id', orderId)
-        .single();
+      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+      const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
 
-      if (fullOrder) {
-        const simPlan = Array.isArray(fullOrder.plans) ? fullOrder.plans[0] : fullOrder.plans;
-        const orderForSim = {
-          ...fullOrder,
-          plan: simPlan,
-        };
+      // Check if cron job has run by looking at last_usage_update timestamp
+      const hasDbData = order.last_usage_update !== null;
 
-        // Use plan data from this query for all calculations
-        const totalDataBytes = (simPlan?.data_gb || 0) * 1024 * 1024 * 1024;
-        const simulation = simulateTestUserUsage(orderForSim);
+      let dataUsedBytes: number;
+      let dataRemainingBytes: number;
+      let lastUpdate: string;
 
-        if (simulation) {
-          const dataUsedBytes = simulation.data_usage_bytes;
-          const dataRemainingBytes = simulation.data_remaining_bytes;
-          const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
-          const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
-          const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
-          const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
+      if (hasDbData) {
+        // Use cron-populated data from DB
+        dataUsedBytes = order.data_usage_bytes || 0;
+        dataRemainingBytes = order.data_remaining_bytes ?? totalDataBytes;
+        lastUpdate = order.last_usage_update || new Date().toISOString();
+        console.log('[Usage API] Returning cron-populated data for test user');
+      } else {
+        // Fallback: calculate on-the-fly simulation (cron hasn't run yet)
+        const { data: fullOrder } = await supabase
+          .from('orders')
+          .select('id, status, created_at, smdp, activation_code, plans(data_gb, validity_days)')
+          .eq('id', orderId)
+          .single();
 
-          console.log('[Usage API] Returning simulated data for test user');
-
-          return NextResponse.json({
-            success: true,
-            simulated: true,
-            data_usage_bytes: dataUsedBytes,
-            data_remaining_bytes: dataRemainingBytes,
-            data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
-            data_total_gb: parseFloat(totalDataGB.toFixed(2)),
-            data_remaining_gb: parseFloat(dataRemainingGB.toFixed(2)),
-            usage_percent: parseFloat(usagePercent.toFixed(1)),
-            last_update: simulation.last_usage_update,
-            updated_at: new Date().toISOString(),
+        if (fullOrder) {
+          const simPlan = Array.isArray(fullOrder.plans) ? fullOrder.plans[0] : fullOrder.plans;
+          const simulation = simulateTestUserUsage({
+            ...fullOrder,
+            plan: simPlan,
           });
-        }
 
-        // Fallback if simulation returns null (no activation details yet)
-        return NextResponse.json({
-          success: true,
-          simulated: true,
-          data_usage_bytes: 0,
-          data_remaining_bytes: totalDataBytes,
-          data_used_gb: 0,
-          data_total_gb: parseFloat((totalDataBytes / (1024 * 1024 * 1024)).toFixed(2)),
-          data_remaining_gb: parseFloat((totalDataBytes / (1024 * 1024 * 1024)).toFixed(2)),
-          usage_percent: 0,
-          last_update: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
+          if (simulation) {
+            dataUsedBytes = simulation.data_usage_bytes;
+            dataRemainingBytes = simulation.data_remaining_bytes;
+            lastUpdate = simulation.last_usage_update;
+            console.log('[Usage API] Returning on-the-fly simulated data for test user (cron not yet run)');
+          } else {
+            dataUsedBytes = 0;
+            dataRemainingBytes = totalDataBytes;
+            lastUpdate = new Date().toISOString();
+          }
+        } else {
+          dataUsedBytes = 0;
+          dataRemainingBytes = totalDataBytes;
+          lastUpdate = new Date().toISOString();
+        }
       }
 
-      // Fallback if fullOrder query fails - use first query's plan data
-      const fallbackPlan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-      const fallbackTotalBytes = (fallbackPlan?.data_gb || 0) * 1024 * 1024 * 1024;
+      const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
+      const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
+      const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
+      const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
 
       return NextResponse.json({
         success: true,
-        simulated: true,
-        data_usage_bytes: 0,
-        data_remaining_bytes: fallbackTotalBytes,
-        data_used_gb: 0,
-        data_total_gb: parseFloat((fallbackTotalBytes / (1024 * 1024 * 1024)).toFixed(2)),
-        data_remaining_gb: parseFloat((fallbackTotalBytes / (1024 * 1024 * 1024)).toFixed(2)),
-        usage_percent: 0,
-        last_update: new Date().toISOString(),
+        simulated: true, // Flag to indicate this is test/simulated data
+        data_usage_bytes: dataUsedBytes,
+        data_remaining_bytes: dataRemainingBytes,
+        data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
+        data_total_gb: parseFloat(totalDataGB.toFixed(2)),
+        data_remaining_gb: parseFloat(dataRemainingGB.toFixed(2)),
+        usage_percent: parseFloat(usagePercent.toFixed(1)),
+        last_update: lastUpdate,
         updated_at: new Date().toISOString(),
       });
     }
+
+    // For real users: fetch from eSIM Access API
 
     // Check if order has esim_tran_no (required for usage query)
     if (!order.esim_tran_no) {

@@ -4,6 +4,9 @@
  *
  * Returns all orders with plan details joined for the logged-in user.
  * Used by mobile app dashboard to display user's eSIM orders.
+ *
+ * For test users: Uses cron-populated data from DB, with on-the-fly
+ * simulation as fallback if cron hasn't run yet.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,7 +28,7 @@ export async function GET(req: NextRequest) {
     const userId = auth.user.id;
     console.log('[User Orders API] Fetching orders for user:', userId);
 
-    // Check if user is a test user (for data simulation)
+    // Check if user is a test user (for fallback simulation if cron hasn't run)
     const { data: userData } = await supabase
       .from('users')
       .select('is_test_user')
@@ -84,12 +87,34 @@ export async function GET(req: NextRequest) {
       plans: undefined, // Remove the plans array
     })) || [];
 
-    // Apply simulated data usage for test users (app store reviewers)
-    // This allows reviewers to see realistic data consumption without affecting real users
-    const finalOrders = applyTestSimulationToOrders(formattedOrders, isTestUser);
+    // For test users: check if cron has populated data, otherwise apply on-the-fly simulation
+    // This ensures test users always see realistic data even if cron hasn't run yet
+    let finalOrders = formattedOrders;
 
     if (isTestUser) {
-      console.log('[User Orders API] Applied test simulation for reviewer account');
+      // Only simulate individual orders that need it (cron hasn't run yet)
+      // Preserve cron-populated data for orders that already have it
+      finalOrders = formattedOrders.map((order: any) => {
+        // Only handle completed or provisioning orders (matches applyTestSimulationToOrders behavior)
+        if (order.status !== 'completed' && order.status !== 'provisioning') return order;
+
+        // If cron has already populated this order, keep the cron data
+        if (order.last_usage_update !== null) return order;
+
+        // Only simulate this specific order (cron hasn't run yet)
+        const simulated = applyTestSimulationToOrders([order], true);
+        return simulated[0] || order;
+      });
+
+      const simulatedCount = formattedOrders.filter((o: any) =>
+        (o.status === 'completed' || o.status === 'provisioning') && o.last_usage_update === null
+      ).length;
+
+      if (simulatedCount > 0) {
+        console.log(`[User Orders API] Applied on-the-fly simulation for ${simulatedCount} order(s) (cron not yet run)`);
+      } else {
+        console.log('[User Orders API] Using cron-populated data for test user');
+      }
     }
 
     return NextResponse.json({
