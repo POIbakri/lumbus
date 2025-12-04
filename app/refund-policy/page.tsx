@@ -59,9 +59,9 @@ export default function RefundPolicyPage() {
                 </li>
               </ul>
               <div className="bg-yellow p-4 sm:p-6 rounded-xl border-2 border-secondary">
-                <p className="text-sm sm:text-base font-bold">
-                  💡 By proceeding to activate your eSIM, you expressly consent to immediate performance and
-                  acknowledge that you will lose your right to cancel once the digital content is delivered and activated.
+                <p className="text-sm sm:text-base font-bold flex items-start gap-2">
+                  <svg className="w-5 h-5 text-secondary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg>
+                  <span>By proceeding to activate your eSIM, you expressly consent to immediate performance and acknowledge that you will lose your right to cancel once the digital content is delivered and activated.</span>
                 </p>
               </div>
             </section>
@@ -92,7 +92,7 @@ export default function RefundPolicyPage() {
               </ol>
 
               <div className="bg-red-50 p-4 sm:p-6 rounded-xl border-2 border-red-500">
-                <p className="text-sm sm:text-base font-bold text-red-700 mb-2">❌ No Refund Available If:</p>
+                <p className="text-sm sm:text-base font-bold text-red-700 mb-2 flex items-center gap-1"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg> No Refund Available If:</p>
                 <ul className="list-disc pl-5 space-y-1 text-sm text-red-600">
                   <li>The eSIM has been installed or activated</li>
                   <li>Any data has been used from the plan</li>
@@ -125,7 +125,7 @@ export default function RefundPolicyPage() {
               </ul>
 
               <div className="bg-cyan/20 p-4 sm:p-6 rounded-xl border-2 border-cyan">
-                <p className="text-sm sm:text-base font-bold mb-2">💡 Before Purchasing:</p>
+                <p className="text-sm sm:text-base font-bold mb-2 flex items-center gap-1"><svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" /></svg> Before Purchasing:</p>
                 <ul className="list-disc pl-5 space-y-1 text-sm">
                   <li>Check if your device supports eSIM at <Link href="/device" className="text-primary hover:underline font-bold">/device</Link></li>
                   <li>Ensure your device is carrier-unlocked</li>
@@ -169,7 +169,7 @@ export default function RefundPolicyPage() {
               </ol>
 
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary">
-                <p className="text-sm sm:text-base font-bold mb-2">✅ Examples of Refundable Technical Issues:</p>
+                <p className="text-sm sm:text-base font-bold mb-2 flex items-center gap-1"><svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> Examples of Refundable Technical Issues:</p>
                 <ul className="list-disc pl-5 space-y-1 text-sm">
                   <li>eSIM activation code doesn't work despite correct entry</li>
                   <li>No network signal in a covered area (confirmed by our provider)</li>
@@ -206,9 +206,9 @@ export default function RefundPolicyPage() {
               </ul>
 
               <div className="bg-yellow p-4 sm:p-6 rounded-xl border-2 border-secondary">
-                <p className="text-sm sm:text-base font-bold">
-                  ⚠️ Important: We rely on third-party network operators for coverage. While we do our best to ensure
-                  reliable service, we cannot guarantee consistent coverage in all locations at all times.
+                <p className="text-sm sm:text-base font-bold flex items-start gap-2">
+                  <svg className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                  <span>Important: We rely on third-party network operators for coverage. While we do our best to ensure reliable service, we cannot guarantee consistent coverage in all locations at all times.</span>
                 </p>
               </div>
             </section>
@@ -319,7 +319,7 @@ export default function RefundPolicyPage() {
               </ol>
 
               <div className="bg-mint p-4 sm:p-6 rounded-xl border-2 border-primary">
-                <p className="font-bold text-sm sm:text-base mb-2">📧 Contact Information:</p>
+                <p className="font-bold text-sm sm:text-base mb-2 flex items-center gap-1"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg> Contact Information:</p>
                 <p className="text-sm mb-1">Email: support@lumbus.com</p>
                 <p className="text-sm mb-1">Support Hours: 24/7</p>
                 <p className="text-sm">Response Time: Within 24-48 hours</p>

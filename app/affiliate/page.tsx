@@ -124,7 +124,11 @@ export default function AffiliateDashboardPage() {
             <div className="container mx-auto max-w-4xl">
               <Card className="bg-yellow border-4 border-secondary shadow-xl">
                 <CardContent className="pt-6 text-center py-8 sm:py-12 px-4">
-                  <div className="text-5xl sm:text-6xl mb-4">⏳</div>
+                  <div className="flex justify-center mb-4">
+                    <svg className="w-12 h-12 sm:w-16 sm:h-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4">APPLICATION UNDER REVIEW</h2>
                   <p className="text-base sm:text-lg font-bold text-muted-foreground mb-4">
                     Thank you for applying to the Lumbus Affiliate Program!

@@ -95,7 +95,7 @@ export default function UpdatePasswordPage() {
 
             <CardHeader className="relative z-10">
               <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center">
-                {success ? '✅ SUCCESS' : 'UPDATE PASSWORD'}
+                {success ? 'SUCCESS' : 'UPDATE PASSWORD'}
               </CardTitle>
             </CardHeader>
 

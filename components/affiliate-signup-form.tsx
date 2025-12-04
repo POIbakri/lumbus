@@ -58,7 +58,9 @@ export function AffiliateSignupForm() {
     return (
       <Card className="bg-mint border-4 border-primary shadow-2xl">
         <CardContent className="p-8 sm:p-12 text-center">
-          <div className="text-6xl sm:text-7xl mb-6">✅</div>
+          <div className="flex justify-center mb-6">
+            <svg className="w-16 h-16 sm:w-20 sm:h-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          </div>
           <h3 className="text-2xl sm:text-3xl font-black uppercase mb-4">
             APPLICATION SUBMITTED!
           </h3>

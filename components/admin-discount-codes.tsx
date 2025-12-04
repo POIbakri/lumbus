@@ -247,7 +247,9 @@ export function AdminDiscountCodes() {
         <div className="space-y-3 sm:space-y-4">
           {codes.length === 0 ? (
             <div className="text-center py-8 sm:py-12">
-              <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">🎟️</div>
+              <div className="flex justify-center mb-3 sm:mb-4">
+                <svg className="w-12 h-12 sm:w-16 sm:h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" /></svg>
+              </div>
               <p className="font-black text-lg sm:text-xl">No discount codes yet</p>
               <p className="text-sm text-muted-foreground">Create your first discount code above</p>
             </div>

@@ -68,7 +68,7 @@ export function AppPromoBanner() {
           <div className="container mx-auto px-3 sm:px-4 py-2 sm:py-3 md:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 md:gap-4">
               <div className="flex items-center gap-2 sm:gap-3 text-center sm:text-left">
-                <span className="text-2xl sm:text-3xl md:text-4xl animate-bounce hidden sm:block">📱</span>
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-primary animate-bounce hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
                 <div>
                   <p className="font-black text-sm sm:text-base md:text-lg uppercase">
                     {APP_DOWNLOAD_CTA.primary}
