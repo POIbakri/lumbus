@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   generator: 'Next.js',
   keywords: [
     // Brand variations - Core identity
-    'Lumbus', 'Lumbus eSIM', 'Get Lumbus', 'getLumbus', 'lumbus esim', 'lumbus travel', 'Lumbus app', 'Lumbus store',
+    'Lumbus', 'Lumbus eSIM', 'Get Lumbus', 'getLumbus', 'lumbus esim', 'lumbus travel', 'Lumbus app', 'getlumbus esim',
 
     // Core eSIM terms - Primary searches
     'eSIM', 'esim', 'e-SIM', 'e sim', 'ESIM', 'travel eSIM', 'international eSIM', 'global eSIM', 'digital SIM',
@@ -121,21 +121,21 @@ export const metadata: Metadata = {
     locale: 'en_GB',
     url: 'https://getlumbus.com',
     siteName: 'Lumbus',
-    title: 'Lumbus - Fast eSIM Store | Instant eSIMs for 150+ Countries',
+    title: 'Buy eSIM Online - eSIM Data Plans for 150+ Countries | Lumbus',
     description: 'Get instant eSIMs for 150+ countries. Up to 10x cheaper than roaming. No signup required. Works abroad and at home with 4G/5G speeds.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Lumbus eSIM - Global Connectivity in 150+ Countries',
+        alt: 'Lumbus eSIM - Buy eSIM Online for 150+ Countries',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lumbus - Fast eSIM Store | Instant eSIMs for 150+ Countries',
+    title: 'Lumbus | Buy eSIM Online - eSIM Data Plans for 150+ Countries',
     description: 'Get instant eSIMs for 150+ countries. Up to 10x cheaper than roaming. Activated in seconds.',
     images: ['/og-image.png'],
     creator: '@lumbus',

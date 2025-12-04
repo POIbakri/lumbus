@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 import { supabase } from '@/lib/db'
-import { getCountriesByContinent, REGIONS } from '@/lib/countries'
+import { getCountriesByContinent, REGIONS, COUNTRIES } from '@/lib/countries'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600 // Revalidate every hour
@@ -142,6 +142,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+
+    // Destination country pages - High priority for SEO
+    // Priority destinations first (Japan, Turkey, USA, UK, Thailand, UAE, Saudi Arabia)
+    ...['JP', 'TR', 'US', 'GB', 'TH', 'AE', 'SA', 'SG', 'MY', 'EG', 'QA', 'FR', 'ES', 'IT'].map(code => ({
+      url: `${baseUrl}/destinations/${code.toLowerCase()}`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    })),
+
+    // All other destination country pages
+    ...Object.keys(COUNTRIES)
+      .filter(code => !['JP', 'TR', 'US', 'GB', 'TH', 'AE', 'SA', 'SG', 'MY', 'EG', 'QA', 'FR', 'ES', 'IT'].includes(code))
+      .map(code => ({
+        url: `${baseUrl}/destinations/${code.toLowerCase()}`,
+        lastModified: currentDate,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      })),
 
     // Individual plan pages (top per region)
     ...Array.from(planUrlsByRegion.values()),
