@@ -57,9 +57,13 @@ export default function Home() {
           {/* Home Usage Badge - Visual Element */}
           <div className="mb-8 px-4" style={{animationDelay: '0.25s'}}>
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-yellow border-2 border-foreground shadow-lg">
-              <span className="text-base sm:text-lg" aria-hidden="true">🏠</span>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
               <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Also Works At Home</span>
-              <span className="text-base sm:text-lg" aria-hidden="true">📱</span>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
             </div>
           </div>
 
@@ -98,7 +102,9 @@ export default function Home() {
           <div className="mt-8 px-4" style={{animationDelay: '0.4s'}}>
             <Link href="/device" className="group inline-block">
               <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl bg-white border-2 border-primary/30 hover:border-primary shadow-lg hover:shadow-xl transition-all">
-                <span className="text-xl sm:text-2xl" aria-hidden="true">📱</span>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
                 <span className="font-black text-xs sm:text-sm uppercase tracking-wide">Check Device Compatibility</span>
                 <span className="text-sm sm:text-base group-hover:translate-x-1 transition-transform">→</span>
               </div>
@@ -106,25 +112,35 @@ export default function Home() {
           </div>
 
           {/* Trust Indicators */}
-          <div className="mt-16 flex flex-wrap justify-center gap-8 items-center opacity-60 " style={{animationDelay: '0.5s'}}>
+          <div className="mt-16 flex flex-wrap justify-center gap-6 sm:gap-8 items-center opacity-70" style={{animationDelay: '0.5s'}}>
             <div className="flex items-center gap-2">
-              <div className="text-2xl" aria-hidden="true">⭐</div>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
               <span className="font-bold text-sm">5.0 Rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl" aria-hidden="true">✨</div>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <span className="font-bold text-sm">No Signup Required</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl" aria-hidden="true">🔒</div>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
               <span className="font-bold text-sm">Secure Checkout</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl" aria-hidden="true">🚀</div>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
               <span className="font-bold text-sm">Instant Delivery</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-2xl" aria-hidden="true">🏠</div>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
               <span className="font-bold text-sm">Works At Home</span>
             </div>
           </div>
@@ -146,17 +162,32 @@ export default function Home() {
             <div className="p-8 sm:p-10 md:p-12 bg-yellow rounded-3xl border-2 border-foreground/5  shadow-xl ">
               <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">150+</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Countries</div>
-              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Global Coverage ✓</div>
+              <div className="flex items-center justify-center gap-1 text-sm sm:text-base font-bold mt-3 text-foreground/70">
+                Global Coverage
+                <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
             </div>
             <div className="p-8 sm:p-10 md:p-12 bg-cyan rounded-3xl border-2 border-foreground/5  shadow-xl " style={{animationDelay: '0.1s'}}>
               <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">5 MIN</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
-              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Super Fast ⚡</div>
+              <div className="flex items-center justify-center gap-1 text-sm sm:text-base font-bold mt-3 text-foreground/70">
+                Super Fast
+                <svg className="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
             </div>
             <div className="p-8 sm:p-10 md:p-12 bg-purple rounded-3xl border-2 border-foreground/5  shadow-xl  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
               <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">24/7</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Support</div>
-              <div className="text-sm sm:text-base font-bold mt-3 text-foreground/70">Always Here 💬</div>
+              <div className="flex items-center justify-center gap-1 text-sm sm:text-base font-bold mt-3 text-foreground/70">
+                Always Here
+                <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -235,8 +266,11 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
-              <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground">
-                <span aria-hidden="true">⚡</span> Quick Start
+              <span className="px-6 py-2 rounded-full bg-primary/20 border-2 border-primary font-black uppercase text-xs tracking-widest text-foreground inline-flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Quick Start
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
@@ -374,7 +408,12 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
-                <div className="text-sm sm:text-xl md:text-2xl font-black text-primary">YES ✓</div>
+                <div className="text-sm sm:text-xl md:text-2xl font-black text-primary inline-flex items-center gap-1">
+                  YES
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
                 <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">EXTRA FEES</div>

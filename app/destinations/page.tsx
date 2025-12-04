@@ -10,7 +10,27 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { getCountriesByContinent, searchCountries, REGIONS, type CountryInfo, type RegionInfo } from '@/lib/countries';
 import { Plan } from '@/lib/db';
-import { ServiceSchema, BreadcrumbSchema, ItemListSchema } from '@/components/structured-data';
+import { ServiceSchema, BreadcrumbSchema, ItemListSchema, FAQSchema } from '@/components/structured-data';
+
+// Static SEO content that renders immediately (fixes soft 404)
+const destinationFaqs = [
+  {
+    q: 'What countries can I buy eSIM for?',
+    a: 'Lumbus offers eSIM plans for over 150 countries worldwide including popular destinations like Japan, USA, UK, Thailand, Turkey, UAE, Singapore, Malaysia, France, Spain, Italy, and many more. Browse our full list of destinations to find your country.',
+  },
+  {
+    q: 'How do I choose the right eSIM destination?',
+    a: 'Simply search for your destination country or browse by region. Each destination shows available plans with data amounts, validity periods, and prices. Choose based on how much data you need and how long you will be traveling.',
+  },
+  {
+    q: 'Can I use one eSIM for multiple countries?',
+    a: 'Yes! Lumbus offers regional eSIM plans that cover multiple countries. For example, our Europe eSIM works in 30+ European countries, and we have Asia and Middle East regional plans too.',
+  },
+  {
+    q: 'What are the most popular eSIM destinations?',
+    a: 'Our most popular eSIM destinations are Japan, Turkey, USA, UK, Thailand, UAE, Saudi Arabia, Singapore, Malaysia, and European countries. These destinations have the highest demand from travelers.',
+  },
+];
 
 export default function DestinationsPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -190,6 +210,7 @@ export default function DestinationsPage() {
         ]}
       />
       <ItemListSchema items={topDestinations} listType="Product" />
+      <FAQSchema faqs={destinationFaqs} />
 
       <Nav />
 
@@ -202,8 +223,12 @@ export default function DestinationsPage() {
         <div className="container mx-auto text-center relative z-10 max-w-5xl">
           {/* Page Badge */}
           <div className="inline-block mb-6">
-            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-cyan border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
-              📍 Browse Destinations
+            <span className="inline-flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-cyan border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Browse Destinations
             </span>
           </div>
 
@@ -219,7 +244,7 @@ export default function DestinationsPage() {
           <div className="max-w-2xl mx-auto px-4 mb-8">
             <Input
               type="text"
-              placeholder="🔍 Search country or region..."
+              placeholder="Search country or region..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
@@ -300,14 +325,18 @@ export default function DestinationsPage() {
               <div className="relative inline-block">
                 <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl sm:text-4xl">⚡</div>
+                  <svg className="w-6 h-6 sm:w-10 sm:h-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </div>
               </div>
               <p className="mt-6 font-black uppercase text-lg sm:text-2xl">Loading...</p>
             </div>
           ) : displayItems.length === 0 ? (
             <div className="text-center py-20">
-              <div className="text-5xl sm:text-6xl mb-4">🌍</div>
+              <svg className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
               <p className="text-2xl sm:text-3xl font-black uppercase mb-3">No Results Found</p>
               <p className="text-base sm:text-lg font-bold opacity-70">
                 Try adjusting your search
@@ -422,6 +451,47 @@ export default function DestinationsPage() {
               <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black mb-1 sm:mb-2">5G</div>
               <div className="text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-xl font-black uppercase leading-tight">Speeds</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Static SEO Content */}
+      <section className="py-12 sm:py-16 md:py-20 px-4 bg-white">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4">
+              eSIM Destinations FAQ
+            </h2>
+            <p className="text-base sm:text-lg font-bold opacity-70">
+              Common questions about buying eSIM for travel
+            </p>
+          </div>
+
+          <div className="space-y-4 sm:space-y-6">
+            {destinationFaqs.map((faq, index) => (
+              <div key={index} className="bg-light-mint rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-foreground/10">
+                <h3 className="font-black text-base sm:text-lg md:text-xl mb-2 sm:mb-3">{faq.q}</h3>
+                <p className="text-sm sm:text-base font-medium opacity-80 leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEO Text Content - Static for Google */}
+      <section className="py-8 sm:py-12 px-4 bg-gray-50">
+        <div className="container mx-auto max-w-4xl">
+          <div className="prose prose-lg max-w-none">
+            <h2 className="text-xl sm:text-2xl font-black mb-4">Buy eSIM Online for 150+ Countries</h2>
+            <p className="text-sm sm:text-base font-medium opacity-80 mb-4">
+              Lumbus offers instant eSIM plans for travelers visiting destinations worldwide. Whether you&apos;re traveling to Japan, exploring Turkey, visiting the USA, or touring Europe, we have affordable data plans that work instantly on your phone.
+            </p>
+            <p className="text-sm sm:text-base font-medium opacity-80 mb-4">
+              Our most popular eSIM destinations include Japan eSIM, Turkey eSIM, USA eSIM, UK eSIM, Thailand eSIM, UAE eSIM, Saudi Arabia eSIM, Singapore eSIM, and Malaysia eSIM. We also offer regional plans covering multiple countries including Europe eSIM (30+ countries), Asia eSIM, and Middle East eSIM packages.
+            </p>
+            <p className="text-sm sm:text-base font-medium opacity-80">
+              All Lumbus eSIM plans come with instant activation, no signup required, and 24/7 support. Stay connected wherever you travel with reliable 4G/5G data. Compare prices across destinations and find the perfect plan for your trip.
+            </p>
           </div>
         </div>
       </section>
