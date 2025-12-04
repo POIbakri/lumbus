@@ -72,8 +72,16 @@ function PlansPageContent() {
   useEffect(() => {
     const regionParam = searchParams.get('region');
     if (regionParam) {
-      const regionInfo = getCountryInfo(regionParam.toUpperCase());
+      const upperRegion = regionParam.toUpperCase();
+      const regionInfo = getCountryInfo(upperRegion);
       setSearchQuery(regionInfo.name);
+
+      // Switch to appropriate tab based on whether it's a regional or country plan
+      if (REGIONS[upperRegion]) {
+        setActiveTab('regions');
+      } else {
+        setActiveTab('countries');
+      }
     }
   }, [searchParams]);
 
