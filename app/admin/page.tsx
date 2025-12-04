@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
 import { AdminDiscountCodes } from '@/components/admin-discount-codes';
+import { FlagIcon } from '@/components/flag-icon';
 
 // Format data amounts to clean values
 function formatDataAmount(dataGB: number): string {
@@ -526,7 +527,7 @@ export default function AdminPage() {
                             {/* Order Info */}
                             <div className="pb-3 sm:pb-0 border-b sm:border-b-0 border-foreground/10">
                               <div className="flex items-center gap-2 mb-2">
-                                {countryInfo && <span className="text-2xl sm:text-3xl">{countryInfo.flag}</span>}
+                                {order.plan?.region_code && <FlagIcon countryCode={order.plan.region_code} className="w-8 h-6 sm:w-10 sm:h-7" />}
                                 <div className="flex-1 min-w-0">
                                   <p className="font-black text-xs sm:text-sm truncate">{order.plan?.name?.replace(/"/g, '') || 'N/A'}</p>
                                   <p className="text-xs text-muted-foreground truncate">{countryInfo?.name}</p>

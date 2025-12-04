@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { getCountryInfo, COUNTRIES } from '@/lib/countries';
 import { Plan } from '@/lib/db';
 import { FAQSchema, BreadcrumbSchema, ServiceSchema } from '@/components/structured-data';
+import { FlagIcon } from '@/components/flag-icon';
 
 // Format data amounts
 function formatDataAmount(dataGB: number): string {
@@ -250,7 +251,7 @@ export default function CountryDestinationPage() {
           </div>
 
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-6xl sm:text-7xl md:text-8xl">{countryInfo.flag}</span>
+            <FlagIcon countryCode={countryCode} className="w-20 h-14 sm:w-24 sm:h-16 md:w-28 md:h-20" />
             <Badge className="bg-primary text-foreground font-black uppercase text-sm px-4 py-2 border-2 border-foreground/10">
               {plans.length} Plans Available
             </Badge>

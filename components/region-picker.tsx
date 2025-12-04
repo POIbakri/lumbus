@@ -1,18 +1,18 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { FlagIcon } from '@/components/flag-icon';
 
 interface Region {
   code: string;
   name: string;
-  flag: string;
 }
 
 const REGIONS: Region[] = [
-  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-  { code: 'EU', name: 'Europe', flag: '🇪🇺' },
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'GLOBAL', name: 'Global', flag: '🌍' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'EU', name: 'Europe' },
+  { code: 'US', name: 'United States' },
+  { code: 'GLOBAL', name: 'Global' },
 ];
 
 interface RegionPickerProps {
@@ -54,8 +54,8 @@ export function RegionPicker({ selectedRegion, onSelectRegion }: RegionPickerPro
             )}
 
             <CardContent className="p-8 text-center relative z-10">
-              <div className={`text-6xl mb-4 transform group-   ${isSelected ? '' : ''}`}>
-                {region.flag}
+              <div className={`mb-4 flex justify-center transform ${isSelected ? '' : ''}`}>
+                <FlagIcon countryCode={region.code} className="w-12 h-9 sm:w-14 sm:h-10 md:w-16 md:h-12" />
               </div>
               <div className="font-black uppercase text-lg tracking-tight">{region.name}</div>
             </CardContent>

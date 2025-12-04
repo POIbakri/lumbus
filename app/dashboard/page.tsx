@@ -17,6 +17,7 @@ import { ReferralWidget } from '@/components/referral-widget';
 import { DataWallet } from '@/components/data-wallet';
 import { AppDownloadBanner } from '@/components/app-download-banner';
 import { SocialMediaLinks } from '@/components/social-media-links';
+import { FlagIcon } from '@/components/flag-icon';
 
 // Format plan data amounts (for "What You Bought" - shows marketing numbers)
 function formatPlanData(dataGB: number): string {
@@ -574,7 +575,7 @@ export default function DashboardPage() {
                                         {getDisplayStatus(order)}
                                       </Badge>
                                       <div className="flex items-center gap-2">
-                                        {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
+                                        {order.plan?.region_code && <FlagIcon countryCode={order.plan.region_code} className="w-10 h-7 sm:w-12 sm:h-8" />}
                                         <div className="text-right">
                                           <div className="text-lg font-black">{order.plan?.region_code}</div>
                                           <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
@@ -691,7 +692,7 @@ export default function DashboardPage() {
                             {getDisplayStatus(order)}
                           </Badge>
                           <div className="flex items-center gap-2">
-                            {countryInfo && <span className="text-4xl">{countryInfo.flag}</span>}
+                            {order.plan?.region_code && <FlagIcon countryCode={order.plan.region_code} className="w-10 h-7 sm:w-12 sm:h-8" />}
                             <div className="text-right">
                               <div className="text-lg font-black">{order.plan?.region_code}</div>
                               <div className="text-xs font-bold text-muted-foreground">{countryInfo?.name}</div>
@@ -930,7 +931,7 @@ export default function DashboardPage() {
                           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl  "
                         >
                           <div className="flex items-start gap-3 flex-1 min-w-0">
-                            {countryInfo && <span className="text-3xl flex-shrink-0">{countryInfo.flag}</span>}
+                            {order.plan?.region_code && <FlagIcon countryCode={order.plan.region_code} className="w-10 h-7 flex-shrink-0" />}
                             <div className="flex-1 min-w-0">
                               <div className="font-black text-base sm:text-lg mb-1 truncate">{order.plan?.name.replace(/^["']|["']$/g, '')}</div>
                               <div className="text-xs font-bold text-muted-foreground mb-1">{countryInfo?.name}</div>

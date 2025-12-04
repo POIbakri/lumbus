@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Plan } from '@/lib/db';
 import { getCountryInfo } from '@/lib/countries';
 import { useRegion } from '@/contexts/regions-context';
+import { FlagIcon } from '@/components/flag-icon';
 
 interface PlanCardProps {
   plan: Plan;
@@ -58,7 +59,7 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
       <CardHeader className="pb-3 sm:pb-4 relative z-10">
         {/* Top row with flag and region badge */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-3xl sm:text-4xl">{countryInfo.flag}</span>
+          <FlagIcon countryCode={plan.region_code} className="w-10 h-7 sm:w-12 sm:h-8" />
           <Badge className="bg-foreground text-white font-black uppercase text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-lg">
             {plan.region_code}
           </Badge>
@@ -110,7 +111,7 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
                       key={country.code}
                       className="flex items-center gap-1.5 p-1.5 rounded bg-mint/20 border border-mint/40"
                     >
-                      <span className="text-xs">{getCountryInfo(country.code).flag || '🏳️'}</span>
+                      <FlagIcon countryCode={country.code} className="w-4 h-3 sm:w-5 sm:h-4" />
                       <span className="font-bold text-[10px] sm:text-xs">{country.name}</span>
                     </div>
                   ))}

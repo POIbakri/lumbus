@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { detectUserLocation, getFlagEmoji, LocationInfo } from '@/lib/location-detection';
+import { detectUserLocation, LocationInfo } from '@/lib/location-detection';
 import { useDeviceDetection } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
+import { FlagIcon } from '@/components/flag-icon';
 
 export function LocationBanner() {
   const [location, setLocation] = useState<LocationInfo | null>(null);
@@ -76,8 +77,8 @@ export function LocationBanner() {
 
       {/* Floating Elements */}
       {location?.detected && (
-        <div className="absolute top-2 right-2 text-4xl">
-          {getFlagEmoji(location.countryCode)}
+        <div className="absolute top-2 right-2">
+          <FlagIcon countryCode={location.countryCode} className="w-10 h-7 sm:w-12 sm:h-8" />
         </div>
       )}
       <div className="absolute bottom-2 left-2" style={{animationDelay: '0.5s'}}>
@@ -108,7 +109,7 @@ export function LocationBanner() {
               <Link href={`/plans?region=${primaryRegion.toLowerCase()}`}>
                 <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl">
                   <span className="flex items-center gap-2">
-                    {getFlagEmoji(primaryRegion)} VIEW {location.country.toUpperCase()} PLANS
+                    <FlagIcon countryCode={primaryRegion} className="w-5 h-4 sm:w-6 sm:h-4" /> VIEW {location.country.toUpperCase()} PLANS
                   </span>
                 </Button>
               </Link>

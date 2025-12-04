@@ -13,6 +13,7 @@ import { ProductSchema, BreadcrumbSchema, FAQSchema } from '@/components/structu
 import { PaymentLogosCompact } from '@/components/payment-logos';
 import Link from 'next/link';
 import { useRegion } from '@/contexts/regions-context';
+import { FlagIcon } from '@/components/flag-icon';
 
 // Format data amounts to clean values
 function formatDataAmount(dataGB: number): string {
@@ -401,7 +402,7 @@ export default function PlanDetailPage() {
                 <div className="flex flex-col gap-3 sm:gap-4 mb-3 sm:mb-4 md:mb-6">
                   {/* Flag and badge row */}
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-3xl sm:text-4xl md:text-5xl">{countryInfo.flag}</span>
+                    <FlagIcon countryCode={plan.region_code} className="w-10 h-7 sm:w-12 sm:h-8 md:w-14 md:h-10" />
                     <Badge className="bg-foreground text-white font-black uppercase text-xs sm:text-sm px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 rounded-full shadow-xl">
                       {plan.region_code}
                     </Badge>
@@ -456,7 +457,7 @@ export default function PlanDetailPage() {
                               key={country.code}
                               className="flex items-center gap-2 p-2 rounded-lg bg-mint/20 border border-mint"
                             >
-                              <span className="text-base sm:text-lg">{getCountryInfo(country.code).flag || '🏳️'}</span>
+                              <FlagIcon countryCode={country.code} className="w-5 h-4 sm:w-6 sm:h-4" />
                               <span className="font-bold text-xs sm:text-sm">{country.name}</span>
                             </div>
                           ))}

@@ -301,4 +301,78 @@ For emails (`lib/email.ts`), either:
 | App Store Badges | `components/app-store-badges.tsx` |
 | Footer | `components/footer.tsx` |
 | Payment Logos | `components/payment-logos.tsx` |
+| Flag Icons | `components/flag-icon.tsx` |
 | Colors Config | `app/globals.css` |
+
+---
+
+## Country & Regional Flags
+
+### Why SVG Flags Over Emojis
+- **Consistent rendering** across all platforms (iOS, Android, Windows, Linux)
+- **No OS-specific variations** - emoji flags differ between Apple, Google, Windows
+- **Some platforms don't support flag emojis** - Windows shows country codes instead
+- **Scalable** - looks crisp at any size
+- **Accessible** - better screen reader support
+
+### FlagIcon Component
+
+Located in `components/flag-icon.tsx`:
+
+```tsx
+import { FlagIcon } from '@/components/flag-icon';
+
+// Country flags (ISO 3166-1 alpha-2 codes)
+<FlagIcon countryCode="US" className="w-6 h-4" />
+<FlagIcon countryCode="JP" className="w-6 h-4" />
+<FlagIcon countryCode="GB" className="w-6 h-4" />
+
+// Regional flags (custom SVGs)
+<FlagIcon countryCode="EU" className="w-6 h-4" />
+<FlagIcon countryCode="GLOBAL" className="w-6 h-4" />
+<FlagIcon countryCode="ASIA" className="w-6 h-4" />
+```
+
+### Supported Regional Flags
+
+| Code | Region | Description |
+|------|--------|-------------|
+| `GLOBAL` | Global | Globe/world icon |
+| `EU`, `EU-30`, `EU-39`, `EUROPE` | Europe | EU blue flag with stars |
+| `ASIA`, `ASIA-17`, `ASIA-20`, `SOUTHEAST-ASIA` | Asia | Red/gold stylized flag |
+| `AFRICA`, `AFRICA-20`, `AFRICA-32` | Africa | Green/yellow/red stripes |
+| `MIDDLE-EAST`, `MENA` | Middle East | Blue with star |
+| `AMERICAS`, `NORTH-AMERICA` | North America | Blue/red stripes |
+| `SOUTH-AMERICA`, `LATAM` | South America | Brazil-inspired |
+| `CARIBBEAN` | Caribbean | Cyan with palm |
+| `OCEANIA`, `PACIFIC` | Oceania/Pacific | Blue with stars |
+| `CIS` | CIS/Central Asia | Purple with golden circle |
+| `BALKANS` | Balkans | Blue/white/red stripes |
+| `GULF`, `GCC` | Gulf States | UAE-inspired |
+
+### Responsive Flag Sizes
+
+| Context | Mobile | Tablet | Desktop | Example |
+|---------|--------|--------|---------|---------|
+| Inline badge | `w-4 h-3` | `w-5 h-4` | `w-6 h-4` | Plan badges |
+| Card header | `w-10 h-7` | `w-12 h-8` | `w-14 h-10` | Plan cards |
+| Hero/Featured | `w-14 h-10` | `w-20 h-14` | `w-24 h-16` | Destination hero |
+| Country list | `w-4 h-3` | `w-5 h-4` | `w-6 h-4` | Multi-country list |
+
+### Helper Function
+
+```tsx
+import { hasFlagIcon } from '@/components/flag-icon';
+
+// Check if a flag exists before rendering
+if (hasFlagIcon('US')) {
+  // render flag
+}
+```
+
+### Technical Details
+
+- Uses `country-flag-icons` npm package for 200+ country flags
+- Custom SVG implementations for regional/special flags
+- Fallback to globe icon for unknown codes
+- All flags have `rounded-sm` for slight corner rounding

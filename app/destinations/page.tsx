@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { getCountriesByContinent, searchCountries, REGIONS, type CountryInfo, type RegionInfo } from '@/lib/countries';
 import { Plan } from '@/lib/db';
 import { ServiceSchema, BreadcrumbSchema, ItemListSchema, FAQSchema } from '@/components/structured-data';
+import { FlagIcon } from '@/components/flag-icon';
 
 // Static SEO content that renders immediately (fixes soft 404)
 const destinationFaqs = [
@@ -282,12 +283,7 @@ export default function DestinationsPage() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 relative z-10">
                 <div className="text-center sm:text-left flex-1 w-full sm:w-auto">
                   <div className="inline-flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 bg-white/30 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-foreground/20 sm:border-2">
-                    <span className="text-2xl sm:text-3xl md:text-4xl">
-                      {(() => {
-                        const country = allCountries.find(c => c.code === userCountry);
-                        return country?.flag || '📍';
-                      })()}
-                    </span>
+                    <FlagIcon countryCode={userCountry} className="w-8 h-6 sm:w-10 sm:h-7 md:w-12 md:h-8" />
                     <span className="font-black uppercase text-[10px] sm:text-xs md:text-sm">Your Location</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase mb-2 sm:mb-3 leading-tight">
@@ -369,8 +365,8 @@ export default function DestinationsPage() {
                         <CardContent className="p-3 sm:p-4 md:p-5 lg:p-6 text-center flex flex-col justify-between h-full relative z-10">
                           {/* Flag - Large and Prominent */}
                           <div className="mb-2 sm:mb-3 md:mb-4">
-                            <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 group-active:scale-110 transition-transform duration-300">
-                              {item.flag}
+                            <div className="flex justify-center mb-2 sm:mb-3 md:mb-4 transform group-hover:scale-110 group-active:scale-110 transition-transform duration-300">
+                              <FlagIcon countryCode={item.code} className="w-14 h-10 sm:w-16 sm:h-12 md:w-20 md:h-14 lg:w-24 lg:h-16" />
                             </div>
 
                             {/* Country/Region Name */}
