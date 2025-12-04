@@ -28,8 +28,11 @@ export default function HowItWorksPage() {
       <section className="pt-32 sm:pt-40 md:pt-48 pb-16 sm:pb-20 px-4 bg-yellow">
         <div className="container mx-auto text-center">
           <div className="inline-block mb-4 sm:mb-6">
-            <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
-              ⚡ Super Simple
+            <span className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Super Simple
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
@@ -59,15 +62,15 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Pick your destination</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Choose data amount (100MB - 20GB)</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Select validity period (1-30 days)</span>
                 </li>
               </ul>
@@ -75,7 +78,11 @@ export default function HowItWorksPage() {
             <div className="md:w-1/2">
               <Card className="bg-mint border-2 border-primary shadow-2xl">
                 <CardContent className="p-8">
-                  <div className="text-6xl mb-4 text-center">🗺️</div>
+                  <div className="flex justify-center mb-4">
+                    <svg className="w-16 h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z" />
+                    </svg>
+                  </div>
                   <div className="bg-white p-6 rounded-xl">
                     <div className="font-black text-lg mb-2">Japan 5GB - 30 Days</div>
                     <div className="text-3xl font-black mb-4">$19.99</div>
@@ -113,15 +120,15 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Apple Pay & Google Pay supported</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">All major credit cards accepted</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Secure encrypted payment</span>
                 </li>
               </ul>
@@ -129,7 +136,11 @@ export default function HowItWorksPage() {
             <div className="md:w-1/2">
               <Card className="bg-purple border-2 border-primary shadow-2xl">
                 <CardContent className="p-8">
-                  <div className="text-6xl mb-4 text-center">💳</div>
+                  <div className="flex justify-center mb-4">
+                    <svg className="w-16 h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                    </svg>
+                  </div>
                   <div className="bg-white p-6 rounded-xl space-y-4">
                     <div className="flex gap-3">
                       <div className="w-12 h-12 bg-foreground rounded-lg flex items-center justify-center">
@@ -173,15 +184,15 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Instant eSIM delivery</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">QR code or one-tap activation</span>
                 </li>
                 <li className="flex gap-3">
-                  <span className="text-primary font-black text-xl">✓</span>
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">Online in less than 5 minutes</span>
                 </li>
               </ul>
@@ -189,10 +200,16 @@ export default function HowItWorksPage() {
             <div className="md:w-1/2">
               <Card className="bg-mint border-2 border-primary shadow-2xl">
                 <CardContent className="p-8">
-                  <div className="text-6xl mb-4 text-center">🌐</div>
+                  <div className="flex justify-center mb-4">
+                    <svg className="w-16 h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                    </svg>
+                  </div>
                   <div className="bg-white p-6 rounded-xl text-center">
                     <div className="w-32 h-32 mx-auto mb-4 bg-foreground/10 rounded-2xl flex items-center justify-center">
-                      <div className="text-4xl">📲</div>
+                      <svg className="w-10 h-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                      </svg>
                     </div>
                     <div className="font-black text-lg mb-2">YOUR eSIM IS READY!</div>
                     <div className="text-sm font-bold text-foreground/70">
@@ -221,7 +238,9 @@ export default function HowItWorksPage() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-6">⚡</div>
+                <svg className="w-16 h-16 mx-auto mb-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
                 <h3 className="font-black text-xl mb-4 uppercase">One-Tap Install</h3>
                 <p className="font-bold text-foreground/70 mb-4">
                   For iOS 17.4+ users. Automatically opens eSIM installer.
@@ -234,7 +253,10 @@ export default function HowItWorksPage() {
 
             <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-6">📸</div>
+                <svg className="w-16 h-16 mx-auto mb-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5z" />
+                </svg>
                 <h3 className="font-black text-xl mb-4 uppercase">QR Code</h3>
                 <p className="font-bold text-foreground/70 mb-4">
                   Scan the QR code with your device camera. Works on all eSIM phones.
@@ -247,7 +269,9 @@ export default function HowItWorksPage() {
 
             <Card className="border-2 border-foreground/10 ">
               <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-6">⌨️</div>
+                <svg className="w-16 h-16 mx-auto mb-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                </svg>
                 <h3 className="font-black text-xl mb-4 uppercase">Manual Entry</h3>
                 <p className="font-bold text-foreground/70 mb-4">
                   Enter activation code manually in your device settings.

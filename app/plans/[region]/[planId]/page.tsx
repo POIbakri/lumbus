@@ -408,7 +408,9 @@ export default function PlanDetailPage() {
                       className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-mint hover:bg-mint/70 transition-colors font-black uppercase text-xs sm:text-sm flex items-center justify-between"
                     >
                       <span className="flex items-center gap-2">
-                        <span className="text-base sm:text-lg">🌍</span>
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <span>Show all countries ({regionInfo.subLocationList.length})</span>
                       </span>
                       <span className="text-base sm:text-lg">{showCountries ? '−' : '+'}</span>
@@ -448,19 +450,19 @@ export default function PlanDetailPage() {
                   <h3 className="font-black uppercase text-sm sm:text-base md:text-lg lg:text-xl">WHAT'S INCLUDED:</h3>
                   <ul className="space-y-1.5 sm:space-y-2 md:space-y-3">
                     <li className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-lg sm:text-xl md:text-2xl shrink-0">✓</span>
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-xs sm:text-sm md:text-base">{displayData} high-speed data</span>
                     </li>
                     <li className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-lg sm:text-xl md:text-2xl shrink-0">✓</span>
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-xs sm:text-sm md:text-base">Valid for {plan.validity_days} days</span>
                     </li>
                     <li className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-lg sm:text-xl md:text-2xl shrink-0">✓</span>
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-xs sm:text-sm md:text-base">Instant activation</span>
                     </li>
                     <li className="flex items-center gap-2 sm:gap-3">
-                      <span className="text-lg sm:text-xl md:text-2xl shrink-0">✓</span>
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-xs sm:text-sm md:text-base">No contracts or commitments</span>
                     </li>
                   </ul>
@@ -469,7 +471,9 @@ export default function PlanDetailPage() {
                 {/* Referral CTA Banner - ABOVE checkout form */}
                 <div className="bg-gradient-to-r from-yellow via-cyan to-yellow border-4 border-foreground rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-2xl mb-6 sm:mb-8 animate-pulse-slow">
                   <div className="text-center">
-                    <div className="text-3xl sm:text-4xl mb-2">💰</div>
+                    <svg className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     <h3 className="text-lg sm:text-xl md:text-2xl font-black uppercase mb-2 text-foreground leading-tight">
                       GOT REFERRED? ENTER CODE FOR 10% OFF + 1GB FREE!
                     </h3>
@@ -477,11 +481,15 @@ export default function PlanDetailPage() {
                       Both you and your friend get 1GB FREE data!
                     </p>
                     <div className="flex items-center justify-center gap-2 text-xs sm:text-sm font-black text-foreground/70">
-                      <span>🎁</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                      </svg>
                       <span>10% OFF + 1GB FREE</span>
                       <span>•</span>
                       <span>FIRST-TIME BUYERS</span>
-                      <span>🚀</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
                     </div>
                   </div>
                 </div>
@@ -503,12 +511,21 @@ export default function PlanDetailPage() {
                         disabled={loading}
                       />
                       <div className="mt-2 p-2 sm:p-3 bg-mint rounded-lg border border-primary/20">
-                        <p className="text-xs sm:text-sm font-bold text-foreground/80 mb-1">
-                          📧 After payment, you'll receive:
+                        <p className="text-xs sm:text-sm font-bold text-foreground/80 mb-1 flex items-center gap-1">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          After payment, you'll receive:
                         </p>
                         <ul className="text-xs sm:text-sm font-bold text-foreground/70 space-y-0.5">
-                          <li>✓ Your eSIM activation details</li>
-                          <li>✓ Account setup link (set your password)</li>
+                          <li className="flex items-center gap-1">
+                            <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Your eSIM activation details
+                          </li>
+                          <li className="flex items-center gap-1">
+                            <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                            Account setup link (set your password)
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -521,7 +538,7 @@ export default function PlanDetailPage() {
                         className="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-yellow/20 hover:bg-yellow/30  font-black uppercase text-xs sm:text-sm flex items-center justify-between"
                       >
                         <span className="flex items-center gap-2">
-                          <span className="text-base sm:text-lg">🎟️</span>
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
                           <span>Have a discount or referral code?</span>
                         </span>
                         <span className="text-base sm:text-lg">{showCodes ? '−' : '+'}</span>
@@ -574,14 +591,14 @@ export default function PlanDetailPage() {
                             )}
                             {codeError && (
                               <p className="mt-2 text-xs sm:text-sm font-bold text-destructive flex items-center gap-1.5">
-                                <span className="text-sm sm:text-base">✗</span>
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                 {codeError}
                               </p>
                             )}
                             {codeSuccess && (
                               <div className="mt-2 p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/30">
                                 <p className="text-xs sm:text-sm font-black text-primary flex items-center gap-1.5">
-                                  <span className="text-sm sm:text-base">✓</span>
+                                  <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                   <span>{codeSuccess}</span>
                                 </p>
                               </div>
@@ -631,8 +648,9 @@ export default function PlanDetailPage() {
                               </Button>
                             </div>
                             {discountPercent > 0 && (
-                              <p className="mt-2 text-xs font-bold text-muted-foreground">
-                                ⚠️ Discount code is active. Remove it to use a referral code instead.
+                              <p className="mt-2 text-xs font-bold text-muted-foreground flex items-center gap-1">
+                                <svg className="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+                                Discount code is active. Remove it to use a referral code instead.
                               </p>
                             )}
                             {referralValidating && (
@@ -643,14 +661,14 @@ export default function PlanDetailPage() {
                             )}
                             {referralError && (
                               <p className="mt-2 text-xs sm:text-sm font-bold text-destructive flex items-start gap-1.5">
-                                <span className="text-sm sm:text-base">✗</span>
+                                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                                 <span>{referralError}</span>
                               </p>
                             )}
                             {referralSuccess && (
                               <div className="mt-2 p-2 sm:p-3 bg-primary/10 rounded-lg border border-primary/30">
                                 <p className="text-xs sm:text-sm font-black text-primary flex items-start gap-1.5">
-                                  <span className="text-sm sm:text-base">✓</span>
+                                  <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                   <span>{referralSuccess}</span>
                                 </p>
                               </div>
@@ -663,8 +681,9 @@ export default function PlanDetailPage() {
                           </div>
 
                           <div className="p-2 sm:p-3 bg-cyan/10 rounded-lg border border-cyan/20">
-                            <p className="text-xs font-bold text-foreground/80">
-                              💡 <strong>Note:</strong> Discount codes apply instantly. Referral codes give 10% OFF + 1GB FREE data (first-time buyers only). You can only use one type of code per order.
+                            <p className="text-xs font-bold text-foreground/80 flex items-start gap-1">
+                              <svg className="w-4 h-4 text-cyan-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                              <span><strong>Note:</strong> Discount codes apply instantly. Referral codes give 10% OFF + 1GB FREE data (first-time buyers only). You can only use one type of code per order.</span>
                             </p>
                           </div>
                         </div>

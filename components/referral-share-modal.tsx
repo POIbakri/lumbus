@@ -96,7 +96,9 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4 md:p-6">
         <Card className="max-w-[95vw] sm:max-w-md md:max-w-lg w-full">
           <CardContent className="pt-4 sm:pt-6 text-center">
-            <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4">⚠️</div>
+            <div className="mb-3 sm:mb-4 flex justify-center">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+            </div>
             <h3 className="text-xl sm:text-2xl font-black uppercase mb-2 sm:mb-3">Oops!</h3>
             <p className="text-destructive mb-4 sm:mb-6 font-bold text-sm sm:text-base">{error}</p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -138,7 +140,9 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
 
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
-            <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 animate-bounce">🎁</div>
+            <div className="mb-3 sm:mb-4 animate-bounce flex justify-center">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+            </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black uppercase mb-2 sm:mb-3 leading-tight">SHARE & EARN!</h2>
             <p className="text-sm sm:text-base md:text-lg font-bold text-foreground/80 leading-relaxed px-2">
               Your friends get 10% off. You get 1GB of free data when they make their first purchase!
@@ -161,9 +165,9 @@ export function ReferralShareModal({ userId, onClose }: ReferralShareModalProps)
               </div>
               <Button
                 onClick={copyLink}
-                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-2 sm:py-2.5 shrink-0"
+                className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-sm sm:text-base py-2 sm:py-2.5 shrink-0 flex items-center gap-1"
               >
-                {copied ? '✓ COPIED' : 'COPY LINK'}
+                {copied ? <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> COPIED</> : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> COPY LINK</>}
               </Button>
             </div>
           </div>

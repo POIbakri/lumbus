@@ -67,8 +67,11 @@ export function WelcomePopup() {
             {/* Header Badge */}
             <div className="text-center mb-3 sm:mb-4">
               <div className="inline-block">
-                <span className="px-3 sm:px-4 py-1.5 rounded-full bg-yellow/30 border-2 border-yellow font-black uppercase text-xs tracking-widest">
-                  🎉 WELCOME OFFER
+                <span className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-yellow/30 border-2 border-yellow font-black uppercase text-xs tracking-widest">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                  </svg>
+                  WELCOME OFFER
                 </span>
               </div>
             </div>
@@ -104,12 +107,16 @@ export function WelcomePopup() {
                 >
                   {copied ? (
                     <span className="flex items-center justify-center gap-2">
-                      <span>✓</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
                       COPIED!
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
-                      <span>📋</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
                       COPY CODE
                     </span>
                   )}
@@ -120,15 +127,15 @@ export function WelcomePopup() {
             {/* Benefits */}
             <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5">
               <div className="flex items-start gap-2">
-                <span className="text-yellow font-black text-lg flex-shrink-0">✓</span>
+                <svg className="w-5 h-5 text-yellow flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span className="font-bold text-xs sm:text-sm">Valid on all destinations & plans</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-yellow font-black text-lg flex-shrink-0">✓</span>
+                <svg className="w-5 h-5 text-yellow flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span className="font-bold text-xs sm:text-sm">Instant activation, no signup required</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-yellow font-black text-lg flex-shrink-0">✓</span>
+                <svg className="w-5 h-5 text-yellow flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                 <span className="font-bold text-xs sm:text-sm">One-time use for new customers</span>
               </div>
             </div>

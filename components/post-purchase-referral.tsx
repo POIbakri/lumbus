@@ -102,7 +102,7 @@ export function PostPurchaseReferral({
       {/* Confetti Effect */}
       {confetti && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(50)].map((_, i) => (
+          {[...Array(30)].map((_, i) => (
             <div
               key={i}
               className="absolute animate-confetti"
@@ -113,7 +113,7 @@ export function PostPurchaseReferral({
                 animationDuration: `${2 + Math.random() * 2}s`,
               }}
             >
-              {['🎉', '🎊', '⭐', '💫', '✨'][Math.floor(Math.random() * 5)]}
+              <svg className={`w-6 h-6 ${['text-primary', 'text-yellow', 'text-cyan', 'text-purple'][Math.floor(Math.random() * 4)]}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
             </div>
           ))}
         </div>
@@ -123,7 +123,9 @@ export function PostPurchaseReferral({
         <CardContent className="pt-6 px-6 pb-6">
           {/* Header - Celebration */}
           <div className="text-center mb-8 animate-bounce">
-            <div className="text-7xl mb-4">🎉</div>
+            <div className="mb-4 flex justify-center">
+              <svg className="w-16 h-16 sm:w-20 sm:h-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase mb-3 text-foreground leading-tight">
               PURCHASE COMPLETE!
             </h2>
@@ -135,7 +137,9 @@ export function PostPurchaseReferral({
           {/* Main CTA */}
           <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 mb-6 border-4 border-foreground/20">
             <div className="text-center mb-6">
-              <div className="text-5xl mb-3">💰</div>
+              <div className="mb-3 flex justify-center">
+                <svg className="w-12 h-12 sm:w-14 sm:h-14 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
               <h3 className="text-2xl sm:text-3xl font-black uppercase mb-2 text-foreground">
                 WANT TO EARN FREE DATA?
               </h3>
@@ -143,8 +147,9 @@ export function PostPurchaseReferral({
                 Share Lumbus with friends and family!
               </p>
               <div className="inline-block bg-gradient-to-r from-primary to-cyan px-6 py-3 rounded-xl mt-4 border-2 border-foreground/20">
-                <p className="text-xl font-black uppercase text-foreground">
-                  🚀 REFER 3 FRIENDS = 3GB FREE!
+                <p className="text-xl font-black uppercase text-foreground flex items-center gap-2 justify-center">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  REFER 3 FRIENDS = 3GB FREE!
                 </p>
               </div>
             </div>
@@ -152,14 +157,18 @@ export function PostPurchaseReferral({
             {/* Benefits */}
             <div className="grid sm:grid-cols-2 gap-4 mb-6">
               <div className="bg-mint p-4 rounded-xl border-2 border-primary/20">
-                <div className="text-3xl mb-2">🎁</div>
+                <div className="mb-2">
+                  <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                </div>
                 <p className="font-black text-sm uppercase mb-1">THEY GET</p>
                 <p className="font-bold text-foreground/70 text-sm">
                   10% off their first eSIM
                 </p>
               </div>
               <div className="bg-yellow p-4 rounded-xl border-2 border-secondary/20">
-                <div className="text-3xl mb-2">💎</div>
+                <div className="mb-2">
+                  <svg className="w-8 h-8 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                </div>
                 <p className="font-black text-sm uppercase mb-1">YOU GET</p>
                 <p className="font-bold text-foreground/70 text-sm">
                   1GB free data per referral
@@ -184,9 +193,9 @@ export function PostPurchaseReferral({
                   </div>
                   <Button
                     onClick={copyLink}
-                    className="bg-foreground text-white hover:bg-foreground/90 font-black px-4"
+                    className="bg-foreground text-white hover:bg-foreground/90 font-black px-4 flex items-center gap-1"
                   >
-                    {copied ? '✓' : 'COPY'}
+                    {copied ? <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> COPIED</> : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> COPY</>}
                   </Button>
                 </div>
               </div>

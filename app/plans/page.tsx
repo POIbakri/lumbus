@@ -187,8 +187,11 @@ function PlansPageContent() {
         <div className="container mx-auto text-center relative z-10 max-w-7xl">
           {/* Page Badge */}
           <div className="inline-block mb-6">
-            <span className="inline-block px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-purple border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
-              💎 Buy eSIM Plans
+            <span className="inline-flex items-center gap-2 px-6 sm:px-8 py-2 sm:py-3 rounded-full bg-purple border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground shadow-lg">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Buy eSIM Plans
             </span>
           </div>
 
@@ -204,7 +207,7 @@ function PlansPageContent() {
           <div className="max-w-2xl mx-auto px-4 mb-8">
             <Input
               type="text"
-              placeholder="🔍 Search country, region, or plan name..."
+              placeholder="Search country, region, or plan name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg md:text-xl font-bold border-2 sm:border-4 border-foreground rounded-xl sm:rounded-2xl shadow-xl focus:border-primary transition-all"
@@ -238,15 +241,20 @@ function PlansPageContent() {
             <div className="bg-yellow rounded-2xl border-4 border-foreground shadow-xl p-4 sm:p-6 max-w-2xl mx-auto">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">🔍</span>
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
                   <span className="font-black text-sm sm:text-base">Searching for: "{searchQuery}"</span>
                 </div>
                 <Button
                   onClick={() => setSearchQuery('')}
                   variant="ghost"
-                  className="font-black text-xs"
+                  className="font-black text-xs flex items-center gap-1"
                 >
-                  ✕ CLEAR
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  CLEAR
                 </Button>
               </div>
             </div>
@@ -259,7 +267,9 @@ function PlansPageContent() {
               <div className="relative inline-block">
                 <div className="w-16 h-16 sm:w-24 sm:h-24 border-4 sm:border-8 border-primary/20 border-t-primary rounded-full animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-2xl sm:text-4xl">⚡</div>
+                  <svg className="w-6 h-6 sm:w-10 sm:h-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </div>
               </div>
               <p className="mt-6 sm:mt-8 font-black uppercase text-lg sm:text-2xl tracking-tight">Loading plans...</p>
@@ -267,7 +277,9 @@ function PlansPageContent() {
           ) : filteredPlans.length === 0 ? (
             <div className="text-center py-20 sm:py-32 px-4">
               <div className="max-w-md mx-auto p-8 sm:p-12 bg-white rounded-3xl border-4 border-foreground shadow-2xl">
-                <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">🌍</div>
+                <svg className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
                 <p className="text-2xl sm:text-3xl font-black uppercase mb-3 sm:mb-4">No Plans Found</p>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-70 mb-6">
                   Try searching for a different country or region

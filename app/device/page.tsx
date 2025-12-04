@@ -231,7 +231,7 @@ export default function DevicePage() {
                 <ul className="space-y-3">
                   {appleDevices.map((device) => (
                     <li key={device} className="flex gap-3">
-                      <span className="text-primary font-black">✓</span>
+                      <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-sm">{device}</span>
                     </li>
                   ))}
@@ -249,7 +249,7 @@ export default function DevicePage() {
                 <ul className="space-y-3">
                   {androidDevices.map((device) => (
                     <li key={device} className="flex gap-3">
-                      <span className="text-primary font-black">✓</span>
+                      <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-sm">{device}</span>
                     </li>
                   ))}
@@ -265,7 +265,7 @@ export default function DevicePage() {
                 <ul className="space-y-3">
                   {otherDevices.map((device) => (
                     <li key={device} className="flex gap-3">
-                      <span className="text-primary font-black">✓</span>
+                      <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                       <span className="font-bold text-sm">{device}</span>
                     </li>
                   ))}

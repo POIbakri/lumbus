@@ -24,10 +24,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://getlumbus.com'),
   title: {
-    default: 'Buy eSIM Online - Cheap eSIM Plans for 150+ Countries | Lumbus',
+    default: 'Buy eSIM Online - Best eSIM Plans for 150+ Countries | Lumbus',
     template: '%s | Lumbus eSIM',
   },
-  description: 'Buy cheap eSIM plans online for 150+ countries. Instant activation, no signup required. Best eSIM provider 2025. Save 10x vs roaming. Get connected in 5 minutes with Lumbus eSIM.',
+  description: 'Buy best eSIM plans online for 150+ countries. Instant activation, no signup required. Best eSIM provider 2025. Save 10x vs roaming. Get connected in 5 minutes with Lumbus eSIM.',
   applicationName: 'Lumbus',
   authors: [{ name: 'Lumbus Technologies Limited', url: 'https://getlumbus.com' }],
   generator: 'Next.js',

@@ -94,7 +94,9 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
               className="w-full px-2 py-2 bg-white/50 hover:bg-white/70 transition-colors font-black uppercase text-[10px] sm:text-xs flex items-center justify-between"
             >
               <span className="flex items-center gap-1">
-                <span className="text-xs">🌍</span>
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                </svg>
                 <span>Countries ({regionInfo.subLocationList.length})</span>
               </span>
               <span className="text-xs">{showCountries ? '−' : '+'}</span>
@@ -123,14 +125,18 @@ export function PlanCard({ plan, displayPrice, displaySymbol }: PlanCardProps) {
         <div className="space-y-2 sm:space-y-3">
           <div className="flex justify-between items-center p-2.5 sm:p-3 bg-white/50 rounded-lg sm:rounded-xl border-2 border-foreground/5">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-base sm:text-lg">📊</span>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+              </svg>
               <span className="font-black uppercase text-xs tracking-wider">Data:</span>
             </div>
             <span className="font-black text-xl sm:text-2xl">{displayData}</span>
           </div>
           <div className="flex justify-between items-center p-2.5 sm:p-3 bg-white/50 rounded-lg sm:rounded-xl border-2 border-foreground/5">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <span className="text-base sm:text-lg">⏰</span>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <span className="font-black uppercase text-xs tracking-wider">Valid for:</span>
             </div>
             <span className="font-black text-xl sm:text-2xl">{plan.validity_days} days</span>

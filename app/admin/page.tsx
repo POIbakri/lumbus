@@ -316,9 +316,10 @@ export default function AdminPage() {
                                   href={affiliate.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-sm font-bold text-primary hover:underline"
+                                  className="text-sm font-bold text-primary hover:underline flex items-center gap-1"
                                 >
-                                  🔗 {affiliate.website}
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
+                                  {affiliate.website}
                                 </a>
                               )}
                             </div>
@@ -385,16 +386,16 @@ export default function AdminPage() {
                             <Button
                               onClick={() => handleApprove(affiliate.id)}
                               disabled={actionLoading === affiliate.id}
-                              className="flex-1 bg-primary text-foreground hover:bg-primary/90 font-black uppercase"
+                              className="flex-1 bg-primary text-foreground hover:bg-primary/90 font-black uppercase flex items-center justify-center gap-1"
                             >
-                              {actionLoading === affiliate.id ? 'Processing...' : '✓ Approve'}
+                              {actionLoading === affiliate.id ? 'Processing...' : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> Approve</>}
                             </Button>
                             <Button
                               onClick={() => handleReject(affiliate.id)}
                               disabled={actionLoading === affiliate.id || !rejectionReason[affiliate.id]}
-                              className="flex-1 bg-destructive text-white hover:bg-destructive/90 font-black uppercase"
+                              className="flex-1 bg-destructive text-white hover:bg-destructive/90 font-black uppercase flex items-center justify-center gap-1"
                             >
-                              {actionLoading === affiliate.id ? 'Processing...' : '✗ Reject'}
+                              {actionLoading === affiliate.id ? 'Processing...' : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg> Reject</>}
                             </Button>
                           </div>
                         </div>
@@ -502,7 +503,9 @@ export default function AdminPage() {
             <CardContent className="p-3 sm:p-4 md:p-6">
               {orders.length === 0 ? (
                 <div className="text-center py-8 sm:py-12">
-                  <div className="text-5xl sm:text-6xl mb-3 sm:mb-4">📦</div>
+                  <div className="mb-3 sm:mb-4 flex justify-center">
+                    <svg className="w-14 h-14 sm:w-16 sm:h-16 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                  </div>
                   <p className="font-black text-lg sm:text-xl">No orders yet</p>
                 </div>
               ) : (
@@ -540,9 +543,9 @@ export default function AdminPage() {
                               <p className="font-black uppercase text-xs text-muted-foreground mb-2">Plan Details</p>
                               {order.plan ? (
                                 <div className="grid grid-cols-3 sm:grid-cols-1 gap-2 sm:gap-1 sm:space-y-1">
-                                  <p className="text-xs sm:text-sm font-bold">💾 {formatDataAmount(order.plan.data_gb)}</p>
-                                  <p className="text-xs sm:text-sm font-bold">⏰ {order.plan.validity_days}d</p>
-                                  <p className="text-xs sm:text-sm font-bold">💰 {order.plan.currency === 'USD' ? '$' : order.plan.currency || '$'}{order.plan.retail_price.toFixed(2)}</p>
+                                  <p className="text-xs sm:text-sm font-bold flex items-center gap-1"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg> {formatDataAmount(order.plan.data_gb)}</p>
+                                  <p className="text-xs sm:text-sm font-bold flex items-center gap-1"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {order.plan.validity_days}d</p>
+                                  <p className="text-xs sm:text-sm font-bold flex items-center gap-1"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> {order.plan.currency === 'USD' ? '$' : order.plan.currency || '$'}{order.plan.retail_price.toFixed(2)}</p>
                                 </div>
                               ) : (
                                 <p className="text-xs text-muted-foreground">No plan data</p>
@@ -565,7 +568,7 @@ export default function AdminPage() {
                                     ></div>
                                   </div>
                                   <p className="text-xs font-bold text-primary">Left: {dataUsage.remaining} GB</p>
-                                  <p className="text-xs font-bold">📅 {daysRemaining} days</p>
+                                  <p className="text-xs font-bold flex items-center gap-1"><svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg> {daysRemaining} days</p>
                                 </div>
                               ) : (
                                 <p className="text-xs text-muted-foreground">No usage data</p>

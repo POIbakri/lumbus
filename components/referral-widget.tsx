@@ -121,7 +121,7 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
         className="fixed bottom-6 right-6 z-40 bg-primary text-foreground font-black px-6 py-4 rounded-full shadow-2xl border-4 border-foreground hover:scale-110 transition-transform flex items-center gap-2 animate-bounce"
         aria-label="Open referral rewards"
       >
-        <span className="text-2xl">🎁</span>
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
         <span className="hidden sm:inline text-sm uppercase">EARN FREE DATA</span>
       </button>
     );
@@ -151,8 +151,9 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
         {/* Header */}
         <div className="text-center">
           <div className="inline-block mb-3">
-            <span className="px-4 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest">
-              🎁 REFER & EARN
+            <span className="px-4 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+              REFER & EARN
             </span>
           </div>
           <h3 className="text-2xl font-black uppercase mb-2 text-foreground">GIVE 10% OFF<br/>GET 1GB FREE</h3>
@@ -193,7 +194,7 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
         {stats.pending_rewards > 0 && (
           <div className="bg-purple p-4 rounded-xl border-2 border-accent/20 text-center">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-xl">⏳</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               <span className="font-black uppercase text-sm">Pending</span>
             </div>
             <div className="text-2xl font-black text-foreground">
@@ -208,15 +209,15 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
         {/* How It Works Steps */}
         <div className="grid grid-cols-3 gap-2 text-left">
           <div className="bg-mint p-3 rounded-xl border-2 border-primary/20">
-            <div className="text-2xl mb-1">1️⃣</div>
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center font-black text-white text-sm mb-1">1</div>
             <div className="text-xs font-black uppercase">SHARE LINK</div>
           </div>
           <div className="bg-cyan p-3 rounded-xl border-2 border-primary/20">
-            <div className="text-2xl mb-1">2️⃣</div>
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center font-black text-white text-sm mb-1">2</div>
             <div className="text-xs font-black uppercase">FRIEND BUYS</div>
           </div>
           <div className="bg-yellow p-3 rounded-xl border-2 border-secondary/20">
-            <div className="text-2xl mb-1">3️⃣</div>
+            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center font-black text-white text-sm mb-1">3</div>
             <div className="text-xs font-black uppercase">GET 1GB</div>
           </div>
         </div>
@@ -243,10 +244,10 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
             </Button>
             <Button
               onClick={copyLink}
-              className="bg-foreground hover:bg-foreground/90 text-white font-black py-3 text-xs rounded-xl border-2 border-foreground"
-              aria-label="Copy referral link"
+              className="bg-foreground hover:bg-foreground/90 text-white font-black py-3 text-xs rounded-xl border-2 border-foreground flex items-center justify-center gap-1"
+              aria-label={copied ? "Link copied" : "Copy referral link"}
             >
-              {copied ? '✓' : '📋'}
+              {copied ? <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> COPIED</> : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg> COPY</>}
             </Button>
           </div>
         </div>
@@ -264,16 +265,17 @@ export function ReferralWidget({ floating = false }: ReferralWidgetProps) {
         {/* CTA */}
         <Button
           onClick={copyLink}
-          className="w-full bg-primary text-foreground hover:bg-primary/90 hover:scale-105 transition-all font-black py-4 text-lg rounded-xl border-4 border-foreground shadow-xl"
+          className="w-full bg-primary text-foreground hover:bg-primary/90 hover:scale-105 transition-all font-black py-4 text-lg rounded-xl border-4 border-foreground shadow-xl flex items-center justify-center gap-2"
         >
-          {copied ? '✓ LINK COPIED!' : '🚀 COPY & SHARE NOW'}
+          {copied ? <><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> LINK COPIED!</> : <><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> COPY & SHARE NOW</>}
         </Button>
 
         {/* Bottom Info */}
         {stats.total_referrals === 0 && (
           <div className="text-center pt-2">
-            <p className="text-xs font-bold text-foreground/70">
-              🚀 Share your link and earn your first GB today!
+            <p className="text-xs font-bold text-foreground/70 flex items-center justify-center gap-1">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Share your link and earn your first GB today!
             </p>
           </div>
         )}

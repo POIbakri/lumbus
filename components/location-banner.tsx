@@ -80,8 +80,8 @@ export function LocationBanner() {
           {getFlagEmoji(location.countryCode)}
         </div>
       )}
-      <div className="absolute bottom-2 left-2 text-2xl" style={{animationDelay: '0.5s'}}>
-        📍
+      <div className="absolute bottom-2 left-2" style={{animationDelay: '0.5s'}}>
+        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
       </div>
 
       <CardContent className="py-8 px-6 relative z-10">
@@ -130,11 +130,11 @@ export function LocationBanner() {
             <div className="mt-6 flex items-center justify-center gap-3 text-sm font-bold opacity-60">
               <span>Device: {deviceInfo.platform.toUpperCase()}</span>
               <span>•</span>
-              <span>{deviceInfo.supportsEsim ? '✓ eSIM Ready' : '? Check Compatibility'}</span>
+              <span className="flex items-center gap-1">{deviceInfo.supportsEsim ? <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> eSIM Ready</> : <><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg> Check Compatibility</>}</span>
               {deviceInfo.supportsUniversalLink && (
                 <>
                   <span>•</span>
-                  <span>✓ One-Tap Install</span>
+                  <span className="flex items-center gap-1"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg> One-Tap Install</span>
                 </>
               )}
             </div>

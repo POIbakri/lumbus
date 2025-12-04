@@ -504,8 +504,11 @@ export default function Home() {
             {/* Main Card */}
             <div className="bg-white/95 backdrop-blur-sm p-6 sm:p-8 md:p-12 rounded-3xl border-4 border-foreground shadow-2xl">
               <div className="inline-block mb-4 sm:mb-6">
-                <span className="px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
-                  <span aria-hidden="true">🎁</span> REFER & EARN
+                <span className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 rounded-full bg-yellow border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                  </svg>
+                  REFER & EARN
                 </span>
               </div>
 
@@ -601,21 +604,21 @@ export default function Home() {
               {/* How It Works */}
               <div className="grid sm:grid-cols-3 gap-4 mb-6 sm:mb-8 text-left">
                 <div className="bg-mint p-4 rounded-xl border-2 border-primary/20">
-                  <div className="text-3xl mb-2">1️⃣</div>
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center font-black text-white text-lg mb-2">1</div>
                   <div className="text-sm font-black uppercase mb-2">SHARE YOUR LINK</div>
                   <div className="text-xs font-bold text-foreground/70">
                     Get your unique referral link from your dashboard
                   </div>
                 </div>
                 <div className="bg-cyan p-4 rounded-xl border-2 border-primary/20">
-                  <div className="text-3xl mb-2">2️⃣</div>
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center font-black text-white text-lg mb-2">2</div>
                   <div className="text-sm font-black uppercase mb-2">FRIEND PURCHASES</div>
                   <div className="text-xs font-bold text-foreground/70">
                     They get 10% off their first eSIM order
                   </div>
                 </div>
                 <div className="bg-yellow p-4 rounded-xl border-2 border-secondary/20">
-                  <div className="text-3xl mb-2">3️⃣</div>
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center font-black text-white text-lg mb-2">3</div>
                   <div className="text-sm font-black uppercase mb-2">YOU & FRIEND GET 1GB FREE</div>
                   <div className="text-xs font-bold text-foreground/70">
                     Data credited instantly to your account
@@ -639,7 +642,9 @@ export default function Home() {
 
               {/* Bottom Banner */}
               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow via-cyan to-yellow border-2 border-foreground px-4 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg">
-                <span className="text-xl sm:text-2xl" aria-hidden="true">🚀</span>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
                 <span className="font-black text-xs sm:text-sm md:text-base text-foreground">UNLIMITED REFERRALS = UNLIMITED DATA</span>
               </div>
             </div>
@@ -652,8 +657,11 @@ export default function Home() {
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-20 ">
             <div className="inline-block mb-4">
-              <span className="px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
-                <span aria-hidden="true">⭐</span> Trusted by Travelers
+              <span className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-foreground/5 border-2 border-foreground/10 font-black uppercase text-xs tracking-widest">
+                <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+                Trusted by Travelers
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase mb-4 leading-tight">
@@ -666,11 +674,11 @@ export default function Home() {
             {/* Testimonial 1 */}
             <div className="bg-mint p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 ">
               <div className="flex gap-1 mb-4" aria-label="5 star rating">
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "Saved me hundreds on my Europe trip! Setup was instant and worked perfectly in every country."
@@ -689,11 +697,11 @@ export default function Home() {
             {/* Testimonial 2 */}
             <div className="bg-cyan p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10 " style={{animationDelay: '0.1s'}}>
               <div className="flex gap-1 mb-4" aria-label="5 star rating">
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "Best travel purchase ever. No more hunting for WiFi or paying crazy roaming fees!"
@@ -712,11 +720,11 @@ export default function Home() {
             {/* Testimonial 3 */}
             <div className="bg-yellow p-6 sm:p-8 rounded-2xl sm:rounded-3xl border-2 border-foreground/10  sm:col-span-2 md:col-span-1" style={{animationDelay: '0.2s'}}>
               <div className="flex gap-1 mb-4" aria-label="5 star rating">
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
-                <span className="text-xl sm:text-2xl" aria-hidden="true">⭐</span>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
               </div>
               <p className="text-base sm:text-lg font-bold mb-5 sm:mb-6 leading-relaxed">
                 "So easy! Bought before my flight, activated when I landed. Connected in seconds!"
@@ -740,8 +748,11 @@ export default function Home() {
         <div className="container mx-auto text-center relative z-10">
           <div className="">
             <div className="inline-block mb-6 sm:mb-8">
-              <span className="px-4 sm:px-6 py-2 rounded-full bg-white/20 border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
-                <span aria-hidden="true">🚀</span> JOIN 10,000+ HAPPY TRAVELERS
+              <span className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 rounded-full bg-white/20 border-2 border-foreground font-black uppercase text-xs tracking-widest text-foreground backdrop-blur-sm">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                JOIN 10,000+ HAPPY TRAVELERS
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 text-foreground leading-tight">

@@ -136,8 +136,11 @@ export default function HelpPage() {
       <section className="pt-32 sm:pt-40 md:pt-48 pb-16 sm:pb-20 px-4 bg-purple">
         <div className="container mx-auto text-center">
           <div className="inline-block mb-4 sm:mb-6">
-            <span className="px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
-              💬 We're Here to Help
+            <span className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 rounded-full bg-foreground/10 border-2 border-foreground/20 font-black uppercase text-xs tracking-widest text-foreground">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+              We're Here to Help
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">
@@ -157,7 +160,9 @@ export default function HelpPage() {
             <Link href="/how-it-works">
               <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-4 sm:p-6 text-center">
-                  <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">⚡</div>
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                   <h3 className="font-black text-xs sm:text-sm uppercase">How it Works</h3>
                 </CardContent>
               </Card>
@@ -165,7 +170,9 @@ export default function HelpPage() {
             <Link href="/device">
               <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
-                  <div className="text-4xl mb-3">📱</div>
+                  <svg className="w-10 h-10 mx-auto mb-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
                   <h3 className="font-black text-sm uppercase">Device Check</h3>
                 </CardContent>
               </Card>
@@ -173,7 +180,9 @@ export default function HelpPage() {
             <Link href="/destinations">
               <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
-                  <div className="text-4xl mb-3">🌍</div>
+                  <svg className="w-10 h-10 mx-auto mb-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <h3 className="font-black text-sm uppercase">Destinations</h3>
                 </CardContent>
               </Card>
@@ -181,7 +190,9 @@ export default function HelpPage() {
             <Link href="/plans">
               <Card className=" cursor-pointer border-2 border-foreground/5 hover:border-primary ">
                 <CardContent className="p-6 text-center">
-                  <div className="text-4xl mb-3">💎</div>
+                  <svg className="w-10 h-10 mx-auto mb-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <h3 className="font-black text-sm uppercase">Browse Plans</h3>
                 </CardContent>
               </Card>
@@ -266,7 +277,9 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <Card className="border-2 border-primary">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">📧</div>
+                <svg className="w-12 h-12 mx-auto mb-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
                 <h3 className="font-black text-lg mb-2 uppercase">Email</h3>
                 <p className="font-bold text-sm text-foreground/70 mb-4">
                   Get a response within 24 hours
@@ -279,7 +292,9 @@ export default function HelpPage() {
 
             <Card className="border-2 border-primary">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">💬</div>
+                <svg className="w-12 h-12 mx-auto mb-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
                 <h3 className="font-black text-lg mb-2 uppercase">Live Chat</h3>
                 <p className="font-bold text-sm text-foreground/70 mb-4">
                   Chat with us in real-time
@@ -295,7 +310,9 @@ export default function HelpPage() {
 
             <Card className="border-2 border-primary">
               <CardContent className="p-8">
-                <div className="text-5xl mb-4">📚</div>
+                <svg className="w-12 h-12 mx-auto mb-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
                 <h3 className="font-black text-lg mb-2 uppercase">Guides</h3>
                 <p className="font-bold text-sm text-foreground/70 mb-4">
                   Detailed setup instructions

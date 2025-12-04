@@ -50,7 +50,8 @@ export function OrganizationSchema() {
       },
     ],
     sameAs: [
-      // Add your social media profiles when available
+      'https://www.instagram.com/getlumbus',
+      'https://www.tiktok.com/@getlumbus',
     ],
   }
 
