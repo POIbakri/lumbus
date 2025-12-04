@@ -592,7 +592,7 @@ function PlansPageContent() {
                 BROWSE PLANS
               </Button>
               <Link href="/device-compatibility">
-                <Button variant="outline" className="btn-lumbus border-2 border-white text-white hover:bg-white hover:text-foreground font-black text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 w-full sm:w-auto">
+                <Button className="btn-lumbus bg-white text-foreground hover:bg-white/90 font-black text-base sm:text-lg px-8 sm:px-12 py-4 sm:py-6 shadow-xl w-full sm:w-auto">
                   CHECK COMPATIBILITY
                 </Button>
               </Link>

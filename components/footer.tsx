@@ -27,14 +27,16 @@ export function Footer() {
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-2">
             <Link href="/" className="inline-block mb-6">
-              <Image
-                src="/logo.jpg"
-                alt="Lumbus - Global eSIM Provider"
-                width={200}
-                height={60}
-                className="h-12 sm:h-14 w-auto"
-                loading="lazy"
-              />
+              <div className="bg-white rounded-xl p-2 sm:p-3 inline-block">
+                <Image
+                  src="/logo.jpg"
+                  alt="Lumbus - Global eSIM Provider"
+                  width={140}
+                  height={40}
+                  className="h-8 sm:h-10 w-auto"
+                  loading="lazy"
+                />
+              </div>
             </Link>
             <p className="text-gray-400 mb-6 max-w-sm text-sm sm:text-base">
               The smarter way to stay connected abroad. Instant eSIMs for 150+ countries.

@@ -736,7 +736,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-32 sm:py-40 px-4 bg-gradient-to-br from-primary via-cyan to-purple overflow-hidden">
+      <section className="relative py-32 sm:py-40 px-4 bg-primary overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
           <div className="">
             <div className="inline-block mb-6 sm:mb-8">
