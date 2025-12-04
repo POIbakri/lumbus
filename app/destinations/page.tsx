@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { getCountriesByContinent, searchCountries, REGIONS, type CountryInfo, type RegionInfo } from '@/lib/countries';
 import { Plan } from '@/lib/db';
+import { ServiceSchema, BreadcrumbSchema, ItemListSchema } from '@/components/structured-data';
 
 export default function DestinationsPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -160,8 +161,36 @@ export default function DestinationsPage() {
   const totalItems = activeTab === 'countries' ? filteredCountries.length : filteredRegions.length;
   const hasMore = displayLimit < totalItems;
 
+  // Generate item list for top destinations (for SEO) - prioritized by traffic
+  const topDestinations = [
+    { name: 'Japan eSIM', url: 'https://getlumbus.com/destinations/jp', position: 1 },
+    { name: 'Turkey eSIM', url: 'https://getlumbus.com/destinations/tr', position: 2 },
+    { name: 'USA eSIM', url: 'https://getlumbus.com/destinations/us', position: 3 },
+    { name: 'UK eSIM', url: 'https://getlumbus.com/destinations/gb', position: 4 },
+    { name: 'Thailand eSIM', url: 'https://getlumbus.com/destinations/th', position: 5 },
+    { name: 'UAE eSIM', url: 'https://getlumbus.com/destinations/ae', position: 6 },
+    { name: 'Saudi Arabia eSIM', url: 'https://getlumbus.com/destinations/sa', position: 7 },
+    { name: 'Singapore eSIM', url: 'https://getlumbus.com/destinations/sg', position: 8 },
+    { name: 'Malaysia eSIM', url: 'https://getlumbus.com/destinations/my', position: 9 },
+    { name: 'Egypt eSIM', url: 'https://getlumbus.com/destinations/eg', position: 10 },
+    { name: 'Qatar eSIM', url: 'https://getlumbus.com/destinations/qa', position: 11 },
+    { name: 'France eSIM', url: 'https://getlumbus.com/destinations/fr', position: 12 },
+    { name: 'Spain eSIM', url: 'https://getlumbus.com/destinations/es', position: 13 },
+    { name: 'Italy eSIM', url: 'https://getlumbus.com/destinations/it', position: 14 },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      <ServiceSchema />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://getlumbus.com' },
+          { name: 'eSIM Destinations', url: 'https://getlumbus.com/destinations' },
+        ]}
+      />
+      <ItemListSchema items={topDestinations} listType="Product" />
+
       <Nav />
 
       {/* Hero Section */}
@@ -251,7 +280,7 @@ export default function DestinationsPage() {
                     </div>
                   </div>
                 </div>
-                <Link href={`/plans?region=${userCountry}`} className="w-full sm:w-auto">
+                <Link href={`/destinations/${userCountry?.toLowerCase()}`} className="w-full sm:w-auto">
                   <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 active:bg-foreground/90 hover:scale-105 active:scale-105 font-black text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 shadow-lg sm:shadow-xl rounded-lg sm:rounded-xl transition-all duration-300 touch-manipulation">
                     VIEW PLANS
                     <span className="ml-1.5 sm:ml-2 text-lg sm:text-xl">→</span>
@@ -292,10 +321,15 @@ export default function DestinationsPage() {
                   const colors = ['bg-mint', 'bg-yellow', 'bg-cyan', 'bg-purple'];
                   const bgColor = colors[index % colors.length];
 
+                  // Countries go to SEO-optimized destination pages, regions go to plans
+                  const href = activeTab === 'countries'
+                    ? `/destinations/${item.code.toLowerCase()}`
+                    : `/plans?region=${item.code}`;
+
                   return (
                     <Link
                       key={item.code}
-                      href={`/plans?region=${item.code}`}
+                      href={href}
                       className="block group"
                       onClick={() => track('Destination Click', { type: activeTab === 'countries' ? 'country' : 'region', code: item.code, name: item.name })}
                     >

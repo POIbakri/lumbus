@@ -34,8 +34,8 @@ export default function Home() {
 
         <div className="container mx-auto text-center relative z-10">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase mb-8 max-w-5xl mx-auto  leading-tight pt-6" style={{animationDelay: '0.1s'}}>
-            <span className="inline-block">eSIMs THAT JUST WORK.</span><br/>
-            <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>EVERYWHERE.</span>
+            <span className="inline-block">BUY eSIM ONLINE.</span><br/>
+            <span className="inline-block text-primary" style={{animationDelay: '0.3s'}}>WORKS EVERYWHERE.</span>
           </h1>
 
           {/* Dynamic Value Prop */}
@@ -403,33 +403,49 @@ export default function Home() {
             <p className="text-xl font-bold opacity-70">Perfect for travel and emergency data at home</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <Card className="bg-mint border-2 border-foreground/5 rounded-3xl   overflow-hidden">
+            <Card className="bg-mint border-2 border-foreground/5 rounded-3xl overflow-hidden">
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6" aria-hidden="true">⚡</div>
+                <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-6 border-2 border-foreground/10 shadow-lg">
+                  <svg className="w-10 h-10 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">INSTANT</h3>
                 <p className="font-bold opacity-70">Activate in seconds, not hours</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.1s'}}>
+            <Card className="bg-cyan border-2 border-foreground/5 rounded-3xl overflow-hidden" style={{animationDelay: '0.1s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6" aria-hidden="true">🌍</div>
+                <div className="w-20 h-20 rounded-2xl bg-foreground flex items-center justify-center mx-auto mb-6 border-2 border-foreground/10 shadow-lg">
+                  <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">GLOBAL</h3>
                 <p className="font-bold opacity-70">Works abroad & at home</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.2s'}}>
+            <Card className="bg-yellow border-2 border-foreground/5 rounded-3xl overflow-hidden" style={{animationDelay: '0.2s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6" aria-hidden="true">💳</div>
+                <div className="w-20 h-20 rounded-2xl bg-cyan flex items-center justify-center mx-auto mb-6 border-2 border-foreground/10 shadow-lg">
+                  <svg className="w-10 h-10 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">FLEXIBLE</h3>
                 <p className="font-bold opacity-70">Use as backup data anytime</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-purple border-2 border-foreground/5 rounded-3xl   overflow-hidden" style={{animationDelay: '0.3s'}}>
+            <Card className="bg-purple border-2 border-foreground/5 rounded-3xl overflow-hidden" style={{animationDelay: '0.3s'}}>
               <CardContent className="p-10 text-center">
-                <div className="text-6xl mb-6" aria-hidden="true">🔒</div>
+                <div className="w-20 h-20 rounded-2xl bg-yellow flex items-center justify-center mx-auto mb-6 border-2 border-foreground/10 shadow-lg">
+                  <svg className="w-10 h-10 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
                 <h3 className="font-black text-2xl uppercase mb-3 tracking-tight">SECURE</h3>
                 <p className="font-bold opacity-70">Bank-level encryption</p>
               </CardContent>

@@ -9,6 +9,7 @@ import { getCountryInfo, REGIONS } from '@/lib/countries';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ServiceSchema, BreadcrumbSchema } from '@/components/structured-data';
 
 function PlansPageContent() {
   const searchParams = useSearchParams();
@@ -166,6 +167,15 @@ function PlansPageContent() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Structured Data for SEO */}
+      <ServiceSchema />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://getlumbus.com' },
+          { name: 'eSIM Plans', url: 'https://getlumbus.com/plans' },
+        ]}
+      />
+
       <Nav />
 
       {/* Hero Section */}

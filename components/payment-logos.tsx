@@ -16,7 +16,7 @@ export function PaymentLogos() {
           {/* Apple Pay */}
           <div className="group px-3 sm:px-4 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border-2 border-foreground/10">
             <div className="flex items-center gap-2">
-              <Image src="/apple-logo.svg" alt="Apple" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+              <Image src="/apple-logo.svg" alt="Apple Pay payment method" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
               <span className="font-black text-foreground text-xs sm:text-sm uppercase">Apple Pay</span>
             </div>
           </div>
@@ -24,7 +24,7 @@ export function PaymentLogos() {
           {/* Google Pay */}
           <div className="group px-3 sm:px-4 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border-2 border-foreground/10">
             <div className="flex items-center gap-2">
-              <Image src="/google-logo.webp" alt="Google" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+              <Image src="/google-logo.webp" alt="Google Pay payment method" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
               <span className="font-black text-foreground text-xs sm:text-sm uppercase">Google Pay</span>
             </div>
           </div>
@@ -84,12 +84,12 @@ export function PaymentLogosCompact() {
       </div>
       <span className="text-foreground/30">•</span>
       <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
-        <Image src="/apple-logo.svg" alt="Apple" width={16} height={16} className="w-4 h-4 object-contain" />
+        <Image src="/apple-logo.svg" alt="Apple Pay payment method" width={16} height={16} className="w-4 h-4 object-contain" />
         <span>Apple Pay</span>
       </div>
       <span className="text-foreground/30">•</span>
       <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
-        <Image src="/google-logo.webp" alt="Google" width={16} height={16} className="w-4 h-4 object-contain" />
+        <Image src="/google-logo.webp" alt="Google Pay payment method" width={16} height={16} className="w-4 h-4 object-contain" />
         <span>Google Pay</span>
       </div>
       <span className="text-foreground/30">•</span>
