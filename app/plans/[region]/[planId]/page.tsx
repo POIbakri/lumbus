@@ -9,7 +9,7 @@ import { Nav } from '@/components/nav';
 import { Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
-import { ProductSchema, BreadcrumbSchema } from '@/components/structured-data';
+import { ProductSchema, BreadcrumbSchema, FAQSchema } from '@/components/structured-data';
 import { PaymentLogosCompact } from '@/components/payment-logos';
 import Link from 'next/link';
 import { useRegion } from '@/contexts/regions-context';
@@ -29,6 +29,36 @@ function formatDataAmount(dataGB: number): string {
 
   // For other values, round to nearest 50MB
   return `${Math.round(dataMB / 50) * 50} MB`;
+}
+
+// Generate plan-specific FAQs
+function generatePlanFAQs(countryName: string, dataAmount: string, validityDays: number) {
+  return [
+    {
+      q: `How do I install my ${countryName} eSIM?`,
+      a: `Installing your eSIM is simple: 1) After purchase, you'll receive your eSIM via email instantly. 2) On compatible devices, tap the installation link to add it automatically. Or scan the QR code in Settings > Cellular > Add eSIM (iPhone) or Settings > Network > SIMs (Android). 3) Enable data roaming when you arrive in ${countryName}. The whole process takes under 2 minutes!`
+    },
+    {
+      q: `Is ${dataAmount} enough for my trip to ${countryName}?`,
+      a: `${dataAmount} is perfect for ${validityDays} days of typical travel use including GPS navigation, messaging apps (WhatsApp, iMessage), social media browsing, and light web surfing. If you plan to stream videos or make frequent video calls, consider a larger data plan. You can always top up if you run low!`
+    },
+    {
+      q: `When does my ${validityDays}-day validity period start?`,
+      a: `Your ${validityDays}-day validity period starts when you first connect to a network in ${countryName}, not when you purchase or install the eSIM. This means you can buy and install your eSIM before your trip, and it will only activate when you land and connect.`
+    },
+    {
+      q: `Can I use hotspot/tethering with this eSIM?`,
+      a: `Yes! All Lumbus eSIM plans include hotspot/tethering capability. You can share your ${dataAmount} data connection with other devices like laptops or tablets. Just enable the hotspot feature in your phone settings.`
+    },
+    {
+      q: `What happens if I run out of data?`,
+      a: `If you use all your ${dataAmount} before the ${validityDays} days expire, you can easily top up through our website or the Lumbus app. Top-ups are instant and will extend your connectivity without needing a new eSIM installation.`
+    },
+    {
+      q: `Will my phone number still work with the eSIM?`,
+      a: `Yes! The Lumbus eSIM provides data only, so your original SIM card keeps working for calls and texts. Your phone will use the eSIM for internet data while your regular SIM handles calls and SMS. You can also use WiFi calling and messaging apps like WhatsApp for free calls.`
+    }
+  ];
 }
 
 export default function PlanDetailPage() {
@@ -54,6 +84,7 @@ export default function PlanDetailPage() {
   const [referralSuccess, setReferralSuccess] = useState('');
   const [referralValid, setReferralValid] = useState(false);
   const [showCountries, setShowCountries] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   // Use the RegionsProvider cache for region info
   const { regionInfo } = useRegion(plan?.region_code || '');
@@ -337,6 +368,7 @@ export default function PlanDetailPage() {
               { name: `${regionInfo?.isMultiCountry ? 'Multi-Country' : getCountryInfo(plan.region_code).name} eSIM`, url: `https://getlumbus.com/plans/${plan.region_code}/${plan.id}` },
             ]}
           />
+          <FAQSchema faqs={generatePlanFAQs(countryInfo.name, displayData, plan.validity_days)} />
         </>
       )}
 
@@ -732,6 +764,183 @@ export default function PlanDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* How It Works Section */}
+      <section className="py-12 sm:py-16 px-4 bg-white">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-2xl sm:text-3xl font-black uppercase mb-8 text-center">
+            HOW IT WORKS
+          </h2>
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 border-2 border-foreground/10 shadow-lg">
+                <span className="text-2xl sm:text-3xl font-black text-foreground">1</span>
+              </div>
+              <h3 className="font-black text-base sm:text-lg uppercase mb-2">BUY & RECEIVE</h3>
+              <p className="font-bold text-foreground/70 text-sm">
+                Purchase your eSIM and receive it instantly via email. No waiting, no shipping.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-cyan flex items-center justify-center mx-auto mb-4 border-2 border-foreground/10 shadow-lg">
+                <span className="text-2xl sm:text-3xl font-black text-foreground">2</span>
+              </div>
+              <h3 className="font-black text-base sm:text-lg uppercase mb-2">TAP & INSTALL</h3>
+              <p className="font-bold text-foreground/70 text-sm">
+                Tap the link to install automatically, or scan the QR code. Takes under 2 minutes!
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-yellow flex items-center justify-center mx-auto mb-4 border-2 border-foreground/10 shadow-lg">
+                <span className="text-2xl sm:text-3xl font-black text-foreground">3</span>
+              </div>
+              <h3 className="font-black text-base sm:text-lg uppercase mb-2">LAND & CONNECT</h3>
+              <p className="font-bold text-foreground/70 text-sm">
+                When you arrive in {countryInfo.name}, enable data roaming. You're instantly connected!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Lumbus Section */}
+      <section className="py-12 sm:py-16 px-4 bg-mint/30">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-2xl sm:text-3xl font-black uppercase mb-8 text-center">
+            WHY CHOOSE LUMBUS?
+          </h2>
+
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-foreground/10 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm sm:text-base uppercase mb-1">INSTANT DELIVERY</h3>
+                  <p className="font-bold text-foreground/70 text-xs sm:text-sm">
+                    Get your eSIM immediately after purchase. No waiting for physical delivery.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-foreground/10 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-cyan flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm sm:text-base uppercase mb-1">24/7 SUPPORT</h3>
+                  <p className="font-bold text-foreground/70 text-xs sm:text-sm">
+                    Real humans available around the clock. Get help whenever you need it.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-foreground/10 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-yellow flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm sm:text-base uppercase mb-1">BEST PRICES</h3>
+                  <p className="font-bold text-foreground/70 text-xs sm:text-sm">
+                    Up to 10x cheaper than roaming. Better rates than competitors.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-5 sm:p-6 border-2 border-foreground/10 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-purple flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm sm:text-base uppercase mb-1">SECURE PAYMENT</h3>
+                  <p className="font-bold text-foreground/70 text-xs sm:text-sm">
+                    Apple Pay, Google Pay, and cards via Stripe. Your data is protected.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-12 sm:py-16 px-4 bg-purple/20">
+        <div className="container mx-auto max-w-3xl">
+          <h2 className="text-2xl sm:text-3xl font-black uppercase mb-4 text-center">
+            FREQUENTLY ASKED QUESTIONS
+          </h2>
+          <p className="text-center text-base font-bold text-foreground/70 mb-8">
+            Everything you need to know about this {countryInfo.name} eSIM plan
+          </p>
+
+          <div className="space-y-3">
+            {generatePlanFAQs(countryInfo.name, displayData, plan.validity_days).map((faq, index) => (
+              <div key={index} className="bg-white rounded-xl border-2 border-foreground/10 overflow-hidden">
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                  className="w-full p-4 sm:p-5 text-left hover:bg-foreground/5 transition-colors"
+                >
+                  <div className="flex justify-between items-start gap-3">
+                    <h3 className="font-black text-sm sm:text-base">{faq.q}</h3>
+                    <span className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
+                      <svg
+                        className={`w-4 h-4 text-foreground transition-transform ${expandedFaq === index ? 'rotate-45' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </span>
+                  </div>
+                </button>
+                {expandedFaq === index && (
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 border-t border-foreground/10 pt-3">
+                    <p className="font-bold text-foreground/70 text-sm">{faq.a}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-12 sm:py-16 px-4 bg-primary">
+        <div className="container mx-auto text-center max-w-2xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 text-foreground">
+            READY TO GET CONNECTED?
+          </h2>
+          <p className="text-base sm:text-lg font-bold text-foreground/80 mb-6">
+            Get {displayData} of high-speed data in {countryInfo.name} for just {currencySymbol}{displayPrice.toFixed(2)}
+          </p>
+          <Button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-8 py-5 shadow-xl rounded-xl"
+          >
+            BUY NOW - {currencySymbol}{displayPrice.toFixed(2)}
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
