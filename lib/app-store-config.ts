@@ -11,11 +11,11 @@ export const APP_DOWNLOAD_CTA = {
     title: 'Get Connected Faster with Our App',
     subtitle: 'Instant eSIM activation, real-time data tracking, and exclusive app-only deals',
     features: [
-      '⚡ Instant eSIM activation',
-      '📊 Real-time data usage tracking',
-      '🎯 Exclusive app-only deals',
-      '🔔 Smart notifications',
-      '🌍 Works in 150+ countries'
+      'Instant eSIM activation',
+      'Real-time data usage tracking',
+      'Exclusive app-only deals',
+      'Smart notifications',
+      'Works in 150+ countries'
     ]
   },
   compact: {
@@ -28,24 +28,21 @@ export const APP_DOWNLOAD_CTA = {
   }
 };
 
+// Icons are rendered as SVGs in the component, not stored here
 export const APP_FEATURES = [
   {
-    icon: '⚡',
     title: 'Instant Setup',
     description: 'Activate your eSIM in seconds'
   },
   {
-    icon: '📱',
     title: 'Easy Management',
     description: 'Manage all your eSIMs in one place'
   },
   {
-    icon: '🔔',
     title: 'Smart Alerts',
     description: 'Get notified before your data runs out'
   },
   {
-    icon: '💰',
     title: 'Exclusive Deals',
     description: 'App-only discounts and offers'
   }

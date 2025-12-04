@@ -68,12 +68,22 @@ export function AppDownloadBanner({
                 {APP_DOWNLOAD_CTA.dashboard.subtitle}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 sm:mb-4">
-                {APP_FEATURES.slice(0, 4).map((feature, index) => (
-                  <div key={index} className="flex items-center sm:items-start gap-2">
-                    <span className="text-base sm:text-lg">{feature.icon}</span>
-                    <span className="text-xs sm:text-sm font-medium">{feature.title}</span>
-                  </div>
-                ))}
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                  <span className="text-xs sm:text-sm font-medium">Instant Setup</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
+                  <span className="text-xs sm:text-sm font-medium">Easy Management</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                  <span className="text-xs sm:text-sm font-medium">Smart Alerts</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+                  <span className="text-xs sm:text-sm font-medium">Exclusive Deals</span>
+                </div>
               </div>
             </div>
             <div className="flex flex-col items-center gap-3 sm:gap-4">
@@ -133,19 +143,42 @@ export function AppDownloadBanner({
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8 md:mb-12">
-            {APP_DOWNLOAD_CTA.banner.features.map((feature, index) => (
-              <Card key={index} className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
-                <CardContent className="p-3 sm:p-4 text-center">
-                  <p className="font-bold text-xs sm:text-sm">{feature}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8 md:mb-12">
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                <p className="font-bold text-xs sm:text-sm">Instant eSIM activation</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+                <p className="font-bold text-xs sm:text-sm">Real-time data tracking</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
+                <p className="font-bold text-xs sm:text-sm">Exclusive app-only deals</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+                <p className="font-bold text-xs sm:text-sm">Smart notifications</p>
+              </CardContent>
+            </Card>
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors col-span-2 sm:col-span-1">
+              <CardContent className="p-3 sm:p-4 text-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+                <p className="font-bold text-xs sm:text-sm">Works in 150+ countries</p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* App Store Badges */}
           <div className="flex flex-col items-center gap-4 sm:gap-6">
-            <AppStoreBadges showQR={true} className="justify-center" />
+            <AppStoreBadges className="justify-center" />
 
             {/* Call to action text */}
             <div className="text-center">

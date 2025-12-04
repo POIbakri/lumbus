@@ -18,6 +18,15 @@ export function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
+// Twitter/X Icon Component
+export function TwitterIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  );
+}
+
 interface SocialMediaLinksProps {
   variant?: 'default' | 'compact' | 'hero' | 'dashboard';
   className?: string;
@@ -74,6 +83,16 @@ export function SocialMediaLinks({ variant = 'default', className = '', showLabe
         <InstagramIcon className={styles.icon} />
       </a>
       {showLabels && <span className="text-xs font-bold hidden sm:inline">Instagram</span>}
+      <a
+        href="https://x.com/getlumbus"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.button}
+        aria-label="Follow Lumbus on X (Twitter)"
+      >
+        <TwitterIcon className={styles.icon} />
+      </a>
+      {showLabels && <span className="text-xs font-bold hidden sm:inline">X</span>}
     </div>
   );
 }
@@ -98,6 +117,15 @@ export function SocialMediaLinksInline({ className = '' }: { className?: string 
         className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
       >
         <InstagramIcon className="w-4 h-4" />
+        <span className="text-sm">@getlumbus</span>
+      </a>
+      <a
+        href="https://x.com/getlumbus"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+      >
+        <TwitterIcon className="w-4 h-4" />
         <span className="text-sm">@getlumbus</span>
       </a>
     </div>

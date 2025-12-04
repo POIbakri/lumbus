@@ -10,7 +10,6 @@ import { PaymentLogos, PaymentLogosCompact } from '@/components/payment-logos';
 import { ServiceSchema, HowToSchema } from '@/components/structured-data';
 import { AppDownloadBanner } from '@/components/app-download-banner';
 import { AppStoreBadges } from '@/components/app-store-badges';
-import { SocialMediaLinks } from '@/components/social-media-links';
 
 export default function Home() {
 
@@ -145,13 +144,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Social Media Links in Hero */}
-          <div className="mt-10 sm:mt-12" style={{animationDelay: '0.55s'}}>
-            <p className="text-xs sm:text-sm font-bold text-foreground/60 uppercase tracking-wide mb-3">
-              Follow Us
-            </p>
-            <SocialMediaLinks variant="hero" />
-          </div>
         </div>
       </section>
 
