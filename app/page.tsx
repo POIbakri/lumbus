@@ -162,7 +162,7 @@ export default function Home() {
               </div>
             </div>
             <div className="p-8 sm:p-10 md:p-12 bg-cyan rounded-3xl border-2 border-foreground/5  shadow-xl " style={{animationDelay: '0.1s'}}>
-              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">5 MIN</div>
+              <div className="text-6xl sm:text-7xl md:text-8xl font-black mb-4 sm:mb-6 text-foreground">2 MIN</div>
               <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">Setup Time</div>
               <div className="flex items-center justify-center gap-1 text-sm sm:text-base font-bold mt-3 text-foreground/70">
                 Super Fast
@@ -336,7 +336,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
-                <div className="text-base sm:text-2xl md:text-3xl font-black text-primary">5 MIN</div>
+                <div className="text-base sm:text-2xl md:text-3xl font-black text-primary">2 MIN</div>
               </div>
               <div className="p-3 sm:p-4 md:p-6 text-center border-l-2 border-foreground/10 flex items-center justify-center">
                 <div className="text-sm sm:text-xl md:text-2xl font-black opacity-40">Hours</div>

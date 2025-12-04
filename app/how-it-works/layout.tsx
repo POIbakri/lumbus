@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'How to Buy & Activate eSIM - 3 Easy Steps | Complete Setup Guide 2025',
-  description: 'Learn how to buy and activate your eSIM in 3 easy steps. Complete setup guide for iPhone & Android. Get connected in 5 minutes. No technical knowledge needed.',
+  description: 'Learn how to buy and activate your eSIM in 3 easy steps. Complete setup guide for iPhone & Android. Get connected in 2 minutes. No technical knowledge needed.',
   keywords: [
     'how to buy eSIM',
     'how to activate eSIM',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'How to Buy & Activate eSIM - Complete Setup Guide',
-    description: 'Learn how to buy and activate your eSIM in 3 easy steps. Get connected in 5 minutes.',
+    description: 'Learn how to buy and activate your eSIM in 3 easy steps. Get connected in 2 minutes.',
     url: 'https://getlumbus.com/how-it-works',
     type: 'article',
   },
