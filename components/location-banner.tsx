@@ -87,41 +87,35 @@ export function LocationBanner() {
       <CardContent className="py-8 px-6 relative z-10">
         <div className="text-center">
           <h3 className="text-2xl md:text-3xl font-black uppercase mb-3 text-foreground">
-            {location?.detected ? (
-              deviceInfo.isMobile ? 'Perfect Timing!' : `Hello from ${location.country}!`
-            ) : (
-              'Ready to Get Connected?'
-            )}
+            Ready to Get Connected?
           </h3>
 
           <p className="text-base md:text-lg font-bold mb-6 opacity-80">
-            {location?.detected && location.city && (
-              <>We detected you're in <span className="text-primary font-black">{location.city}, {location.country}</span>. </>
-            )}
-            {location?.detected && !location.city && location.country && (
-              <>We detected you're in <span className="text-primary font-black">{location.country}</span>. </>
-            )}
-            {!location?.detected && (
+            {location?.detected && location.country ? (
+              <>Need an eSIM for <span className="text-primary font-black">{location.country}</span> or another destination? </>
+            ) : (
               <>Find the perfect eSIM plan for your destination. </>
             )}
             {deviceInfo.supportsEsim ? (
-              <>Your device supports eSIM! Get connected in seconds.</>
+              <>Your device supports eSIM - get connected in seconds.</>
             ) : (
               <>Check if your device supports eSIM and get connected instantly.</>
             )}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href={`/plans?region=${primaryRegion.toLowerCase()}`}>
-              <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl">
-                <span className="flex items-center gap-2">
-                  {getFlagEmoji(primaryRegion)} VIEW {location?.country?.toUpperCase() || 'GLOBAL'} PLANS
-                </span>
-              </Button>
-            </Link>
-            <Link href="/plans">
-              <Button className="btn-lumbus bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5 font-black text-base px-8 py-4">
-                BROWSE ALL PLANS
+            {location?.detected && location.country && (
+              <Link href={`/plans?region=${primaryRegion.toLowerCase()}`}>
+                <Button className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base px-8 py-4 shadow-xl">
+                  <span className="flex items-center gap-2">
+                    {getFlagEmoji(primaryRegion)} VIEW {location.country.toUpperCase()} PLANS
+                  </span>
+                </Button>
+              </Link>
+            )}
+            <Link href="/destinations">
+              <Button className={`btn-lumbus font-black text-base px-8 py-4 ${location?.detected ? 'bg-white text-foreground border-2 border-foreground/20 hover:bg-foreground/5' : 'bg-foreground text-white hover:bg-foreground/90 shadow-xl'}`}>
+                BROWSE ALL DESTINATIONS
               </Button>
             </Link>
           </div>
