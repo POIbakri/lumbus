@@ -75,8 +75,10 @@ export function PlanCard({ plan, displayPrice, displaySymbol, colorIndex }: Plan
               </div>
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-2xl sm:text-3xl font-black text-foreground leading-none">
+          <div className="text-right flex-shrink-0">
+            <div className={`font-black text-foreground leading-none ${
+              price >= 100 ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'
+            }`}>
               {symbol}{price.toFixed(2)}
             </div>
           </div>

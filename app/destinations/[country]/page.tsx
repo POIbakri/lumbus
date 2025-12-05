@@ -393,7 +393,7 @@ export default function CountryDestinationPage() {
                           <span className="font-bold">{plan.validity_days} days</span>
                         </td>
                         <td className="p-4">
-                          <span className="font-black text-xl text-primary">{currencySymbol}{getPrice(plan).toFixed(2)}</span>
+                          <span className={`font-black text-primary ${getPrice(plan) >= 100 ? 'text-lg' : 'text-xl'}`}>{currencySymbol}{getPrice(plan).toFixed(2)}</span>
                         </td>
                         <td className="p-4 text-center">
                           <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center mx-auto">
@@ -431,8 +431,8 @@ export default function CountryDestinationPage() {
                           <div className="font-black text-2xl">{formatDataAmount(plan.data_gb)}</div>
                           <div className="font-bold text-foreground/70">{plan.validity_days} days</div>
                         </div>
-                        <div className="text-right">
-                          <div className="font-black text-2xl text-primary">{currencySymbol}{getPrice(plan).toFixed(2)}</div>
+                        <div className="text-right flex-shrink-0">
+                          <div className={`font-black text-primary ${getPrice(plan) >= 100 ? 'text-xl' : 'text-2xl'}`}>{currencySymbol}{getPrice(plan).toFixed(2)}</div>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2 mb-4">

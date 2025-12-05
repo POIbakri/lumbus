@@ -458,13 +458,15 @@ export default function PlanDetailPage() {
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex-shrink-0">
                   {discountPercent > 0 && (
                     <div className="text-sm sm:text-base text-foreground/40 line-through mb-1">
                       {currencySymbol}{basePrice.toFixed(2)}
                     </div>
                   )}
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground leading-none">
+                  <div className={`font-black text-foreground leading-none ${
+                    displayPrice >= 100 ? 'text-2xl sm:text-3xl md:text-4xl' : 'text-3xl sm:text-4xl md:text-5xl'
+                  }`}>
                     {currencySymbol}{displayPrice.toFixed(2)}
                   </div>
                   {discountPercent > 0 && (
