@@ -2,31 +2,41 @@ import { Resend } from 'resend';
 
 // App Store Links
 const APP_STORE_URL = 'https://apps.apple.com/app/id6754379325';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.lumbus.app';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.lumbus.app&pcampaignid=web_share';
 
 /**
  * Reusable app store links section for emails
  */
 function getAppStoreSection() {
   return `
-    <div style="margin: 30px 0 0; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
-      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A; text-align: center;">Download the Lumbus App</p>
-      <p style="margin: 0 0 15px; font-size: 14px; color: #666666; text-align: center;">
-        Manage your eSIM, track data usage, and top up on the go.
+    <div style="margin: 40px 0 0; padding: 30px 20px; background-color: #F5F5F5; border-radius: 16px; text-align: center;">
+      <p style="margin: 0 0 8px; font-size: 18px; font-weight: 800; color: #1A1A1A; letter-spacing: -0.5px;">Download the Lumbus App</p>
+      <p style="margin: 0 0 24px; font-size: 14px; color: #666666; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Get instant activation, track your data usage in real-time, and access exclusive app-only deals.
       </p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
-          <td align="center" style="padding: 5px 0;">
-            <a href="${APP_STORE_URL}" style="display: inline-block; margin: 0 5px;">
-              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" style="height: 40px; width: auto;" />
+          <td align="center">
+            <!--[if mso]>
+            <table align="center" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+            <td align="center" valign="top" width="160">
+            <![endif]-->
+            <a href="${APP_STORE_URL}" style="display: inline-block; text-decoration: none; margin: 8px;">
+              <img src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83" alt="Download on the App Store" style="height: 40px; width: auto; display: block;" border="0" />
             </a>
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding: 5px 0;">
-            <a href="${PLAY_STORE_URL}" style="display: inline-block; margin: 0 5px;">
-              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 60px; width: auto;" />
+            <!--[if mso]>
+            </td>
+            <td align="center" valign="top" width="160">
+            <![endif]-->
+            <a href="${PLAY_STORE_URL}" style="display: inline-block; text-decoration: none; margin: 8px;">
+              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" style="height: 54px; width: auto; display: block; margin-top: -7px;" border="0" />
             </a>
+            <!--[if mso]>
+            </td>
+            </tr>
+            </table>
+            <![endif]-->
           </td>
         </tr>
       </table>
@@ -246,14 +256,30 @@ function createEmailTemplate(params: {
                     </tr>
 
                     <tr>
-                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                        <td style="padding: 40px 30px; background-color: #FFFFFF; border-top: 1px solid #E5E5E5;">
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
-                                    <td align="center">
-                                        <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
-                                            Need help? Contact us at <a href="mailto:support@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@lumbus.com</a>
+                                    <td align="center" style="padding-bottom: 24px;">
+                                        <a href="https://getlumbus.com" style="text-decoration: none;">
+                                            <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="48" height="48" style="display: block; width: 48px; height: 48px;" />
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center" style="padding-bottom: 24px;">
+                                        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 500;">
+                                            Need help? <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none; border-bottom: 1px solid #E5E5E5;">support@getlumbus.com</a>
                                         </p>
-                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                        <p style="margin: 0; font-size: 14px; color: #666666;">
+                                            <a href="https://www.instagram.com/getlumbus" style="color: #666666; text-decoration: none; margin: 0 10px;">Instagram</a>
+                                            <a href="https://www.tiktok.com/@getlumbus" style="color: #666666; text-decoration: none; margin: 0 10px;">TikTok</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <p style="margin: 0; font-size: 12px; color: #999999; line-height: 1.6;">
+                                            Lumbus Technologies Limited<br/>
                                             © ${new Date().getFullYear()} Lumbus. All rights reserved.
                                         </p>
                                     </td>
@@ -1196,7 +1222,7 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                                 <tr>
                                     <td align="center">
                                         <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
-                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                            Questions? Contact us at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
                                             © ${new Date().getFullYear()} Lumbus. All rights reserved.
@@ -1543,7 +1569,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                                 <tr>
                                     <td align="center">
                                         <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
-                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                            Questions? Contact us at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
                                             © ${new Date().getFullYear()} Lumbus. All rights reserved.
@@ -1810,7 +1836,7 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
                                 <tr>
                                     <td align="center">
                                         <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
-                                            Questions? Contact us at <a href="mailto:partners@lumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">partners@lumbus.com</a>
+                                            Questions? Contact us at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
                                         </p>
                                         <p style="margin: 0; font-size: 12px; color: #666666;">
                                             © ${new Date().getFullYear()} Lumbus. All rights reserved.
