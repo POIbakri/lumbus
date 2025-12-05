@@ -141,10 +141,10 @@ export function ProductSchema({ plan }: { plan: Plan }) {
     },
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '5.0',
-      bestRating: '5',
-      worstRating: '1',
-      ratingCount: '10000',
+      ratingValue: 5.0,
+      bestRating: 5,
+      worstRating: 1,
+      ratingCount: 10000,
     },
     additionalProperty: [
       {
@@ -328,7 +328,7 @@ export function HowToSchema() {
  * ItemList Schema - Use on plans and destinations pages
  * Helps search engines understand collections
  */
-export function ItemListSchema({ items, listType = 'Product' }: { items: Array<{ name: string; url: string; position: number }>; listType?: string }) {
+export function ItemListSchema({ items, listType = 'Thing' }: { items: Array<{ name: string; url: string; position: number }>; listType?: string }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',

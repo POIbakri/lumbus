@@ -38,6 +38,7 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
   ),
   'EU-30': ({ className }) => RegionalFlags['EU']({ className }),
   'EU-39': ({ className }) => RegionalFlags['EU']({ className }),
+  'EU-42': ({ className }) => RegionalFlags['EU']({ className }),
   'EUROPE': ({ className }) => RegionalFlags['EU']({ className }),
 
   // Asia (stylized)
@@ -49,6 +50,10 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
   ),
   'ASIA-17': ({ className }) => RegionalFlags['ASIA']({ className }),
   'ASIA-20': ({ className }) => RegionalFlags['ASIA']({ className }),
+  'AS-7': ({ className }) => RegionalFlags['ASIA']({ className }),
+  'AS-12': ({ className }) => RegionalFlags['ASIA']({ className }),
+  'AS-20': ({ className }) => RegionalFlags['ASIA']({ className }),
+  'AS-21': ({ className }) => RegionalFlags['ASIA']({ className }),
   'SOUTHEAST-ASIA': ({ className }) => RegionalFlags['ASIA']({ className }),
 
   // Africa
@@ -70,6 +75,8 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
     </svg>
   ),
   'MENA': ({ className }) => RegionalFlags['MIDDLE-EAST']({ className }),
+  'ME-6': ({ className }) => RegionalFlags['MIDDLE-EAST']({ className }),
+  'ME-12': ({ className }) => RegionalFlags['MIDDLE-EAST']({ className }),
 
   // Americas
   'AMERICAS': ({ className }) => (
@@ -80,6 +87,7 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
     </svg>
   ),
   'NORTH-AMERICA': ({ className }) => RegionalFlags['AMERICAS']({ className }),
+  'NA-3': ({ className }) => RegionalFlags['AMERICAS']({ className }),
   'SOUTH-AMERICA': ({ className }) => (
     <svg className={className} viewBox="0 0 36 24">
       <rect fill="#43A047" width="36" height="24"/>
@@ -88,6 +96,7 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
     </svg>
   ),
   'LATAM': ({ className }) => RegionalFlags['SOUTH-AMERICA']({ className }),
+  'SA-18': ({ className }) => RegionalFlags['SOUTH-AMERICA']({ className }),
 
   // Caribbean
   'CARIBBEAN': ({ className }) => (
@@ -97,6 +106,7 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
       <path fill="#43A047" d="M20,8 Q28,6 32,12 Q28,18 20,16 Q24,12 20,8"/>
     </svg>
   ),
+  'CB-25': ({ className }) => RegionalFlags['CARIBBEAN']({ className }),
 
   // Oceania / Pacific
   'OCEANIA': ({ className }) => (
@@ -110,6 +120,38 @@ const RegionalFlags: Record<string, React.FC<{ className?: string }>> = {
     </svg>
   ),
   'PACIFIC': ({ className }) => RegionalFlags['OCEANIA']({ className }),
+  'AUNZ-2': ({ className }) => RegionalFlags['OCEANIA']({ className }),
+
+  // USA & Canada
+  'USCA-2': ({ className }) => (
+    <svg className={className} viewBox="0 0 36 24">
+      <rect fill="#1565C0" width="36" height="24"/>
+      <rect fill="#E53935" width="36" height="3" y="3"/>
+      <rect fill="#FFFFFF" width="36" height="3" y="6"/>
+      <rect fill="#E53935" width="36" height="3" y="9"/>
+      <rect fill="#FFFFFF" width="36" height="3" y="12"/>
+      <rect fill="#E53935" width="36" height="3" y="15"/>
+      <rect fill="#FFFFFF" width="36" height="3" y="18"/>
+      <rect fill="#E53935" width="36" height="3" y="21"/>
+      <rect fill="#1565C0" width="14" height="12"/>
+      <polygon fill="#FFFFFF" points="7,6 7.5,7.5 9,7.5 7.8,8.3 8.2,9.8 7,9 5.8,9.8 6.2,8.3 5,7.5 6.5,7.5"/>
+    </svg>
+  ),
+
+  // Greater China
+  'CN-3': ({ className }) => (
+    <svg className={className} viewBox="0 0 36 24">
+      <rect fill="#DE2910" width="36" height="24"/>
+      <polygon fill="#FFDE00" points="6,4 7.2,7.7 11,7.7 7.9,10 9.1,13.7 6,11.4 2.9,13.7 4.1,10 1,7.7 4.8,7.7"/>
+      <polygon fill="#FFDE00" points="13,2 13.4,3.2 14.7,3.2 13.6,4 14,5.2 13,4.4 12,5.2 12.4,4 11.3,3.2 12.6,3.2"/>
+      <polygon fill="#FFDE00" points="16,4 16.4,5.2 17.7,5.2 16.6,6 17,7.2 16,6.4 15,7.2 15.4,6 14.3,5.2 15.6,5.2"/>
+      <polygon fill="#FFDE00" points="16,8 16.4,9.2 17.7,9.2 16.6,10 17,11.2 16,10.4 15,11.2 15.4,10 14.3,9.2 15.6,9.2"/>
+      <polygon fill="#FFDE00" points="13,11 13.4,12.2 14.7,12.2 13.6,13 14,14.2 13,13.4 12,14.2 12.4,13 11.3,12.2 12.6,12.2"/>
+    </svg>
+  ),
+
+  // Global
+  'GL-139': ({ className }) => RegionalFlags['GLOBAL']({ className }),
 
   // CIS / Central Asia
   'CIS': ({ className }) => (

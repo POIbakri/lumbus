@@ -184,20 +184,20 @@ export default function DestinationsPage() {
 
   // Generate item list for top destinations (for SEO) - prioritized by traffic
   const topDestinations = [
-    { name: 'Japan eSIM', url: 'https://getlumbus.com/destinations/jp', position: 1 },
-    { name: 'Turkey eSIM', url: 'https://getlumbus.com/destinations/tr', position: 2 },
-    { name: 'USA eSIM', url: 'https://getlumbus.com/destinations/us', position: 3 },
-    { name: 'UK eSIM', url: 'https://getlumbus.com/destinations/gb', position: 4 },
-    { name: 'Thailand eSIM', url: 'https://getlumbus.com/destinations/th', position: 5 },
-    { name: 'UAE eSIM', url: 'https://getlumbus.com/destinations/ae', position: 6 },
-    { name: 'Saudi Arabia eSIM', url: 'https://getlumbus.com/destinations/sa', position: 7 },
-    { name: 'Singapore eSIM', url: 'https://getlumbus.com/destinations/sg', position: 8 },
-    { name: 'Malaysia eSIM', url: 'https://getlumbus.com/destinations/my', position: 9 },
-    { name: 'Egypt eSIM', url: 'https://getlumbus.com/destinations/eg', position: 10 },
-    { name: 'Qatar eSIM', url: 'https://getlumbus.com/destinations/qa', position: 11 },
-    { name: 'France eSIM', url: 'https://getlumbus.com/destinations/fr', position: 12 },
-    { name: 'Spain eSIM', url: 'https://getlumbus.com/destinations/es', position: 13 },
-    { name: 'Italy eSIM', url: 'https://getlumbus.com/destinations/it', position: 14 },
+    { name: 'Japan', url: 'https://getlumbus.com/destinations/jp', position: 1 },
+    { name: 'Turkey', url: 'https://getlumbus.com/destinations/tr', position: 2 },
+    { name: 'USA', url: 'https://getlumbus.com/destinations/us', position: 3 },
+    { name: 'UK', url: 'https://getlumbus.com/destinations/gb', position: 4 },
+    { name: 'Thailand', url: 'https://getlumbus.com/destinations/th', position: 5 },
+    { name: 'UAE', url: 'https://getlumbus.com/destinations/ae', position: 6 },
+    { name: 'Saudi Arabia', url: 'https://getlumbus.com/destinations/sa', position: 7 },
+    { name: 'Singapore', url: 'https://getlumbus.com/destinations/sg', position: 8 },
+    { name: 'Malaysia', url: 'https://getlumbus.com/destinations/my', position: 9 },
+    { name: 'Egypt', url: 'https://getlumbus.com/destinations/eg', position: 10 },
+    { name: 'Qatar', url: 'https://getlumbus.com/destinations/qa', position: 11 },
+    { name: 'France', url: 'https://getlumbus.com/destinations/fr', position: 12 },
+    { name: 'Spain', url: 'https://getlumbus.com/destinations/es', position: 13 },
+    { name: 'Italy', url: 'https://getlumbus.com/destinations/it', position: 14 },
   ];
 
   return (
@@ -210,7 +210,10 @@ export default function DestinationsPage() {
           { name: 'eSIM Destinations', url: 'https://getlumbus.com/destinations' },
         ]}
       />
-      <ItemListSchema items={topDestinations} listType="Product" />
+      <ItemListSchema 
+        items={topDestinations} 
+        listType="Place" 
+      />
       <FAQSchema faqs={destinationFaqs} />
 
       <Nav />
