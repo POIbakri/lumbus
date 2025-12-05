@@ -13,7 +13,6 @@ import { Order, Plan } from '@/lib/db';
 import { triggerHaptic } from '@/lib/device-detection';
 import { getCountryInfo } from '@/lib/countries';
 import { authenticatedGet } from '@/lib/api-client';
-import { ReferralWidget } from '@/components/referral-widget';
 import { DataWallet } from '@/components/data-wallet';
 import { AppDownloadBanner } from '@/components/app-download-banner';
 import { SocialMediaLinks } from '@/components/social-media-links';
@@ -1256,10 +1255,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Floating Referral Widget (Mobile FAB) */}
-      <div className="md:hidden">
-        <ReferralWidget floating={true} />
-      </div>
     </div>
   );
 }
