@@ -35,15 +35,19 @@ const faqs = [
     questions: [
       {
         q: 'How do I install my eSIM?',
-        a: 'For iPhone: Go to Settings > Cellular > Add eSIM, then scan the QR code or use the one-tap installation link. For Android: Go to Settings > Network & Internet > SIMs > Download a SIM, then scan the QR code.'
+        a: 'For iPhone: Go to Settings > Cellular > Add eSIM, then scan the QR code or use the one-tap installation link. For Android: Go to Settings > Network & Internet > SIMs > Download a SIM, then scan the QR code. After installation, you MUST enable Data Roaming for the eSIM to work.'
+      },
+      {
+        q: 'Do I need to turn on Data Roaming?',
+        a: 'Yes! Data Roaming MUST be enabled for your eSIM to work. For iPhone: Settings > Cellular > [Your eSIM] > Data Roaming > ON. For Android: Settings > Network & Internet > SIMs > [Your eSIM] > Roaming > ON. Without this, your eSIM won\'t connect to networks.'
       },
       {
         q: 'When should I install my eSIM?',
-        a: 'You can install your eSIM anytime after purchase, but only turn on data when you arrive at your destination. This ensures your validity period starts when you actually need it.'
+        a: 'You can install your eSIM anytime after purchase, but only turn on Data Roaming when you arrive at your destination. This ensures your validity period starts when you actually need it. Install before your trip so you\'re ready to connect when you land.'
       },
       {
         q: 'Can I install the eSIM before my trip?',
-        a: 'Yes! You can install the eSIM before you travel. Just don\'t activate it (turn on cellular data) until you reach your destination. Your validity period starts when you first connect to a network.'
+        a: 'Yes! We recommend installing the eSIM before you travel so it\'s ready to use. Just don\'t enable Data Roaming until you reach your destination. Your validity period starts when you first connect to a network with Data Roaming on.'
       },
       {
         q: 'What if I can\'t scan the QR code?',
@@ -98,11 +102,15 @@ const faqs = [
     questions: [
       {
         q: 'My eSIM isn\'t connecting. What should I do?',
-        a: 'First, ensure data roaming is enabled and your eSIM is set as the primary data line. Try toggling airplane mode on/off, or restart your device. If issues persist, contact our support team.'
+        a: 'The #1 reason is Data Roaming not being enabled! Check: 1) Data Roaming is ON for your eSIM (Settings > Cellular > [Your eSIM] > Data Roaming), 2) Your eSIM is set as the data line, 3) Airplane mode is OFF. Try toggling airplane mode on/off, or restart your device.'
       },
       {
         q: 'I see "No Service" on my device.',
-        a: 'Make sure you\'re in an area with coverage and that your device isn\'t in airplane mode. Check that the eSIM is installed correctly and cellular data is enabled for it.'
+        a: 'First, make sure Data Roaming is enabled for your eSIM - this is the most common cause! Then check: you\'re in an area with coverage, airplane mode is off, and the eSIM is installed correctly. For iPhone: Settings > Cellular > [Your eSIM] > Data Roaming > ON.'
+      },
+      {
+        q: 'I installed the eSIM but have no internet.',
+        a: 'You need to enable Data Roaming! For iPhone: Go to Settings > Cellular > tap your eSIM > turn on Data Roaming. For Android: Settings > Network & Internet > SIMs > tap your eSIM > turn on Roaming. Also make sure your eSIM is selected as the data line.'
       },
       {
         q: 'How do I check my data usage?',

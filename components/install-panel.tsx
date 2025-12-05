@@ -135,9 +135,16 @@ export function InstallPanel({
         {/* Method 2: QR Code */}
         <Card className="bg-cyan border-2 sm:border-3 md:border-4 border-foreground shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
-              {supportsUniversalLink ? 'METHOD 2:' : 'METHOD 1:'} SCAN QR CODE
-            </CardTitle>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl font-black uppercase">
+                {supportsUniversalLink ? 'METHOD 2:' : 'METHOD 1:'} SCAN QR CODE
+              </CardTitle>
+              {!supportsUniversalLink && (
+                <Badge className="bg-foreground text-white font-black uppercase text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-1.5">
+                  RECOMMENDED
+                </Badge>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4">
             <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg sm:rounded-xl space-y-3 sm:space-y-4 border-2 border-foreground/10">

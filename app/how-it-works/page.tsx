@@ -10,7 +10,8 @@ import { HowToSchema, FAQSchema } from '@/components/structured-data';
 export default function HowItWorksPage() {
   // FAQs for schema
   const howItWorksFAQs = [
-    { q: 'When should I install my eSIM?', a: 'You can install your eSIM anytime after purchase, but only activate it (turn on data) when you arrive at your destination to start your validity period.' },
+    { q: 'Do I need to enable Data Roaming?', a: 'Yes! Data Roaming MUST be turned ON for your eSIM to work. For iPhone: Settings > Cellular > [Your eSIM] > Data Roaming > ON. For Android: Settings > Network > SIMs > [Your eSIM] > Roaming > ON.' },
+    { q: 'When should I install my eSIM?', a: 'Install your eSIM anytime after purchase, but only enable Data Roaming when you arrive at your destination. This ensures your validity period starts when you actually need it.' },
     { q: 'Do I need to remove my primary SIM?', a: 'No! Your eSIM works alongside your existing SIM. You can switch between them in your settings or use both simultaneously (calls on primary, data on eSIM).' },
     { q: 'What if I run out of data?', a: 'You can purchase a top-up plan from your dashboard. Additional data packages can be added anytime during your validity period.' },
     { q: 'Can I use hotspot/tethering?', a: 'Yes! All our eSIM plans support hotspot and tethering, so you can share your connection with other devices.' }
@@ -180,7 +181,7 @@ export default function HowItWorksPage() {
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4 sm:mb-6">GET CONNECTED</h2>
               <p className="text-xl font-bold text-foreground/70 mb-6">
-                Receive your eSIM instantly. Activate it by scanning the QR code or using the one-tap installation on iOS 17.4+.
+                Receive your eSIM instantly. Activate it by scanning the QR code or using the one-tap installation on iOS 17.4+. Then enable Data Roaming!
               </p>
               <ul className="space-y-3">
                 <li className="flex gap-3">
@@ -190,6 +191,10 @@ export default function HowItWorksPage() {
                 <li className="flex gap-3">
                   <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                   <span className="font-bold">QR code or one-tap activation</span>
+                </li>
+                <li className="flex gap-3">
+                  <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  <span className="font-bold">Turn on Data Roaming to connect</span>
                 </li>
                 <li className="flex gap-3">
                   <svg className="w-5 h-5 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>

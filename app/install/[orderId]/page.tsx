@@ -309,23 +309,23 @@ export default function InstallPage() {
                 PLAN DETAILS
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6 sm:p-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="bg-mint p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">PLAN</p>
-                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
+            <CardContent className="p-4 sm:p-6 md:p-8">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="bg-mint p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border-2 border-foreground/20 overflow-hidden">
+                  <p className="font-black uppercase text-xs text-foreground/60 mb-1">PLAN</p>
+                  <p className="font-black text-sm sm:text-base md:text-lg text-foreground leading-tight truncate">{order.plan.name.replace(/^["']|["']$/g, '')}</p>
                 </div>
-                <div className="bg-cyan p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">REGION</p>
-                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.region}</p>
+                <div className="bg-cyan p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border-2 border-foreground/20 overflow-hidden">
+                  <p className="font-black uppercase text-xs text-foreground/60 mb-1">REGION</p>
+                  <p className="font-black text-sm sm:text-base md:text-lg text-foreground leading-tight truncate">{order.plan.region}</p>
                 </div>
-                <div className="bg-yellow p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">DATA INCLUDED</p>
-                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.dataGb} GB</p>
+                <div className="bg-yellow p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border-2 border-foreground/20 overflow-hidden">
+                  <p className="font-black uppercase text-xs text-foreground/60 mb-1">DATA</p>
+                  <p className="font-black text-sm sm:text-base md:text-lg text-foreground leading-tight">{order.plan.dataGb} GB</p>
                 </div>
-                <div className="bg-purple p-5 sm:p-6 rounded-xl border-3 border-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  <p className="font-black uppercase text-xs sm:text-sm text-foreground/60 mb-2">VALIDITY PERIOD</p>
-                  <p className="font-black text-base sm:text-lg md:text-xl text-foreground leading-tight">{order.plan.validityDays} Days</p>
+                <div className="bg-purple p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border-2 border-foreground/20 overflow-hidden">
+                  <p className="font-black uppercase text-xs text-foreground/60 mb-1">VALIDITY</p>
+                  <p className="font-black text-sm sm:text-base md:text-lg text-foreground leading-tight">{order.plan.validityDays} Days</p>
                 </div>
               </div>
             </CardContent>
@@ -339,8 +339,37 @@ export default function InstallPage() {
             platform={deviceInfo.platform}
           />
 
+          {/* Data Roaming Required - Prominent Notice */}
+          <Card className="mt-6 sm:mt-8 bg-mint border-3 sm:border-4 border-primary shadow-xl">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-primary rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" /></svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black uppercase text-base sm:text-lg md:text-xl text-foreground mb-2">
+                    TURN ON DATA ROAMING
+                  </h3>
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 mb-3">
+                    After installing, you MUST enable data roaming for your eSIM to work:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                    <div className="bg-white/60 p-3 rounded-lg">
+                      <p className="font-black text-xs uppercase text-foreground/60 mb-1">iPhone/iPad</p>
+                      <p className="text-xs sm:text-sm font-bold text-foreground">Settings → Cellular → Your eSIM → Data Roaming → ON</p>
+                    </div>
+                    <div className="bg-white/60 p-3 rounded-lg">
+                      <p className="font-black text-xs uppercase text-foreground/60 mb-1">Android</p>
+                      <p className="text-xs sm:text-sm font-bold text-foreground">Settings → Network → SIMs → Your eSIM → Roaming → ON</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Important Tips Section */}
-          <Card className="mt-6 sm:mt-8 bg-yellow border-3 sm:border-4 border-foreground shadow-xl">
+          <Card className="mt-4 sm:mt-6 bg-yellow border-3 sm:border-4 border-foreground shadow-xl">
             <CardHeader>
               <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-foreground">
                 IMPORTANT TIPS
@@ -353,7 +382,7 @@ export default function InstallPage() {
                     <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">When to activate</h3>
                   </div>
-                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-9">
                     Install now, but turn on data roaming only when you arrive at your destination to start the validity period.
                   </p>
                 </div>
@@ -363,7 +392,7 @@ export default function InstallPage() {
                     <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
                     <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Keep your SIM</h3>
                   </div>
-                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-9">
                     Don't remove your physical SIM! The eSIM works alongside it. Switch between them in settings.
                   </p>
                 </div>
@@ -373,7 +402,7 @@ export default function InstallPage() {
                     <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
                     <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Save the QR code</h3>
                   </div>
-                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-9">
                     Take a screenshot of the QR code so you can install later if needed (also in your email).
                   </p>
                 </div>
@@ -383,7 +412,7 @@ export default function InstallPage() {
                     <svg className="w-6 h-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
                     <h3 className="font-black uppercase text-sm sm:text-base text-foreground leading-tight">Need more data?</h3>
                   </div>
-                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-11">
+                  <p className="text-sm sm:text-base font-bold text-foreground/80 leading-relaxed pl-9">
                     You can purchase top-up plans from your dashboard anytime during the validity period.
                   </p>
                 </div>
