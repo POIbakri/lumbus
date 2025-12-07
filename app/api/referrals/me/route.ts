@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
-import { getUserReferralStats } from '@/lib/referral';
+import { getUserReferralStats, ensureUserProfile } from '@/lib/referral';
 import { requireUserAuth } from '@/lib/server-auth';
 
 /**
@@ -22,18 +22,28 @@ export async function GET(req: NextRequest) {
 
     const userId = auth.user.id;
 
-    // Get user profile with referral code
-    const { data: profile, error: profileError } = await supabase
+    // Get or create user profile with referral code
+    // This ensures users who signed up before profile creation was added still get a code
+    let profile;
+    const { data: existingProfile, error: profileError } = await supabase
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
       .single();
 
-    if (profileError || !profile) {
-      return NextResponse.json(
-        { error: 'User profile not found' },
-        { status: 404 }
-      );
+    if (profileError || !existingProfile) {
+      // Profile doesn't exist - create one (handles legacy users and edge cases)
+      try {
+        profile = await ensureUserProfile(userId);
+      } catch (createError) {
+        console.error('Failed to create user profile:', createError);
+        return NextResponse.json(
+          { error: 'Failed to create user profile' },
+          { status: 500 }
+        );
+      }
+    } else {
+      profile = existingProfile;
     }
 
     // Get referral statistics

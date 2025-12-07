@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWelcomeEmail } from '@/lib/email';
 import { supabase } from '@/lib/db';
+import { ensureUserProfile } from '@/lib/referral';
 
 /**
  * Supabase Auth Webhook Handler
@@ -95,6 +96,15 @@ async function handleNewUser(user: {
   }
 
   console.log(`Supabase Auth Webhook: Processing new user ${userId} (${email})`);
+
+  // Create user profile with referral code (for all signup methods: email, Google, Apple)
+  try {
+    await ensureUserProfile(userId);
+    console.log(`Supabase Auth Webhook: User profile created for ${userId}`);
+  } catch (profileError) {
+    console.error(`Supabase Auth Webhook: Failed to create user profile for ${userId}:`, profileError);
+    // Don't throw - continue with welcome email
+  }
 
   // Check if user has any orders (they'll get order confirmation instead)
   const { count: orderCount } = await supabase

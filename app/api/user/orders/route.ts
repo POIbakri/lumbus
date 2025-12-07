@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
         activation_code,
         iccid,
         activated_at,
+        expires_at,
         data_usage_bytes,
         data_remaining_bytes,
         last_usage_update,
@@ -80,11 +81,94 @@ export async function GET(req: NextRequest) {
 
     console.log(`[User Orders API] Successfully fetched ${orders?.length || 0} orders`);
 
-    // Format the response to ensure plans is always an object
+    // Helper function to calculate time remaining
+    const calculateTimeRemaining = (order: any) => {
+      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+      const validityDays = plan?.validity_days || 0;
+
+      // If not activated, return full validity
+      if (!order.activated_at) {
+        return {
+          days: validityDays,
+          hours: 0,
+          minutes: 0,
+          total_seconds: validityDays * 24 * 60 * 60,
+          is_expired: false,
+          formatted: `${validityDays}d`,
+        };
+      }
+
+      // Calculate expiry date from expires_at or activated_at + validity_days
+      let expiryDate: Date;
+      if (order.expires_at) {
+        expiryDate = new Date(order.expires_at);
+        // Validate the parsed date - fall back to calculation if invalid
+        if (isNaN(expiryDate.getTime())) {
+          const activationDate = new Date(order.activated_at);
+          expiryDate = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
+        }
+      } else {
+        const activationDate = new Date(order.activated_at);
+        expiryDate = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
+      }
+
+      // Final validation - if still invalid, return full validity as fallback
+      if (isNaN(expiryDate.getTime())) {
+        return {
+          days: validityDays,
+          hours: 0,
+          minutes: 0,
+          total_seconds: validityDays * 24 * 60 * 60,
+          is_expired: false,
+          formatted: `${validityDays}d`,
+        };
+      }
+
+      const now = new Date();
+      const totalMs = expiryDate.getTime() - now.getTime();
+
+      if (totalMs <= 0) {
+        return {
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          total_seconds: 0,
+          is_expired: true,
+          formatted: 'EXP',
+        };
+      }
+
+      const totalSeconds = Math.floor(totalMs / 1000);
+      const days = Math.floor(totalMs / (24 * 60 * 60 * 1000));
+      const hours = Math.floor((totalMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+      const minutes = Math.floor((totalMs % (60 * 60 * 1000)) / (60 * 1000));
+
+      // Format: days if >= 1 day, hours if < 1 day, minutes if < 1 hour
+      let formatted: string;
+      if (days >= 1) {
+        formatted = `${days}d`;
+      } else if (hours >= 1) {
+        formatted = `${hours}h`;
+      } else {
+        formatted = `${minutes}m`;
+      }
+
+      return {
+        days,
+        hours,
+        minutes,
+        total_seconds: totalSeconds,
+        is_expired: false,
+        formatted,
+      };
+    };
+
+    // Format the response to ensure plans is always an object and include time_remaining
     const formattedOrders = orders?.map((order: any) => ({
       ...order,
       plan: Array.isArray(order.plans) ? order.plans[0] : order.plans,
       plans: undefined, // Remove the plans array
+      time_remaining: calculateTimeRemaining(order),
     })) || [];
 
     // For test users: check if cron has populated data, otherwise apply on-the-fly simulation

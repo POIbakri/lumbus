@@ -270,24 +270,82 @@ export default function DashboardPage() {
     return Math.min(100, (remaining / total) * 100);
   };
 
-  const getDaysRemaining = (order: OrderWithPlan) => {
+  // Get time remaining with precise hours/minutes support
+  const getTimeRemaining = (order: OrderWithPlan): { days: number; hours: number; minutes: number; totalMs: number } => {
     const validityDays = order.plan?.validity_days || 0;
 
-    // If eSIM hasn't been activated yet (no activated_at date), return full validity period
+    // If eSIM hasn't been activated yet, return full validity period
     if (!order.activated_at) {
-      return validityDays;
+      return { days: validityDays, hours: 0, minutes: 0, totalMs: validityDays * 24 * 60 * 60 * 1000 };
     }
 
-    // Calculate from activation date
-    const activationDate = new Date(order.activated_at);
-    const expiry = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
+    // Use expires_at if available (more accurate), otherwise calculate from activated_at
+    let expiryDate: Date;
+    const orderWithExpiry = order as OrderWithPlan & { expires_at?: string };
+    if (orderWithExpiry.expires_at) {
+      expiryDate = new Date(orderWithExpiry.expires_at);
+      // Validate the parsed date - fall back to calculation if invalid
+      if (isNaN(expiryDate.getTime())) {
+        const activationDate = new Date(order.activated_at);
+        expiryDate = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
+      }
+    } else {
+      const activationDate = new Date(order.activated_at);
+      expiryDate = new Date(activationDate.getTime() + validityDays * 24 * 60 * 60 * 1000);
+    }
+
+    // Final validation - if still invalid, return full validity as fallback
+    if (isNaN(expiryDate.getTime())) {
+      return { days: validityDays, hours: 0, minutes: 0, totalMs: validityDays * 24 * 60 * 60 * 1000 };
+    }
+
     const now = new Date();
-    const remaining = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return remaining; // Can be negative for expired plans
+    const totalMs = expiryDate.getTime() - now.getTime();
+
+    if (totalMs <= 0) {
+      return { days: 0, hours: 0, minutes: 0, totalMs: 0 };
+    }
+
+    const days = Math.floor(totalMs / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((totalMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+    const minutes = Math.floor((totalMs % (60 * 60 * 1000)) / (60 * 1000));
+
+    return { days, hours, minutes, totalMs };
+  };
+
+  // Format time remaining for display
+  const formatTimeRemaining = (order: OrderWithPlan): string => {
+    const { days, hours, minutes, totalMs } = getTimeRemaining(order);
+
+    if (totalMs <= 0) {
+      return 'EXP';
+    }
+
+    // If more than 1 day, show days
+    if (days >= 1) {
+      return `${days}d`;
+    }
+
+    // If less than 1 day but more than 1 hour, show hours
+    if (hours >= 1) {
+      return `${hours}h`;
+    }
+
+    // If less than 1 hour, show minutes
+    return `${minutes}m`;
+  };
+
+  const getDaysRemaining = (order: OrderWithPlan) => {
+    const { totalMs } = getTimeRemaining(order);
+    // Return -1 for expired, otherwise use ceil to match original behavior
+    // This ensures styling thresholds work correctly (e.g., <= 5 days warning)
+    if (totalMs <= 0) return -1;
+    // Use ceil to round up - 12 hours remaining = 1 day for styling purposes
+    return Math.ceil(totalMs / (24 * 60 * 60 * 1000));
   };
 
   const isOrderExpired = (order: OrderWithPlan) => {
-    return getDaysRemaining(order) <= 0;
+    return getTimeRemaining(order).totalMs <= 0;
   };
 
   const copyReferralLink = async () => {
@@ -722,7 +780,7 @@ export default function DashboardPage() {
                           <div className={`${daysRemaining <= 5 && order.activated_at ? 'bg-destructive/20' : 'bg-white/60'} rounded-lg sm:rounded-xl p-2 sm:p-3 text-center`}>
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Left</div>
                             <div className={`text-base sm:text-lg font-black ${daysRemaining <= 0 ? 'text-destructive' : daysRemaining <= 5 && order.activated_at ? 'text-destructive' : 'text-foreground'}`}>
-                              {daysRemaining <= 0 ? 'EXP' : `${daysRemaining}d`}
+                              {formatTimeRemaining(order)}
                             </div>
                           </div>
                         </div>

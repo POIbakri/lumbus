@@ -71,6 +71,7 @@ export interface Order {
   data_remaining_bytes: number | null;
   last_usage_update: string | null;
   activated_at: string | null;
+  expires_at: string | null;
   amount_cents?: number;
   currency?: string;
   paid_at?: string | null;

@@ -44,6 +44,45 @@ function buildLpaString(smdpAddress: string, activationCode: string): string {
   return `LPA:1$${smdpAddress}$${activationCode}`;
 }
 
+/**
+ * Parse webhook timestamp handling various formats from eSIM Access
+ * Handles: "2025-09-11T13:28:09+0000" (no colon in timezone)
+ *          "2025-09-11T13:28:09+00:00" (ISO 8601 with colon)
+ *          "2025-09-11 13:28:09 UTC" (space-separated with UTC)
+ * Returns null if parsing fails
+ */
+function parseWebhookTimestamp(timestamp: string): Date | null {
+  if (!timestamp) return null;
+
+  // Try direct parsing first (works for standard ISO 8601)
+  let parsed = new Date(timestamp);
+  if (!isNaN(parsed.getTime())) {
+    return parsed;
+  }
+
+  // Handle "+0000" format (no colon) - convert to "+00:00"
+  // Matches patterns like +0000, -0530, +1200
+  const fixedTimezone = timestamp.replace(/([+-])(\d{2})(\d{2})$/, '$1$2:$3');
+  if (fixedTimezone !== timestamp) {
+    parsed = new Date(fixedTimezone);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  // Handle "YYYY-MM-DD HH:mm:ss UTC" format
+  const utcFormat = timestamp.replace(' UTC', 'Z').replace(' ', 'T');
+  if (utcFormat !== timestamp) {
+    parsed = new Date(utcFormat);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  console.error('[parseWebhookTimestamp] Failed to parse timestamp:', timestamp);
+  return null;
+}
+
 interface WebhookPayload {
   notifyType: 'CHECK_HEALTH' | 'ORDER_STATUS' | 'SMDP_EVENT' | 'ESIM_STATUS' | 'DATA_USAGE' | 'VALIDITY_USAGE';
   eventGenerateTime?: string;
@@ -125,7 +164,7 @@ export async function POST(req: NextRequest) {
         break;
 
       case 'SMDP_EVENT':
-        await handleSmdpEvent(payload.content);
+        await handleSmdpEvent(payload.content, payload.eventGenerateTime);
         break;
 
       case 'ESIM_STATUS':
@@ -276,17 +315,56 @@ async function handleSmdpEvent(content: {
   orderNo: string;
   esimTranNo: string;
   transactionId?: string;
-}) {
+}, eventGenerateTime?: string) {
   // Update order based on SM-DP+ status
   if (content.smdpStatus === 'ENABLED') {
+    // Get order to calculate expires_at from validity_days
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id, plan_id')
+      .eq('iccid', content.iccid)
+      .maybeSingle();
+
+    if (!order) {
+      // No order found with this ICCID - nothing to update
+      console.log(`[SMDP_EVENT] No order found for ICCID: ${content.iccid}`);
+      return;
+    }
+
+    // Get plan validity days
+    const { data: plan } = await supabase
+      .from('plans')
+      .select('validity_days')
+      .eq('id', order.plan_id)
+      .maybeSingle();
+
+    // Use eventGenerateTime from webhook (when eSIM was actually activated)
+    // Fall back to server time if not provided or invalid
+    let activatedAt: Date;
+    if (eventGenerateTime) {
+      const parsedTime = parseWebhookTimestamp(eventGenerateTime);
+      activatedAt = parsedTime || new Date();
+    } else {
+      activatedAt = new Date();
+    }
+
+    const expiresAt = plan?.validity_days
+      ? new Date(activatedAt.getTime() + plan.validity_days * 24 * 60 * 60 * 1000)
+      : null;
+
     // eSIM has been activated on the device
-    await supabase
+    const { error } = await supabase
       .from('orders')
       .update({
         status: 'active',
-        activated_at: new Date().toISOString(),
+        activated_at: activatedAt.toISOString(),
+        expires_at: expiresAt?.toISOString() || null,
       })
       .eq('iccid', content.iccid);
+
+    if (error) {
+      console.error('[SMDP_EVENT] Failed to update order:', error.message, { iccid: content.iccid });
+    }
   }
 }
 
@@ -456,6 +534,24 @@ async function handleValidityUsage(content: {
     return;
   }
 
+  // Update expires_at with the exact expiration time from eSIM Access
+  // This is more accurate than our calculated value
+  try {
+    const expiresAt = new Date(content.expiredTime);
+    if (!isNaN(expiresAt.getTime())) {
+      const { error } = await supabase
+        .from('orders')
+        .update({ expires_at: expiresAt.toISOString() })
+        .eq('iccid', content.iccid);
+
+      if (error) {
+        console.error('[VALIDITY_USAGE] Failed to update expires_at:', error.message, { iccid: content.iccid });
+      }
+    }
+  } catch (err) {
+    console.error('[VALIDITY_USAGE] Error parsing expiredTime:', err);
+  }
+
   // Send email notification to user about expiring plan
   try {
     // Get plan and user data separately (avoid joins)
@@ -472,8 +568,13 @@ async function handleValidityUsage(content: {
       .maybeSingle();
 
     if (plan && user && user.email) {
-      // Format expiry date
+      // Validate and format expiry date
       const expiryDate = new Date(content.expiredTime);
+      if (isNaN(expiryDate.getTime())) {
+        console.error('[VALIDITY_USAGE] Invalid expiredTime, skipping email:', content.expiredTime);
+        return;
+      }
+
       const formattedDate = expiryDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
