@@ -252,3 +252,45 @@ export interface AppleNotificationProcessingLog {
   processing_duration_ms: number | null;
   created_at: string;
 }
+
+// Push notification types
+export type NotificationType =
+  | 'data_50'
+  | 'data_80'
+  | 'data_90'
+  | 'data_100'
+  | 'validity_1_day'
+  | 'validity_expired'
+  | 'esim_ready'
+  | 'esim_activated';
+
+export interface UserPushToken {
+  id: string;
+  user_id: string;
+  push_token: string;
+  platform: 'ios' | 'android';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UsageNotificationSent {
+  id: string;
+  order_id: string;
+  user_id: string;
+  notification_type: NotificationType;
+  threshold_value: number | null;
+  sent_at: string;
+  push_sent: boolean;
+  email_sent: boolean;
+}
+
+export interface EsimUsage {
+  id: string;
+  order_id: string;
+  data_used_bytes: number;
+  data_remaining_bytes: number;
+  total_bytes: number;
+  usage_percent: number;
+  source: 'webhook' | 'cron' | 'api_refresh';
+  recorded_at: string;
+}

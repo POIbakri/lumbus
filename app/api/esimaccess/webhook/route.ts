@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { getOrderStatus, generateQrCodeData } from '@/lib/esimaccess';
 import { sendOrderConfirmationEmail, sendDataUsageAlert, sendPlanExpiryAlert } from '@/lib/email';
+import { sendDataUsagePush, sendValidityPush, sendEsimReadyPush, sendEsimActivatedPush } from '@/lib/push-notifications';
 
 /**
  * eSIM Access Webhook Handler
@@ -296,6 +297,14 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
           },
           installUrl: installUrl,
         });
+
+        // Send push notification for eSIM ready
+        await sendEsimReadyPush({
+          userId: order.user_id,
+          orderId: order.id,
+          planName: plan.name,
+          dataGb: plan.data_gb,
+        });
       }
     }
   } catch (error) {
@@ -321,7 +330,7 @@ async function handleSmdpEvent(content: {
     // Get order to calculate expires_at from validity_days
     const { data: order } = await supabase
       .from('orders')
-      .select('id, plan_id')
+      .select('id, plan_id, user_id')
       .eq('iccid', content.iccid)
       .maybeSingle();
 
@@ -364,6 +373,26 @@ async function handleSmdpEvent(content: {
 
     if (error) {
       console.error('[SMDP_EVENT] Failed to update order:', error.message, { iccid: content.iccid });
+    } else {
+      // Send push notification for eSIM activated
+      try {
+        const { data: planData } = await supabase
+          .from('plans')
+          .select('name')
+          .eq('id', order.plan_id)
+          .maybeSingle();
+
+        if (planData) {
+          await sendEsimActivatedPush({
+            userId: order.user_id,
+            orderId: order.id,
+            planName: planData.name,
+          });
+        }
+      } catch (pushError) {
+        // Don't throw - webhook should still succeed even if push fails
+        console.error('[SMDP_EVENT] Failed to send push notification:', pushError);
+      }
     }
   }
 }
@@ -504,9 +533,18 @@ async function handleDataUsage(content: {
         dataRemainingGB: dataRemainingGB,
         totalDataGB: totalDataGB,
       });
+
+      // Send push notification for data usage
+      await sendDataUsagePush({
+        userId: order.user_id,
+        orderId: order.id,
+        planName: plan.name,
+        usagePercent: usagePercent,
+        dataRemainingGB: dataRemainingGB,
+      });
     }
   } catch (emailError) {
-    // Don't throw - webhook should still succeed even if email fails
+    // Don't throw - webhook should still succeed even if email/push fails
   }
 }
 
@@ -587,8 +625,17 @@ async function handleValidityUsage(content: {
         daysRemaining: content.remain,
         expiryDate: formattedDate,
       });
+
+      // Send push notification for validity expiry
+      await sendValidityPush({
+        userId: order.user_id,
+        orderId: order.id,
+        planName: plan.name,
+        daysRemaining: content.remain,
+        expiryDate: formattedDate,
+      });
     }
   } catch (emailError) {
-    // Don't throw - webhook should still succeed even if email fails
+    // Don't throw - webhook should still succeed even if email/push fails
   }
 }

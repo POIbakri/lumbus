@@ -54,6 +54,81 @@ function getStripeClient(mode: StripeMode = 'live') {
   return stripeLive;
 }
 
+/**
+ * Get or create a Stripe customer for the user.
+ * Uses separate customer IDs for live vs test mode.
+ */
+async function getOrCreateStripeCustomer(
+  userId: string,
+  email: string,
+  mode: StripeMode
+): Promise<string> {
+  // Check if user already has a Stripe customer ID for this mode
+  const { data: userData, error: fetchError } = await supabase
+    .from('users')
+    .select('stripe_customer_id, stripe_customer_id_test')
+    .eq('id', userId)
+    .single();
+
+  if (fetchError) {
+    console.error('[Checkout] Failed to fetch user for Stripe customer:', fetchError);
+    throw new Error('Failed to fetch user data');
+  }
+
+  // Get the appropriate customer ID based on mode
+  const existingCustomerId = mode === 'test'
+    ? userData?.stripe_customer_id_test
+    : userData?.stripe_customer_id;
+
+  if (existingCustomerId) {
+    // Verify the customer still exists in Stripe (handles edge case of deleted customers)
+    try {
+      const stripe = getStripeClient(mode);
+      const customer = await stripe.customers.retrieve(existingCustomerId);
+
+      // Check if customer was deleted
+      if ((customer as any).deleted) {
+        console.log(`[Checkout] Stripe customer ${existingCustomerId} was deleted, creating new one`);
+      } else {
+        console.log(`[Checkout] Using existing Stripe customer: ${existingCustomerId}`);
+        return existingCustomerId;
+      }
+    } catch (stripeError: any) {
+      // Customer doesn't exist, will create a new one
+      console.log(`[Checkout] Stripe customer ${existingCustomerId} not found, creating new one`);
+    }
+  }
+
+  // Create new Stripe customer
+  console.log(`[Checkout] Creating new Stripe customer for user ${userId} (${mode} mode)`);
+  const stripe = getStripeClient(mode);
+  const customer = await stripe.customers.create({
+    email: email,
+    metadata: {
+      userId: userId,
+      mode: mode,
+    },
+  });
+
+  // Save the customer ID to the database
+  const updateData = mode === 'test'
+    ? { stripe_customer_id_test: customer.id }
+    : { stripe_customer_id: customer.id };
+
+  const { error: updateError } = await supabase
+    .from('users')
+    .update(updateData)
+    .eq('id', userId);
+
+  if (updateError) {
+    // Log but don't fail - the checkout can still proceed
+    console.error('[Checkout] Failed to save Stripe customer ID:', updateError);
+  }
+
+  console.log(`[Checkout] Created Stripe customer: ${customer.id}`);
+  return customer.id;
+}
+
 const checkoutSchema = z.object({
   planId: z.string().uuid(),
   email: z.string().email().optional(),
@@ -441,6 +516,15 @@ export async function POST(req: NextRequest) {
     const stripeMode: StripeMode = (user as any).is_test_user ? 'test' : 'live';
     const orderType = isTopUp ? 'Top-up' : 'New eSIM';
 
+    // Get or create Stripe customer for this user
+    // Falls back to customer_email if customer creation fails (defensive)
+    let stripeCustomerId: string | null = null;
+    try {
+      stripeCustomerId = await getOrCreateStripeCustomer(user.id, user.email, stripeMode);
+    } catch (customerError) {
+      console.error('[Checkout] Failed to get/create Stripe customer, falling back to customer_email:', customerError);
+    }
+
     // Build discount description
     let discountDescription = '';
     if (applyDiscount) {
@@ -475,11 +559,16 @@ export async function POST(req: NextRequest) {
     console.log('[Checkout] Calling Stripe API...', {
       currency: userCurrency.toLowerCase(),
       amount: stripeAmount,
-      customerEmail: user.email,
+      stripeCustomerId: stripeCustomerId || '(using email fallback)',
       planName: plan.name,
       stripeMode,
       userId: user.id,
     });
+
+    // Build customer options - prefer customer ID, fall back to email
+    const customerOptions: { customer: string } | { customer_email: string } = stripeCustomerId
+      ? { customer: stripeCustomerId }
+      : { customer_email: user.email };
 
     const session = await getStripeClient(stripeMode).checkout.sessions.create({
       payment_method_types: ['card'],
@@ -489,7 +578,7 @@ export async function POST(req: NextRequest) {
       cancel_url: isTopUp
         ? `${process.env.NEXT_PUBLIC_APP_URL}/topup/${existingOrderId}?canceled=true`
         : `${process.env.NEXT_PUBLIC_APP_URL}/plans?canceled=true`,
-      customer_email: user.email,
+      ...customerOptions,
       metadata: {
         orderId: order.id,
         planId: planId,
