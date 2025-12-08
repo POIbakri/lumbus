@@ -8,15 +8,15 @@
  *
  * For test users: Uses cron-populated data from DB, with on-the-fly
  * simulation as fallback if cron hasn't run yet.
- * For real users: Fetches from eSIM Access API
  *
- * Note: eSIM Access updates usage data every 2-3 hours, so "real-time"
- * means latest available data from their system, not instant usage.
+ * For real users:
+ * 1. First tries the Real-time Balance API (instant carrier data)
+ * 2. Falls back to standard Usage API (2-3 hour delay) if not supported
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
-import { checkEsimUsage } from '@/lib/esimaccess';
+import { checkEsimUsage, getRealtimeBalance } from '@/lib/esimaccess';
 import { requireUserAuth } from '@/lib/server-auth';
 import { simulateTestUserUsage } from '@/lib/test-simulation';
 
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     // Get order with usage data
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('id, user_id, esim_tran_no, iccid, plan_id, data_usage_bytes, data_remaining_bytes, last_usage_update, plans(data_gb)')
+      .select('id, user_id, esim_tran_no, iccid, plan_id, data_usage_bytes, data_remaining_bytes, total_bytes, last_usage_update, plans(data_gb)')
       .eq('id', orderId)
       .single();
 
@@ -154,20 +154,77 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Get plan data for calculations
+    const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+    const planTotalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
+
     try {
-      // Fetch real-time usage from eSIM Access API
+      // STEP 1: Try Real-time Balance API first (instant carrier data)
+      // This is a private API that queries the carrier directly
+      // Limitations: Only works for GOT_RESOURCE/IN_USE/SUSPENDED, dataType=1, some carriers
+      console.log('[Usage API] Attempting real-time balance query for:', order.esim_tran_no);
+      const realtimeData = await getRealtimeBalance(order.esim_tran_no);
+
+      if (realtimeData?.dataBalance) {
+        // Real-time data available!
+        const dataRemainingBytes = realtimeData.dataBalance.dataRemaining;
+        const lastUpdateTime = realtimeData.dataBalance.lastUpdateTime;
+
+        // We need totalData to calculate usage - get from DB or plan
+        // Real-time API only returns remaining, not total
+        // Use ?? instead of || to handle 0 as a valid value
+        const totalDataBytes = order.total_bytes ?? planTotalDataBytes;
+        const dataUsedBytes = Math.max(0, totalDataBytes - dataRemainingBytes);
+
+        console.log('[Usage API] Real-time balance SUCCESS:', {
+          esimTranNo: order.esim_tran_no,
+          dataRemainingBytes,
+          totalDataBytes,
+          dataUsedBytes,
+          lastUpdateTime,
+        });
+
+        // Update database with real-time data
+        await supabase
+          .from('orders')
+          .update({
+            data_usage_bytes: dataUsedBytes,
+            data_remaining_bytes: dataRemainingBytes,
+            last_usage_update: lastUpdateTime,
+          })
+          .eq('id', orderId);
+
+        // Calculate response values
+        const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
+        const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
+        const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
+        const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
+
+        return NextResponse.json({
+          success: true,
+          realtime: true, // Flag indicating this is live carrier data
+          data_usage_bytes: dataUsedBytes,
+          data_remaining_bytes: dataRemainingBytes,
+          data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
+          data_total_gb: parseFloat(totalDataGB.toFixed(2)),
+          data_remaining_gb: parseFloat(dataRemainingGB.toFixed(2)),
+          usage_percent: parseFloat(usagePercent.toFixed(1)),
+          last_update: lastUpdateTime,
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      // STEP 2: Fallback to standard Usage API (2-3 hour delay)
+      console.log('[Usage API] Real-time not available, falling back to standard usage API');
       const usageData = await checkEsimUsage([order.esim_tran_no]);
 
       if (!usageData || usageData.length === 0) {
         // Return full plan data if no usage data available yet
-        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-        const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
-
         return NextResponse.json(
           {
             error: 'No usage data available yet',
             data_usage_bytes: 0,
-            data_remaining_bytes: totalDataBytes, // Full data available
+            data_remaining_bytes: planTotalDataBytes,
             last_update: null,
           },
           { status: 200 }
@@ -179,8 +236,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       const totalDataBytes = usage.totalData;
       let dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
 
-      // Handle edge case: if remaining is less than 1MB (1048576 bytes), consider it depleted
-      // Some providers report tiny amounts (like a few KB) even when SIM is depleted
+      // Handle edge case: if remaining is less than 1MB, consider it depleted
       const DEPLETION_THRESHOLD = 1048576; // 1 MB in bytes
       if (dataRemainingBytes < DEPLETION_THRESHOLD && dataRemainingBytes > 0) {
         console.log('[Usage API] Data remaining below threshold, setting to 0:', {
@@ -190,7 +246,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         dataRemainingBytes = 0;
       }
 
-      console.log('[Usage API] Raw data from eSIM Access:', {
+      console.log('[Usage API] Standard usage API data:', {
         esimTranNo: order.esim_tran_no,
         dataUsedBytes,
         totalDataBytes,
@@ -209,8 +265,6 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         })
         .eq('id', orderId);
 
-      console.log('[Usage API] Database updated successfully for order:', orderId);
-
       // Calculate percentage and GB values for response
       const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
       const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
@@ -219,6 +273,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
       return NextResponse.json({
         success: true,
+        realtime: false, // Standard API with 2-3 hour delay
         data_usage_bytes: dataUsedBytes,
         data_remaining_bytes: dataRemainingBytes,
         data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
@@ -232,15 +287,11 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       console.error('Failed to fetch eSIM usage from eSIM Access:', esimError);
 
       // Return cached data from database if API call fails
-      // If no cached data, return full plan data
-      const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
-      const totalDataBytes = (plan?.data_gb || 0) * 1024 * 1024 * 1024;
-
       const cachedData = {
         data_usage_bytes: order.data_usage_bytes || 0,
         data_remaining_bytes: order.data_remaining_bytes !== null && order.data_remaining_bytes !== undefined
           ? order.data_remaining_bytes
-          : totalDataBytes, // Use full plan data if no cache
+          : planTotalDataBytes,
         last_update: order.last_usage_update || null,
       };
 

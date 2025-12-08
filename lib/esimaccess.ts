@@ -447,6 +447,72 @@ export async function checkEsimUsage(esimTranNos: string[]): Promise<Array<{
 }
 
 /**
+ * Get real-time eSIM data balance (Private API)
+ * Calls the carrier's API directly for live usage data.
+ *
+ * Limitations:
+ * - Only works for orders with status: GOT_RESOURCE, IN_USE, SUSPENDED
+ * - Only works for packages with dataType = 1 (fixed data packages)
+ * - Some operators and older orders may not support this
+ * - Rate limit: 5 requests per second (QPS = 5)
+ *
+ * @param esimTranNo - The eSIM transaction number (recommended over iccid)
+ * @returns Real-time balance data or null if not supported
+ */
+export async function getRealtimeBalance(esimTranNo: string): Promise<{
+  dataBalance: {
+    dataRemaining: number; // bytes
+    lastUpdateTime: string;
+  } | null;
+  smsBalance: {
+    smsMoLocalRemaining: number;
+    smsMoGlobalRemaining: number;
+  } | null;
+  voiceBalance: {
+    voiceMoLocalRemaining: number;
+    voiceMoGlobalRemaining: number;
+    voiceMtLocalRemaining: number;
+    voiceMtGlobalRemaining: number;
+    voiceMtMoSharedLocalRemaining: number;
+    voiceMtMoSharedGlobalRemaining: number;
+  } | null;
+} | null> {
+  try {
+    const data = await makeEsimAccessRequest<{
+      dataBalance?: {
+        dataRemaining: number;
+        lastUpdateTime: string;
+      };
+      smsBalance?: {
+        smsMoLocalRemaining: number;
+        smsMoGlobalRemaining: number;
+      };
+      voiceBalance?: {
+        voiceMoLocalRemaining: number;
+        voiceMoGlobalRemaining: number;
+        voiceMtLocalRemaining: number;
+        voiceMtGlobalRemaining: number;
+        voiceMtMoSharedLocalRemaining: number;
+        voiceMtMoSharedGlobalRemaining: number;
+      };
+    }>('/esim/realtimeBalance/query', {
+      esimTranNo: esimTranNo,
+    });
+
+    return {
+      dataBalance: data.dataBalance || null,
+      smsBalance: data.smsBalance || null,
+      voiceBalance: data.voiceBalance || null,
+    };
+  } catch (error: any) {
+    // This API may not be supported for all eSIMs
+    // Return null instead of throwing to allow graceful fallback
+    console.log(`[eSIM Access] Real-time balance not available for ${esimTranNo}:`, error.message);
+    return null;
+  }
+}
+
+/**
  * Get eSIM details by ICCID
  * Note: This endpoint may not exist in eSIM Access API
  * Use orderQuery() with orderNo or checkEsimUsage() with esimTranNo instead
