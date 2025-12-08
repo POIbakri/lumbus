@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
           minutes: 0,
           total_seconds: validityDays * 24 * 60 * 60,
           is_expired: false,
-          formatted: `${validityDays}d`,
+          formatted: `${validityDays} ${validityDays === 1 ? 'day' : 'days'}`,
         };
       }
 
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
           minutes: 0,
           total_seconds: validityDays * 24 * 60 * 60,
           is_expired: false,
-          formatted: `${validityDays}d`,
+          formatted: `${validityDays} ${validityDays === 1 ? 'day' : 'days'}`,
         };
       }
 
@@ -134,7 +134,7 @@ export async function GET(req: NextRequest) {
           minutes: 0,
           total_seconds: 0,
           is_expired: true,
-          formatted: 'EXP',
+          formatted: 'Expired',
         };
       }
 
@@ -146,11 +146,11 @@ export async function GET(req: NextRequest) {
       // Format: days if >= 1 day, hours if < 1 day, minutes if < 1 hour
       let formatted: string;
       if (days >= 1) {
-        formatted = `${days}d`;
+        formatted = `${days} ${days === 1 ? 'day' : 'days'}`;
       } else if (hours >= 1) {
-        formatted = `${hours}h`;
+        formatted = `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
       } else {
-        formatted = `${minutes}m`;
+        formatted = `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
       }
 
       return {

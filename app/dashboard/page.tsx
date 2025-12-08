@@ -318,21 +318,21 @@ export default function DashboardPage() {
     const { days, hours, minutes, totalMs } = getTimeRemaining(order);
 
     if (totalMs <= 0) {
-      return 'EXP';
+      return 'Expired';
     }
 
     // If more than 1 day, show days
     if (days >= 1) {
-      return `${days}d`;
+      return `${days} ${days === 1 ? 'day' : 'days'}`;
     }
 
     // If less than 1 day but more than 1 hour, show hours
     if (hours >= 1) {
-      return `${hours}h`;
+      return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
     }
 
     // If less than 1 hour, show minutes
-    return `${minutes}m`;
+    return `${minutes} ${minutes === 1 ? 'min' : 'mins'}`;
   };
 
   const getDaysRemaining = (order: OrderWithPlan) => {
@@ -775,7 +775,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="bg-cyan/40 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Valid</div>
-                            <div className="text-base sm:text-lg font-black text-foreground">{order.plan?.validity_days}d</div>
+                            <div className="text-base sm:text-lg font-black text-foreground">{order.plan?.validity_days} days</div>
                           </div>
                           <div className={`${daysRemaining <= 5 && order.activated_at ? 'bg-destructive/20' : 'bg-white/60'} rounded-lg sm:rounded-xl p-2 sm:p-3 text-center`}>
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Left</div>
