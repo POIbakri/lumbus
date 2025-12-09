@@ -28,6 +28,9 @@ export const auth = {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          signup_source: 'web',
+        },
       },
     });
     return { data, error };
@@ -52,6 +55,9 @@ export const auth = {
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          signup_source: 'web',
+        },
       },
     });
     return { data, error };
@@ -65,6 +71,9 @@ export const auth = {
       provider: 'apple',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          signup_source: 'web',
+        },
       },
     });
     return { data, error };

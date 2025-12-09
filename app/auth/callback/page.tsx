@@ -6,39 +6,36 @@ import { track } from '@vercel/analytics';
 import { supabaseClient } from '@/lib/supabase-client';
 
 /**
- * Send welcome email for new users
- * Uses fetch with keepalive to ensure request completes even if page navigates away
+ * Send welcome email for new users (fallback if Supabase webhook didn't fire)
+ * Delayed to give the webhook time to send first - the API checks for duplicates
  */
-function sendWelcomeEmail(userId: string, email: string, userName?: string) {
-  // Use navigator.sendBeacon or fetch with keepalive to ensure request completes
-  // even when the page navigates away
-  const payload = JSON.stringify({ userId, email, userName });
+function sendWelcomeEmailFallback(userId: string, email: string, userName?: string) {
+  // Delay 5 seconds to let Supabase webhook fire first
+  // The /api/user/welcome-email endpoint checks webhook_events for duplicates
+  setTimeout(() => {
+    const payload = JSON.stringify({ userId, email, userName });
 
-  // Try sendBeacon first (most reliable for fire-and-forget)
-  // Use text/plain as it's CORS-safelisted (application/json can throw in Chrome 59+)
-  // Wrap in try-catch to prevent auth flow crash
-  try {
-    if (navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: 'text/plain' });
-      const queued = navigator.sendBeacon('/api/user/welcome-email', blob);
-      if (queued) {
-        return;
+    // Try sendBeacon first (most reliable for fire-and-forget)
+    try {
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'text/plain' });
+        const queued = navigator.sendBeacon('/api/user/welcome-email', blob);
+        if (queued) return;
       }
-      // sendBeacon failed, fall through to fetch
+    } catch {
+      // sendBeacon threw, fall through to fetch
     }
-  } catch {
-    // sendBeacon threw, fall through to fetch
-  }
 
-  // Fallback to fetch with keepalive
-  fetch('/api/user/welcome-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: payload,
-    keepalive: true,
-  }).catch(() => {
-    // Silently ignore errors - this is fire-and-forget
-  });
+    // Fallback to fetch with keepalive
+    fetch('/api/user/welcome-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {
+      // Silently ignore - this is fire-and-forget
+    });
+  }, 5000);
 }
 
 export default function AuthCallbackPage() {
@@ -74,8 +71,7 @@ export default function AuthCallbackPage() {
                 return;
               }
 
-              // Check if this is a new user and send welcome email
-              // This handles both OAuth signups and email confirmation callbacks
+              // Handle new user welcome email and analytics tracking
               const user = data.session.user;
               const createdAt = new Date(user.created_at);
               const now = new Date();
@@ -85,8 +81,10 @@ export default function AuthCallbackPage() {
               if (isNewUser && user.email) {
                 // Extract name from user metadata (OAuth providers often include this)
                 const userName = user.user_metadata?.full_name || user.user_metadata?.name;
-                // Fire-and-forget - uses sendBeacon/keepalive so navigation won't cancel it
-                sendWelcomeEmail(user.id, user.email, userName);
+
+                // Send welcome email as fallback (delayed 5s to let webhook fire first)
+                // The API checks webhook_events for duplicates, so no double emails
+                sendWelcomeEmailFallback(user.id, user.email, userName);
 
                 // Track OAuth signup only (email signups are tracked in signup page)
                 const provider = user.app_metadata?.provider;

@@ -585,6 +585,7 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         userEmail: email || user.email,
         needsPasswordSetup: isNewUser ? 'true' : 'false', // New users need to set password
+        source: 'web', // Track payment source (web vs mobile)
         afid: afid || '',
         rfcd: rfcd || '',
         sessionId: sid || '',
