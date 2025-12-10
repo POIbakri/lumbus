@@ -47,6 +47,7 @@ export async function GET(
         activation_code,
         created_at,
         connect_order_id,
+        is_topup,
         plans (
           name,
           region_code,
@@ -166,6 +167,7 @@ export async function GET(
       hasActivationDetails: !!(order.smdp && order.activation_code),
       smdp: order.smdp,
       activationCode: order.activation_code,
+      isTopUp: order.is_topup || false,
       plan: {
         name: plan?.name ? cleanPlanName(plan.name) : 'Unknown Plan',
         region: plan?.name ? extractRegionFromName(plan.name) : 'Unknown Region',

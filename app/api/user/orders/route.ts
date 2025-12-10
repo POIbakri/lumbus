@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
         stripe_session_id,
         amount_cents,
         currency,
+        is_topup,
         created_at,
         updated_at,
         plans!orders_plan_id_fkey (

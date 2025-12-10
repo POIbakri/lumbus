@@ -172,6 +172,7 @@ export async function POST(req: NextRequest) {
         plan_id: planId,
         status: 'pending',
         currency: currency, // User's detected currency (for record keeping)
+        is_topup: isTopUp || false,
       })
       .select()
       .single();

@@ -78,6 +78,7 @@ export interface Order {
   country_code?: string | null;
   refunded_at?: string | null;
   refund_reason?: string | null;
+  is_topup?: boolean;
   created_at: string;
   updated_at?: string;
 }

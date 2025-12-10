@@ -393,6 +393,7 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         plan_id: planId,
         status: 'pending',
+        is_topup: isTopUp || false,
       })
       .select()
       .single();
