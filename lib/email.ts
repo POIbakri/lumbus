@@ -59,13 +59,22 @@ function getResendClient() {
 }
 
 // Shared email template wrapper with Lumbus branding
+// Color Palette:
+// Primary: #2EFECC (Turquoise/Mint)
+// Secondary: #FDFD74 (Yellow)
+// Accent: #87EFFF (Cyan)
+// Background: #FFFFFF
+// Muted: #F5F5F5
+// Text: #1A1A1A
+// Muted Text: #666666
+// Border: #E5E5E5
+
 function createEmailTemplate(params: {
   title: string;
   subtitle?: string;
   content: string;
-  headerGradient?: string;
 }) {
-  const { title, subtitle, content, headerGradient = 'linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%)' } = params;
+  const { title, subtitle, content } = params;
 
   return `
 <!DOCTYPE html>
@@ -75,212 +84,70 @@ function createEmailTemplate(params: {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - Lumbus</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
         /* Reset styles for better email client compatibility */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
         img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; max-width: 100%; }
         table { border-collapse: collapse !important; }
         body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; min-width: 100% !important; }
-
-        /* Force Outlook to provide "view in browser" button */
         #outlook a { padding: 0; }
-
-        /* Prevent Webkit and Windows Mobile from changing default font sizes */
         .ReadMsgBody { width: 100%; }
         .ExternalClass { width: 100%; }
         .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div { line-height: 100%; }
 
-        /* Make sure the container is always responsive */
-        .container {
-            width: 100% !important;
-            max-width: 600px !important;
-            margin: 0 auto !important;
-        }
-
-        /* Ensure wrapper takes full width */
-        .wrapper {
-            width: 100% !important;
-            table-layout: fixed !important;
-            -webkit-text-size-adjust: 100% !important;
-            -ms-text-size-adjust: 100% !important;
-        }
-
-        /* Desktop and larger screens (default) */
-        @media screen and (min-width: 601px) {
-            .container { width: 600px !important; }
-        }
-
-        /* Tablet and medium screens */
-        @media screen and (max-width: 768px) {
-            .mobile-padding { padding: 30px 20px !important; }
-            .container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 10px !important;
-            }
-            .inner-padding { padding: 30px 25px !important; }
-            h1 { font-size: 28px !important; }
-            h2 { font-size: 24px !important; }
-            h3 { font-size: 20px !important; }
-        }
-
-        /* Mobile phones */
         @media screen and (max-width: 600px) {
-            .mobile-padding { padding: 20px 15px !important; }
-            .mobile-center { text-align: center !important; }
-            .container {
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-            }
-            .inner-padding { padding: 20px 15px !important; }
-            h1 { font-size: 24px !important; line-height: 1.2 !important; }
-            h2 { font-size: 20px !important; line-height: 1.3 !important; }
-            h3 { font-size: 18px !important; line-height: 1.3 !important; }
-            p { font-size: 14px !important; line-height: 1.5 !important; }
-            .mobile-button {
-                display: block !important;
-                width: 100% !important;
-                padding: 16px 20px !important;
-                font-size: 14px !important;
-                box-sizing: border-box !important;
-                text-align: center !important;
-            }
-            .mobile-stack {
-                display: block !important;
-                width: 100% !important;
-                padding: 0 !important;
-            }
-            .mobile-hide { display: none !important; }
-            .mobile-text { font-size: 14px !important; line-height: 1.5 !important; }
-            .mobile-large-text { font-size: 32px !important; }
-            .mobile-code-box {
-                font-size: 11px !important;
-                padding: 12px 8px !important;
-                word-break: break-all !important;
-            }
-            .code-box {
-                font-size: 11px !important;
-                padding: 12px 8px !important;
-                word-break: break-all !important;
-            }
-            .qr-image {
-                max-width: 250px !important;
-                width: 100% !important;
-                height: auto !important;
-            }
-            .progress-bar { height: 40px !important; }
-            .progress-bar-text { font-size: 14px !important; }
-            .stat-card {
-                display: block !important;
-                width: 100% !important;
-                margin-bottom: 15px !important;
-                box-sizing: border-box !important;
-            }
-            .stat-value { font-size: 26px !important; }
-            .big-number { font-size: 32px !important; }
-            /* Fix for table cells */
-            td[class="mobile-stack"] {
-                display: block !important;
-                width: 100% !important;
-            }
-        }
-
-        /* Small phones */
-        @media screen and (max-width: 480px) {
-            .mobile-padding { padding: 15px 10px !important; }
-            .inner-padding { padding: 15px 10px !important; }
-            h1 { font-size: 22px !important; }
-            h2 { font-size: 19px !important; }
-            h3 { font-size: 17px !important; }
-            p { font-size: 13px !important; }
-            .mobile-button {
-                padding: 14px 16px !important;
-                font-size: 13px !important;
-            }
-            .stat-value { font-size: 24px !important; }
-            .big-number { font-size: 28px !important; }
-        }
-
-        /* Very small phones */
-        @media screen and (max-width: 360px) {
-            .mobile-padding { padding: 12px 8px !important; }
-            .inner-padding { padding: 12px 8px !important; }
-            h1 { font-size: 20px !important; }
-            h2 { font-size: 18px !important; }
+            .container { width: 100% !important; padding: 0 !important; }
+            .mobile-padding { padding: 20px 16px !important; }
+            .inner-padding { padding: 24px 16px !important; }
+            h2 { font-size: 20px !important; }
             h3 { font-size: 16px !important; }
-            p { font-size: 12px !important; }
-            .mobile-button {
-                padding: 12px 14px !important;
-                font-size: 12px !important;
-            }
-            .code-box {
-                font-size: 10px !important;
-                padding: 10px 6px !important;
-            }
-            .qr-image { max-width: 200px !important; }
-            .big-number { font-size: 26px !important; }
-            .stat-value { font-size: 22px !important; }
-        }
-
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            /* Optional: Add dark mode styles if needed */
+            p { font-size: 14px !important; }
+            .mobile-button { display: block !important; width: 100% !important; text-align: center !important; }
+            .code-box { font-size: 11px !important; padding: 12px 8px !important; word-break: break-all !important; }
+            .qr-image { max-width: 220px !important; }
+            .big-number { font-size: 32px !important; }
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #F5F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
     <!--[if mso]>
     <center>
     <table align="center" border="0" cellspacing="0" cellpadding="0" width="600">
     <tr>
     <td align="center" valign="top" width="600">
     <![endif]-->
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
-            <td align="center" style="padding: 20px 10px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+            <td align="center" style="padding: 24px 16px;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #FFFFFF; border-radius: 12px; overflow: hidden;">
+                    <!-- Header -->
                     <tr>
-                        <td align="center" class="mobile-padding" style="padding: 40px 20px 20px; background: ${headerGradient};">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">LUMBUS</h1>
-                            ${subtitle ? `<p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">${subtitle}</p>` : ''}
+                        <td align="center" class="mobile-padding" style="padding: 32px 24px 24px; border-bottom: 3px solid #2EFECC;">
+                            <a href="https://getlumbus.com" style="text-decoration: none;">
+                                <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="140" style="display: block; width: 140px; height: auto;" />
+                            </a>
+                            ${subtitle ? `<p style="margin: 12px 0 0; font-size: 14px; color: #666666; font-weight: 500;">${subtitle}</p>` : ''}
                         </td>
                     </tr>
 
+                    <!-- Content -->
                     <tr>
-                        <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
+                        <td class="mobile-padding inner-padding" style="padding: 32px 24px;">
                             ${content}
                         </td>
                     </tr>
 
+                    <!-- Footer -->
                     <tr>
-                        <td style="padding: 40px 30px; background-color: #FFFFFF; border-top: 1px solid #E5E5E5;">
+                        <td style="padding: 24px; background-color: #F5F5F5; border-top: 1px solid #E5E5E5;">
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
-                                    <td align="center" style="padding-bottom: 24px;">
-                                        <a href="https://getlumbus.com" style="text-decoration: none;">
-                                            <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="48" height="48" style="display: block; width: 48px; height: 48px;" />
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="center" style="padding-bottom: 24px;">
-                                        <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 500;">
-                                            Need help? <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none; border-bottom: 1px solid #E5E5E5;">support@getlumbus.com</a>
-                                        </p>
-                                        <p style="margin: 0; font-size: 14px; color: #666666;">
-                                            <a href="https://www.instagram.com/getlumbus" style="color: #666666; text-decoration: none; margin: 0 10px;">Instagram</a>
-                                            <a href="https://www.tiktok.com/@getlumbus" style="color: #666666; text-decoration: none; margin: 0 10px;">TikTok</a>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td align="center">
-                                        <p style="margin: 0; font-size: 12px; color: #999999; line-height: 1.6;">
-                                            Lumbus Technologies Limited<br/>
-                                            © ${new Date().getFullYear()} Lumbus. All rights reserved.
+                                        <p style="margin: 0 0 8px; font-size: 13px; color: #666666;">
+                                            Questions? <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 600; text-decoration: none;">support@getlumbus.com</a>
+                                        </p>
+                                        <p style="margin: 0; font-size: 12px; color: #999999;">
+                                            © ${new Date().getFullYear()} Lumbus Technologies Limited
                                         </p>
                                     </td>
                                 </tr>
@@ -411,7 +278,14 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
   const { to, orderDetails, activationDetails, installUrl } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Your eSIM is Ready!</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #E0FEF7; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#2EFECC"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Your eSIM is Ready!</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Your Lumbus eSIM has been activated and is ready to use!
@@ -422,7 +296,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
           <td style="padding: 8px 0; font-size: 15px; color: #666666;">
-            <strong>📊 Data:</strong>
+            <strong>Data:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
             ${orderDetails.dataGb} GB
@@ -430,7 +304,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 15px; color: #666666;">
-            <strong>⏰ Valid for:</strong>
+            <strong>Valid for:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
             ${orderDetails.validityDays} days
@@ -440,7 +314,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
     </div>
 
     <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
-      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">📱 HOW TO INSTALL</p>
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">HOW TO INSTALL</p>
       <ol style="margin: 0; padding-left: 20px; color: #1A1A1A; font-weight: 600; line-height: 1.8;">
         <li>Go to your device settings</li>
         <li>Navigate to Cellular/Mobile Data → Add eSIM</li>
@@ -505,7 +379,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
       <div style="margin: 0 0 20px;">
         <p style="margin: 0 0 8px; font-size: 14px; color: #666666; font-weight: 700; text-transform: uppercase;">Activate Before</p>
         <div style="background: #FDFD74; border: 2px solid #1A1A1A; border-radius: 8px; padding: 15px; font-size: 14px; color: #1A1A1A; font-weight: 600;">
-          ⏰ ${activationDetails.activateBeforeDate}
+          ${activationDetails.activateBeforeDate}
         </div>
         <p style="margin: 8px 0 0; font-size: 12px; color: #666666;">
           Please activate your eSIM before this date to ensure it works properly
@@ -565,10 +439,23 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
   const isUrgent = usagePercent >= 90;
   const isWarning = usagePercent >= 80;
   const alertLevel = isUrgent ? 'Urgent' : isWarning ? 'Warning' : 'Notice';
-  const alertEmoji = isUrgent ? '🚨' : isWarning ? '⚠️' : 'ℹ️';
+
+  // SVG icons for different alert levels
+  const alertIcon = isUrgent
+    ? `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#EF4444"/></svg>`
+    : isWarning
+    ? `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="#F59E0B"/></svg>`
+    : `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="#2EFECC"/></svg>`;
+
+  const iconBgColor = isUrgent ? '#FEF2F2' : isWarning ? '#FEF3C7' : '#E0FEF7';
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">${alertEmoji} Data Usage ${alertLevel}</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: ${iconBgColor}; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        ${alertIcon}
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Data Usage ${alertLevel}</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       This is a ${alertLevel.toLowerCase()} about your data usage for <strong>${planName}</strong>.
@@ -602,22 +489,22 @@ export async function sendDataUsageAlert(params: SendDataUsageAlertParams) {
     </table>
 
     ${isUrgent ? `
-      <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
-        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">🚨 CRITICAL: RUNNING LOW ON DATA</p>
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF2F2; border-radius: 12px; border: 3px solid #EF4444;">
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">CRITICAL: RUNNING LOW ON DATA</p>
         <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
           You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. Consider purchasing a top-up to avoid service interruption.
         </p>
       </div>
     ` : isWarning ? `
-      <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 2px solid #1A1A1A;">
-        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">⚠️ WARNING: HIGH DATA USAGE</p>
+      <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">WARNING: HIGH DATA USAGE</p>
         <p style="margin: 0; font-size: 14px; color: #666666; font-weight: 600; line-height: 1.6;">
           You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You may want to monitor your usage or purchase a top-up soon.
         </p>
       </div>
     ` : `
       <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
-        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">ℹ️ NOTICE: DATA USAGE UPDATE</p>
+        <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">NOTICE: DATA USAGE UPDATE</p>
         <p style="margin: 0; font-size: 14px; color: #666666; font-weight: 600; line-height: 1.6;">
           You've used <strong>${usagePercent.toFixed(0)}%</strong> of your data. You still have plenty of data remaining.
         </p>
@@ -678,20 +565,27 @@ export async function sendPlanExpiryAlert(params: SendPlanExpiryAlertParams) {
   const { to, planName, daysRemaining, expiryDate } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">⏰ Plan Expiring Soon</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #FEF3C7; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z" fill="#F59E0B"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Plan Expiring Soon</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Your <strong>${planName}</strong> plan is expiring soon.
     </p>
 
-    <div style="margin: 0 0 30px; padding: 30px; background: #FDFD74; border: 3px solid #1A1A1A; border-radius: 12px; text-align: center;">
+    <div style="margin: 0 0 30px; padding: 30px; background: #FEF3C7; border: 3px solid #F59E0B; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Expires In</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}</p>
       <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Expiry Date: ${expiryDate}</p>
     </div>
 
-    <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
-      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">⚠️ ACTION REQUIRED</p>
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF3C7; border-radius: 12px; border: 2px solid #F59E0B;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">ACTION REQUIRED</p>
       <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
         After the expiry date, your eSIM will no longer have data connectivity. Purchase a new plan or top-up to continue using your eSIM.
       </p>
@@ -751,7 +645,14 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
   const { to, referredUserEmail, rewardAmount, referralCode } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">🎉 Referral Reward!</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #E0FEF7; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z" fill="#2EFECC"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Referral Reward!</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Great news! Someone used your referral code and made their first purchase. You've earned a reward!
@@ -760,7 +661,7 @@ export async function sendReferralRewardEmail(params: SendReferralRewardParams) 
     <div style="margin: 0 0 30px; padding: 30px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">You Earned</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${rewardAmount}</p>
-      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">🎊 Added to your wallet!</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Added to your wallet!</p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
@@ -839,7 +740,14 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
   const { to, planName, dataAdded, validityDays, iccid } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Top-Up Successful!</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #E0FEF7; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#2EFECC"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Top-Up Successful!</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       Great news! Your eSIM has been successfully topped up with additional data.
@@ -848,7 +756,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
       <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Data Added</p>
       <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
-      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">📶 Ready to use!</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Ready to use!</p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
@@ -881,8 +789,8 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
       </table>
     </div>
 
-    <div style="margin: 0 0 30px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A;">
-      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800;">✨ NO ACTION NEEDED!</p>
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">NO ACTION NEEDED</p>
       <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
         The data has been automatically added to your existing eSIM. Just continue using your device as normal - no reinstallation required!
       </p>
@@ -906,7 +814,7 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     </table>
 
     <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
-      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">💡 How it works:</p>
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">How it works:</p>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Data is added to your existing eSIM instantly</p></td></tr>
         <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #2EFECC; font-weight: 900;">•</span> Validity period resets from the top-up date</p></td></tr>
@@ -1131,20 +1039,21 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
     <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 20px 10px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #FFFFFF; border-radius: 12px; overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        <td align="center" style="padding: 40px 20px 30px; background-color: #FFFFFF; border-bottom: 3px solid #2EFECC;">
+                            <a href="https://getlumbus.com" style="text-decoration: none;">
+                                <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="160" style="display: block; width: 160px; height: auto; max-width: 100%;" />
+                            </a>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
-                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Received!</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 800; color: #1A1A1A; text-align: center;">Application Received!</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
-                                Hi ${displayName}! 👋
+                                Hi ${displayName}!
                             </p>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
@@ -1217,14 +1126,14 @@ export async function sendAffiliateApplicationEmail(params: SendAffiliateApplica
                     </tr>
 
                     <tr>
-                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                        <td style="padding: 30px; background-color: #F5F5F5; border-top: 1px solid #E5E5E5;">
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
                                         <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">
-                                            Questions? Contact us at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
+                                            Questions? <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 600; text-decoration: none;">support@getlumbus.com</a>
                                         </p>
-                                        <p style="margin: 0; font-size: 12px; color: #666666;">
+                                        <p style="margin: 0; font-size: 12px; color: #999999;">
                                             © ${new Date().getFullYear()} Lumbus. All rights reserved.
                                         </p>
                                     </td>
@@ -1271,7 +1180,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [to],
-      subject: '🎉 Welcome to Lumbus Affiliate Program - Application Approved!',
+      subject: 'Welcome to Lumbus Affiliate Program - Application Approved!',
       html: `
 <!DOCTYPE html>
 <html lang="en">
@@ -1446,17 +1355,18 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
     <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 20px 10px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #FFFFFF; border-radius: 12px; overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        <td align="center" style="padding: 40px 20px 30px; background-color: #FFFFFF; border-bottom: 3px solid #2EFECC;">
+                            <a href="https://getlumbus.com" style="text-decoration: none;">
+                                <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="160" style="display: block; width: 160px; height: auto; max-width: 100%;" />
+                            </a>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
-                            <h2 style="margin: 0 0 20px; font-size: 32px; font-weight: 600; color: #1A1A1A; text-align: center;">🎉 You're Approved!</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 800; color: #1A1A1A; text-align: center;">You're Approved!</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Congratulations ${displayName}! We're excited to welcome you to the Lumbus Affiliate Program.
@@ -1504,7 +1414,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center" style="padding: 0 0 30px;">
-                                        <a href="${dashboardLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.05);">
+                                        <a href="${dashboardLink}" class="mobile-button" style="display: inline-block; padding: 14px 32px; background-color: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 14px; font-weight: 700; border-radius: 8px;">
                                             Go to Dashboard
                                         </a>
                                     </td>
@@ -1564,7 +1474,7 @@ export async function sendAffiliateApprovedEmail(params: SendAffiliateApprovedPa
                     </tr>
 
                     <tr>
-                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                        <td style="padding: 30px; background-color: #F5F5F5; border-top: 1px solid #E5E5E5;">
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
@@ -1791,17 +1701,18 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 40px 20px;">
-                <table class="container" border="0" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                <table class="container" border="0" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 600px; background-color: #FFFFFF; border-radius: 12px; overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">Affiliate Program</p>
+                        <td align="center" style="padding: 40px 20px 30px; background-color: #FFFFFF; border-bottom: 3px solid #2EFECC;">
+                            <a href="https://getlumbus.com" style="text-decoration: none;">
+                                <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="160" style="display: block; width: 160px; height: auto; max-width: 100%;" />
+                            </a>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
-                            <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Application Update</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 800; color: #1A1A1A; text-align: center;">Application Update</h2>
 
                             <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
                                 Hi ${displayName},
@@ -1831,7 +1742,7 @@ export async function sendAffiliateRejectedEmail(params: SendAffiliateRejectedPa
                     </tr>
 
                     <tr>
-                        <td style="padding: 30px; background-color: #F0FFFB; border-top: 3px solid #2EFECC;">
+                        <td style="padding: 30px; background-color: #F5F5F5; border-top: 1px solid #E5E5E5;">
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center">
@@ -1884,7 +1795,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
     const { data, error } = await getResendClient().emails.send({
       from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
       to: [adminEmail],
-      subject: `🆕 New Affiliate Application - ${applicant.displayName}`,
+      subject: `New Affiliate Application - ${applicant.displayName}`,
       html: `
 <!DOCTYPE html>
 <html lang="en">
@@ -1917,17 +1828,18 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
     <table border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="background-color: #F5F5F5;">
         <tr>
             <td align="center" style="padding: 20px 10px;">
-                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden;">
+                <table class="container" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 600px; background-color: #FFFFFF; border-radius: 12px; overflow: hidden;">
                     <tr>
-                        <td align="center" style="padding: 40px 20px 20px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%);">
-                            <h1 style="margin: 0; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: -0.5px; text-transform: uppercase;">Lumbus Admin</h1>
-                            <p style="margin: 10px 0 0; font-size: 16px; color: #1A1A1A; font-weight: 600;">New Affiliate Application</p>
+                        <td align="center" style="padding: 40px 20px 30px; background-color: #FFFFFF; border-bottom: 3px solid #2EFECC;">
+                            <a href="https://getlumbus.com" style="text-decoration: none;">
+                                <img src="https://getlumbus.com/logotrans.png" alt="Lumbus" width="160" style="display: block; width: 160px; height: auto; max-width: 100%;" />
+                            </a>
                         </td>
                     </tr>
 
                     <tr>
                         <td class="mobile-padding inner-padding" style="padding: 40px 30px;">
-                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #1A1A1A;">New Application Received</h2>
+                            <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 800; color: #1A1A1A;">New Application Received</h2>
 
                             <div style="margin: 0 0 25px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
                                 <table border="0" cellspacing="0" cellpadding="0" width="100%">
@@ -1990,7 +1902,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                             <table border="0" cellspacing="0" cellpadding="0" width="100%">
                                 <tr>
                                     <td align="center" style="padding: 0 0 20px;">
-                                        <a href="${reviewLink}" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(46, 254, 204, 0.4);">
+                                        <a href="${reviewLink}" class="mobile-button" style="display: inline-block; padding: 14px 32px; background-color: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 14px; font-weight: 700; border-radius: 8px;">
                                             Review in Admin Panel
                                         </a>
                                     </td>
@@ -2000,7 +1912,7 @@ export async function sendAdminNewAffiliateApplicationEmail(params: SendAdminNew
                     </tr>
 
                     <tr>
-                        <td style="padding: 20px; background-color: #F5F5F5; text-align: center;">
+                        <td style="padding: 30px; background-color: #F5F5F5; border-top: 1px solid #E5E5E5; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: #666666;">
                                 © ${new Date().getFullYear()} Lumbus. All rights reserved.
                             </p>
@@ -2040,24 +1952,35 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
   const { to, userEmail } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">⚠️ Account Deletion Request Received</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #FEF2F2; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="#EF4444"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Account Deletion Request Received</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       We've received your request to delete your Lumbus account. This email confirms that your deletion request has been submitted.
     </p>
 
     <div style="margin: 0 0 30px; padding: 30px; background: #FEF2F2; border: 3px solid #EF4444; border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 10px; font-size: 48px;">🗑️</p>
+      <div style="margin-bottom: 10px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="#EF4444"/>
+        </svg>
+      </div>
       <p style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">DELETION IN PROGRESS</p>
       <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">Your account will be deleted within 30 days</p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background-color: #FFF7ED; border-radius: 12px; border: 2px solid #F59E0B;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ What Happens Next</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">What Happens Next</h3>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>1️⃣ Processing Period:</strong>
+            <strong>1. Processing Period:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             Up to 30 days
@@ -2065,7 +1988,7 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>2️⃣ Account Status:</strong>
+            <strong>2. Account Status:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             Scheduled for deletion
@@ -2073,7 +1996,7 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>3️⃣ Data Removal:</strong>
+            <strong>3. Data Removal:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             Permanent
@@ -2083,7 +2006,7 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 What Will Be Deleted</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">What Will Be Deleted</h3>
       <ul style="margin: 0; padding: 0 0 0 20px; font-size: 14px; line-height: 2; color: #666666;">
         <li><strong>Account Information:</strong> Email, profile, and settings</li>
         <li><strong>eSIM Orders:</strong> Purchase history and order details</li>
@@ -2093,14 +2016,14 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background: linear-gradient(135deg, #E0FEF7 0%, #E0FEF7 100%); border: 2px solid #2EFECC; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">✅ Active eSIMs</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Active eSIMs</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
         <strong>Good news:</strong> Any active eSIMs will continue to work until their expiry date, even after your account is deleted. You won't lose access to your current connectivity.
       </p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">❗ Changed Your Mind?</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Changed Your Mind?</h3>
       <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #666666;">
         If you didn't request this deletion or want to cancel it, please contact our support team immediately:
       </p>
@@ -2163,7 +2086,7 @@ export async function sendAdminAccountDeletionNotification(params: SendAdminAcco
   const { userEmail, userId, scheduledDate } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">🗑️ Account Deletion Request</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Account Deletion Request</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       A user has requested to delete their account.
@@ -2218,7 +2141,7 @@ export async function sendAdminAccountDeletionNotification(params: SendAdminAcco
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background: #FFF7ED; border: 2px solid #F59E0B; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ Action Required</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Action Required</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
         The account has been marked for deletion and will be permanently removed after 30 days unless the user contacts support to cancel.
       </p>
@@ -2261,7 +2184,7 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
   const { userEmail, specificData, reason } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">📧 Data Deletion Request</h2>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Data Deletion Request</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       A user has requested deletion of specific personal data (GDPR request).
@@ -2297,7 +2220,7 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
 
     ${specificData ? `
     <div style="margin: 0 0 30px; padding: 25px; background: #FFF7ED; border: 2px solid #F59E0B; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 Specific Data Requested</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Specific Data Requested</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
         ${specificData}
       </p>
@@ -2306,7 +2229,7 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
 
     ${reason ? `
     <div style="margin: 0 0 30px; padding: 25px; background: #F5F5F5; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">💬 Reason Provided</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Reason Provided</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
         ${reason}
       </p>
@@ -2314,7 +2237,7 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
     ` : ''}
 
     <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ Timeline</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Timeline</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666;">
         <strong>GDPR Compliance:</strong> Must respond within 30 days. Process the deletion request and send confirmation to the user.
       </p>
@@ -2357,24 +2280,35 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
   const { userEmail, specificData, reason } = params;
 
   const content = `
-    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">✅ Data Deletion Request Received</h2>
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #E0FEF7; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="#2EFECC"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Data Deletion Request Received</h2>
 
     <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
       We've received your request to delete specific personal data from your Lumbus account.
     </p>
 
     <div style="margin: 0 0 30px; padding: 30px; background: #E0FEF7; border: 3px solid #2EFECC; border-radius: 12px; text-align: center;">
-      <p style="margin: 0 0 10px; font-size: 48px;">📧</p>
+      <div style="margin-bottom: 10px;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#2EFECC"/>
+        </svg>
+      </div>
       <p style="margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">REQUEST SUBMITTED</p>
       <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">We'll process your request within 30 days</p>
     </div>
 
     <div style="margin: 0 0 30px; padding: 25px; background-color: #FFF7ED; border-radius: 12px; border: 2px solid #F59E0B;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">⏰ What Happens Next</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">What Happens Next</h3>
       <table border="0" cellspacing="0" cellpadding="0" width="100%">
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>1️⃣ Confirmation:</strong>
+            <strong>1. Confirmation:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             24-48 hours
@@ -2382,7 +2316,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>2️⃣ Identity Verification:</strong>
+            <strong>2. Identity Verification:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             1-2 days
@@ -2390,7 +2324,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>3️⃣ Data Deletion:</strong>
+            <strong>3. Data Deletion:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             Up to 30 days
@@ -2398,7 +2332,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666;">
-            <strong>4️⃣ Final Confirmation:</strong>
+            <strong>4. Final Confirmation:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">
             Email sent
@@ -2409,7 +2343,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
 
     ${specificData ? `
     <div style="margin: 0 0 30px; padding: 25px; background: #F5F5F5; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">📋 Your Request</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Your Request</h3>
       <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; white-space: pre-wrap;">
         ${specificData}
       </p>
@@ -2417,7 +2351,7 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
     ` : ''}
 
     <div style="margin: 0 0 30px; padding: 25px; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 12px;">
-      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">❓ Questions?</h3>
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Questions?</h3>
       <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #666666;">
         If you have any questions about this request or need to provide additional information:
       </p>
