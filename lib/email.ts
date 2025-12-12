@@ -2063,7 +2063,6 @@ export async function sendAccountDeletionEmail(params: SendAccountDeletionParams
         title: 'Account Deletion Request',
         subtitle: 'Confirmation',
         content,
-        headerGradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
       }),
     });
 
@@ -2161,7 +2160,6 @@ export async function sendAdminAccountDeletionNotification(params: SendAdminAcco
         title: 'Account Deletion Request',
         subtitle: 'Admin Notification',
         content,
-        headerGradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
       }),
     });
 
@@ -2257,7 +2255,6 @@ export async function sendAdminDataDeletionNotification(params: SendAdminDataDel
         title: 'Data Deletion Request',
         subtitle: 'GDPR Request - Admin Notification',
         content,
-        headerGradient: 'linear-gradient(135deg, #2EFECC 0%, #00D9A5 100%)',
       }),
     });
 
@@ -2391,7 +2388,6 @@ export async function sendDataDeletionRequestConfirmation(params: SendDataDeleti
         title: 'Data Deletion Request',
         subtitle: 'Confirmation',
         content,
-        headerGradient: 'linear-gradient(135deg, #2EFECC 0%, #00D9A5 100%)',
       }),
     });
 
