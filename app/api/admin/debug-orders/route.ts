@@ -17,6 +17,8 @@ export async function GET() {
         data_remaining_bytes,
         data_usage_bytes,
         created_at,
+        is_topup,
+        iccid,
         plans(name, data_gb, validity_days, region_code)
       `)
       .order('created_at', { ascending: false });
@@ -55,6 +57,8 @@ export async function GET() {
         id: o.id,
         status: o.status,
         plan_name: plan?.name?.replace(/^["']|["']$/g, ''),
+        is_topup: (o as any).is_topup,
+        iccid: (o as any).iccid,
         activated: !!o.activated_at,
         data_remaining_bytes: o.data_remaining_bytes,
         data_usage_bytes: o.data_usage_bytes,
