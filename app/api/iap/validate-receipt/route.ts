@@ -9,8 +9,9 @@ const validateReceiptSchema = z.object({
   receipt: z.string(), // Base64 encoded receipt from Apple
   orderId: z.string().uuid(),
   transactionId: z.string().optional(), // Apple transaction ID
-  isTopUp: z.boolean().optional(), // Whether this is a top-up purchase
-  iccid: z.string().optional(), // ICCID for top-up purchases
+  // Top-up params (optional - we also read is_topup from the order itself)
+  isTopUp: z.boolean().optional(),
+  iccid: z.string().optional(),
 });
 
 /**
@@ -56,10 +57,42 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // Validate top-up request has ICCID
-    if (isTopUp && !iccid) {
-      console.error('[IAP Validate] Top-up request missing ICCID');
-      return NextResponse.json({ error: 'ICCID required for top-up' }, { status: 400 });
+    // Determine if this is a top-up from the ORDER (source of truth), not just the request
+    const isTopUpOrder = order.is_topup === true || isTopUp === true;
+    // Prefer ICCID from order (set at checkout), then request param, then auto-lookup
+    let topUpIccid = order.iccid || iccid;
+
+    // If this is a top-up but no ICCID stored/provided, try to find user's existing eSIM
+    if (isTopUpOrder && !topUpIccid) {
+      console.log('[IAP Validate] Top-up order without ICCID, looking up existing eSIM...');
+      const user = Array.isArray(order.user) ? order.user[0] : order.user;
+      const plan = Array.isArray(order.plan) ? order.plan[0] : order.plan;
+
+      // Find existing eSIM with same region
+      const { data: existingEsim } = await supabase
+        .from('orders')
+        .select('iccid, plans(region_code)')
+        .eq('user_id', user.id)
+        .not('iccid', 'is', null)
+        .in('status', ['active', 'completed'])
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Find one matching the same region as the new plan
+      const matchingEsim = existingEsim?.find(e => {
+        const existingPlan = Array.isArray(e.plans) ? e.plans[0] : e.plans;
+        return (existingPlan as any)?.region_code === plan.region_code;
+      });
+
+      if (matchingEsim?.iccid) {
+        topUpIccid = matchingEsim.iccid;
+        console.log('[IAP Validate] Found existing eSIM for top-up:', topUpIccid);
+      } else {
+        console.error('[IAP Validate] Top-up order but no existing eSIM found for region:', plan.region_code);
+        return NextResponse.json({
+          error: 'No existing eSIM found for top-up. Please purchase a new eSIM first.',
+        }, { status: 400 });
+      }
     }
 
     // Check if already processed
@@ -119,16 +152,16 @@ export async function POST(req: NextRequest) {
     console.log('[IAP Validate] Triggering eSIM provisioning/top-up...');
 
     try {
-      if (isTopUp && iccid) {
+      if (isTopUpOrder && topUpIccid) {
         // Top-up existing eSIM
-        console.log('[IAP Validate] Processing top-up for ICCID:', iccid);
+        console.log('[IAP Validate] Processing top-up for ICCID:', topUpIccid);
 
         // Get existing order to retrieve esimTranNo
         const { data: existingOrderForTopUp } = await supabase
           .from('orders')
           .select('esim_tran_no, iccid')
           .eq('user_id', user.id)
-          .eq('iccid', iccid)
+          .eq('iccid', topUpIccid)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -139,7 +172,7 @@ export async function POST(req: NextRequest) {
         const topUpTransactionId = `apple_topup_${orderId}_${Date.now()}`;
 
         const topUpResponse = await topUpEsim({
-          iccid: esimTranNo ? undefined : iccid, // Use iccid only if no esimTranNo
+          iccid: esimTranNo ? undefined : topUpIccid, // Use iccid only if no esimTranNo
           esimTranNo: esimTranNo || undefined,
           packageCode: plan.supplier_sku,
           transactionId: topUpTransactionId,

@@ -393,8 +393,8 @@ export async function POST(req: NextRequest) {
       const needsPasswordSetup = paymentIntent.metadata?.needsPasswordSetup === 'true';
       const userEmail = paymentIntent.metadata?.userEmail;
       const source = paymentIntent.metadata?.source;
-      const isTopUp = paymentIntent.metadata?.isTopUp === 'true';
-      const existingOrderIccid = paymentIntent.metadata?.iccid;
+      const isTopUpMeta = paymentIntent.metadata?.isTopUp === 'true';
+      const metadataIccid = paymentIntent.metadata?.iccid;
 
       if (!orderId) {
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
@@ -410,6 +410,11 @@ export async function POST(req: NextRequest) {
       if (!existingOrder) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
+
+      // Determine top-up status from order (source of truth) or metadata
+      const isTopUp = existingOrder.is_topup === true || isTopUpMeta;
+      // Prefer ICCID from order (set at checkout), then metadata
+      const existingOrderIccid = existingOrder.iccid || metadataIccid;
 
       // Update order status to paid
       const { data: order, error: orderError } = await supabase

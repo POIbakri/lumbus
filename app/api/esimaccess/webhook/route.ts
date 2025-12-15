@@ -328,10 +328,12 @@ async function handleSmdpEvent(content: {
   // Update order based on SM-DP+ status
   if (content.smdpStatus === 'ENABLED') {
     // Get order to calculate expires_at from validity_days
+    // Get the ORIGINAL order (not top-ups) - status/activation applies to the eSIM itself
     const { data: order } = await supabase
       .from('orders')
       .select('id, plan_id, user_id')
       .eq('iccid', content.iccid)
+      .eq('is_topup', false)
       .maybeSingle();
 
     if (!order) {
@@ -361,7 +363,7 @@ async function handleSmdpEvent(content: {
       ? new Date(activatedAt.getTime() + plan.validity_days * 24 * 60 * 60 * 1000)
       : null;
 
-    // eSIM has been activated on the device
+    // eSIM has been activated on the device - only update the original order
     const { error } = await supabase
       .from('orders')
       .update({
@@ -369,7 +371,8 @@ async function handleSmdpEvent(content: {
         activated_at: activatedAt.toISOString(),
         expires_at: expiresAt?.toISOString() || null,
       })
-      .eq('iccid', content.iccid);
+      .eq('iccid', content.iccid)
+      .eq('is_topup', false);
 
     if (error) {
       console.error('[SMDP_EVENT] Failed to update order:', error.message, { iccid: content.iccid });
@@ -426,11 +429,12 @@ async function handleEsimStatus(content: {
     esimTranNo: content.esimTranNo
   });
 
-  // Try to update by ICCID first
+  // Try to update by ICCID first - only update the original order (not top-ups)
   const { data: updatedByIccid, error: iccidError } = await supabase
     .from('orders')
     .update({ status: newStatus })
     .eq('iccid', content.iccid)
+    .eq('is_topup', false)
     .select();
 
   if (updatedByIccid && updatedByIccid.length > 0) {
@@ -481,18 +485,19 @@ async function handleDataUsage(content: {
   // Convert to usage percentage: 50% remaining = 50% used, 20% remaining = 80% used, 10% remaining = 90% used
   const usagePercent = (1 - content.remainThreshold) * 100;
 
-  // Get order details (avoid joins)
+  // Get original order details (not top-ups) - usage applies to the eSIM itself
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .select('*')
     .eq('iccid', content.iccid)
+    .eq('is_topup', false)
     .maybeSingle();
 
   if (orderError || !order) {
     return;
   }
 
-  // Update usage data in database (use totalVolume from webhook)
+  // Update usage data in database - only on the original order
   await supabase
     .from('orders')
     .update({
@@ -501,7 +506,8 @@ async function handleDataUsage(content: {
       total_bytes: content.totalVolume, // Store provider's totalVolume
       last_usage_update: content.lastUpdateTime,
     })
-    .eq('iccid', content.iccid);
+    .eq('iccid', content.iccid)
+    .eq('is_topup', false);
 
   // Send email notification to user about data usage
   try {
@@ -561,11 +567,12 @@ async function handleValidityUsage(content: {
   expiredTime: string;
   remain: number;
 }) {
-  // Get order details (avoid joins)
+  // Get original order details (not top-ups) - validity applies to the eSIM itself
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .select('*')
     .eq('iccid', content.iccid)
+    .eq('is_topup', false)
     .maybeSingle();
 
   if (orderError || !order) {
@@ -573,14 +580,15 @@ async function handleValidityUsage(content: {
   }
 
   // Update expires_at with the exact expiration time from eSIM Access
-  // This is more accurate than our calculated value
+  // This is more accurate than our calculated value - only on original order
   try {
     const expiresAt = new Date(content.expiredTime);
     if (!isNaN(expiresAt.getTime())) {
       const { error } = await supabase
         .from('orders')
         .update({ expires_at: expiresAt.toISOString() })
-        .eq('iccid', content.iccid);
+        .eq('iccid', content.iccid)
+        .eq('is_topup', false);
 
       if (error) {
         console.error('[VALIDITY_USAGE] Failed to update expires_at:', error.message, { iccid: content.iccid });

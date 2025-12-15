@@ -200,6 +200,8 @@ export async function POST(req: NextRequest) {
         plan_id: planId,
         status: 'pending',
         is_topup: isTopUp || false,
+        // Store the target ICCID for top-ups so webhook knows which eSIM to top up
+        iccid: isTopUp && iccid ? iccid : null,
       })
       .select()
       .single();
@@ -215,7 +217,18 @@ export async function POST(req: NextRequest) {
     const amount = convertToStripeAmount(plan.retail_price, currency as Currency);
 
     // Route specific users (e.g. App Store / Play Store reviewers) through Stripe TEST mode
-    const stripeMode: StripeMode = (user as any).is_test_user ? 'test' : 'live';
+    const isTestUser = (user as any).is_test_user === true;
+    const stripeMode: StripeMode = isTestUser ? 'test' : 'live';
+
+    // Debug: Log test user detection
+    console.log('[Mobile Checkout] Test user check:', {
+      userId: user.id,
+      email: user.email,
+      is_test_user_raw: (user as any).is_test_user,
+      is_test_user_type: typeof (user as any).is_test_user,
+      isTestUser,
+      stripeMode,
+    });
 
     console.log('[Mobile Checkout] Creating Payment Intent...', {
       currency,

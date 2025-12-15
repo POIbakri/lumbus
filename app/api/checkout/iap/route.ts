@@ -13,7 +13,13 @@ const iapCheckoutSchema = z.object({
   existingOrderId: z.string().uuid().optional(),
   iccid: z.string().optional(),
   referralCode: z.string().optional(),
-});
+}).refine(
+  (data) => !data.isTopUp || (data.iccid && data.iccid.length > 0),
+  {
+    message: 'iccid is required when isTopUp is true',
+    path: ['iccid'],
+  }
+);
 
 /**
  * Apple IAP Checkout API
@@ -163,6 +169,35 @@ export async function POST(req: NextRequest) {
     }
     console.log('[IAP Checkout] User ready:', user.id);
 
+    // Validate ICCID ownership for top-ups
+    if (isTopUp && iccid) {
+      const { data: existingOrder, error: ownershipError } = await supabase
+        .from('orders')
+        .select('id, iccid')
+        .eq('user_id', user.id)
+        .eq('iccid', iccid)
+        .limit(1)
+        .maybeSingle();
+
+      if (ownershipError) {
+        console.error('[IAP Checkout] ICCID ownership check failed:', ownershipError);
+        return NextResponse.json({ error: 'Failed to validate eSIM ownership' }, { status: 500 });
+      }
+
+      if (!existingOrder) {
+        console.warn('[IAP Checkout] ICCID ownership validation failed:', {
+          userId: user.id,
+          iccid,
+        });
+        return NextResponse.json(
+          { error: 'You do not own an eSIM with this ICCID' },
+          { status: 403 }
+        );
+      }
+
+      console.log('[IAP Checkout] ICCID ownership validated:', existingOrder.id);
+    }
+
     // Create pending order
     console.log('[IAP Checkout] Creating order in database...');
     const { data: order, error: orderError } = await supabase
@@ -173,6 +208,8 @@ export async function POST(req: NextRequest) {
         status: 'pending',
         currency: currency, // User's detected currency (for record keeping)
         is_topup: isTopUp || false,
+        // Store the target ICCID for top-ups so validate-receipt knows which eSIM to top up
+        iccid: isTopUp && iccid ? iccid : null,
       })
       .select()
       .single();
