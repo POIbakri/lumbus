@@ -181,8 +181,8 @@ export async function POST(req: NextRequest) {
         const existingPlan = Array.isArray(existingOrderForTopUp?.plans)
           ? existingOrderForTopUp.plans[0]
           : existingOrderForTopUp?.plans;
-        const existingDataBytes = existingOrderForTopUp?.total_bytes
-          ?? ((existingOrderForTopUp?.data_remaining_bytes ?? 0) + (existingOrderForTopUp?.data_usage_bytes ?? 0))
+        const existingDataBytes = (existingOrderForTopUp?.total_bytes
+          ?? ((existingOrderForTopUp?.data_remaining_bytes ?? 0) + (existingOrderForTopUp?.data_usage_bytes ?? 0)))
           || ((existingPlan?.data_gb ?? 0) * 1024 * 1024 * 1024);
 
         const topUpResponse = await topUpEsim({
