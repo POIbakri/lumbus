@@ -571,10 +571,13 @@ export async function getTopUpPackages(params: {
         price: number;
         currency: string;
         locationCode: string;
+        supportTopUpType?: number;
       }>;
     }>('/package/list', requestBody);
 
-    return data.packageList || [];
+    // Filter out packages that explicitly don't support top-ups
+    // supportTopUpType: 1 = new eSIM only, 2 = supports top-up, undefined = assume supports
+    return (data.packageList || []).filter(pkg => pkg.supportTopUpType !== 1);
   } catch (error) {
     throw error;
   }

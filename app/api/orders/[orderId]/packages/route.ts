@@ -3,13 +3,12 @@
  *
  * GET /api/orders/[orderId]/packages
  *
- * Fetches available top-up packages from eSIM Access API for a specific order.
- * This ensures packages are compatible with the user's existing eSIM.
+ * Returns available top-up packages from local Supabase plans table.
+ * Filters by the same region as the original order's plan.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
-import { getTopUpPackages } from '@/lib/esimaccess';
 import { requireUserAuth } from '@/lib/server-auth';
 
 interface RouteParams {
@@ -29,10 +28,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const userId = auth.user.id;
     const { orderId } = await params;
 
-    // Get order with esim_tran_no and iccid
+    // Get order with plan details including region
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('id, user_id, esim_tran_no, iccid, plan_id, plans(supplier_sku)')
+      .select('id, user_id, esim_tran_no, iccid, plan_id, plans(id, name, region_code, supplier_sku)')
       .eq('id', orderId)
       .single();
 
@@ -48,7 +47,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Check if order has esim_tran_no or iccid
+    // Check if order has esim_tran_no or iccid (eSIM must be provisioned)
     if (!order.esim_tran_no && !order.iccid) {
       return NextResponse.json(
         { error: 'eSIM not yet provisioned. Cannot query top-up packages.' },
@@ -56,31 +55,54 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    try {
-      // Query available top-up packages from eSIM Access API
-      const packages = await getTopUpPackages({
-        esimTranNo: order.esim_tran_no || undefined,
-        iccid: order.esim_tran_no ? undefined : order.iccid || undefined,
-      });
+    // Get the region from the original plan (handle array or single object)
+    const originalPlan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+    const regionCode = (originalPlan as any)?.region_code;
 
-      console.log('[Packages API] Found', packages.length, 'compatible packages for order:', orderId);
-
-      return NextResponse.json({
-        success: true,
-        packages,
-      });
-    } catch (esimError) {
-      console.error('Failed to fetch packages from eSIM Access:', esimError);
-
+    if (!regionCode) {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to fetch available packages from eSIM Access API',
-          packages: [],
-        },
-        { status: 200 } // Return 200 with empty packages rather than error
+        { error: 'Could not determine region for this order' },
+        { status: 400 }
       );
     }
+
+    // Query local plans for the same region
+    const { data: plans, error: plansError } = await supabase
+      .from('plans')
+      .select('id, name, region_code, data_gb, validity_days, supplier_sku, retail_price, currency')
+      .eq('region_code', regionCode)
+      .eq('is_active', true)
+      .order('data_gb', { ascending: true });
+
+    if (plansError) {
+      console.error('[Packages API] Failed to fetch plans:', plansError);
+      return NextResponse.json(
+        { error: 'Failed to fetch available packages' },
+        { status: 500 }
+      );
+    }
+
+    // Transform to match expected format
+    const packages = (plans || []).map(plan => ({
+      id: plan.id,
+      packageCode: plan.supplier_sku,
+      name: plan.name,
+      data: `${plan.data_gb}GB`,
+      dataGb: plan.data_gb,
+      validity: `${plan.validity_days} Days`,
+      validityDays: plan.validity_days,
+      price: plan.retail_price,
+      currency: plan.currency || 'USD',
+      locationCode: plan.region_code,
+    }));
+
+    console.log('[Packages API] Found', packages.length, 'packages for region:', regionCode);
+
+    return NextResponse.json({
+      success: true,
+      packages,
+      region: regionCode,
+    });
   } catch (error) {
     console.error('Packages API error:', error);
     return NextResponse.json(

@@ -55,7 +55,17 @@ const checkoutSchema = z.object({
   planId: z.string().uuid(),
   email: z.string().email(),
   currency: z.string().optional().default('USD'),
-});
+  // Top-up fields
+  isTopUp: z.boolean().optional(),
+  existingOrderId: z.string().uuid().optional(),
+  iccid: z.string().optional(),
+}).refine(
+  (data) => !data.isTopUp || (data.iccid && data.iccid.length > 0),
+  {
+    message: 'iccid is required when isTopUp is true',
+    path: ['iccid'],
+  }
+);
 
 /**
  * Mobile Checkout API - Creates Payment Intent for Stripe Payment Sheet
@@ -67,9 +77,9 @@ export async function POST(req: NextRequest) {
   try {
     console.log('[Mobile Checkout] Starting mobile checkout...');
     const body = await req.json();
-    console.log('[Mobile Checkout] Request body:', { planId: body.planId, email: body.email });
+    console.log('[Mobile Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
 
-    const { planId, email, currency } = checkoutSchema.parse(body);
+    const { planId, email, currency, isTopUp, existingOrderId, iccid } = checkoutSchema.parse(body);
 
     // Get plan details
     console.log('[Mobile Checkout] Fetching plan:', planId);
@@ -152,14 +162,44 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Mobile Checkout] User ready:', user.id);
 
+    // Validate ICCID ownership for top-ups
+    if (isTopUp && iccid) {
+      const { data: existingOrder, error: ownershipError } = await supabase
+        .from('orders')
+        .select('id, iccid')
+        .eq('user_id', user.id)
+        .eq('iccid', iccid)
+        .limit(1)
+        .maybeSingle();
+
+      if (ownershipError) {
+        console.error('[Mobile Checkout] ICCID ownership check failed:', ownershipError);
+        return NextResponse.json({ error: 'Failed to validate eSIM ownership' }, { status: 500 });
+      }
+
+      if (!existingOrder) {
+        console.warn('[Mobile Checkout] ICCID ownership validation failed - user does not own this eSIM:', {
+          userId: user.id,
+          iccid,
+        });
+        return NextResponse.json(
+          { error: 'You do not own an eSIM with this ICCID' },
+          { status: 403 }
+        );
+      }
+
+      console.log('[Mobile Checkout] ICCID ownership validated:', existingOrder.id);
+    }
+
     // Create pending order
-    console.log('[Mobile Checkout] Creating order in database...');
+    console.log('[Mobile Checkout] Creating order in database...', { isTopUp, existingOrderId, iccid });
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         user_id: user.id,
         plan_id: planId,
         status: 'pending',
+        is_topup: isTopUp || false,
       })
       .select()
       .single();
@@ -197,6 +237,10 @@ export async function POST(req: NextRequest) {
         needsPasswordSetup: isNewUser ? 'true' : 'false',
         source: 'mobile',
         stripeMode,
+        // Top-up metadata
+        isTopUp: isTopUp ? 'true' : 'false',
+        existingOrderId: existingOrderId || '',
+        iccid: iccid || '',
       },
       automatic_payment_methods: {
         enabled: true,

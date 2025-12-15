@@ -393,6 +393,8 @@ export async function POST(req: NextRequest) {
       const needsPasswordSetup = paymentIntent.metadata?.needsPasswordSetup === 'true';
       const userEmail = paymentIntent.metadata?.userEmail;
       const source = paymentIntent.metadata?.source;
+      const isTopUp = paymentIntent.metadata?.isTopUp === 'true';
+      const existingOrderIccid = paymentIntent.metadata?.iccid;
 
       if (!orderId) {
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
@@ -448,38 +450,93 @@ export async function POST(req: NextRequest) {
         // Check if user is a test user (for mocking eSIM provision)
         const isTestUser = (user as any).is_test_user === true;
 
-        // Assign new eSIM via eSIM Access API
-        const esimResponse = await assignEsim({
-          packageId: plan.supplier_sku,
-          email: user.email,
-          reference: orderId,
-        }, isTestUser);
+        if (isTopUp && existingOrderIccid) {
+          // TOP-UP: Add data to existing eSIM
+          console.log('[Webhook] Processing top-up for ICCID:', existingOrderIccid);
 
-        // For test users, mock response includes activation details immediately
-        // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
-        if (isTestUser) {
-          // Test user: save mock activation details and mark as completed
-          await supabase
+          // Get esimTranNo from existing order with same ICCID
+          const { data: existingOrderForTopUp } = await supabase
             .from('orders')
-            .update({
-              status: 'completed',
-              connect_order_id: esimResponse.orderId,
-              iccid: esimResponse.iccid || null,
-              smdp: esimResponse.smdpAddress || null,
-              activation_code: esimResponse.activationCode || null,
-              qr_url: esimResponse.qrCode || null,
-            })
-            .eq('id', orderId);
+            .select('esim_tran_no, iccid')
+            .eq('user_id', user.id)
+            .eq('iccid', existingOrderIccid)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          const esimTranNo = existingOrderForTopUp?.esim_tran_no;
+          const transactionId = `topup_${orderId}_${Date.now()}`;
+
+          const topUpResponse = await topUpEsim({
+            iccid: existingOrderIccid,
+            esimTranNo: esimTranNo || undefined,
+            packageCode: plan.supplier_sku,
+            transactionId,
+            amount: plan.retail_price.toString(),
+          }, isTestUser);
+
+          if (topUpResponse.success) {
+            // Update order with top-up details - use SAME ICCID
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                iccid: topUpResponse.iccid, // Same ICCID
+                data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+                data_usage_bytes: topUpResponse.orderUsage,
+                last_usage_update: new Date().toISOString(),
+              })
+              .eq('id', orderId);
+
+            // Send top-up confirmation email
+            try {
+              await sendTopUpConfirmationEmail({
+                to: user.email,
+                planName: plan.name,
+                dataAdded: plan.data_gb,
+                validityDays: plan.validity_days,
+                iccid: topUpResponse.iccid,
+              });
+            } catch (emailError) {
+              // Don't fail webhook for email errors
+            }
+          } else {
+            throw new Error('Top-up failed');
+          }
         } else {
-          // Real user: only save standard fields, wait for ORDER_STATUS webhook
-          await supabase
-            .from('orders')
-            .update({
-              status: 'provisioning',
-              connect_order_id: esimResponse.orderId,
-              iccid: esimResponse.iccid || null,
-            })
-            .eq('id', orderId);
+          // NEW eSIM: Assign new eSIM via eSIM Access API
+          const esimResponse = await assignEsim({
+            packageId: plan.supplier_sku,
+            email: user.email,
+            reference: orderId,
+          }, isTestUser);
+
+          // For test users, mock response includes activation details immediately
+          // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
+          if (isTestUser) {
+            // Test user: save mock activation details and mark as completed
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                connect_order_id: esimResponse.orderId,
+                iccid: esimResponse.iccid || null,
+                smdp: esimResponse.smdpAddress || null,
+                activation_code: esimResponse.activationCode || null,
+                qr_url: esimResponse.qrCode || null,
+              })
+              .eq('id', orderId);
+          } else {
+            // Real user: only save standard fields, wait for ORDER_STATUS webhook
+            await supabase
+              .from('orders')
+              .update({
+                status: 'provisioning',
+                connect_order_id: esimResponse.orderId,
+                iccid: esimResponse.iccid || null,
+              })
+              .eq('id', orderId);
+          }
         }
       } catch (error) {
         await supabase
