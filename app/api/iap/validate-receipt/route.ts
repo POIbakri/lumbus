@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
         // Get existing order to retrieve esimTranNo and current data values (for test mode simulation)
         const { data: existingOrderForTopUp } = await supabase
           .from('orders')
-          .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes')
+          .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes, expires_at, plans(data_gb)')
           .eq('user_id', user.id)
           .eq('iccid', topUpIccid)
           .eq('is_topup', false) // Get the original order for accurate data
@@ -176,6 +176,15 @@ export async function POST(req: NextRequest) {
         // Generate unique transaction ID
         const topUpTransactionId = `apple_topup_${orderId}_${Date.now()}`;
 
+        // Calculate existing data bytes with proper fallbacks
+        // Priority: total_bytes > (remaining + usage) > plan data > 0
+        const existingPlan = Array.isArray(existingOrderForTopUp?.plans)
+          ? existingOrderForTopUp.plans[0]
+          : existingOrderForTopUp?.plans;
+        const existingDataBytes = existingOrderForTopUp?.total_bytes
+          ?? ((existingOrderForTopUp?.data_remaining_bytes ?? 0) + (existingOrderForTopUp?.data_usage_bytes ?? 0))
+          || ((existingPlan?.data_gb ?? 0) * 1024 * 1024 * 1024);
+
         const topUpResponse = await topUpEsim({
           iccid: topUpIccid, // Always pass ICCID (safe: topUpEsim prefers esimTranNo for real API, but needs iccid for mock return)
           esimTranNo: esimTranNo || undefined,
@@ -185,23 +194,30 @@ export async function POST(req: NextRequest) {
           // Mock data for test users - simulates realistic top-up
           mockPlanDataGb: plan.data_gb,
           mockPlanValidityDays: plan.validity_days,
-          mockExistingDataBytes: existingOrderForTopUp?.total_bytes || 0,
+          mockExistingDataBytes: existingDataBytes,
           mockExistingUsageBytes: existingOrderForTopUp?.data_usage_bytes || 0,
+          mockExistingExpiryTime: existingOrderForTopUp?.expires_at || undefined,
         }, isTestUser);
 
         if (topUpResponse.success) {
-          // Update top-up order with details
-          await supabase
+          // Update top-up order with details and cumulative data for consistency
+          const { error: topUpOrderUpdateError } = await supabase
             .from('orders')
             .update({
               status: 'completed',
               iccid: topUpResponse.iccid,
+              total_bytes: topUpResponse.totalVolume, // Include for consistency with original order
               data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
               data_usage_bytes: topUpResponse.orderUsage,
               expires_at: topUpResponse.expiredTime, // New expiry after top-up
               last_usage_update: new Date().toISOString(),
             })
             .eq('id', orderId);
+
+          if (topUpOrderUpdateError) {
+            console.error('[IAP Validate] Failed to update top-up order:', topUpOrderUpdateError);
+            // Continue anyway - the eSIM provider has already processed the top-up
+          }
 
           // ALSO update the ORIGINAL order's data so UI shows correct totals
           // The topUpResponse contains the NEW total for the entire eSIM profile

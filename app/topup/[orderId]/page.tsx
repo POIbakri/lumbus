@@ -213,7 +213,9 @@ export default function TopUpPage({ params }: TopUpPageProps) {
   }
 
   const dataUsedBytes = order.data_usage_bytes || 0;
-  const totalDataBytes = (order.plan?.data_gb || 0) * 1024 * 1024 * 1024;
+  // Use total_bytes if available (includes top-ups), otherwise fall back to plan data
+  const totalDataBytes = (order as any).total_bytes || ((order.plan?.data_gb || 0) * 1024 * 1024 * 1024);
+  const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
   const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
   const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
 
@@ -257,7 +259,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
                 <div className="p-4 bg-white rounded-xl">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-black uppercase text-xs">Current Usage</span>
-                    <span className="font-black text-sm">{dataUsedGB.toFixed(1)} / {order.plan?.data_gb} GB</span>
+                    <span className="font-black text-sm">{dataUsedGB.toFixed(1)} / {totalDataGB.toFixed(1)} GB</span>
                   </div>
                   <div className="w-full bg-foreground/10 rounded-full h-3 overflow-hidden">
                     <div

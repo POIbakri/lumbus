@@ -599,6 +599,7 @@ export async function topUpEsim(params: {
   mockPlanValidityDays?: number;
   mockExistingDataBytes?: number;
   mockExistingUsageBytes?: number;
+  mockExistingExpiryTime?: string; // Existing expiry to extend from
 }, isTestMode = false): Promise<{
   success: boolean;
   transactionId: string;
@@ -618,18 +619,25 @@ export async function topUpEsim(params: {
       const planValidityDays = params.mockPlanValidityDays || 30;
       const existingDataBytes = params.mockExistingDataBytes || 0;
       const existingUsageBytes = params.mockExistingUsageBytes || 0;
+      const existingExpiryTime = params.mockExistingExpiryTime;
 
       // Simulate adding data to existing eSIM
       const newTotalVolume = existingDataBytes + planDataBytes;
+
+      // Validity is cumulative: extend from existing expiry (or now if expired/not set)
+      // Real API adds new validity to remaining validity, but never from a past date
+      const existingExpiryMs = existingExpiryTime ? new Date(existingExpiryTime).getTime() : 0;
+      const baseTime = Math.max(existingExpiryMs, Date.now()); // Never extend from past
+      const newExpiry = new Date(baseTime + planValidityDays * 24 * 60 * 60 * 1000);
 
       return {
         success: true,
         transactionId: params.transactionId,
         // Use the provided ICCID - must match the eSIM being topped up
         iccid: params.iccid || '89000000000000000000',
-        expiredTime: new Date(Date.now() + planValidityDays * 24 * 60 * 60 * 1000).toISOString(),
+        expiredTime: newExpiry.toISOString(),
         totalVolume: newTotalVolume,
-        totalDuration: planValidityDays,
+        totalDuration: planValidityDays, // This is the added duration, not cumulative
         orderUsage: existingUsageBytes, // Preserve existing usage
       };
     }

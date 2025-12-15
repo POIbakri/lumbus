@@ -216,6 +216,17 @@ export default function DashboardPage() {
   }, [user, loadOrders, loadReferralStats]);
 
 
+  // Helper to calculate remaining bytes with fallback logic
+  const getDataRemainingBytes = (o: OrderWithPlan): number => {
+    if (o.data_remaining_bytes != null) {
+      return o.data_remaining_bytes;
+    }
+    // Fallback: calculate from total_bytes or plan data
+    const totalBytes = (o as any).total_bytes || ((o.plan?.data_gb || 0) * 1024 * 1024 * 1024);
+    const usedBytes = o.data_usage_bytes || 0;
+    return Math.max(0, totalBytes - usedBytes);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -242,8 +253,8 @@ export default function DashboardPage() {
   };
 
   const getDisplayStatus = (order: OrderWithPlan): string => {
-    // Check if depleted
-    if (order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0) {
+    // Check if depleted - use helper with fallback logic for consistency
+    if (getDataRemainingBytes(order) <= 0) {
       return 'depleted';
     }
 
@@ -445,9 +456,13 @@ export default function DashboardPage() {
   }
 
   // Filter for truly active orders (completed/provisioning/active) that are not depleted or expired
+  // IMPORTANT: Exclude top-up orders - they share the same ICCID as the original and shouldn't show as separate eSIMs
   const activeOrders = orders.filter(o => {
+    // Top-up orders should never show as separate eSIMs
+    if ((o as any).is_topup === true) return false;
+
     const status = o.status;
-    const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
+    const isDepleted = getDataRemainingBytes(o) <= 0;
     const expired = isOrderExpired(o);
 
     // Explicitly exclude cancelled, revoked, or failed orders
@@ -457,9 +472,12 @@ export default function DashboardPage() {
     return (status === 'completed' || status === 'provisioning' || status === 'active') && !isDepleted && !expired && !isInvalidStatus;
   });
 
-  // Past orders: Show depleted OR expired eSIMs
+  // Past orders: Show depleted OR expired eSIMs (exclude top-ups)
   const pastOrders = orders.filter(o => {
-    const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
+    // Top-up orders should never show as separate eSIMs
+    if ((o as any).is_topup === true) return false;
+
+    const isDepleted = getDataRemainingBytes(o) <= 0;
     const expired = isOrderExpired(o);
     return isDepleted || expired;
   });
@@ -517,21 +535,15 @@ export default function DashboardPage() {
                   {(() => {
                     // Calculate total data remaining across all active eSIMs
                     const totalRemaining = activeOrders.reduce((sum, o) => {
-                      // Use marketing values for consistency
-                      const planGB = o.plan?.data_gb || 0;
-                      const planMB = planGB * 1024;
-
-                      // Get marketing total
-                      let marketingTotalMB = planMB;
-                      if (planMB <= 105) marketingTotalMB = 100;
-                      else if (planMB <= 260) marketingTotalMB = 200;
-                      else if (planMB <= 520) marketingTotalMB = 500;
-                      else if (planMB <= 1000) marketingTotalMB = 1000;
-
-                      const marketingTotalBytes = marketingTotalMB * 1024 * 1024;
+                      // Use data_remaining_bytes from DB (most accurate, includes top-ups)
+                      // Use != null to catch both null and undefined
+                      if (o.data_remaining_bytes != null) {
+                        return sum + (o.data_remaining_bytes / (1024 * 1024 * 1024));
+                      }
+                      // Fallback: calculate from total_bytes or plan data
+                      const totalBytes = (o as any).total_bytes || ((o.plan?.data_gb || 0) * 1024 * 1024 * 1024);
                       const usedBytes = o.data_usage_bytes || 0;
-                      const remainingBytes = Math.max(0, marketingTotalBytes - usedBytes);
-                      const remainingGB = remainingBytes / (1024 * 1024 * 1024);
+                      const remainingGB = Math.max(0, totalBytes - usedBytes) / (1024 * 1024 * 1024);
                       return sum + remainingGB;
                     }, 0);
 
@@ -613,8 +625,10 @@ export default function DashboardPage() {
                             {readyOrders.map((order, index) => {
                               const daysRemaining = getDaysRemaining(order);
                               const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
-                              const totalData = order.plan?.data_gb || 0;
-                              const totalDataFormatted = formatPlanData(totalData);
+                              // Use total_bytes if available (includes top-ups), otherwise fall back to plan data
+                              const totalBytes = (order as any).total_bytes || ((order.plan?.data_gb || 0) * 1024 * 1024 * 1024);
+                              const totalDataGB = totalBytes / (1024 * 1024 * 1024);
+                              const totalDataFormatted = formatPlanData(totalDataGB);
 
                               return (
                                 <Card
@@ -703,26 +717,22 @@ export default function DashboardPage() {
                   const daysRemaining = getDaysRemaining(order);
                   const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
 
-                  // Calculate real data usage from database
-                  // Use marketing values for user-facing math (500 MB not 512 MB)
-                  const planGB = order.plan?.data_gb || 0;
-                  const planMB = planGB * 1024;
+                  // Calculate data usage - use total_bytes if available (includes top-ups)
+                  const totalBytes = (order as any).total_bytes || ((order.plan?.data_gb || 0) * 1024 * 1024 * 1024);
+                  const totalGB = totalBytes / (1024 * 1024 * 1024);
 
-                  // Get marketing-friendly total (e.g., 500 MB instead of 512 MB)
-                  let marketingTotalMB = planMB;
-                  if (planMB <= 105) marketingTotalMB = 100;
-                  else if (planMB <= 260) marketingTotalMB = 200;
-                  else if (planMB <= 520) marketingTotalMB = 500; // 512 MB shown as 500 MB
-                  else if (planMB <= 1000) marketingTotalMB = 1000;
-
-                  const marketingTotalBytes = marketingTotalMB * 1024 * 1024;
                   const dataUsedBytes = order.data_usage_bytes || 0;
                   const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
-                  const dataRemainingBytes = Math.max(0, marketingTotalBytes - dataUsedBytes);
+
+                  // Use data_remaining_bytes from DB if available (most accurate after top-ups)
+                  // Use != null to catch both null and undefined
+                  const dataRemainingBytes = order.data_remaining_bytes != null
+                    ? order.data_remaining_bytes
+                    : Math.max(0, totalBytes - dataUsedBytes);
                   const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
 
                   // Progress bar shows USED percentage (fills up as you use data)
-                  const dataUsedPercentage = marketingTotalBytes > 0 ? (dataUsedBytes / marketingTotalBytes) * 100 : 0;
+                  const dataUsedPercentage = totalBytes > 0 ? (dataUsedBytes / totalBytes) * 100 : 0;
 
                   // Format data for display
                   const formatData = (gb: number) => {
@@ -731,11 +741,11 @@ export default function DashboardPage() {
                     return formatDataUsage(gb); // Use precise formatting for usage
                   };
 
-                  const totalData = order.plan?.data_gb || 0;
-                  const totalDataFormatted = formatPlanData(totalData); // Use marketing-friendly formatting for plan data
+                  const totalDataFormatted = formatPlanData(totalGB); // Use total including top-ups
 
-                  // Check if plan is depleted
-                  const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+                  // Check if plan is depleted - use calculated dataRemainingBytes for consistency
+                  // (includes fallback logic when DB value is null/undefined)
+                  const isDepleted = dataRemainingBytes <= 0;
 
                   return (
                     <Card
@@ -943,13 +953,15 @@ export default function DashboardPage() {
                     <div className="space-y-3 sm:space-y-4">
                       {pastOrders.map((order) => {
                       const countryInfo = order.plan ? getCountryInfo(order.plan.region_code) : null;
-                      const totalData = order.plan?.data_gb || 0;
-                      const totalDataFormatted = formatPlanData(totalData);
+                      // Use total_bytes if available (includes top-ups), otherwise fall back to plan data
+                      const totalBytes = (order as any).total_bytes || ((order.plan?.data_gb || 0) * 1024 * 1024 * 1024);
+                      const totalDataGB = totalBytes / (1024 * 1024 * 1024);
+                      const totalDataFormatted = formatPlanData(totalDataGB);
                       // Format order reference (last 8 characters of order ID)
                       const orderRef = order.id.slice(-8).toUpperCase();
 
-                      // Check both depleted and expired status
-                      const isDepleted = order.data_remaining_bytes !== null && order.data_remaining_bytes <= 0;
+                      // Check both depleted and expired status - use helper for consistency
+                      const isDepleted = getDataRemainingBytes(order) <= 0;
                       const isExpired = isOrderExpired(order);
 
                       return (

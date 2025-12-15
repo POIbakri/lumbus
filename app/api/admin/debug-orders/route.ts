@@ -48,10 +48,11 @@ export async function GET() {
       const isDepleted = o.data_remaining_bytes !== null && o.data_remaining_bytes <= 0;
       const isExpired = daysRemaining <= 0 && o.activated_at !== null;
       const isActiveStatus = o.status === 'completed' || o.status === 'provisioning' || o.status === 'active';
+      const isTopUp = (o as any).is_topup === true;
 
-      // Current filter logic
-      const wouldShowInActiveSims = isActiveStatus && !isDepleted && !isExpired;
-      const wouldShowInOrderHistory = isDepleted; // Past orders: ONLY show truly depleted eSIMs
+      // Current filter logic - top-ups should never show as separate eSIMs
+      const wouldShowInActiveSims = !isTopUp && isActiveStatus && !isDepleted && !isExpired;
+      const wouldShowInOrderHistory = !isTopUp && isDepleted; // Past orders: ONLY show truly depleted eSIMs (not top-ups)
 
       return {
         id: o.id,
