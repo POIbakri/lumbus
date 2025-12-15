@@ -65,10 +65,13 @@ export async function GET(req: NextRequest) {
         activation_code,
         data_usage_bytes,
         data_remaining_bytes,
+        total_bytes,
+        is_topup,
         plans(data_gb, validity_days)
       `)
       .in('user_id', testUserIds)
-      .in('status', ['completed', 'provisioning', 'active']);
+      .in('status', ['completed', 'provisioning', 'active'])
+      .or('is_topup.is.null,is_topup.eq.false'); // Only simulate original orders, not top-ups
 
     if (ordersError) {
       console.error('[Test Simulation Cron] Failed to fetch orders:', ordersError);
@@ -102,7 +105,8 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
-      const totalDataBytes = plan.data_gb * 1024 * 1024 * 1024;
+      // Use total_bytes if available (includes top-ups), otherwise fall back to plan data
+      const totalDataBytes = (order as any).total_bytes || (plan.data_gb * 1024 * 1024 * 1024);
       const orderCreated = new Date(order.created_at);
       const minutesSinceCreation = (now.getTime() - orderCreated.getTime()) / (1000 * 60);
 

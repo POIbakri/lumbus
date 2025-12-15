@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
         expires_at,
         data_usage_bytes,
         data_remaining_bytes,
+        total_bytes,
         last_usage_update,
         stripe_session_id,
         amount_cents,

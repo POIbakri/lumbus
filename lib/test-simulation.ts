@@ -27,6 +27,7 @@ interface OrderForSimulation {
   activated_at?: string | null;
   data_usage_bytes?: number | null;
   data_remaining_bytes?: number | null;
+  total_bytes?: number | null; // Includes top-ups
   smdp?: string | null;
   activation_code?: string | null;
   plan?: {
@@ -60,8 +61,8 @@ export function simulateTestUserUsage(order: OrderForSimulation): SimulatedUsage
   const orderCreated = new Date(order.created_at);
   const minutesSinceCreation = (now.getTime() - orderCreated.getTime()) / (1000 * 60);
 
-  // Total data in bytes
-  const totalDataBytes = order.plan.data_gb * 1024 * 1024 * 1024;
+  // Total data in bytes - use total_bytes if available (includes top-ups), otherwise plan data
+  const totalDataBytes = order.total_bytes || (order.plan.data_gb * 1024 * 1024 * 1024);
 
   // Simulate activation 1 minute after order creation
   const activationDelayMinutes = 1;
