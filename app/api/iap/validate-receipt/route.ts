@@ -160,12 +160,13 @@ export async function POST(req: NextRequest) {
         // Top-up existing eSIM
         console.log('[IAP Validate] Processing top-up for ICCID:', topUpIccid);
 
-        // Get existing order to retrieve esimTranNo
+        // Get existing order to retrieve esimTranNo and current data values (for test mode simulation)
         const { data: existingOrderForTopUp } = await supabase
           .from('orders')
-          .select('esim_tran_no, iccid')
+          .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes')
           .eq('user_id', user.id)
           .eq('iccid', topUpIccid)
+          .eq('is_topup', false) // Get the original order for accurate data
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -181,6 +182,11 @@ export async function POST(req: NextRequest) {
           packageCode: plan.supplier_sku,
           transactionId: topUpTransactionId,
           amount: plan.retail_price.toString(),
+          // Mock data for test users - simulates realistic top-up
+          mockPlanDataGb: plan.data_gb,
+          mockPlanValidityDays: plan.validity_days,
+          mockExistingDataBytes: existingOrderForTopUp?.total_bytes || 0,
+          mockExistingUsageBytes: existingOrderForTopUp?.data_usage_bytes || 0,
         }, isTestUser);
 
         if (topUpResponse.success) {

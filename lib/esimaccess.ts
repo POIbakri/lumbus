@@ -594,6 +594,11 @@ export async function topUpEsim(params: {
   packageCode: string;
   transactionId: string;
   amount?: string;
+  // Mock data for test mode - allows realistic simulation
+  mockPlanDataGb?: number;
+  mockPlanValidityDays?: number;
+  mockExistingDataBytes?: number;
+  mockExistingUsageBytes?: number;
 }, isTestMode = false): Promise<{
   success: boolean;
   transactionId: string;
@@ -607,16 +612,25 @@ export async function topUpEsim(params: {
     // Mock response for test users
     if (isTestMode) {
       console.log('[eSIM Access] Test mode detected - returning mock top-up response');
+
+      // Use provided plan data or defaults
+      const planDataBytes = (params.mockPlanDataGb || 5) * 1024 * 1024 * 1024;
+      const planValidityDays = params.mockPlanValidityDays || 30;
+      const existingDataBytes = params.mockExistingDataBytes || 0;
+      const existingUsageBytes = params.mockExistingUsageBytes || 0;
+
+      // Simulate adding data to existing eSIM
+      const newTotalVolume = existingDataBytes + planDataBytes;
+
       return {
         success: true,
         transactionId: params.transactionId,
-        // Use the provided ICCID (or esimTranNo if that was passed, though mock relies on ICCID)
-        // Fallback to test ICCID only if none provided (which shouldn't happen in valid top-up)
+        // Use the provided ICCID - must match the eSIM being topped up
         iccid: params.iccid || '89000000000000000000',
-        expiredTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 days
-        totalVolume: 5 * 1024 * 1024 * 1024, // 5GB
-        totalDuration: 30,
-        orderUsage: 0,
+        expiredTime: new Date(Date.now() + planValidityDays * 24 * 60 * 60 * 1000).toISOString(),
+        totalVolume: newTotalVolume,
+        totalDuration: planValidityDays,
+        orderUsage: existingUsageBytes, // Preserve existing usage
       };
     }
 

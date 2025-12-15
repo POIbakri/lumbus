@@ -280,12 +280,13 @@ export async function POST(req: NextRequest) {
 
         if (isTopUp && iccid) {
           // Top-up existing eSIM
-          // Get existing order to check for esimTranNo
+          // Get existing order to check for esimTranNo and current data values (for test mode simulation)
           const { data: existingOrderForTopUp } = await supabase
             .from('orders')
-            .select('esim_tran_no, iccid')
+            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes')
             .eq('user_id', user.id)
             .eq('iccid', iccid)
+            .eq('is_topup', false) // Get the original order for accurate data
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
@@ -304,6 +305,11 @@ export async function POST(req: NextRequest) {
             packageCode: plan.supplier_sku,
             transactionId,
             amount: plan.retail_price.toString(),
+            // Mock data for test users - simulates realistic top-up
+            mockPlanDataGb: plan.data_gb,
+            mockPlanValidityDays: plan.validity_days,
+            mockExistingDataBytes: existingOrderForTopUp?.total_bytes || 0,
+            mockExistingUsageBytes: existingOrderForTopUp?.data_usage_bytes || 0,
           }, isTestUser);
 
           if (topUpResponse.success) {
@@ -487,12 +493,13 @@ export async function POST(req: NextRequest) {
           // TOP-UP: Add data to existing eSIM
           console.log('[Webhook] Processing top-up for ICCID:', existingOrderIccid);
 
-          // Get esimTranNo from existing order with same ICCID
+          // Get esimTranNo and current data values from existing order (for test mode simulation)
           const { data: existingOrderForTopUp } = await supabase
             .from('orders')
-            .select('esim_tran_no, iccid')
+            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes')
             .eq('user_id', user.id)
             .eq('iccid', existingOrderIccid)
+            .eq('is_topup', false) // Get the original order for accurate data
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
@@ -506,6 +513,11 @@ export async function POST(req: NextRequest) {
             packageCode: plan.supplier_sku,
             transactionId,
             amount: plan.retail_price.toString(),
+            // Mock data for test users - simulates realistic top-up
+            mockPlanDataGb: plan.data_gb,
+            mockPlanValidityDays: plan.validity_days,
+            mockExistingDataBytes: existingOrderForTopUp?.total_bytes || 0,
+            mockExistingUsageBytes: existingOrderForTopUp?.data_usage_bytes || 0,
           }, isTestUser);
 
           if (topUpResponse.success) {
