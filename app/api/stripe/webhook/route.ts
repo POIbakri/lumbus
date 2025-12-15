@@ -313,13 +313,37 @@ export async function POST(req: NextRequest) {
               .update({
                 status: 'completed',
                 iccid: topUpResponse.iccid,
-                // Note: We don't update data_usage_bytes here as it's the OLD usage before topup
-                // The totalVolume is the NEW total after top-up
                 data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
                 data_usage_bytes: topUpResponse.orderUsage,
+                expires_at: topUpResponse.expiredTime, // New expiry after top-up
                 last_usage_update: new Date().toISOString(),
               })
               .eq('id', orderId);
+
+            // ALSO update the ORIGINAL order's data so UI shows correct totals
+            const { error: originalOrderUpdateError, count: originalOrderCount } = await supabase
+              .from('orders')
+              .update(
+                {
+                  data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+                  data_usage_bytes: topUpResponse.orderUsage,
+                  total_bytes: topUpResponse.totalVolume,
+                  expires_at: topUpResponse.expiredTime, // Update expiry on original order too
+                  last_usage_update: new Date().toISOString(),
+                },
+                { count: 'exact' }
+              )
+              .eq('iccid', topUpResponse.iccid)
+              .eq('is_topup', false);
+
+            if (originalOrderUpdateError) {
+              console.error('[Webhook] Failed to update original order:', originalOrderUpdateError);
+              // Don't fail the webhook - top-up succeeded, but log for investigation
+            } else if (originalOrderCount === 0) {
+              console.warn('[Webhook] No original order found to update for ICCID:', topUpResponse.iccid);
+            } else {
+              console.log('[Webhook] Updated original order data after checkout.session top-up');
+            }
 
             // Send top-up confirmation email
             try {
@@ -351,6 +375,7 @@ export async function POST(req: NextRequest) {
           // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
           if (isTestUser) {
             // Test user: save mock activation details and mark as completed
+            const mockDataBytes = plan.data_gb * 1024 * 1024 * 1024;
             await supabase
               .from('orders')
               .update({
@@ -360,6 +385,9 @@ export async function POST(req: NextRequest) {
                 smdp: esimResponse.smdpAddress || null,
                 activation_code: esimResponse.activationCode || null,
                 qr_url: esimResponse.qrCode || null,
+                total_bytes: mockDataBytes,
+                data_remaining_bytes: mockDataBytes,
+                data_usage_bytes: 0,
               })
               .eq('id', orderId);
           } else {
@@ -481,17 +509,43 @@ export async function POST(req: NextRequest) {
           }, isTestUser);
 
           if (topUpResponse.success) {
-            // Update order with top-up details - use SAME ICCID
+            // Update top-up order with details
             await supabase
               .from('orders')
               .update({
                 status: 'completed',
-                iccid: topUpResponse.iccid, // Same ICCID
+                iccid: topUpResponse.iccid,
                 data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
                 data_usage_bytes: topUpResponse.orderUsage,
+                expires_at: topUpResponse.expiredTime, // New expiry after top-up
                 last_usage_update: new Date().toISOString(),
               })
               .eq('id', orderId);
+
+            // ALSO update the ORIGINAL order's data so UI shows correct totals
+            const { error: originalOrderUpdateError, count: originalOrderCount } = await supabase
+              .from('orders')
+              .update(
+                {
+                  data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+                  data_usage_bytes: topUpResponse.orderUsage,
+                  total_bytes: topUpResponse.totalVolume,
+                  expires_at: topUpResponse.expiredTime, // Update expiry on original order too
+                  last_usage_update: new Date().toISOString(),
+                },
+                { count: 'exact' }
+              )
+              .eq('iccid', topUpResponse.iccid)
+              .eq('is_topup', false);
+
+            if (originalOrderUpdateError) {
+              console.error('[Webhook] Failed to update original order:', originalOrderUpdateError);
+              // Don't fail the webhook - top-up succeeded, but log for investigation
+            } else if (originalOrderCount === 0) {
+              console.warn('[Webhook] No original order found to update for ICCID:', topUpResponse.iccid);
+            } else {
+              console.log('[Webhook] Updated original order data after payment_intent top-up');
+            }
 
             // Send top-up confirmation email
             try {
@@ -520,6 +574,7 @@ export async function POST(req: NextRequest) {
           // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
           if (isTestUser) {
             // Test user: save mock activation details and mark as completed
+            const mockDataBytes = plan.data_gb * 1024 * 1024 * 1024;
             await supabase
               .from('orders')
               .update({
@@ -529,6 +584,9 @@ export async function POST(req: NextRequest) {
                 smdp: esimResponse.smdpAddress || null,
                 activation_code: esimResponse.activationCode || null,
                 qr_url: esimResponse.qrCode || null,
+                total_bytes: mockDataBytes,
+                data_remaining_bytes: mockDataBytes,
+                data_usage_bytes: 0,
               })
               .eq('id', orderId);
           } else {

@@ -151,6 +151,10 @@ export async function POST(req: NextRequest) {
     // Trigger eSIM provisioning or top-up
     console.log('[IAP Validate] Triggering eSIM provisioning/top-up...');
 
+    // Check if user is a test user (for mocking eSIM provision)
+    const isTestUser = (user as any).is_test_user === true;
+    console.log('[IAP Validate] Test user check:', { userId: user.id, isTestUser });
+
     try {
       if (isTopUpOrder && topUpIccid) {
         // Top-up existing eSIM
@@ -172,15 +176,15 @@ export async function POST(req: NextRequest) {
         const topUpTransactionId = `apple_topup_${orderId}_${Date.now()}`;
 
         const topUpResponse = await topUpEsim({
-          iccid: esimTranNo ? undefined : topUpIccid, // Use iccid only if no esimTranNo
+          iccid: topUpIccid, // Always pass ICCID (safe: topUpEsim prefers esimTranNo for real API, but needs iccid for mock return)
           esimTranNo: esimTranNo || undefined,
           packageCode: plan.supplier_sku,
           transactionId: topUpTransactionId,
           amount: plan.retail_price.toString(),
-        });
+        }, isTestUser);
 
         if (topUpResponse.success) {
-          // Update order with top-up details
+          // Update top-up order with details
           await supabase
             .from('orders')
             .update({
@@ -188,9 +192,36 @@ export async function POST(req: NextRequest) {
               iccid: topUpResponse.iccid,
               data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
               data_usage_bytes: topUpResponse.orderUsage,
+              expires_at: topUpResponse.expiredTime, // New expiry after top-up
               last_usage_update: new Date().toISOString(),
             })
             .eq('id', orderId);
+
+          // ALSO update the ORIGINAL order's data so UI shows correct totals
+          // The topUpResponse contains the NEW total for the entire eSIM profile
+          const { error: originalOrderUpdateError, count: originalOrderCount } = await supabase
+            .from('orders')
+            .update(
+              {
+                data_remaining_bytes: topUpResponse.totalVolume - topUpResponse.orderUsage,
+                data_usage_bytes: topUpResponse.orderUsage,
+                total_bytes: topUpResponse.totalVolume,
+                expires_at: topUpResponse.expiredTime, // Update expiry on original order too
+                last_usage_update: new Date().toISOString(),
+              },
+              { count: 'exact' }
+            )
+            .eq('iccid', topUpResponse.iccid)
+            .eq('is_topup', false);
+
+          if (originalOrderUpdateError) {
+            console.error('[IAP Validate] Failed to update original order:', originalOrderUpdateError);
+            // Don't fail the request - top-up succeeded, but log for investigation
+          } else if (originalOrderCount === 0) {
+            console.warn('[IAP Validate] No original order found to update for ICCID:', topUpResponse.iccid);
+          } else {
+            console.log('[IAP Validate] Updated original order data after top-up');
+          }
 
           // Send top-up confirmation email
           try {
@@ -218,20 +249,41 @@ export async function POST(req: NextRequest) {
           packageId: plan.supplier_sku,
           email: user.email,
           reference: orderId,
-        });
+        }, isTestUser);
 
-        // Update order with initial eSIM details
-        // Status is 'provisioning' until we get activation details from ORDER_STATUS webhook
-        await supabase
-          .from('orders')
-          .update({
-            status: 'provisioning',
-            connect_order_id: esimResponse.orderId,
-            iccid: esimResponse.iccid || null,
-          })
-          .eq('id', orderId);
+        // For test users, mock response includes activation details immediately
+        // For real users, we get 'provisioning' status and wait for ORDER_STATUS webhook
+        if (isTestUser) {
+          // Test user: save mock activation details and mark as completed
+          await supabase
+            .from('orders')
+            .update({
+              status: 'completed',
+              connect_order_id: esimResponse.orderId,
+              iccid: esimResponse.iccid || null,
+              smdp: esimResponse.smdpAddress || null,
+              activation_code: esimResponse.activationCode || null,
+              qr_url: esimResponse.qrCode || null,
+              total_bytes: plan.data_gb * 1024 * 1024 * 1024, // Mock data allocation
+              data_remaining_bytes: plan.data_gb * 1024 * 1024 * 1024,
+              data_usage_bytes: 0,
+            })
+            .eq('id', orderId);
 
-        console.log('[IAP Validate] New eSIM provisioning initiated');
+          console.log('[IAP Validate] Test user: eSIM provisioned with mock activation details');
+        } else {
+          // Real user: only save standard fields, wait for ORDER_STATUS webhook
+          await supabase
+            .from('orders')
+            .update({
+              status: 'provisioning',
+              connect_order_id: esimResponse.orderId,
+              iccid: esimResponse.iccid || null,
+            })
+            .eq('id', orderId);
+
+          console.log('[IAP Validate] New eSIM provisioning initiated');
+        }
       }
     } catch (provisionError) {
       console.error('[IAP Validate] Failed to provision/top-up:', provisionError);
