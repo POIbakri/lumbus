@@ -6,12 +6,12 @@ import { track } from '@vercel/analytics';
 import { supabaseClient } from '@/lib/supabase-client';
 
 /**
- * Send welcome email for new users (fallback if Supabase webhook didn't fire)
- * Delayed to give the webhook time to send first - the API checks for duplicates
+ * Send welcome email for new users after email confirmation
+ * This is triggered when users land on this page after clicking confirmation link
+ * The API checks webhook_events for duplicates to prevent double emails
  */
 function sendWelcomeEmailFallback(userId: string, email: string, userName?: string) {
-  // Delay 5 seconds to let Supabase webhook fire first
-  // The /api/user/welcome-email endpoint checks webhook_events for duplicates
+  // Delay 5 seconds to allow webhook to record event first (prevents race condition duplicates)
   setTimeout(() => {
     const payload = JSON.stringify({ userId, email, userName });
 
@@ -71,22 +71,23 @@ export default function AuthCallbackPage() {
                 return;
               }
 
-              // Handle new user welcome email and analytics tracking
+              // Handle welcome email for new users who just confirmed their email
+              // This is the main trigger for welcome emails after email confirmation
               const user = data.session.user;
               const createdAt = new Date(user.created_at);
               const now = new Date();
-              // Consider "new" if created within last 5 minutes (allows for email confirmation delay)
-              const isNewUser = (now.getTime() - createdAt.getTime()) < 300000;
+              // Consider "new" if created within last 10 minutes (allows for email confirmation delay)
+              const isNewUser = (now.getTime() - createdAt.getTime()) < 600000;
 
               if (isNewUser && user.email) {
                 // Extract name from user metadata (OAuth providers often include this)
                 const userName = user.user_metadata?.full_name || user.user_metadata?.name;
 
-                // Send welcome email as fallback (delayed 5s to let webhook fire first)
+                // Send welcome email (delayed 5s to avoid race conditions with webhook)
                 // The API checks webhook_events for duplicates, so no double emails
                 sendWelcomeEmailFallback(user.id, user.email, userName);
 
-                // Track OAuth signup only (email signups are tracked in signup page)
+                // Track OAuth signup (email signups are tracked in signup page)
                 const provider = user.app_metadata?.provider;
                 if (provider && provider !== 'email') {
                   track('Signup', { method: provider });

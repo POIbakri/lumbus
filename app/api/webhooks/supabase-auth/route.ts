@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendWelcomeEmail } from '@/lib/email';
-import { supabase } from '@/lib/db';
 import { ensureUserProfile } from '@/lib/referral';
 
 /**
@@ -76,88 +74,41 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Handle new user signup - send welcome email if applicable
+ * Handle new user signup - create user profile only
+ * Welcome emails are handled by the auth callback page after user confirms/completes auth
+ * This prevents duplicate emails for OAuth signups where both webhook and callback would fire
  */
 async function handleNewUser(user: {
   id: string;
   email?: string;
+  email_confirmed_at?: string | null;
+  confirmed_at?: string | null;
   raw_user_meta_data?: Record<string, unknown>;
   user_metadata?: Record<string, unknown>;
   created_at?: string;
 }) {
   const userId = user.id;
   const email = user.email;
-  const metadata = user.raw_user_meta_data || user.user_metadata || {};
-  const userName = (metadata.full_name || metadata.name) as string | undefined;
 
-  if (!userId || !email) {
-    console.log('Supabase Auth Webhook: Missing userId or email, skipping welcome email');
+  if (!userId) {
+    console.log('Supabase Auth Webhook: Missing userId, skipping');
     return;
   }
 
-  console.log(`Supabase Auth Webhook: Processing new user ${userId} (${email})`);
+  console.log(`Supabase Auth Webhook: Processing new user ${userId} (${email || 'no email'})`);
 
   // Create user profile with referral code (for all signup methods: email, Google, Apple)
+  // Welcome email is NOT sent here - it's handled by auth callback to prevent duplicates
   try {
     await ensureUserProfile(userId);
     console.log(`Supabase Auth Webhook: User profile created for ${userId}`);
   } catch (profileError) {
     console.error(`Supabase Auth Webhook: Failed to create user profile for ${userId}:`, profileError);
-    // Don't throw - continue with welcome email
   }
 
-  // Check if user has any orders (they'll get order confirmation instead)
-  const { count: orderCount } = await supabase
-    .from('orders')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .in('status', ['paid', 'completed', 'provisioning']);
-
-  if (orderCount && orderCount > 0) {
-    console.log(`Supabase Auth Webhook: User ${userId} has orders, skipping welcome email`);
-    return;
-  }
-
-  // Check if we've already sent a welcome email (prevent duplicates)
-  const { data: existingWelcome } = await supabase
-    .from('webhook_events')
-    .select('id')
-    .eq('provider', 'internal')
-    .eq('event_type', 'welcome_email_sent')
-    .eq('notify_id', userId)
-    .maybeSingle();
-
-  if (existingWelcome) {
-    console.log(`Supabase Auth Webhook: Welcome email already sent to user ${userId}`);
-    return;
-  }
-
-  // Send welcome email
-  try {
-    await sendWelcomeEmail({
-      to: email,
-      userName: userName,
-    });
-
-    // Record that we sent the welcome email
-    await supabase.from('webhook_events').insert({
-      provider: 'internal',
-      event_type: 'welcome_email_sent',
-      notify_id: userId,
-      payload_json: {
-        email,
-        userName,
-        sentAt: new Date().toISOString(),
-        source: 'supabase_auth_webhook'
-      },
-      processed_at: new Date().toISOString(),
-    });
-
-    console.log(`Supabase Auth Webhook: Welcome email sent to ${email}`);
-  } catch (emailError) {
-    console.error(`Supabase Auth Webhook: Failed to send welcome email to ${email}:`, emailError);
-    throw emailError;
-  }
+  // Note: Welcome email is intentionally NOT sent here
+  // The auth callback page (/auth/callback) handles welcome emails for all signup methods
+  // This prevents duplicate emails for OAuth signups where email is already confirmed
 }
 
 // Also support GET for webhook verification (some systems ping GET first)
