@@ -310,8 +310,8 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
         // Send app download email to guest users (purchased without signing up)
         try {
           // Check if user was created via checkout (guest user)
-          const { data: authUser } = await supabase.auth.admin.getUserById(order.user_id);
-          const isGuestUser = authUser?.user_metadata?.needs_password_setup === true;
+          const { data: authData } = await supabase.auth.admin.getUserById(order.user_id);
+          const isGuestUser = authData?.user?.user_metadata?.needs_password_setup === true;
 
           if (isGuestUser) {
             await sendAppDownloadEmail({
