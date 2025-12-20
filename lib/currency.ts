@@ -181,15 +181,22 @@ export function getCurrencyForCheckout(headers: Headers): Currency {
 /**
  * Convert and format price for Stripe (in smallest currency unit)
  * Stripe requires amounts in cents for most currencies, but not for zero-decimal currencies
+ *
+ * IMPORTANT: Stripe's official zero-decimal currencies are:
+ * BIF, CLP, DJF, GNF, JPY, KMF, KRW, MGA, PYG, RWF, UGX, VND, VUV, XAF, XOF, XPF
+ *
+ * IDR is NOT a zero-decimal currency in Stripe - they expect amounts in "sen" (1/100 of rupiah)
+ * https://docs.stripe.com/currencies#zero-decimal
  */
 export function convertToStripeAmount(usdPrice: number, currency: Currency): number {
   const converted = convertPrice(usdPrice, currency);
 
-  // Zero-decimal currencies (JPY, KRW, IDR, etc.)
-  if (currency === 'JPY' || currency === 'KRW' || currency === 'IDR') {
+  // Stripe's official zero-decimal currencies
+  // Note: IDR is NOT zero-decimal in Stripe (they expect sen, not rupiah)
+  if (currency === 'JPY' || currency === 'KRW') {
     return Math.round(converted);
   }
 
-  // All other currencies - convert to cents
+  // All other currencies (including IDR) - convert to smallest unit (cents/sen)
   return Math.round(converted * 100);
 }
