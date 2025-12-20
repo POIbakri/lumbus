@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/db';
 import { getOrderStatus, generateQrCodeData } from '@/lib/esimaccess';
 import { sendOrderConfirmationEmail, sendDataUsageAlert, sendPlanExpiryAlert } from '@/lib/email';
+import { sendAppDownloadEmail } from '@/lib/app-download-email';
 import { sendDataUsagePush, sendValidityPush, sendEsimReadyPush, sendEsimActivatedPush } from '@/lib/push-notifications';
 
 /**
@@ -305,6 +306,22 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
           planName: plan.name,
           dataGb: plan.data_gb,
         });
+
+        // Send app download email to guest users (purchased without signing up)
+        try {
+          // Check if user was created via checkout (guest user)
+          const { data: authUser } = await supabase.auth.admin.getUserById(order.user_id);
+          const isGuestUser = authUser?.user_metadata?.needs_password_setup === true;
+
+          if (isGuestUser) {
+            await sendAppDownloadEmail({
+              to: user.email,
+              planName: plan.name,
+            });
+          }
+        } catch (appEmailError) {
+          // Don't throw - webhook should still succeed even if email fails
+        }
       }
     }
   } catch (error) {

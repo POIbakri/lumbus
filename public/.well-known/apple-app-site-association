@@ -4,7 +4,7 @@
     "details": [
       {
         "appID": "MQY423BU9T.com.lumbus.app",
-        "paths": [ "/dashboard", "/install/*", "/plan/*", "/reset-password" ]
+        "paths": [ "/auth/callback", "/auth/confirm", "/dashboard", "/install/*", "/plan/*", "/reset-password" ]
       }
     ]
   }
