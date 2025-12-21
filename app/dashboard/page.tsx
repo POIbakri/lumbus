@@ -446,9 +446,9 @@ export default function DashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block  rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+      <div className="min-h-screen dashboard-bg flex items-center justify-center">
+        <div className="text-center glass p-8 rounded-3xl float-shadow">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
           <p className="text-muted-foreground font-bold">Loading dashboard...</p>
         </div>
       </div>
@@ -483,7 +483,7 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen dashboard-bg">
       {/* Navigation */}
       <Nav />
 
@@ -518,7 +518,7 @@ export default function DashboardPage() {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 md:mb-12 " style={{animationDelay: '0.1s'}}>
-            <Card className="bg-mint border-2 sm:border-4 border-primary shadow-xl   ">
+            <Card className="glass-mint border border-primary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {activeOrders.length}
@@ -529,7 +529,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-yellow border-2 sm:border-4 border-secondary shadow-xl   ">
+            <Card className="glass-yellow border border-secondary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {(() => {
@@ -557,7 +557,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-cyan border-2 sm:border-4 border-primary shadow-xl   ">
+            <Card className="glass-cyan border border-primary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
               <CardContent className="pt-4 sm:pt-6 pb-4 sm:pb-6">
                 <div className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground mb-1 sm:mb-2">
                   {(() => {
@@ -579,7 +579,7 @@ export default function DashboardPage() {
           <div className="mb-6 sm:mb-8 md:mb-12">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">eSIMs</h2>
-              <Link href="/plans" className="w-full sm:w-auto">
+              <Link href="/destinations" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black    text-xs sm:text-sm md:text-base px-4 sm:px-6 py-3">
                   + BUY NEW eSIM
                 </Button>
@@ -587,7 +587,7 @@ export default function DashboardPage() {
             </div>
 
             {activeOrders.length === 0 ? (
-              <Card className="bg-purple border-2 border-accent shadow-lg ">
+              <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl sm:rounded-3xl">
                 <CardContent className="pt-4 sm:pt-6 text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
                   <div className="mb-4 flex justify-center">
                     <svg className="w-12 h-12 sm:w-16 sm:h-16 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>
@@ -633,7 +633,7 @@ export default function DashboardPage() {
                               return (
                                 <Card
                                   key={order.id}
-                                  className="bg-yellow border-2 border-foreground/10 hover:border-secondary/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
+                                  className="glass-yellow border border-secondary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl overflow-hidden relative transition-all duration-300"
                                   style={{animationDelay: `${index * 0.1}s`}}
                                 >
                                   {/* Subtle pulse indicator */}
@@ -665,18 +665,18 @@ export default function DashboardPage() {
 
                                     {/* Stats Grid: Data + Validity */}
                                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
-                                      <div className="bg-white/60 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                                      <div className="glass rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center glass-inner-glow">
                                         <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Data</div>
                                         <div className="text-base sm:text-lg font-black text-foreground">{totalDataFormatted}</div>
                                       </div>
-                                      <div className="bg-white/60 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                                      <div className="glass rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center glass-inner-glow">
                                         <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Validity</div>
                                         <div className="text-base sm:text-lg font-black text-foreground">{order.plan?.validity_days} days</div>
                                       </div>
                                     </div>
 
                                     {/* Activation Notice */}
-                                    <div className="mb-4 p-3 bg-white/60 rounded-xl">
+                                    <div className="mb-4 p-3 glass rounded-xl glass-inner-glow">
                                       <div className="flex items-center gap-2 mb-1">
                                         <svg className="w-4 h-4 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         <span className="font-black text-xs uppercase">Not Activated Yet</span>
@@ -688,7 +688,7 @@ export default function DashboardPage() {
 
                                     {/* Activate Button */}
                                     <Link href={`/install/${order.id}`} className="block">
-                                      <Button className="w-full bg-foreground hover:bg-foreground/90 text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-lg sm:rounded-xl transition-all shadow-lg">
+                                      <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
                                         <span className="flex items-center justify-center gap-2">
                                           <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
                                           ACTIVATE SIM NOW
@@ -750,7 +750,7 @@ export default function DashboardPage() {
                   return (
                     <Card
                       key={order.id}
-                      className="bg-mint border-2 border-foreground/10 hover:border-primary/50 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                      className="glass-mint border border-primary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300"
                       style={{animationDelay: `${index * 0.1}s`}}
                     >
                       <CardContent className="p-4 sm:p-5">
@@ -779,15 +779,15 @@ export default function DashboardPage() {
 
                         {/* Stats Grid: Data + Validity + Days Left */}
                         <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
-                          <div className="bg-white/60 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                          <div className="glass rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center glass-inner-glow">
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Data</div>
                             <div className="text-base sm:text-lg font-black text-foreground">{totalDataFormatted}</div>
                           </div>
-                          <div className="bg-cyan/40 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                          <div className="glass-cyan rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center glass-inner-glow">
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Valid</div>
                             <div className="text-base sm:text-lg font-black text-foreground">{order.plan?.validity_days} days</div>
                           </div>
-                          <div className={`${daysRemaining <= 5 && order.activated_at ? 'bg-destructive/20' : 'bg-white/60'} rounded-lg sm:rounded-xl p-2 sm:p-3 text-center`}>
+                          <div className={`${daysRemaining <= 5 && order.activated_at ? 'bg-destructive/20 backdrop-blur-sm' : 'glass glass-inner-glow'} rounded-xl sm:rounded-2xl p-2 sm:p-3 text-center`}>
                             <div className="text-xs font-bold text-foreground/60 uppercase mb-1">Left</div>
                             <div className={`text-base sm:text-lg font-black ${daysRemaining <= 0 ? 'text-destructive' : daysRemaining <= 5 && order.activated_at ? 'text-destructive' : 'text-foreground'}`}>
                               {formatTimeRemaining(order)}
@@ -796,7 +796,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Data Usage Progress */}
-                        <div className="mb-4 p-3 bg-white/60 rounded-xl">
+                        <div className="mb-4 p-3 sm:p-4 glass rounded-xl sm:rounded-2xl glass-inner-glow">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-xs font-bold text-foreground/60 uppercase">Usage</span>
                             <div className="flex items-center gap-2">
@@ -813,12 +813,12 @@ export default function DashboardPage() {
                               )}
                             </div>
                           </div>
-                          <div className="w-full bg-foreground/10 rounded-full h-2.5 overflow-hidden">
+                          <div className="w-full progress-bar-glass rounded-full h-3 overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all ${
-                                dataUsedPercentage < 50 ? 'bg-primary' :
-                                dataUsedPercentage < 80 ? 'bg-yellow-500' :
-                                'bg-destructive'
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                dataUsedPercentage < 50 ? 'progress-bar-fill' :
+                                dataUsedPercentage < 80 ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 shadow-[0_0_12px_rgba(253,253,116,0.5)]' :
+                                'bg-gradient-to-r from-destructive to-red-600 shadow-[0_0_12px_rgba(239,68,68,0.5)]'
                               }`}
                               style={{ width: `${dataUsedPercentage}%` }}
                             ></div>
@@ -863,7 +863,7 @@ export default function DashboardPage() {
                                 setShowQuickHelp(prev => ({ ...prev, [order.id]: !prev[order.id] }));
                                 triggerHaptic('light');
                               }}
-                              className="w-full px-3 py-2 bg-foreground/5 hover:bg-foreground/10 rounded-lg transition-colors font-bold text-xs flex items-center justify-between"
+                              className="w-full px-3 py-2.5 glass hover:bg-white/80 rounded-xl transition-all duration-200 font-bold text-xs flex items-center justify-between"
                             >
                               <span className="flex items-center gap-2 text-foreground/70">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" /></svg>
@@ -875,7 +875,7 @@ export default function DashboardPage() {
                             </button>
 
                             {showQuickHelp[order.id] && (
-                              <div className="mt-2 p-3 bg-foreground/5 rounded-lg space-y-2">
+                              <div className="mt-2 p-3 sm:p-4 glass rounded-xl space-y-2 glass-inner-glow">
                                 <div className="text-xs">
                                   <span className="font-black">Data Roaming:</span>
                                   <span className="text-foreground/70"> Settings → Cellular → Data Roaming ON</span>
@@ -897,7 +897,7 @@ export default function DashboardPage() {
                         {/* Action Button */}
                         {!order.activated_at ? (
                           <Link href={`/install/${order.id}`} className="block">
-                            <Button className="w-full bg-foreground hover:bg-foreground/90 text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-lg sm:rounded-xl transition-all">
+                            <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
                               <span className="flex items-center justify-center gap-2">
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
                                 ACTIVATE SIM
@@ -907,7 +907,7 @@ export default function DashboardPage() {
                         ) : (
                           order.iccid && !isDepleted && daysRemaining > 0 && (
                             <Link href={`/topup/${order.id}`} className="block">
-                              <Button className="w-full bg-foreground hover:bg-foreground/90 text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-lg sm:rounded-xl transition-all">
+                              <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
                                 <span className="flex items-center justify-center gap-2">
                                   + TOP UP DATA
                                 </span>
@@ -941,14 +941,14 @@ export default function DashboardPage() {
                     setShowOrderHistory(!showOrderHistory);
                     triggerHaptic('light');
                   }}
-                  className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-xs sm:text-sm px-4 py-2"
+                  className="glass-dark text-white font-black text-xs sm:text-sm px-4 py-2 rounded-xl hover:scale-[1.02] transition-all"
                 >
                   {showOrderHistory ? '▼ HIDE' : '▶ SHOW'}
                 </Button>
               </div>
 
               {showOrderHistory && (
-                <Card className="bg-yellow border-2 border-secondary shadow-lg  ">
+                <Card className="glass-yellow border border-secondary/30 float-shadow rounded-2xl sm:rounded-3xl">
                   <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6">
                     <div className="space-y-3 sm:space-y-4">
                       {pastOrders.map((order) => {
@@ -967,7 +967,7 @@ export default function DashboardPage() {
                       return (
                         <div
                           key={order.id}
-                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl  "
+                          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 glass rounded-xl glass-inner-glow hover-lift"
                         >
                           <div className="flex items-start gap-3 flex-1 min-w-0">
                             {order.plan?.region_code && <FlagIcon countryCode={order.plan.region_code} className="w-10 h-7 flex-shrink-0" />}
@@ -1019,7 +1019,7 @@ export default function DashboardPage() {
               <div className="mb-3 sm:mb-4 md:mb-6">
                 <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase">REFER & EARN</h2>
               </div>
-              <Card className="bg-white border-2 sm:border-4 border-foreground shadow-xl rounded-2xl sm:rounded-3xl">
+              <Card className="glass border border-foreground/20 float-shadow-lg rounded-2xl sm:rounded-3xl">
                 <CardContent className="pt-4 sm:pt-6 px-3 sm:px-4 md:px-6 pb-4 sm:pb-6">
                   {/* Header Badge */}
                   <div className="text-center mb-6 sm:mb-8">
@@ -1027,13 +1027,13 @@ export default function DashboardPage() {
                       REFER FRIENDS
                     </h3>
                     <div className="flex items-center justify-center gap-3 sm:gap-4 mb-2">
-                      <div className="bg-primary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">
+                      <div className="glass-mint px-4 sm:px-6 py-2 sm:py-3 rounded-xl border border-primary/40 glass-inner-glow">
                         <div className="text-xs font-bold text-foreground/70 mb-1">THEY GET</div>
                         <div className="text-lg sm:text-xl font-black">10% OFF</div>
                         <div className="text-lg sm:text-xl font-black">+ 1GB FREE</div>
                       </div>
                       <div className="text-2xl sm:text-3xl">+</div>
-                      <div className="bg-secondary px-4 sm:px-6 py-2 sm:py-3 rounded-xl border-2 border-foreground">
+                      <div className="glass-yellow px-4 sm:px-6 py-2 sm:py-3 rounded-xl border border-secondary/40 glass-inner-glow">
                         <div className="text-xs font-bold text-foreground/70 mb-1">YOU GET</div>
                         <div className="text-xl sm:text-2xl font-black">1GB FREE</div>
                       </div>
@@ -1048,7 +1048,7 @@ export default function DashboardPage() {
                     <div>
 
                       {/* Referral Link */}
-                      <div className="bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-4 sm:p-5 mb-4 border-2 border-foreground/20 shadow-lg">
+                      <div className="glass rounded-2xl p-4 sm:p-5 mb-4 border border-foreground/10 float-shadow glass-inner-glow">
                         <div className="flex items-center gap-2 mb-3">
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" /></svg>
                           <div className="font-black uppercase text-sm">
@@ -1056,12 +1056,12 @@ export default function DashboardPage() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                          <div className="px-4 py-3 bg-white rounded-xl font-mono text-xs sm:text-sm break-all border-2 border-foreground/10 shadow-sm">
+                          <div className="px-4 py-3 glass rounded-xl font-mono text-xs sm:text-sm break-all border border-foreground/10">
                             {referralStats.referral_link}
                           </div>
                           <Button
                             onClick={copyReferralLink}
-                            className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 hover:scale-105 font-black py-4 text-base border-2 border-foreground shadow-lg transition-transform"
+                            className="w-full glass-dark text-white font-black py-4 text-base rounded-xl float-shadow hover:scale-[1.02] transition-all"
                           >
                             {copiedLink ? (
                               <>
@@ -1085,7 +1085,7 @@ export default function DashboardPage() {
                         </div>
                         <Button
                           onClick={shareViaWhatsApp}
-                          className="w-full btn-lumbus bg-[#25D366] text-white hover:bg-[#128C7E] hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
+                          className="w-full bg-[#25D366]/90 backdrop-blur-sm text-white font-black py-4 text-base flex items-center justify-center gap-3 rounded-xl float-shadow hover:scale-[1.02] transition-all"
                         >
                           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
@@ -1094,7 +1094,7 @@ export default function DashboardPage() {
                         </Button>
                         <Button
                           onClick={shareViaTwitter}
-                          className="w-full btn-lumbus bg-white hover:bg-gray-100 hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
+                          className="w-full glass font-black py-4 text-base flex items-center justify-center gap-3 rounded-xl float-shadow hover:scale-[1.02] transition-all"
                         >
                           <svg className="w-6 h-6 flex-shrink-0 text-black" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -1103,7 +1103,7 @@ export default function DashboardPage() {
                         </Button>
                         <Button
                           onClick={shareViaEmail}
-                          className="w-full btn-lumbus bg-foreground text-white hover:bg-foreground/90 hover:scale-105 font-black py-4 text-base flex items-center justify-center gap-3 border-2 border-foreground shadow-lg transition-transform"
+                          className="w-full glass-dark text-white font-black py-4 text-base flex items-center justify-center gap-3 rounded-xl float-shadow hover:scale-[1.02] transition-all"
                         >
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -1117,7 +1117,7 @@ export default function DashboardPage() {
                     <div>
                       <div className="space-y-3">
                         {/* Total Clicks */}
-                        <div className="bg-cyan rounded-2xl p-4 sm:p-5 border-2 border-primary shadow-lg">
+                        <div className="glass-cyan rounded-2xl p-4 sm:p-5 border border-primary/30 float-shadow glass-inner-glow hover-lift">
                           <div className="flex justify-between items-center">
                             <div className="flex-1">
                               <div className="font-black uppercase text-xs text-foreground/70 mb-1">
@@ -1134,7 +1134,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Friends Referred */}
-                        <div className="bg-mint rounded-2xl p-4 sm:p-5 border-2 border-primary shadow-lg">
+                        <div className="glass-mint rounded-2xl p-4 sm:p-5 border border-primary/30 float-shadow glass-inner-glow hover-lift">
                           <div className="flex justify-between items-center">
                             <div className="flex-1">
                               <div className="font-black uppercase text-xs text-foreground/70 mb-1">
@@ -1151,7 +1151,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Data Earned */}
-                        <div className="bg-yellow rounded-2xl p-4 sm:p-5 border-2 border-secondary shadow-lg">
+                        <div className="glass-yellow rounded-2xl p-4 sm:p-5 border border-secondary/30 float-shadow glass-inner-glow hover-lift">
                           <div className="flex justify-between items-center">
                             <div className="flex-1">
                               <div className="font-black uppercase text-xs text-foreground/70 mb-1">
@@ -1169,7 +1169,7 @@ export default function DashboardPage() {
 
                         {/* Pending Rewards */}
                         {referralStats.pending_rewards > 0 && (
-                          <div className="bg-purple rounded-2xl p-4 sm:p-5 border-2 border-accent shadow-lg">
+                          <div className="glass-purple rounded-2xl p-4 sm:p-5 border border-accent/30 float-shadow glass-inner-glow hover-lift">
                             <div className="flex justify-between items-center">
                               <div className="flex-1">
                                 <div className="font-black uppercase text-xs text-white/90 mb-1">
@@ -1205,7 +1205,7 @@ export default function DashboardPage() {
 
           {/* Account Settings Section */}
           <div className="mb-6 sm:mb-8 md:mb-12" style={{animationDelay: '0.5s'}}>
-            <Card className="bg-purple border-2 sm:border-3 md:border-4 border-accent shadow-xl rounded-2xl sm:rounded-3xl">
+            <Card className="glass-purple border border-accent/30 float-shadow-lg rounded-2xl sm:rounded-3xl">
               <CardHeader className="border-b-2 border-accent/20 px-4 sm:px-6">
                 <CardTitle className="text-xl sm:text-2xl md:text-3xl font-black uppercase flex items-center gap-2 sm:gap-3">
                   <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -1218,7 +1218,7 @@ export default function DashboardPage() {
                   <Link href="/privacy" className="block">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full glass font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-foreground/20 rounded-xl justify-between hover-lift transition-all"
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
@@ -1232,7 +1232,7 @@ export default function DashboardPage() {
                   <Link href="/terms" className="block">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full glass font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-foreground/20 rounded-xl justify-between hover-lift transition-all"
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>
@@ -1246,7 +1246,7 @@ export default function DashboardPage() {
                   <Link href="/deletedata" className="block">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full glass font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-foreground/20 rounded-xl justify-between hover-lift transition-all"
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
@@ -1260,7 +1260,7 @@ export default function DashboardPage() {
                   <Link href="/help" className="block">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full glass font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-foreground/20 rounded-xl justify-between hover-lift transition-all"
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" /></svg>
@@ -1274,7 +1274,7 @@ export default function DashboardPage() {
                   <a href="mailto:support@getlumbus.com" className="block">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-white hover:bg-gray-50 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full glass font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-foreground/20 rounded-xl justify-between hover-lift transition-all"
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
                         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
@@ -1288,7 +1288,7 @@ export default function DashboardPage() {
                   <Link href="/delete-account" className="block sm:col-span-2 lg:col-span-1">
                     <Button
                       variant="outline"
-                      className="w-full btn-lumbus bg-destructive text-white hover:bg-destructive/90 font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border-2 border-foreground justify-between"
+                      className="w-full bg-destructive/90 backdrop-blur-sm text-white font-black py-3 sm:py-4 px-3 sm:px-4 text-xs sm:text-sm md:text-base border border-destructive/50 rounded-xl justify-between hover-lift hover:bg-destructive transition-all"
                       onClick={() => triggerHaptic('heavy')}
                     >
                       <span className="flex items-center gap-1 sm:gap-2">
@@ -1301,22 +1301,22 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Account Info */}
-                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl">
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 glass rounded-xl sm:rounded-2xl">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <p className="text-xs font-bold text-white/70 mb-1">EMAIL</p>
-                      <p className="text-xs sm:text-sm font-bold text-white break-all">{user?.email || 'Loading...'}</p>
+                      <p className="text-xs font-bold text-foreground/60 mb-1">EMAIL</p>
+                      <p className="text-xs sm:text-sm font-bold text-foreground break-all">{user?.email || 'Loading...'}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white/70 mb-1">USER ID</p>
-                      <p className="text-xs sm:text-sm font-mono text-white break-all">{user?.id || 'Loading...'}</p>
+                      <p className="text-xs font-bold text-foreground/60 mb-1">USER ID</p>
+                      <p className="text-xs sm:text-sm font-mono text-foreground break-all">{user?.id || 'Loading...'}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Social Media Follow Section */}
-                <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-white/10 rounded-lg sm:rounded-xl">
-                  <p className="text-xs font-bold text-white/70 mb-3 uppercase">Follow Us On Social Media</p>
+                <div className="mt-4 sm:mt-6 p-3 sm:p-4 glass rounded-xl sm:rounded-2xl">
+                  <p className="text-xs font-bold text-foreground/60 mb-3 uppercase">Follow Us On Social Media</p>
                   <SocialMediaLinks variant="dashboard" />
                 </div>
               </CardContent>
