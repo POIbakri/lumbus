@@ -445,6 +445,12 @@ export async function POST(req: NextRequest) {
       const source = paymentIntent.metadata?.source;
       const isTopUpMeta = paymentIntent.metadata?.isTopUp === 'true';
       const metadataIccid = paymentIntent.metadata?.iccid;
+      // Attribution metadata
+      const afid = paymentIntent.metadata?.afid;
+      const rfcd = paymentIntent.metadata?.rfcd;
+      // Only skip rewards if discountSource explicitly indicates a code was applied
+      // (not just if discountCode was passed - mobile checkout passes it without applying)
+      const discountSource = paymentIntent.metadata?.discountSource;
 
       if (!orderId) {
         return NextResponse.json({ error: 'No orderId' }, { status: 400 });
@@ -491,6 +497,65 @@ export async function POST(req: NextRequest) {
         } catch (error) {
           // Don't fail the webhook
         }
+      }
+
+      // Process attribution and referral rewards (same as checkout.session.completed)
+      const cookies: AttributionCookies = {
+        afid: afid || undefined,
+        rfcd: rfcd || undefined,
+      };
+
+      const attribution = await resolveAttribution(cookies, order.user_id);
+      const savedAttribution = await saveOrderAttribution(order.id, attribution);
+
+      if (savedAttribution) {
+        // Process commissions/rewards
+        // Only skip rewards if a discount code was actually validated and applied
+        // (discountSource === 'code' means web checkout validated it)
+        const skipRewards = discountSource === 'code';
+        const result = await processOrderAttribution(order, savedAttribution, skipRewards);
+
+        if (result.reward) {
+          // Send email notification to referrer about their reward
+          try {
+            const { data: referrerProfile } = await supabase
+              .from('user_profiles')
+              .select('ref_code')
+              .eq('id', savedAttribution.referrer_user_id)
+              .maybeSingle();
+
+            const { data: referrerUser } = await supabase
+              .from('users')
+              .select('email')
+              .eq('id', savedAttribution.referrer_user_id)
+              .maybeSingle();
+
+            const referredUserEmail =
+              order.users?.email || (Array.isArray(order.users) ? order.users[0]?.email : null);
+
+            if (referrerUser && referrerUser.email && referredUserEmail) {
+              const rewardMB = result.reward.reward_value;
+              const rewardGB = (rewardMB / 1024).toFixed(1);
+
+              await sendReferralRewardEmail({
+                to: referrerUser.email,
+                referredUserEmail: referredUserEmail,
+                rewardAmount: `${rewardGB} GB`,
+                referralCode: referrerProfile?.ref_code || '',
+              });
+            }
+          } catch (emailError) {
+            // Don't throw - webhook should still succeed even if email fails
+          }
+        }
+
+        // Run fraud checks
+        await runFraudChecks({
+          orderId: order.id,
+          userId: order.user_id,
+          affiliateId: savedAttribution.affiliate_id || undefined,
+          referrerUserId: savedAttribution.referrer_user_id || undefined,
+        });
       }
 
       try {

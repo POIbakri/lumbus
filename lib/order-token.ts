@@ -8,7 +8,16 @@
 
 import jwt from 'jsonwebtoken';
 
-const SECRET = process.env.ORDER_TOKEN_SECRET || process.env.JWT_SECRET || 'fallback-secret-change-in-production';
+function getSecret(): string {
+  const secret = process.env.ORDER_TOKEN_SECRET || process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      'ORDER_TOKEN_SECRET or JWT_SECRET environment variable must be set. ' +
+      'Generate a secure secret with: openssl rand -base64 32'
+    );
+  }
+  return secret;
+}
 const TOKEN_EXPIRY = '1h'; // 1 hour - enough time to view order after purchase
 
 interface OrderTokenPayload {
@@ -28,7 +37,7 @@ export function generateOrderAccessToken(orderId: string, userId: string): strin
     type: 'order_access',
   };
 
-  return jwt.sign(payload, SECRET, {
+  return jwt.sign(payload, getSecret(), {
     expiresIn: TOKEN_EXPIRY,
     issuer: 'lumbus',
   });
@@ -40,7 +49,7 @@ export function generateOrderAccessToken(orderId: string, userId: string): strin
  */
 export function verifyOrderAccessToken(token: string): OrderTokenPayload | null {
   try {
-    const decoded = jwt.verify(token, SECRET, {
+    const decoded = jwt.verify(token, getSecret(), {
       issuer: 'lumbus',
     }) as OrderTokenPayload;
 

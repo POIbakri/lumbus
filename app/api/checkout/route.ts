@@ -59,6 +59,10 @@ const checkoutSchema = z.object({
   isTopUp: z.boolean().optional(),
   existingOrderId: z.string().uuid().optional(),
   iccid: z.string().optional(),
+  // Referral/attribution fields
+  afid: z.string().optional(), // affiliate click ID
+  rfcd: z.string().optional(), // referral code
+  discountCode: z.string().optional(), // discount code (validated and applied server-side)
 }).refine(
   (data) => !data.isTopUp || (data.iccid && data.iccid.length > 0),
   {
@@ -79,7 +83,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[Mobile Checkout] Request body:', { planId: body.planId, email: body.email, isTopUp: body.isTopUp });
 
-    const { planId, email, currency, isTopUp, existingOrderId, iccid } = checkoutSchema.parse(body);
+    const { planId, email, currency, isTopUp, existingOrderId, iccid, afid, rfcd, discountCode } = checkoutSchema.parse(body);
 
     // Get plan details
     console.log('[Mobile Checkout] Fetching plan:', planId);
@@ -212,9 +216,79 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Mobile Checkout] Order created:', order.id);
 
+    // Validate and apply discount code if provided
+    let discountPercent = 0;
+    let discountCodeId: string | null = null;
+    let discountSource: 'code' | 'referral' | null = null;
+    const basePriceUSD = plan.retail_price;
+    let finalPriceUSD = basePriceUSD;
+
+    if (!isTopUp && discountCode) {
+      console.log('[Mobile Checkout] Validating discount code:', discountCode);
+      const { data: validationResult } = await supabase
+        .rpc('validate_discount_code', {
+          p_code: discountCode.toUpperCase().trim(),
+          p_user_id: user.id,
+        });
+
+      const result = Array.isArray(validationResult) ? validationResult[0] : validationResult;
+
+      if (result && result.is_valid) {
+        discountPercent = result.discount_percent || 0;
+        discountSource = 'code';
+        finalPriceUSD = basePriceUSD * (1 - discountPercent / 100);
+        console.log('[Mobile Checkout] Discount applied:', { discountPercent, finalPriceUSD });
+
+        // Get discount code ID for tracking
+        const { data: codeData } = await supabase
+          .from('discount_codes')
+          .select('id')
+          .eq('code', discountCode.toUpperCase().trim())
+          .maybeSingle();
+
+        if (codeData) {
+          discountCodeId = codeData.id;
+        }
+      } else {
+        console.log('[Mobile Checkout] Discount code invalid:', result?.error || 'Unknown error');
+      }
+    }
+
+    // Check for referral discount if no discount code applied
+    if (!isTopUp && !discountSource && rfcd) {
+      // Validate referral code exists and isn't self-referral
+      const { data: referrerProfile } = await supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('ref_code', rfcd.toUpperCase().trim())
+        .maybeSingle();
+
+      if (referrerProfile && referrerProfile.id !== user.id) {
+        // Valid referral code - check if user is first-time buyer
+        const { count: orderCount } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .in('status', ['paid', 'completed']);
+
+        if ((orderCount || 0) === 0) {
+          discountPercent = 10;
+          discountSource = 'referral';
+          finalPriceUSD = basePriceUSD * 0.9;
+          console.log('[Mobile Checkout] Referral discount applied: 10%');
+        } else {
+          console.log('[Mobile Checkout] Referral code valid but user is not first-time buyer');
+        }
+      } else if (referrerProfile && referrerProfile.id === user.id) {
+        console.log('[Mobile Checkout] Self-referral rejected');
+      } else {
+        console.log('[Mobile Checkout] Invalid referral code:', rfcd);
+      }
+    }
+
     // Create Payment Intent for mobile
     // Convert price from USD to user's currency
-    const amount = convertToStripeAmount(plan.retail_price, currency as Currency);
+    const amount = convertToStripeAmount(finalPriceUSD, currency as Currency);
 
     // Route specific users (e.g. App Store / Play Store reviewers) through Stripe TEST mode
     const isTestUser = (user as any).is_test_user === true;
@@ -233,6 +307,10 @@ export async function POST(req: NextRequest) {
     console.log('[Mobile Checkout] Creating Payment Intent...', {
       currency,
       amount,
+      basePriceUSD,
+      finalPriceUSD,
+      discountPercent,
+      discountSource,
       stripeMode,
       userId: user.id,
       userEmail: user.email,
@@ -254,6 +332,15 @@ export async function POST(req: NextRequest) {
         isTopUp: isTopUp ? 'true' : 'false',
         existingOrderId: existingOrderId || '',
         iccid: iccid || '',
+        // Referral/attribution metadata
+        afid: afid || '',
+        rfcd: rfcd ? rfcd.toUpperCase().trim() : '',
+        // Discount metadata
+        discountCodeId: discountCodeId || '',
+        discountSource: discountSource || '',
+        discountPercent: discountPercent.toString(),
+        basePriceUSD: basePriceUSD.toString(),
+        finalPriceUSD: finalPriceUSD.toString(),
       },
       automatic_payment_methods: {
         enabled: true,

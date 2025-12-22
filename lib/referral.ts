@@ -281,17 +281,20 @@ export async function resolveAttribution(
 
   // Priority 2: Referral (if valid ref code and not self-referral)
   if (cookies.rfcd) {
+    // Normalize referral code to uppercase (codes are stored uppercase in DB)
+    const normalizedRefCode = cookies.rfcd.toUpperCase().trim();
+
     const { data: referrerProfile } = await supabase
       .from('user_profiles')
       .select('id')
-      .eq('ref_code', cookies.rfcd)
+      .eq('ref_code', normalizedRefCode)
       .maybeSingle();
 
     if (referrerProfile && referrerProfile.id !== userId) {
       return {
         source_type: 'REFERRAL',
         referrer_user_id: referrerProfile.id,
-        ref_code: cookies.rfcd,
+        ref_code: normalizedRefCode,
       };
     }
   }
@@ -370,6 +373,9 @@ export interface ReferralStats {
   total_signups: number;
   pending_rewards: number;
   earned_rewards: number;
+  // Referee stats (for users who used someone else's code)
+  referee_pending_rewards: number;
+  referee_earned_rewards: number;
 }
 
 /**
@@ -389,6 +395,8 @@ export async function getUserReferralStats(userId: string): Promise<ReferralStat
       total_signups: 0,
       pending_rewards: 0,
       earned_rewards: 0,
+      referee_pending_rewards: 0,
+      referee_earned_rewards: 0,
     };
   }
 
@@ -404,20 +412,30 @@ export async function getUserReferralStats(userId: string): Promise<ReferralStat
     .select('*', { count: 'exact', head: true })
     .eq('referred_by_code', profile.ref_code);
 
-  // Get rewards
+  // Get ALL rewards where user is the recipient (referrer_user_id = userId)
   const { data: rewards } = await supabase
     .from('referral_rewards')
-    .select('status, reward_value')
+    .select('status, reward_value, referrer_user_id, referred_user_id')
     .eq('referrer_user_id', userId);
 
-  const pendingRewards = rewards?.filter(r => r.status === 'PENDING').reduce((sum, r) => sum + r.reward_value, 0) || 0;
-  const earnedRewards = rewards?.filter(r => r.status === 'APPLIED').reduce((sum, r) => sum + r.reward_value, 0) || 0;
+  // Separate REFERRER rewards (someone else used their code) from REFEREE rewards (they used someone's code)
+  // Referee rewards have referrer_user_id === referred_user_id (self-reward)
+  const referrerRewards = rewards?.filter(r => r.referrer_user_id !== r.referred_user_id) || [];
+  const refereeRewards = rewards?.filter(r => r.referrer_user_id === r.referred_user_id) || [];
+
+  const pendingRewards = referrerRewards.filter(r => r.status === 'PENDING').reduce((sum, r) => sum + r.reward_value, 0);
+  const earnedRewards = referrerRewards.filter(r => r.status === 'APPLIED').reduce((sum, r) => sum + r.reward_value, 0);
+
+  const refereePendingRewards = refereeRewards.filter(r => r.status === 'PENDING').reduce((sum, r) => sum + r.reward_value, 0);
+  const refereeEarnedRewards = refereeRewards.filter(r => r.status === 'APPLIED').reduce((sum, r) => sum + r.reward_value, 0);
 
   return {
     total_clicks: totalClicks || 0,
     total_signups: totalSignups || 0,
     pending_rewards: pendingRewards,
     earned_rewards: earnedRewards,
+    referee_pending_rewards: refereePendingRewards,
+    referee_earned_rewards: refereeEarnedRewards,
   };
 }
 
