@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     // Get all orders with esim_tran_no (these can have their usage checked)
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('id, esim_tran_no, status, data_remaining_bytes, activated_at')
+      .select('id, esim_tran_no, status, data_remaining_bytes, data_usage_bytes, activated_at')
       .not('esim_tran_no', 'is', null)
       .in('status', ['active', 'completed', 'provisioning', 'depleted']) // Only check active/relevant orders
       .order('last_usage_update', { ascending: true, nullsFirst: true }); // Prioritize orders never updated
@@ -94,8 +94,21 @@ export async function GET(req: NextRequest) {
           const order = batch.find(o => o.esim_tran_no === usage.esimTranNo);
           if (!order) continue;
 
-          const dataUsedBytes = usage.dataUsage;
+          const providerUsageBytes = usage.dataUsage;
           const totalDataBytes = usage.totalData;
+
+          // IMPORTANT: Preserve usage after top-ups
+          // Provider may reset usage to 0 after a top-up, but we need to keep the cumulative usage
+          // Data usage can only increase in real life - you can't "un-use" data
+          const currentUsageBytes = order.data_usage_bytes || 0;
+          const dataUsedBytes = Math.max(currentUsageBytes, providerUsageBytes);
+
+          // Log when we're preserving usage (provider reported less than we have stored)
+          if (providerUsageBytes < currentUsageBytes) {
+            console.log(`[Usage Cron] Preserving usage for order ${order.id}: provider reported ${providerUsageBytes} bytes, keeping ${currentUsageBytes} bytes (likely post-top-up reset)`);
+          }
+
+          // Calculate remaining based on preserved usage
           let dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
 
           // Apply 1MB threshold for depletion
@@ -115,12 +128,13 @@ export async function GET(req: NextRequest) {
             console.log(`[Usage Cron] Order ${order.id} no longer depleted (may have been topped up)`);
           }
 
-          // Update database
+          // Update database with preserved usage
           const { error: updateError } = await supabase
             .from('orders')
             .update({
               data_usage_bytes: dataUsedBytes,
               data_remaining_bytes: dataRemainingBytes,
+              total_bytes: totalDataBytes, // Always update total (may increase after top-up)
               last_usage_update: usage.lastUpdateTime,
               status: newStatus,
             })
@@ -144,7 +158,9 @@ export async function GET(req: NextRequest) {
               old_status: order.status,
               new_status: newStatus,
               data_remaining_gb: (dataRemainingBytes / (1024 * 1024 * 1024)).toFixed(3),
+              data_used_gb: (dataUsedBytes / (1024 * 1024 * 1024)).toFixed(3),
               usage_percent: totalDataBytes > 0 ? ((dataUsedBytes / totalDataBytes) * 100).toFixed(1) : '0',
+              usage_preserved: providerUsageBytes < currentUsageBytes, // Flag if we preserved usage
             });
           }
         }

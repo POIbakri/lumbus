@@ -174,37 +174,57 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         // Real-time API only returns remaining, not total
         // Use ?? instead of || to handle 0 as a valid value
         const totalDataBytes = order.total_bytes ?? planTotalDataBytes;
-        const dataUsedBytes = Math.max(0, totalDataBytes - dataRemainingBytes);
+        const calculatedUsageBytes = Math.max(0, totalDataBytes - dataRemainingBytes);
+
+        // IMPORTANT: Preserve usage after top-ups
+        // If provider reports remaining = total (100% full), it might be a post-top-up reset
+        // Data usage can only increase - never decrease
+        const currentUsageBytes = order.data_usage_bytes || 0;
+        const dataUsedBytes = Math.max(currentUsageBytes, calculatedUsageBytes);
+
+        // Calculate accurate remaining based on preserved usage
+        const adjustedRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+
+        // Log when we're preserving usage
+        if (calculatedUsageBytes < currentUsageBytes) {
+          console.log('[Usage API] Preserving usage (realtime path):', {
+            orderId,
+            calculatedUsage: calculatedUsageBytes,
+            preservedUsage: currentUsageBytes,
+            reason: 'likely post-top-up reset',
+          });
+        }
 
         console.log('[Usage API] Real-time balance SUCCESS:', {
           esimTranNo: order.esim_tran_no,
-          dataRemainingBytes,
+          dataRemainingBytes: adjustedRemainingBytes,
           totalDataBytes,
           dataUsedBytes,
           lastUpdateTime,
+          usagePreserved: calculatedUsageBytes < currentUsageBytes,
         });
 
-        // Update database with real-time data
+        // Update database with preserved usage data
         await supabase
           .from('orders')
           .update({
             data_usage_bytes: dataUsedBytes,
-            data_remaining_bytes: dataRemainingBytes,
+            data_remaining_bytes: adjustedRemainingBytes,
             last_usage_update: lastUpdateTime,
           })
           .eq('id', orderId);
 
-        // Calculate response values
+        // Calculate response values using adjusted (preserved) data
         const dataUsedGB = dataUsedBytes / (1024 * 1024 * 1024);
         const totalDataGB = totalDataBytes / (1024 * 1024 * 1024);
-        const dataRemainingGB = dataRemainingBytes / (1024 * 1024 * 1024);
+        const dataRemainingGB = adjustedRemainingBytes / (1024 * 1024 * 1024);
         const usagePercent = totalDataBytes > 0 ? (dataUsedBytes / totalDataBytes) * 100 : 0;
 
         return NextResponse.json({
           success: true,
           realtime: true, // Flag indicating this is live carrier data
           data_usage_bytes: dataUsedBytes,
-          data_remaining_bytes: dataRemainingBytes,
+          data_remaining_bytes: adjustedRemainingBytes,
           data_used_gb: parseFloat(dataUsedGB.toFixed(2)),
           data_total_gb: parseFloat(totalDataGB.toFixed(2)),
           data_remaining_gb: parseFloat(dataRemainingGB.toFixed(2)),
@@ -232,9 +252,27 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       }
 
       const usage = usageData[0];
-      const dataUsedBytes = usage.dataUsage;
+      const providerUsageBytes = usage.dataUsage;
       const totalDataBytes = usage.totalData;
+
+      // IMPORTANT: Preserve usage after top-ups
+      // Provider may reset usage to 0 after a top-up, but we need to keep the cumulative usage
+      // Data usage can only increase in real life - you can't "un-use" data
+      const currentUsageBytes = order.data_usage_bytes || 0;
+      const dataUsedBytes = Math.max(currentUsageBytes, providerUsageBytes);
+
+      // Calculate remaining based on preserved usage
       let dataRemainingBytes = Math.max(0, totalDataBytes - dataUsedBytes);
+
+      // Log when we're preserving usage
+      if (providerUsageBytes < currentUsageBytes) {
+        console.log('[Usage API] Preserving usage (standard path):', {
+          orderId,
+          providerUsage: providerUsageBytes,
+          preservedUsage: currentUsageBytes,
+          reason: 'likely post-top-up reset',
+        });
+      }
 
       // Handle edge case: if remaining is less than 1MB, consider it depleted
       const DEPLETION_THRESHOLD = 1048576; // 1 MB in bytes
@@ -252,15 +290,17 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
         totalDataBytes,
         dataRemainingBytes,
         usagePercent: totalDataBytes > 0 ? ((dataUsedBytes / totalDataBytes) * 100).toFixed(2) + '%' : '0%',
-        lastUpdateTime: usage.lastUpdateTime
+        lastUpdateTime: usage.lastUpdateTime,
+        usagePreserved: providerUsageBytes < currentUsageBytes,
       });
 
-      // Update order with latest usage data
+      // Update order with preserved usage data
       await supabase
         .from('orders')
         .update({
           data_usage_bytes: dataUsedBytes,
           data_remaining_bytes: dataRemainingBytes,
+          total_bytes: totalDataBytes, // Always update total (may increase after top-up)
           last_usage_update: usage.lastUpdateTime,
         })
         .eq('id', orderId);
