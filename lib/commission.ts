@@ -275,64 +275,26 @@ export async function createReferralReward(
 
 /**
  * Apply a referral reward (mark as APPLIED and credit data wallet)
+ * Uses atomic DB function to prevent race conditions
  */
-export async function applyReferralReward(rewardId: string): Promise<boolean> {
-  const { data: reward } = await supabase
-    .from('referral_rewards')
-    .select('*')
-    .eq('id', rewardId)
-    .single();
-
-  if (!reward || reward.status !== 'PENDING') {
-    return false;
-  }
-
-  // Update status
-  const { error } = await supabase
-    .from('referral_rewards')
-    .update({
-      status: 'APPLIED',
-      applied_at: new Date().toISOString(),
-    })
-    .eq('id', rewardId);
+export async function applyReferralReward(rewardId: string, userId: string): Promise<boolean> {
+  // Use atomic DB function with FOR UPDATE locking
+  const { data: result, error } = await supabase.rpc('redeem_referral_reward', {
+    p_reward_id: rewardId,
+    p_user_id: userId,
+  });
 
   if (error) {
-    console.error('Failed to apply reward:', error);
+    console.error(`Failed to apply reward ${rewardId}:`, error);
     return false;
   }
 
-  // Add free data to user's wallet
-  const dataMB = reward.reward_value; // 1024 MB = 1 GB
-  const userId = reward.referrer_user_id;
-
-  // Check if wallet entry exists
-  const { data: existingWallet } = await supabase
-    .from('user_data_wallet')
-    .select('*')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (existingWallet) {
-    // Update existing wallet
-    await supabase
-      .from('user_data_wallet')
-      .update({
-        balance_mb: existingWallet.balance_mb + dataMB,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', userId);
-  } else {
-    // Create new wallet entry
-    await supabase
-      .from('user_data_wallet')
-      .insert({
-        user_id: userId,
-        balance_mb: dataMB,
-      });
+  if (!result?.success) {
+    console.log(`Reward ${rewardId} not applied: ${result?.error || 'already redeemed or not found'}`);
+    return false;
   }
 
-  console.log(`Applied reward ${rewardId}: ${(dataMB / 1024).toFixed(1)}GB free data added to user ${userId}`);
-
+  console.log(`Applied reward ${rewardId}: ${(result.credits_added / 1024).toFixed(1)}GB free data added`);
   return true;
 }
 
@@ -404,7 +366,7 @@ export async function processOrderAttribution(
     }
   }
 
-  // Handle referral reward - BOTH users get 1GB as pending rewards
+  // Handle referral reward - BOTH users get 1GB auto-credited to their wallet
   // Skip rewards if a discount code was used (discount codes override referral benefits)
   if (!skipRewards && attribution.source_type === 'REFERRAL' && attribution.referrer_user_id) {
     // Check if rewards already exist for this order
@@ -421,41 +383,70 @@ export async function processOrderAttribution(
 
     // Only create rewards if this is the buyer's first purchase
     if (isFirstOrder) {
-      // 1. Create reward for the referrer - needs manual claim
+      // 1. Create reward and credit referrer's wallet atomically
       if (!referrerRewardExists) {
-        const referrerReward = await createReferralReward(
-          order.id,
-          attribution.referrer_user_id,
-          order.user_id,
-          'FREE_DATA',
-          rewardValueMB,
-          rewardConfig
-        );
+        // Check monthly cap
+        const withinCap = await checkReferrerMonthlyCap(attribution.referrer_user_id, rewardConfig);
+        if (withinCap) {
+          const rewardId = crypto.randomUUID();
 
-        if (referrerReward) {
-          result.reward = referrerReward;
+          // Atomic: insert reward record + credit wallet in one transaction
+          const { data: rewardResult, error } = await supabase.rpc('create_and_credit_referral_reward', {
+            p_reward_id: rewardId,
+            p_order_id: order.id,
+            p_referrer_user_id: attribution.referrer_user_id,
+            p_referred_user_id: order.user_id,
+            p_reward_value: rewardValueMB,
+            p_notes: 'Earned from referral - friend made first purchase',
+          });
+
+          if (error) {
+            console.error(`Failed to create referrer reward:`, error);
+          } else if (rewardResult?.success) {
+            // Set result.reward so webhook can send notification email
+            result.reward = {
+              id: rewardId,
+              order_id: order.id,
+              referrer_user_id: attribution.referrer_user_id,
+              referred_user_id: order.user_id,
+              reward_type: 'FREE_DATA',
+              reward_value: rewardValueMB,
+              status: 'APPLIED',
+              created_at: new Date().toISOString(),
+              applied_at: new Date().toISOString(),
+              expired_at: null,
+              voided_at: null,
+              notes: 'Earned from referral - friend made first purchase',
+            } as ReferralReward;
+            console.log(`Auto-credited 1GB to referrer ${attribution.referrer_user_id}`);
+          } else {
+            console.log(`Referrer reward already exists for order ${order.id}`);
+          }
+        } else {
+          console.log(`Referrer ${attribution.referrer_user_id} has reached monthly cap`);
         }
       }
 
-      // 2. Create reward for the person who used the code - also needs manual claim
+      // 2. Create reward and credit buyer's wallet atomically
       if (!buyerRewardExists) {
-        // Create a reward for the first-time buyer
-        const { data: buyerReward } = await supabase
-          .from('referral_rewards')
-          .insert({
-            order_id: order.id,
-            referrer_user_id: order.user_id, // The buyer gets their own reward
-            referred_user_id: order.user_id, // Self-referral indicates they used a code
-            reward_type: 'FREE_DATA',
-            reward_value: rewardValueMB,
-            status: 'PENDING',
-            notes: 'First-time buyer bonus for using referral code'
-          })
-          .select()
-          .single();
+        const rewardId = crypto.randomUUID();
 
-        if (buyerReward) {
-          console.log(`Created 1GB pending reward for first-time buyer ${order.user_id} for using referral code`);
+        // Atomic: insert reward record + credit wallet in one transaction
+        const { data: rewardResult, error } = await supabase.rpc('create_and_credit_referral_reward', {
+          p_reward_id: rewardId,
+          p_order_id: order.id,
+          p_referrer_user_id: order.user_id,
+          p_referred_user_id: order.user_id,
+          p_reward_value: rewardValueMB,
+          p_notes: 'First-time buyer bonus for using referral code',
+        });
+
+        if (error) {
+          console.error(`Failed to create buyer reward:`, error);
+        } else if (rewardResult?.success) {
+          console.log(`Auto-credited 1GB to first-time buyer ${order.user_id}`);
+        } else {
+          console.log(`Buyer reward already exists for order ${order.id}`);
         }
       }
     } else {

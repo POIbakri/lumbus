@@ -4,21 +4,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sparkles, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { authenticatedGet, authenticatedPost } from '@/lib/api-client';
 
 interface WalletData {
   balance_mb: number;
   balance_gb: string;
-  pending_rewards: Array<{
-    id: string;
-    reward_value: number;
-    created_at: string;
-    order_id: string;
-    referrer_user_id: string;
-    referred_user_id: string;
-  }>;
   active_esims: Array<{
     id: string;
     plan_name: string;
@@ -44,8 +36,6 @@ interface RewardPackage {
 export function DataWallet() {
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [redeeming, setRedeeming] = useState<string | null>(null);
-  const [showCelebration, setShowCelebration] = useState(false);
   const [applyingData, setApplyingData] = useState<string | null>(null);
   const [selectedAmount, setSelectedAmount] = useState<Record<string, number>>({});
   const [packages, setPackages] = useState<RewardPackage[] | null>(null);
@@ -83,40 +73,6 @@ export function DataWallet() {
   useEffect(() => {
     fetchPackages();
   }, []);
-
-  const redeemReward = async (rewardId: string) => {
-    setRedeeming(rewardId);
-    try {
-      const result = await authenticatedPost<{
-        success: boolean;
-        message?: string;
-        error?: string
-      }>('/api/rewards/redeem', { rewardId });
-
-      if (result.success) {
-        // Show celebration animation
-        setShowCelebration(true);
-        setTimeout(() => setShowCelebration(false), 3000);
-
-        // Show success toast
-        toast.success(
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-yellow-500" />
-            <span className="font-black">1GB added to your data balance!</span>
-          </div>
-        );
-
-        // Refresh wallet data
-        await fetchWalletData();
-      }
-    } catch (error) {
-      console.error('Redeem error:', error);
-      const message = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
-      toast.error(message);
-    } finally {
-      setRedeeming(null);
-    }
-  };
 
   const applyDataToEsim = async (orderId: string) => {
     const amountMB = selectedAmount[orderId] || 1024; // Default 1GB
@@ -184,29 +140,11 @@ export function DataWallet() {
     return null;
   }
 
-  const totalPendingMB = walletData.pending_rewards.reduce(
-    (sum, reward) => sum + reward.reward_value,
-    0
-  );
-  const totalPendingGB = (totalPendingMB / 1024).toFixed(1);
   const hasBalance = walletData.balance_mb > 0;
-  const hasPendingRewards = walletData.pending_rewards.length > 0;
   const hasActiveEsims = walletData.active_esims?.length > 0;
 
   return (
     <div className="space-y-3">
-      {/* Celebration Overlay */}
-      {showCelebration && (
-        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-          <div className="animate-bounce">
-            <svg className="w-16 h-16 sm:w-24 sm:h-24 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg className="w-14 h-14 sm:w-20 sm:h-20 text-yellow animate-ping" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div>
         <h2 className="text-lg sm:text-xl font-black uppercase mb-1">
@@ -221,70 +159,16 @@ export function DataWallet() {
       <Card className="bg-white border-2 border-foreground shadow-lg rounded-xl overflow-hidden">
         <CardContent className="p-4">
           {/* Balance Summary */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {/* Available Data */}
-            <div>
-              <div className="font-black uppercase text-xs text-muted-foreground mb-1">
-                Your Free Data
-              </div>
-              <div className="text-2xl font-black text-foreground">
-                {walletData.balance_gb} GB
-              </div>
+          <div className="mb-4">
+            <div className="font-black uppercase text-xs text-muted-foreground mb-1">
+              Your Free Data
             </div>
-
-            {/* Pending Rewards */}
-            {hasPendingRewards && (
-              <div>
-                <div className="font-black uppercase text-xs text-muted-foreground mb-1">
-                  Unclaimed
-                </div>
-                <div className="text-2xl font-black text-foreground">
-                  {totalPendingGB} GB
-                </div>
-              </div>
-            )}
+            <div className="text-2xl font-black text-foreground">
+              {walletData.balance_gb} GB
+            </div>
           </div>
-            {/* Pending Rewards */}
-            {hasPendingRewards && (
-              <div className="mb-4">
-                <h3 className="text-sm font-black uppercase mb-2 text-muted-foreground">
-                  Claim Your Rewards ({walletData.pending_rewards.length})
-                </h3>
 
-                <div className="space-y-2">
-                  {walletData.pending_rewards.map((reward) => {
-                    const isFromUsingCode = reward.referrer_user_id === reward.referred_user_id;
-
-                    return (
-                      <div
-                        key={reward.id}
-                        className="bg-mint border border-primary rounded-lg p-3"
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-black text-sm">
-                              1GB Free Data
-                            </div>
-                            <div className="text-xs font-bold text-muted-foreground truncate">
-                              {isFromUsingCode ? 'Bonus for using referral code' : 'Earned from referral'}
-                            </div>
-                          </div>
-                          <Button
-                            onClick={() => redeemReward(reward.id)}
-                            disabled={redeeming === reward.id}
-                            className="bg-foreground text-white hover:bg-foreground/90 font-black text-xs px-4 py-2 rounded-lg"
-                          >
-                            {redeeming === reward.id ? 'CLAIMING...' : 'CLAIM'}
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Apply Data to Active eSIMs */}
+          {/* Apply Data to Active eSIMs */}
             {hasBalance && hasActiveEsims && (
               <div>
                 <h3 className="text-sm font-black uppercase mb-1 text-muted-foreground">
@@ -390,7 +274,7 @@ export function DataWallet() {
             )}
 
             {/* Empty State */}
-            {!hasPendingRewards && !hasBalance && !hasActiveEsims && (
+            {!hasBalance && !hasActiveEsims && (
               <div className="text-center py-6">
                 <h3 className="font-black text-sm mb-1 uppercase">No Free Data Yet</h3>
                 <p className="text-xs font-bold text-muted-foreground">

@@ -1,6 +1,6 @@
 /**
  * Data Wallet API
- * GET /api/rewards/wallet - Get user's data wallet balance and pending rewards
+ * GET /api/rewards/wallet - Get user's data wallet balance
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,7 +9,8 @@ import { requireUserAuth } from '@/lib/server-auth';
 
 /**
  * GET /api/rewards/wallet
- * Get user's data wallet balance and pending rewards
+ * Get user's data wallet balance and active eSIMs
+ * Auto-applies any PENDING rewards using atomic DB function
  */
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +22,29 @@ export async function GET(req: NextRequest) {
 
     const userId = auth.user.id;
 
-    // Get wallet balance
+    // Auto-apply any PENDING rewards using atomic DB function (prevents race conditions)
+    const { data: pendingRewards } = await supabase
+      .from('referral_rewards')
+      .select('id')
+      .eq('referrer_user_id', userId)
+      .eq('status', 'PENDING');
+
+    if (pendingRewards && pendingRewards.length > 0) {
+      for (const reward of pendingRewards) {
+        // Use atomic DB function with FOR UPDATE locking
+        const { data: result } = await supabase.rpc('redeem_referral_reward', {
+          p_reward_id: reward.id,
+          p_user_id: userId,
+        });
+
+        if (result?.success) {
+          console.log(`Auto-applied pending reward ${reward.id} for user ${userId}`);
+        }
+        // If not success, reward was already redeemed by concurrent request - that's fine
+      }
+    }
+
+    // Get wallet balance (after any auto-applied rewards)
     const { data: wallet } = await supabase
       .from('user_data_wallet')
       .select('*')
@@ -29,14 +52,6 @@ export async function GET(req: NextRequest) {
       .maybeSingle();
 
     const balanceMB = wallet?.balance_mb || 0;
-
-    // Get pending rewards
-    const { data: pendingRewards } = await supabase
-      .from('referral_rewards')
-      .select('*')
-      .eq('referrer_user_id', userId)
-      .eq('status', 'PENDING')
-      .order('created_at', { ascending: false });
 
     // Get active eSIMs (orders that can be topped up - not expired)
     const { data: activeEsims } = await supabase
@@ -68,7 +83,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       balance_mb: balanceMB,
       balance_gb: (balanceMB / 1024).toFixed(1),
-      pending_rewards: pendingRewards || [],
       active_esims: formattedEsims,
     });
   } catch (error) {
