@@ -59,6 +59,20 @@ export async function POST(request: NextRequest) {
           error: 'Referral codes are only valid for first-time buyers. You already have an order.',
         });
       }
+
+      // Step 2b: Check if user already has a referral code linked
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('referred_by_code')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (userProfile?.referred_by_code) {
+        return NextResponse.json({
+          valid: false,
+          error: 'Referral benefit already used',
+        });
+      }
     }
 
     // Step 3: If we have an email, check if this email has any orders
