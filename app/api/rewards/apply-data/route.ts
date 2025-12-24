@@ -74,13 +74,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get the order and verify ownership
+    // Get the order and verify ownership (allow completed, active, or depleted eSIMs)
     const { data: order } = await supabase
       .from('orders')
       .select('*, plans(*)')
       .eq('id', orderId)
       .eq('user_id', userId)
-      .eq('status', 'completed')
+      .in('status', ['completed', 'active', 'depleted'])
       .maybeSingle();
 
     if (!order) {

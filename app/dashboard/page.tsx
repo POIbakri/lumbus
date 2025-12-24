@@ -1124,40 +1124,6 @@ export default function DashboardPage() {
                     {/* Right: Stats Section */}
                     <div>
                       <div className="space-y-3">
-                        {/* Total Clicks */}
-                        <div className="glass-cyan rounded-2xl p-4 sm:p-5 border border-primary/30 float-shadow glass-inner-glow hover-lift">
-                          <div className="flex justify-between items-center">
-                            <div className="flex-1">
-                              <div className="font-black uppercase text-xs text-foreground/70 mb-1">
-                                TOTAL CLICKS
-                              </div>
-                              <div className="text-3xl sm:text-4xl font-black text-foreground">
-                                {referralStats.total_clicks}
-                              </div>
-                              <div className="text-xs font-bold text-foreground/70 mt-2">
-                                {referralStats.total_clicks === 0 ? 'Start sharing to get clicks!' : `${((referralStats.total_referrals / Math.max(referralStats.total_clicks, 1)) * 100).toFixed(1)}% conversion rate`}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Friends Referred */}
-                        <div className="glass-mint rounded-2xl p-4 sm:p-5 border border-primary/30 float-shadow glass-inner-glow hover-lift">
-                          <div className="flex justify-between items-center">
-                            <div className="flex-1">
-                              <div className="font-black uppercase text-xs text-foreground/70 mb-1">
-                                FRIENDS JOINED
-                              </div>
-                              <div className="text-3xl sm:text-4xl font-black text-foreground">
-                                {referralStats.total_referrals}
-                              </div>
-                              <div className="text-xs font-bold text-foreground/70 mt-2">
-                                {referralStats.total_referrals === 0 ? 'Invite your first friend!' : `${referralStats.total_referrals} ${referralStats.total_referrals === 1 ? 'friend' : 'friends'} signed up`}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
                         {/* Data Earned */}
                         <div className="glass-yellow rounded-2xl p-4 sm:p-5 border border-secondary/30 float-shadow glass-inner-glow hover-lift">
                           <div className="flex justify-between items-center">

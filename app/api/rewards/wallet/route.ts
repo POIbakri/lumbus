@@ -38,12 +38,12 @@ export async function GET(req: NextRequest) {
       .eq('status', 'PENDING')
       .order('created_at', { ascending: false });
 
-    // Get active eSIMs (orders that are completed and have data or are not expired)
+    // Get active eSIMs (orders that can be topped up - not expired)
     const { data: activeEsims } = await supabase
       .from('orders')
       .select('id, plan_id, data_remaining_bytes, free_data_added_mb, created_at, expires_at, plans(name, region_code)')
       .eq('user_id', userId)
-      .eq('status', 'completed')
+      .in('status', ['completed', 'active', 'depleted'])
       .order('created_at', { ascending: false });
 
     // Format active eSIMs data
