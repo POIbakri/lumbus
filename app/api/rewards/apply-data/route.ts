@@ -127,17 +127,42 @@ export async function POST(req: NextRequest) {
 
       referralRewardPackageCode = packagePlan.supplier_sku;
     } else {
-      const pkgCodeRaw = systemConfig.REFERRAL_REWARD_PACKAGE_CODE as unknown;
-      referralRewardPackageCode =
-        typeof pkgCodeRaw === 'string' && pkgCodeRaw.trim().length > 0
-          ? pkgCodeRaw.trim()
-          : null;
+      // Auto-detect: find a 1GB package matching the eSIM's region
+      const esimRegion = plan.region_code;
+
+      if (esimRegion) {
+        // First try to find a regional 1GB package
+        const { data: regionalPackage } = await supabase
+          .from('plans')
+          .select('supplier_sku')
+          .eq('region_code', esimRegion)
+          .eq('is_active', true)
+          .gte('data_gb', 0.9)
+          .lte('data_gb', 1.1)
+          .order('retail_price', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (regionalPackage) {
+          referralRewardPackageCode = regionalPackage.supplier_sku;
+          console.log(`Auto-selected regional 1GB package: ${referralRewardPackageCode} for region ${esimRegion}`);
+        }
+      }
+
+      // Fallback to system config if no regional package found
+      if (!referralRewardPackageCode) {
+        const pkgCodeRaw = systemConfig.REFERRAL_REWARD_PACKAGE_CODE as unknown;
+        referralRewardPackageCode =
+          typeof pkgCodeRaw === 'string' && pkgCodeRaw.trim().length > 0
+            ? pkgCodeRaw.trim()
+            : null;
+      }
     }
 
     if (!referralRewardPackageCode) {
       return NextResponse.json(
-        { error: 'Referral reward package code is not configured' },
-        { status: 500 }
+        { error: 'No compatible 1GB package found for this eSIM region' },
+        { status: 400 }
       );
     }
 

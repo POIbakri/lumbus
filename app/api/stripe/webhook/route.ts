@@ -124,6 +124,7 @@ export async function POST(req: NextRequest) {
       const discountSource = session.metadata?.discountSource;
       const discountPercent = parseInt(session.metadata?.discountPercent || '0', 10);
       const basePriceUSD = parseFloat(session.metadata?.basePriceUSD || '0');
+      const hasFinalPriceMetadata = session.metadata?.finalPriceUSD !== undefined;
       const finalPriceUSD = parseFloat(session.metadata?.finalPriceUSD || '0');
       // Note: We no longer use data credits as payment discounts - they're actual data now
 
@@ -142,8 +143,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
       }
 
-      // Calculate amount_cents from plan price
-      const amountCents = Math.round((existingOrder.plans?.retail_price || 0) * 100);
+      // Use finalPriceUSD from metadata (respects discounts), fallback to plan price for older orders
+      const amountCents = hasFinalPriceMetadata
+        ? Math.round(finalPriceUSD * 100)
+        : Math.round((existingOrder.plans?.retail_price || 0) * 100);
 
       // Update order status to paid with amount and paid_at
       const { data: order, error: orderError } = await supabase

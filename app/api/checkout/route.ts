@@ -269,7 +269,7 @@ export async function POST(req: NextRequest) {
           .from('orders')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .in('status', ['paid', 'completed']);
+          .in('status', ['paid', 'completed', 'provisioning']);
 
         if ((orderCount || 0) === 0) {
           discountPercent = 10;
@@ -284,6 +284,101 @@ export async function POST(req: NextRequest) {
       } else {
         console.log('[Mobile Checkout] Invalid referral code:', rfcd);
       }
+    }
+
+    // Handle 100% discount - bypass Stripe entirely (free order)
+    if (finalPriceUSD <= 0) {
+      console.log('[Mobile Checkout] Free order detected (100% discount) - bypassing Stripe');
+
+      // Mark order as paid with $0
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          status: 'paid',
+          amount_cents: 0,
+        })
+        .eq('id', order.id);
+
+      if (updateError) {
+        console.error('[Mobile Checkout] Failed to update order:', updateError);
+        return NextResponse.json({ error: 'Failed to process free order' }, { status: 500 });
+      }
+
+      // Trigger eSIM provisioning via internal webhook call
+      const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/stripe/webhook`;
+      const internalSecret = process.env.INTERNAL_WEBHOOK_SECRET;
+
+      if (!internalSecret) {
+        console.error('[Mobile Checkout] INTERNAL_WEBHOOK_SECRET is not configured');
+        // Roll back order status
+        await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      }
+
+      console.log('[Mobile Checkout] Triggering eSIM provisioning for free order');
+
+      try {
+        const webhookResponse = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': internalSecret,
+          },
+          body: JSON.stringify({
+            type: 'checkout.session.completed',
+            data: {
+              object: {
+                id: 'free_' + order.id,
+                customer_email: user.email,
+                amount_total: 0,
+                currency: currency.toLowerCase(),
+                payment_status: 'paid',
+                metadata: {
+                  orderId: order.id,
+                  planId: planId,
+                  userId: user.id,
+                  userEmail: user.email,
+                  needsPasswordSetup: isNewUser ? 'true' : 'false',
+                  source: 'mobile',
+                  afid: afid || '',
+                  rfcd: rfcd || '',
+                  discountApplied: 'true',
+                  discountPercent: discountPercent.toString(),
+                  discountSource: discountSource || '',
+                  discountCodeId: discountCodeId || '',
+                  discountCode: discountCode || '',
+                  isTopUp: isTopUp ? 'true' : 'false',
+                  existingOrderId: existingOrderId || '',
+                  iccid: iccid || '',
+                  basePriceUSD: basePriceUSD.toString(),
+                  finalPriceUSD: '0',
+                },
+              },
+            },
+          }),
+        });
+
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text().catch(() => 'Unknown error');
+          console.error('[Mobile Checkout] Webhook returned error:', webhookResponse.status, errorText);
+          // Roll back order status
+          await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+          return NextResponse.json({ error: 'Failed to provision eSIM' }, { status: 500 });
+        }
+      } catch (webhookError) {
+        console.error('[Mobile Checkout] Failed to trigger provisioning:', webhookError);
+        // Roll back order status
+        await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+        return NextResponse.json({ error: 'Failed to provision eSIM' }, { status: 500 });
+      }
+
+      // Discount code usage is recorded by the webhook handler
+
+      console.log('[Mobile Checkout] Free order success! Returning orderId:', order.id);
+      return NextResponse.json({
+        orderId: order.id,
+        freeOrder: true,
+      });
     }
 
     // Create Payment Intent for mobile

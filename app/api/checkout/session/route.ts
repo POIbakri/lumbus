@@ -423,37 +423,25 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to process free order' }, { status: 500 });
       }
 
-      // Record discount code usage
-      if (discountCodeId && discountSource === 'code') {
-        console.log('[Checkout] Recording 100% discount code usage');
-        const { error: usageError } = await supabase
-          .from('discount_code_usage')
-          .insert({
-            discount_code_id: discountCodeId,
-            order_id: order.id,
-            user_id: user.id,
-            discount_percent: 100,
-            original_price_usd: basePriceUSD,
-            discount_amount_usd: basePriceUSD,
-            final_price_usd: 0,
-          });
-
-        if (usageError) {
-          console.error('[Checkout] Failed to record discount usage:', usageError);
-        }
-      }
-
       // Trigger eSIM provisioning
       const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/stripe/webhook`;
+      const internalSecret = process.env.INTERNAL_WEBHOOK_SECRET;
+
+      if (!internalSecret) {
+        console.error('[Checkout] INTERNAL_WEBHOOK_SECRET is not configured');
+        await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+      }
+
       console.log('[Checkout] Triggering eSIM provisioning for free order');
 
       // Call webhook handler directly (simulating successful payment)
       try {
-        await fetch(webhookUrl, {
+        const webhookResponse = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-internal-secret': process.env.INTERNAL_WEBHOOK_SECRET || '', // Secure internal call
+            'x-internal-secret': internalSecret,
           },
           body: JSON.stringify({
             type: 'checkout.session.completed',
@@ -492,9 +480,20 @@ export async function POST(req: NextRequest) {
             },
           }),
         });
+
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text().catch(() => 'Unknown error');
+          console.error('[Checkout] Webhook returned error:', webhookResponse.status, errorText);
+          await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+          return NextResponse.json({ error: 'Failed to provision eSIM' }, { status: 500 });
+        }
       } catch (webhookError) {
         console.error('[Checkout] Failed to trigger provisioning:', webhookError);
+        await supabase.from('orders').update({ status: 'failed' }).eq('id', order.id);
+        return NextResponse.json({ error: 'Failed to provision eSIM' }, { status: 500 });
       }
+
+      // Discount code usage is recorded by the webhook handler
 
       // Generate secure token for order access
       const accessToken = generateOrderAccessToken(order.id, user.id);
