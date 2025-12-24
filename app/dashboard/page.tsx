@@ -905,7 +905,7 @@ export default function DashboardPage() {
                             </Button>
                           </Link>
                         ) : (
-                          order.iccid && !isDepleted && daysRemaining > 0 && (
+                          order.iccid && daysRemaining > 0 && (
                             <Link href={`/topup/${order.id}`} className="block">
                               <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
                                 <span className="flex items-center justify-center gap-2">
@@ -1001,6 +1001,14 @@ export default function DashboardPage() {
                               <Badge className="bg-orange-500 text-white font-black uppercase text-xs px-2 sm:px-3 py-1">
                                 expired
                               </Badge>
+                            )}
+                            {/* Allow top-up for depleted but not expired eSIMs */}
+                            {order.iccid && isDepleted && !isExpired && (
+                              <Link href={`/topup/${order.id}`}>
+                                <Button className="glass-dark text-white font-black text-xs px-3 py-1.5 rounded-lg hover:scale-[1.02] transition-all">
+                                  + TOP UP
+                                </Button>
+                              </Link>
                             )}
                           </div>
                         </div>
