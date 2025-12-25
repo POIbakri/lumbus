@@ -219,6 +219,15 @@ export interface SendTopUpConfirmationParams {
   iccid: string;
 }
 
+export interface SendRewardClaimConfirmationParams {
+  to: string;
+  planName: string;
+  dataAdded: number; // in GB
+  validityDays: number;
+  iccid: string;
+  remainingBalanceGB: string;
+}
+
 export interface SendAffiliateApplicationParams {
   applicantEmail: string;
   displayName: string;
@@ -780,10 +789,10 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 15px; color: #666666;">
-            <strong>Validity:</strong>
+            <strong>Validity Extended:</strong>
           </td>
           <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
-            ${validityDays} days from today
+            +${validityDays} days
           </td>
         </tr>
       </table>
@@ -850,6 +859,135 @@ export async function sendTopUpConfirmationEmail(params: SendTopUpConfirmationPa
     return data;
   } catch (error) {
     console.error('Failed to send top-up confirmation email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send reward claim confirmation email
+ */
+export async function sendRewardClaimConfirmationEmail(params: SendRewardClaimConfirmationParams) {
+  const { to, planName, dataAdded, validityDays, iccid, remainingBalanceGB } = params;
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #FEF7E0; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FECC2E"/>
+        </svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 28px; font-weight: 600; color: #1A1A1A; text-align: center;">Reward Claimed!</h2>
+
+    <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      You've successfully used your referral reward to add free data to your eSIM.
+    </p>
+
+    <div style="margin: 0 0 30px; padding: 30px; background: #FEF7E0; border: 3px solid #FECC2E; border-radius: 12px; text-align: center;">
+      <p style="margin: 0 0 10px; font-size: 14px; color: #666666; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Free Data Added</p>
+      <p class="big-number" style="margin: 0 0 10px; font-size: 48px; font-weight: 900; color: #1A1A1A;">${dataAdded} GB</p>
+      <p style="margin: 0; font-size: 16px; color: #666666; font-weight: 600;">From your rewards balance</p>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 25px; background-color: #F5F5F5; border-radius: 12px;">
+      <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Reward Details</h3>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
+            <strong>Region:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${planName}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
+            <strong>Data Added:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            ${dataAdded} GB
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
+            <strong>Validity Extended:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #1A1A1A; text-align: right; font-weight: 700;">
+            +${validityDays} days
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 15px; color: #666666;">
+            <strong>Remaining Balance:</strong>
+          </td>
+          <td style="padding: 8px 0; font-size: 15px; color: #FECC2E; text-align: right; font-weight: 700;">
+            ${remainingBalanceGB} GB
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FEF7E0; border-radius: 12px; border: 2px solid #FECC2E;">
+      <p style="margin: 0 0 10px; font-size: 15px; color: #1A1A1A; font-weight: 800; text-transform: uppercase;">NO ACTION NEEDED</p>
+      <p style="margin: 0; font-size: 14px; color: #1A1A1A; font-weight: 600; line-height: 1.6;">
+        The free data has been automatically added to your existing eSIM. Just continue using your device as normal!
+      </p>
+    </div>
+
+    <div class="code-box" style="margin: 0 0 20px; padding: 15px; background-color: #F5F5F5; border: 2px solid #E5E5E5; border-radius: 8px;">
+      <p style="margin: 0 0 8px; font-size: 14px; color: #666666; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">ICCID</p>
+      <p style="margin: 0; font-size: 12px; color: #1A1A1A; font-family: monospace; overflow-wrap: break-word; word-wrap: break-word;">
+        ${iccid}
+      </p>
+    </div>
+
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+      <tr>
+        <td align="center" style="padding: 0 0 30px;">
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="mobile-button" style="display: inline-block; padding: 16px 40px; background: #FECC2E; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 30px -5px rgba(254, 204, 46, 0.4);">
+            VIEW DASHBOARD
+          </a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="margin: 40px 0 0; padding: 30px 0; border-top: 1px solid #E5E5E5;">
+      <p style="margin: 0 0 15px; font-size: 16px; font-weight: 700; color: #1A1A1A;">Earn more rewards:</p>
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #FECC2E; font-weight: 900;">•</span> Share your referral code with friends</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #FECC2E; font-weight: 900;">•</span> Earn 1GB for each friend who purchases</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #FECC2E; font-weight: 900;">•</span> Use rewards on any of your active eSIMs</p></td></tr>
+        <tr><td style="padding: 5px 0;"><p style="margin: 0; font-size: 14px; color: #666666;"><span style="color: #FECC2E; font-weight: 900;">•</span> No expiration on your rewards balance</p></td></tr>
+      </table>
+    </div>
+
+    <p style="margin: 30px 0 0; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      Keep sharing! Find your referral code in your <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" style="color: #FECC2E; font-weight: 700; text-decoration: none;">dashboard</a>.
+    </p>
+
+    ${getAppStoreSection()}
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
+      to: [to],
+      subject: `Reward Claimed! ${dataAdded}GB added to your eSIM`,
+      html: createEmailTemplate({
+        title: 'Reward Claimed',
+        subtitle: 'Free Data Added',
+        content,
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send reward claim confirmation email:', error);
     throw error;
   }
 }
@@ -2494,3 +2632,7 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams) {
     throw error;
   }
 }
+
+// Re-export from separate files for convenience
+export * from './emails/esim-alerts';
+export * from './emails/milestone-alerts';

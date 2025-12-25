@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/db';
-import { assignEsim, topUpEsim } from '@/lib/esimaccess';
+import { assignEsim, topUpEsim, getTopUpPackages } from '@/lib/esimaccess';
 import { resolveAttribution, saveOrderAttribution } from '@/lib/referral';
 import { processOrderAttribution, voidCommission, voidReferralReward } from '@/lib/commission';
 import { runFraudChecks } from '@/lib/fraud';
@@ -286,7 +286,7 @@ export async function POST(req: NextRequest) {
           // Get existing order to check for esimTranNo and current data values (for test mode simulation)
           const { data: existingOrderForTopUp } = await supabase
             .from('orders')
-            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes, expires_at, plans(data_gb)')
+            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes, expires_at, plans(data_gb, region_code)')
             .eq('user_id', user.id)
             .eq('iccid', iccid)
             .eq('is_topup', false) // Get the original order for accurate data
@@ -296,8 +296,8 @@ export async function POST(req: NextRequest) {
 
           const esimTranNo = existingOrderForTopUp?.esim_tran_no;
 
-          // Generate unique transaction ID
-          const transactionId = `topup_${orderId}_${Date.now()}`;
+          // Generate unique transaction ID (keep it short)
+          const transactionId = `${Date.now()}_paid`;
 
           // Check if user is a test user (for mocking eSIM provision)
           const isTestUser = (user as any).is_test_user === true;
@@ -311,12 +311,27 @@ export async function POST(req: NextRequest) {
             ?? ((existingOrderForTopUp?.data_remaining_bytes ?? 0) + (existingOrderForTopUp?.data_usage_bytes ?? 0)))
             || ((existingPlan?.data_gb ?? 0) * 1024 * 1024 * 1024);
 
+          // Fetch the package slug from eSIM Access API (required for top-ups)
+          // The API requires slug format (e.g., AE_1_7) not packageCode (e.g., CKH527)
+          let topUpPackageCode = plan.supplier_sku; // Fallback
+          if (!isTestUser) {
+            try {
+              const topUpPackages = await getTopUpPackages({ iccid });
+              const matchingPkg = topUpPackages.find(pkg => pkg.packageCode === plan.supplier_sku);
+              if (matchingPkg?.slug) {
+                topUpPackageCode = matchingPkg.slug;
+                console.log(`[Webhook] Using slug ${topUpPackageCode} for top-up (was ${plan.supplier_sku})`);
+              }
+            } catch (pkgError) {
+              console.error('[Webhook] Failed to fetch top-up packages, using supplier_sku:', pkgError);
+            }
+          }
+
           const topUpResponse = await topUpEsim({
-            iccid: iccid, // Always pass ICCID (safe: topUpEsim prefers esimTranNo for real API, but needs iccid for mock return)
+            iccid: iccid,
             esimTranNo: esimTranNo || undefined,
-            packageCode: plan.supplier_sku,
+            packageCode: topUpPackageCode, // Use slug for real API calls
             transactionId,
-            amount: plan.retail_price.toString(),
             // Mock data for test users - simulates realistic top-up
             mockPlanDataGb: plan.data_gb,
             mockPlanValidityDays: plan.validity_days,
@@ -580,7 +595,7 @@ export async function POST(req: NextRequest) {
           // Get esimTranNo and current data values from existing order (for test mode simulation)
           const { data: existingOrderForTopUp } = await supabase
             .from('orders')
-            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes, expires_at, plans(data_gb)')
+            .select('esim_tran_no, iccid, total_bytes, data_usage_bytes, data_remaining_bytes, expires_at, plans(data_gb, region_code)')
             .eq('user_id', user.id)
             .eq('iccid', existingOrderIccid)
             .eq('is_topup', false) // Get the original order for accurate data
@@ -589,7 +604,8 @@ export async function POST(req: NextRequest) {
             .maybeSingle();
 
           const esimTranNo = existingOrderForTopUp?.esim_tran_no;
-          const transactionId = `topup_${orderId}_${Date.now()}`;
+          // Generate unique transaction ID (keep it short)
+          const transactionId = `${Date.now()}_paid`;
 
           // Calculate existing data bytes with proper fallbacks
           // Priority: total_bytes > (remaining + usage) > plan data > 0
@@ -600,12 +616,26 @@ export async function POST(req: NextRequest) {
             ?? ((existingOrderForTopUp?.data_remaining_bytes ?? 0) + (existingOrderForTopUp?.data_usage_bytes ?? 0)))
             || ((existingPlan?.data_gb ?? 0) * 1024 * 1024 * 1024);
 
+          // Fetch the package slug from eSIM Access API (required for top-ups)
+          let topUpPackageCode = plan.supplier_sku; // Fallback
+          if (!isTestUser) {
+            try {
+              const topUpPackages = await getTopUpPackages({ iccid: existingOrderIccid });
+              const matchingPkg = topUpPackages.find(pkg => pkg.packageCode === plan.supplier_sku);
+              if (matchingPkg?.slug) {
+                topUpPackageCode = matchingPkg.slug;
+                console.log(`[Webhook] Using slug ${topUpPackageCode} for top-up (was ${plan.supplier_sku})`);
+              }
+            } catch (pkgError) {
+              console.error('[Webhook] Failed to fetch top-up packages, using supplier_sku:', pkgError);
+            }
+          }
+
           const topUpResponse = await topUpEsim({
             iccid: existingOrderIccid,
             esimTranNo: esimTranNo || undefined,
-            packageCode: plan.supplier_sku,
+            packageCode: topUpPackageCode,
             transactionId,
-            amount: plan.retail_price.toString(),
             // Mock data for test users - simulates realistic top-up
             mockPlanDataGb: plan.data_gb,
             mockPlanValidityDays: plan.validity_days,

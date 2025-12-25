@@ -534,7 +534,8 @@ export async function getTopUpPackages(params: {
   packageCode: string;
   slug?: string;
   name: string;
-  data: string;
+  data?: string;
+  volume?: number; // Data in bytes
   validity: string;
   price: number;
   currency: string;
@@ -566,7 +567,8 @@ export async function getTopUpPackages(params: {
         packageCode: string;
         slug?: string;
         name: string;
-        data: string;
+        data?: string;
+        volume?: number; // Data in bytes
         validity: string;
         price: number;
         currency: string;
@@ -654,16 +656,15 @@ export async function topUpEsim(params: {
       transactionId,
     };
 
-    // Prefer esimTranNo over iccid (as per API docs)
-    if (esimTranNo) {
-      requestBody.esimTranNo = esimTranNo;
-    } else if (iccid) {
+    // Use iccid OR esimTranNo (not both) - try iccid first
+    if (iccid) {
       requestBody.iccid = iccid;
+    } else if (esimTranNo) {
+      requestBody.esimTranNo = esimTranNo;
     }
+    // Note: amount is optional and can cause issues, omitting it
 
-    if (amount) {
-      requestBody.amount = amount;
-    }
+    console.log(`[eSIM Access] Top-up request to /esim/topup:`, JSON.stringify(requestBody, null, 2));
 
     const data = await makeEsimAccessRequest<{
       transactionId: string;
