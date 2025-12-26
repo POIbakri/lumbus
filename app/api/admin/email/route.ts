@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from('users')
-      .select('id, email, referral_code, created_at, is_test_user')
+      .select('id, email, created_at, is_test_user, user_profiles(ref_code)')
       .eq('is_test_user', false)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -40,8 +40,17 @@ export async function GET(req: NextRequest) {
       .select('*', { count: 'exact', head: true })
       .eq('is_test_user', false);
 
+    // Transform response to flatten user_profiles.ref_code into referral_code
+    const transformedUsers = (users || []).map(user => ({
+      id: user.id,
+      email: user.email,
+      referral_code: (user.user_profiles as any)?.ref_code || null,
+      created_at: user.created_at,
+      is_test_user: user.is_test_user,
+    }));
+
     return NextResponse.json({
-      users: users || [],
+      users: transformedUsers,
       totalUsers: count || 0,
     });
   } catch (error) {
@@ -114,10 +123,10 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: 'No recipients specified' }, { status: 400 });
         }
 
-        // Get user referral codes
+        // Get user referral codes from user_profiles
         const { data: users, error } = await supabase
           .from('users')
-          .select('email, referral_code')
+          .select('email, user_profiles(ref_code)')
           .in('email', recipients);
 
         if (error || !users) {
@@ -125,13 +134,14 @@ export async function POST(req: NextRequest) {
         }
 
         for (const user of users) {
-          if (!user.referral_code) continue;
+          const refCode = (user.user_profiles as any)?.ref_code;
+          if (!refCode) continue;
 
           try {
             await sendReferralPromoEmail({
               to: user.email,
-              referralCode: user.referral_code,
-              referralLink: `https://getlumbus.com/r/${user.referral_code}`,
+              referralCode: refCode,
+              referralLink: `https://getlumbus.com/r/${refCode}`,
             });
             results.success.push(user.email);
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -147,20 +157,22 @@ export async function POST(req: NextRequest) {
         // Send referral promo to all users with referral codes
         const { data: users, error } = await supabase
           .from('users')
-          .select('email, referral_code')
-          .eq('is_test_user', false)
-          .not('referral_code', 'is', null);
+          .select('email, user_profiles!inner(ref_code)')
+          .eq('is_test_user', false);
 
         if (error || !users) {
           return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
         }
 
         for (const user of users) {
+          const refCode = (user.user_profiles as any)?.ref_code;
+          if (!refCode) continue;
+
           try {
             await sendReferralPromoEmail({
               to: user.email,
-              referralCode: user.referral_code,
-              referralLink: `https://getlumbus.com/r/${user.referral_code}`,
+              referralCode: refCode,
+              referralLink: `https://getlumbus.com/r/${refCode}`,
             });
             results.success.push(user.email);
             await new Promise(resolve => setTimeout(resolve, 100));
