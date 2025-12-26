@@ -71,12 +71,35 @@ export async function POST(req: NextRequest) {
       console.log('[IAP Checkout] Top-up flow - getting user from order');
       const { data: existingOrder } = await supabase
         .from('orders')
-        .select('user_id, users(*)')
+        .select('user_id, users(*), iccid')
         .eq('id', existingOrderId)
         .single();
 
       if (!existingOrder) {
         return NextResponse.json({ error: 'Existing order not found' }, { status: 404 });
+      }
+
+      // Get the ORIGINAL order by ICCID to check is_reloadable (prevents bypass via top-up order ID)
+      const targetIccid = iccid || existingOrder.iccid;
+      if (!targetIccid) {
+        return NextResponse.json({ error: 'No ICCID found for top-up' }, { status: 400 });
+      }
+
+      const { data: originalOrder } = await supabase
+        .from('orders')
+        .select('plans(is_reloadable)')
+        .eq('iccid', targetIccid)
+        .eq('is_topup', false)
+        .limit(1)
+        .maybeSingle();
+
+      // Check if original plan supports top-ups
+      const originalPlan = Array.isArray(originalOrder?.plans) ? originalOrder.plans[0] : originalOrder?.plans;
+      if ((originalPlan as any)?.is_reloadable === false) {
+        return NextResponse.json(
+          { error: 'This plan does not support top-ups. Please purchase a new plan instead.' },
+          { status: 400 }
+        );
       }
 
       user = Array.isArray(existingOrder.users) ? existingOrder.users[0] : existingOrder.users;

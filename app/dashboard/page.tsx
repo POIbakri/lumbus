@@ -906,13 +906,19 @@ export default function DashboardPage() {
                           </Link>
                         ) : (
                           order.iccid && daysRemaining > 0 && (
-                            <Link href={`/topup/${order.id}`} className="block">
-                              <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
-                                <span className="flex items-center justify-center gap-2">
-                                  + TOP UP DATA
-                                </span>
-                              </Button>
-                            </Link>
+                            order.plan?.is_reloadable !== false ? (
+                              <Link href={`/topup/${order.id}`} className="block">
+                                <Button className="w-full glass-dark text-white font-black text-sm sm:text-base py-3 sm:py-4 rounded-xl sm:rounded-2xl transition-all float-shadow hover:scale-[1.02]">
+                                  <span className="flex items-center justify-center gap-2">
+                                    + TOP UP DATA
+                                  </span>
+                                </Button>
+                              </Link>
+                            ) : (
+                              <div className="w-full text-center text-white/60 text-xs sm:text-sm py-2">
+                                This plan doesn&apos;t support top-ups
+                              </div>
+                            )
                           )
                         )}
                       </CardContent>
@@ -1004,11 +1010,15 @@ export default function DashboardPage() {
                             )}
                             {/* Allow top-up for depleted but not expired eSIMs */}
                             {order.iccid && isDepleted && !isExpired && (
-                              <Link href={`/topup/${order.id}`}>
-                                <Button className="glass-dark text-white font-black text-xs px-3 py-1.5 rounded-lg hover:scale-[1.02] transition-all">
-                                  + TOP UP
-                                </Button>
-                              </Link>
+                              order.plan?.is_reloadable !== false ? (
+                                <Link href={`/topup/${order.id}`}>
+                                  <Button className="glass-dark text-white font-black text-xs px-3 py-1.5 rounded-lg hover:scale-[1.02] transition-all">
+                                    + TOP UP
+                                  </Button>
+                                </Link>
+                              ) : (
+                                <span className="text-white/50 text-xs">No top-up</span>
+                              )
                             )}
                           </div>
                         </div>

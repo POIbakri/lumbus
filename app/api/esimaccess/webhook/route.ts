@@ -286,6 +286,7 @@ async function handleOrderStatus(content: { orderNo: string; orderStatus: string
             planName: plan.name,
             dataGb: plan.data_gb,
             validityDays: plan.validity_days,
+            regionCode: plan.region_code,
           },
           activationDetails: {
             smdp: smdpAddress,

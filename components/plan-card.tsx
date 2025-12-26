@@ -62,6 +62,18 @@ export function PlanCard({ plan, displayPrice, displaySymbol, colorIndex }: Plan
   return (
     <Card className={`group ${colors.bg} border-2 ${colors.border} hover:border-primary shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden`}>
       <CardContent className="p-4 sm:p-5">
+        {/* No Top-ups Badge for non-reloadable plans */}
+        {plan.is_reloadable === false && (
+          <div className="mb-3">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-100 border border-red-300 text-red-700 font-bold text-[10px] uppercase tracking-wide">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              No Top-ups
+            </span>
+          </div>
+        )}
+
         {/* Header: Flag + Region + Price */}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-2 sm:gap-3">

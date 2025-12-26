@@ -22,6 +22,7 @@ interface OrderData {
   plan: {
     name: string;
     region: string;
+    regionCode: string;
     dataGb: number;
     validityDays: number;
   };
@@ -35,6 +36,7 @@ export default function InstallPage() {
   const [error, setError] = useState('');
   const [deepLinkTriggered, setDeepLinkTriggered] = useState(false);
   const [showReferralModal, setShowReferralModal] = useState(false);
+  const [showRussiaAlert, setShowRussiaAlert] = useState(false);
   const deviceInfo = useDeviceDetection();
 
   const loadOrder = useCallback(async () => {
@@ -134,6 +136,22 @@ export default function InstallPage() {
     order?.activationCode, 
     deviceInfo.supportsUniversalLink
   ]); // Only re-run if critical data changes, ignoring object reference updates
+
+  // Show Russia alert immediately for Russian eSIMs - only once per order
+  useEffect(() => {
+    if (order?.hasActivationDetails && order.plan.regionCode === 'RU' && !showRussiaAlert) {
+      const dismissedKey = `russia_alert_dismissed_${order.id}`;
+      const alreadyDismissed = localStorage.getItem(dismissedKey);
+
+      if (!alreadyDismissed) {
+        // Show immediately (slight delay for page to render)
+        const timer = setTimeout(() => {
+          setShowRussiaAlert(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [order, showRussiaAlert]);
 
   // Show referral modal after success (5 seconds delay) - only once per order
   useEffect(() => {
@@ -339,6 +357,61 @@ export default function InstallPage() {
             platform={deviceInfo.platform}
           />
 
+          {/* Russia-specific MTS Registration Notice */}
+          {order.plan.regionCode === 'RU' && (
+            <Card className="mt-6 sm:mt-8 bg-red-50 border-3 sm:border-4 border-red-500 shadow-xl">
+              <CardHeader className="bg-red-500 border-b-3 border-red-600 pb-3 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl font-black uppercase text-center text-white flex items-center justify-center gap-2">
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                  </svg>
+                  IMPORTANT: RUSSIA eSIM ACTIVATION
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-black text-sm">1</div>
+                    <div>
+                      <p className="font-black text-sm sm:text-base text-foreground">
+                        You'll get an SMS from MTS with a link to their official site
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-black text-sm">2</div>
+                    <div>
+                      <p className="font-black text-sm sm:text-base text-foreground">
+                        Sometimes the site asks for quick registration - that's normal. Just fill it out.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-black text-sm">✓</div>
+                    <div>
+                      <p className="font-black text-sm sm:text-base text-foreground">
+                        Good news: Once registered, you're all set! No need to wait 24 hours (we've tested this).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-4 bg-white rounded-xl border-2 border-red-200">
+                    <p className="font-black text-sm sm:text-base text-foreground mb-2">
+                      📱 If your phone doesn't show network bars after registering:
+                    </p>
+                    <ol className="list-decimal list-inside space-y-1 text-sm sm:text-base font-bold text-foreground/80 pl-2">
+                      <li>Turn <span className="font-black text-foreground">ON</span> Airplane mode</li>
+                      <li>Wait a few seconds</li>
+                      <li>Turn <span className="font-black text-foreground">OFF</span> Airplane mode</li>
+                    </ol>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Data Roaming Required - Prominent Notice */}
           <Card className="mt-6 sm:mt-8 bg-mint border-3 sm:border-4 border-primary shadow-xl">
             <CardContent className="p-4 sm:p-6">
@@ -458,6 +531,66 @@ export default function InstallPage() {
             localStorage.setItem(`referral_modal_dismissed_${order.id}`, 'true');
           }}
         />
+      )}
+
+      {/* Russia eSIM Alert Modal */}
+      {showRussiaAlert && order && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => {
+            setShowRussiaAlert(false);
+            localStorage.setItem(`russia_alert_dismissed_${order.id}`, 'true');
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl border-4 border-red-500 shadow-2xl max-w-md w-full mx-4 overflow-hidden animate-in fade-in zoom-in duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-red-500 px-5 py-4 flex items-center gap-3">
+              <span className="text-2xl">🇷🇺</span>
+              <h2 className="text-white font-black text-base sm:text-lg uppercase leading-tight">
+                Russia eSIM - Extra Step Required
+              </h2>
+            </div>
+
+            {/* Content */}
+            <div className="p-5 sm:p-6 space-y-4">
+              <p className="text-sm sm:text-base font-bold text-foreground leading-relaxed">
+                After installing your eSIM, you'll receive an <span className="font-black text-red-600">SMS from MTS</span> with a registration link.
+              </p>
+
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                <p className="text-sm sm:text-base font-black text-foreground mb-2">
+                  Complete the quick registration to activate your data.
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-foreground/70">
+                  This is a one-time step required by MTS (Russia's carrier).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm font-bold text-foreground/70">
+                <svg className="w-4 h-4 text-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+                Scroll down for detailed instructions
+              </div>
+            </div>
+
+            {/* Button */}
+            <div className="px-5 pb-5 sm:px-6 sm:pb-6">
+              <button
+                onClick={() => {
+                  setShowRussiaAlert(false);
+                  localStorage.setItem(`russia_alert_dismissed_${order.id}`, 'true');
+                }}
+                className="w-full bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-black text-base sm:text-lg py-4 rounded-xl shadow-lg touch-manipulation transition-colors"
+              >
+                GOT IT
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

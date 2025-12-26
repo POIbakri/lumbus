@@ -114,12 +114,13 @@ export default function TopUpPage({ params }: TopUpPageProps) {
             }
           }
         } else {
-          // Fallback: Load plans directly from database for the same region
+          // Fallback: Load plans directly from database for the same region (only reloadable)
           const { data: fallbackPlans, error: fallbackError } = await supabaseClient
             .from('plans')
             .select('*')
             .eq('region_code', regionCode)
             .eq('is_active', true)
+            .eq('is_reloadable', true)
             .order('retail_price', { ascending: true });
 
           if (fallbackError) {
@@ -129,12 +130,13 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           }
         }
       } catch (packagesError) {
-        // Fallback: Load plans directly from database for the same region
+        // Fallback: Load plans directly from database for the same region (only reloadable)
         const { data: fallbackPlans, error: fallbackError } = await supabaseClient
           .from('plans')
           .select('*')
           .eq('region_code', regionCode)
           .eq('is_active', true)
+          .eq('is_reloadable', true)
           .order('retail_price', { ascending: true });
 
         if (fallbackError) {
@@ -199,13 +201,42 @@ export default function TopUpPage({ params }: TopUpPageProps) {
           <div className="container mx-auto max-w-4xl text-center">
             <h1 className="text-4xl font-black uppercase mb-4">ORDER NOT FOUND</h1>
             <p className="text-lg font-bold text-muted-foreground mb-8">
-              This order doesn't exist or you don't have access to it.
+              This order doesn&apos;t exist or you don&apos;t have access to it.
             </p>
             <Link href="/dashboard">
               <Button className="btn-lumbus bg-foreground text-white">
                 BACK TO DASHBOARD
               </Button>
             </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if the plan supports top-ups
+  if (order.plan?.is_reloadable === false) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Nav />
+        <div className="pt-32 pb-20 px-4">
+          <div className="container mx-auto max-w-4xl text-center">
+            <h1 className="text-4xl font-black uppercase mb-4">TOP-UP NOT AVAILABLE</h1>
+            <p className="text-lg font-bold text-muted-foreground mb-8">
+              This plan doesn&apos;t support top-ups. Please purchase a new plan instead.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link href="/dashboard">
+                <Button variant="outline" className="font-black">
+                  BACK TO DASHBOARD
+                </Button>
+              </Link>
+              <Link href="/plans">
+                <Button className="btn-lumbus bg-foreground text-white">
+                  BROWSE PLANS
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

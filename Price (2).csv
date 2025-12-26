@@ -1797,3 +1797,11 @@ Multi-Area,Singapore & Malaysia & Thailand,Singapore & Malaysia & Thailand 3GB 1
 Multi-Area,Singapore & Malaysia & Thailand,Singapore & Malaysia & Thailand 3GB 30Days,Data in Total,$3.00,$6.00,SGMYTH-3,3,30,SGMYTH-3_3_30,"TH,SG,MY",PZ8NV3QK9,First Network Connection,180,3G/4G/5G,Data Reloadable for same area within validitity,HK
 Multi-Area,Singapore & Malaysia & Thailand,Singapore & Malaysia & Thailand 500MB/Day,Daily Unlimited,$0.60,$1.20,SGMYTH-3,0,1,SGMYTH-3_0.5_Daily,"TH,SG,MY",PB9B7RVL0,First Network Connection,180,3G/4G/5G,Non-reloadable,HK
 Multi-Area,Singapore & Malaysia & Thailand,Singapore & Malaysia & Thailand 5GB 30Days,Data in Total,$4.40,$8.80,SGMYTH-3,5,30,SGMYTH-3_5_30,"TH,SG,MY",PYX2W95MR,First Network Connection,180,3G/4G/5G,Data Reloadable for same area within validitity,HK
+Single,Russia,Russia 500MB 7Days,Data in Total,$1.11,$2.99,RU,0.5,7,RU_0.5_7,RU,PKLM729JK,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 1GB 7Days,Data in Total,$2.05,$4.99,RU,1,7,RU_1_7,RU,JC070,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 2GB/Day,Daily Unlimited,$3.65,$8.99,RU,2,1,RU_2_Daily,RU,PE4VDPN49,First Network Connection,180,4G,Non-reloadable,PL
+Single,Russia,Russia 3GB 15Days,Data in Total,$5.47,$12.99,RU,3,15,RU_3_15,RU,JC071,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 3GB 30Days,Data in Total,$5.81,$13.99,RU,3,30,RU_3_30,RU,JC068,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 5GB 30Days,Data in Total,$9.12,$21.99,RU,5,30,RU_5_30,RU,JC069,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 10GB 30Days,Data in Total,$16.64,$39.99,RU,10,30,RU_10_30,RU,PQOSLY3JW,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL
+Single,Russia,Russia 20GB 30Days,Data in Total,$33.28,$79.99,RU,20,30,RU_20_30,RU,P4G1R48B6,First Network Connection,180,4G,Data Reloadable for same area within validitity,PL

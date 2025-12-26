@@ -105,6 +105,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Original plan not found' }, { status: 404 });
     }
 
+    // Check if the plan is reloadable
+    if ((originalPlan as any).is_reloadable === false) {
+      return NextResponse.json(
+        { error: 'This plan does not support top-ups. Please purchase a new plan instead.' },
+        { status: 400 }
+      );
+    }
+
     // Get eSIM identifiers from original order
     const existingOrderIccid = originalOrder.iccid;
     const esimTranNo = (originalOrder as unknown as { esim_tran_no?: string }).esim_tran_no;

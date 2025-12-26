@@ -170,9 +170,10 @@ export async function POST(req: NextRequest) {
     if (isTopUp && iccid) {
       const { data: existingOrder, error: ownershipError } = await supabase
         .from('orders')
-        .select('id, iccid')
+        .select('id, iccid, plans(is_reloadable)')
         .eq('user_id', user.id)
         .eq('iccid', iccid)
+        .eq('is_topup', false) // Get original order to check plan's reloadability
         .limit(1)
         .maybeSingle();
 
@@ -189,6 +190,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { error: 'You do not own an eSIM with this ICCID' },
           { status: 403 }
+        );
+      }
+
+      // Check if original plan supports top-ups
+      const originalPlan = Array.isArray(existingOrder.plans) ? existingOrder.plans[0] : existingOrder.plans;
+      if ((originalPlan as any)?.is_reloadable === false) {
+        return NextResponse.json(
+          { error: 'This plan does not support top-ups. Please purchase a new plan instead.' },
+          { status: 400 }
         );
       }
 

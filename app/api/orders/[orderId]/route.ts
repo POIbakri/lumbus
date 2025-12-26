@@ -171,6 +171,7 @@ export async function GET(
       plan: {
         name: plan?.name ? cleanPlanName(plan.name) : 'Unknown Plan',
         region: plan?.name ? extractRegionFromName(plan.name) : 'Unknown Region',
+        regionCode: plan?.region_code || '',
         dataGb: plan?.data_gb || 0,
         validityDays: plan?.validity_days || 0,
       },

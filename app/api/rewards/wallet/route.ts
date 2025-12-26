@@ -1,6 +1,8 @@
 /**
  * Data Wallet API
  * GET /api/rewards/wallet - Get user's data wallet balance
+ *
+ * Only returns eSIMs with reloadable plans (is_reloadable = true)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -56,12 +58,13 @@ export async function GET(req: NextRequest) {
     // Get active eSIMs (orders that can be topped up - not expired)
     const { data: activeEsims } = await supabase
       .from('orders')
-      .select('id, plan_id, data_remaining_bytes, free_data_added_mb, created_at, expires_at, plans(name, region_code)')
+      .select('id, plan_id, data_remaining_bytes, free_data_added_mb, created_at, expires_at, plans(name, region_code, is_reloadable)')
       .eq('user_id', userId)
+      .eq('is_topup', false) // Only original orders, not top-up orders
       .in('status', ['completed', 'active', 'depleted'])
       .order('created_at', { ascending: false });
 
-    // Format active eSIMs data
+    // Format active eSIMs data - include is_reloadable for UI messaging
     const formattedEsims = activeEsims?.map(esim => {
       const plan = Array.isArray(esim.plans) ? esim.plans[0] : esim.plans;
       return {
@@ -72,6 +75,7 @@ export async function GET(req: NextRequest) {
         created_at: esim.created_at,
         expires_at: esim.expires_at,
         region_code: plan?.region_code || null,
+        is_reloadable: (plan as any)?.is_reloadable ?? true, // Default to true for backwards compat
       };
     }).filter(esim => {
       // Only show eSIMs that are active (have data or not expired)

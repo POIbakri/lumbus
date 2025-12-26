@@ -445,6 +445,18 @@ export default function PlanDetailPage() {
           {/* Main Plan Card */}
           <Card className={`${colors.cardBg} border-2 border-foreground/10 shadow-xl overflow-hidden`}>
             <CardContent className="p-5 sm:p-6 md:p-8">
+              {/* No Top-ups Badge for non-reloadable plans */}
+              {plan.is_reloadable === false && (
+                <div className="mb-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 border border-red-300 text-red-700 font-bold text-xs uppercase tracking-wide">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    No Top-ups Available
+                  </span>
+                </div>
+              )}
+
               {/* Header: Flag + Region + Price */}
               <div className="flex items-start justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3 sm:gap-4">

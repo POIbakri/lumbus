@@ -52,6 +52,7 @@ export interface Plan {
   retail_price: number;
   currency: string;
   is_active: boolean;
+  is_reloadable: boolean;
   created_at?: string;
 }
 

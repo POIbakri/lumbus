@@ -20,6 +20,7 @@ interface WalletData {
     created_at: string;
     expires_at: string | null;
     region_code: string | null;
+    is_reloadable: boolean;
   }>;
 }
 
@@ -145,11 +146,14 @@ export function DataWallet() {
                 {walletData.active_esims.map((esim) => {
                   const dataRemainingGB = (esim.data_remaining_bytes / (1024 * 1024 * 1024)).toFixed(1);
                   const maxAvailableGB = Math.floor(walletData.balance_mb / 1024);
+                  const canAddData = esim.is_reloadable !== false;
 
                   return (
                     <div
                       key={esim.id}
-                      className="bg-white border border-foreground/20 rounded-lg p-3"
+                      className={`bg-white border rounded-lg p-3 ${
+                        canAddData ? 'border-foreground/20' : 'border-red-200 bg-red-50/30'
+                      }`}
                     >
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
@@ -159,9 +163,18 @@ export function DataWallet() {
                               {dataRemainingGB}GB remaining
                             </div>
                           </div>
+                          {!canAddData && (
+                            <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-100 border border-red-300 text-red-700 font-bold text-[10px] uppercase">
+                              No Top-ups
+                            </span>
+                          )}
                         </div>
 
-                        {maxAvailableGB > 0 && (
+                        {!canAddData ? (
+                          <div className="text-xs font-bold text-red-600/80">
+                            This plan doesn&apos;t support adding data. Purchase a new plan instead.
+                          </div>
+                        ) : maxAvailableGB > 0 ? (
                           <div className="flex gap-2 items-center">
                             <Select
                               value={selectedAmount[esim.id]?.toString() || '1024'}
@@ -194,7 +207,7 @@ export function DataWallet() {
                               {applyingData === esim.id ? 'ADDING...' : 'ADD DATA'}
                             </Button>
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   );

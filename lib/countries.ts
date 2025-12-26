@@ -94,6 +94,7 @@ export const COUNTRIES: Record<string, CountryInfo> = {
   MD: { code: 'MD', name: 'Moldova', flag: '🇲🇩', continent: 'Europe' },
   BY: { code: 'BY', name: 'Belarus', flag: '🇧🇾', continent: 'Europe' },
   UA: { code: 'UA', name: 'Ukraine', flag: '🇺🇦', continent: 'Europe' },
+  RU: { code: 'RU', name: 'Russia', flag: '🇷🇺', continent: 'Europe' },
   AD: { code: 'AD', name: 'Andorra', flag: '🇦🇩', continent: 'Europe' },
   MC: { code: 'MC', name: 'Monaco', flag: '🇲🇨', continent: 'Europe' },
   LI: { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮', continent: 'Europe' },

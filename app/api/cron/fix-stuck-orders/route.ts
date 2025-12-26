@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
         connect_order_id,
         created_at,
         users!inner(email),
-        plans!inner(name, data_gb, validity_days, supplier_sku)
+        plans!inner(name, data_gb, validity_days, supplier_sku, region_code)
       `)
       .eq('status', 'provisioning')
       .not('connect_order_id', 'is', null)
@@ -133,6 +133,7 @@ export async function GET(req: NextRequest) {
                 planName: plan.name,
                 dataGb: plan.data_gb,
                 validityDays: plan.validity_days,
+                regionCode: plan.region_code,
               },
               activationDetails: {
                 smdp: smdpAddress,

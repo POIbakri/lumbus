@@ -175,6 +175,7 @@ export interface SendOrderConfirmationParams {
     planName: string;
     dataGb: number;
     validityDays: number;
+    regionCode?: string;
   };
   activationDetails: {
     smdp: string;
@@ -330,6 +331,36 @@ export async function sendOrderConfirmationEmail(params: SendOrderConfirmationPa
         <li>Scan the QR code below or enter details manually</li>
       </ol>
     </div>
+
+    ${orderDetails.regionCode === 'RU' ? `
+    <div style="margin: 0 0 30px; padding: 20px; background-color: #FEE2E2; border-radius: 12px; border: 3px solid #EF4444;">
+      <p style="margin: 0 0 15px; font-size: 16px; color: #DC2626; font-weight: 800; text-transform: uppercase;">⚠️ IMPORTANT: RUSSIA eSIM ACTIVATION</p>
+
+      <div style="margin: 0 0 12px; display: flex; align-items: flex-start;">
+        <span style="display: inline-block; width: 24px; height: 24px; background-color: #EF4444; border-radius: 50%; color: white; font-weight: 800; font-size: 14px; text-align: center; line-height: 24px; margin-right: 10px; flex-shrink: 0;">1</span>
+        <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">You'll get an SMS from MTS with a link to their official site</span>
+      </div>
+
+      <div style="margin: 0 0 12px; display: flex; align-items: flex-start;">
+        <span style="display: inline-block; width: 24px; height: 24px; background-color: #EF4444; border-radius: 50%; color: white; font-weight: 800; font-size: 14px; text-align: center; line-height: 24px; margin-right: 10px; flex-shrink: 0;">2</span>
+        <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">Sometimes the site asks for quick registration - that's normal. Just fill it out.</span>
+      </div>
+
+      <div style="margin: 0 0 15px; display: flex; align-items: flex-start;">
+        <span style="display: inline-block; width: 24px; height: 24px; background-color: #22C55E; border-radius: 50%; color: white; font-weight: 800; font-size: 14px; text-align: center; line-height: 24px; margin-right: 10px; flex-shrink: 0;">✓</span>
+        <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">Good news: Once registered, you're all set! No need to wait 24 hours.</span>
+      </div>
+
+      <div style="margin-top: 15px; padding: 15px; background-color: #FFFFFF; border-radius: 8px; border: 2px solid #FECACA;">
+        <p style="margin: 0 0 8px; font-size: 14px; color: #1A1A1A; font-weight: 700;">📱 If no network bars after registering:</p>
+        <ol style="margin: 0; padding-left: 20px; color: #1A1A1A; font-weight: 600; font-size: 13px; line-height: 1.6;">
+          <li>Turn <strong>ON</strong> Airplane mode</li>
+          <li>Wait a few seconds</li>
+          <li>Turn <strong>OFF</strong> Airplane mode</li>
+        </ol>
+      </div>
+    </div>
+    ` : ''}
 
     <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
       <h3 style="margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #1A1A1A;">Scan this QR Code</h3>

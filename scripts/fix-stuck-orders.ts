@@ -145,6 +145,7 @@ async function fixOrder(order: StuckOrder): Promise<boolean> {
             planName: order.plans.name,
             dataGb: order.plans.data_gb,
             validityDays: order.plans.validity_days,
+            regionCode: order.plans.region_code,
           },
           activationDetails: {
             smdp: smdp,

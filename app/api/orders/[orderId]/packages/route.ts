@@ -5,6 +5,7 @@
  *
  * Returns available top-up packages from local Supabase plans table.
  * Filters by the same region as the original order's plan.
+ * Only returns reloadable plans (is_reloadable = true).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -66,12 +67,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Query local plans for the same region
+    // Query local plans for the same region (only reloadable plans for top-up)
     const { data: plans, error: plansError } = await supabase
       .from('plans')
-      .select('id, name, region_code, data_gb, validity_days, supplier_sku, retail_price, currency')
+      .select('id, name, region_code, data_gb, validity_days, supplier_sku, retail_price, currency, is_reloadable')
       .eq('region_code', regionCode)
       .eq('is_active', true)
+      .eq('is_reloadable', true)
       .order('data_gb', { ascending: true });
 
     if (plansError) {
@@ -96,7 +98,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       locationCode: plan.region_code,
     }));
 
-    console.log('[Packages API] Found', packages.length, 'packages for region:', regionCode);
+    console.log('[Packages API] Found', packages.length, 'reloadable packages for region:', regionCode);
 
     return NextResponse.json({
       success: true,
