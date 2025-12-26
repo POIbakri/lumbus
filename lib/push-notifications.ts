@@ -18,16 +18,43 @@ function getExpoClient(): Expo {
   return expoClient;
 }
 
-// Notification types matching the database enum
+// Notification types matching mobile app expectations
 export type NotificationType =
-  | 'data_50'
-  | 'data_80'
-  | 'data_90'
-  | 'data_100'
+  | 'usage_50'      // 50% data used
+  | 'usage_30'      // 30% remaining (70% used)
+  | 'usage_20'      // 20% remaining (80% used)
+  | 'usage_10'      // 10% remaining (90% used)
+  | 'usage_depleted' // 0% remaining (100% used)
   | 'validity_1_day'
   | 'validity_expired'
   | 'esim_ready'
   | 'esim_activated';
+
+/**
+ * Get Android channel ID based on notification type
+ */
+function getChannelId(notificationType: NotificationType): string {
+  if (notificationType === 'esim_ready' || notificationType === 'esim_activated') {
+    return 'esim-ready';
+  }
+  if (notificationType.startsWith('usage_') || notificationType.startsWith('validity_')) {
+    return 'usage-alerts';
+  }
+  return 'default';
+}
+
+/**
+ * Get iOS category identifier for action buttons
+ */
+function getCategoryIdentifier(notificationType: NotificationType): string | undefined {
+  if (notificationType === 'esim_ready') {
+    return 'esim_ready';
+  }
+  if (notificationType.startsWith('usage_') || notificationType.startsWith('validity_')) {
+    return 'usage_alert';
+  }
+  return undefined;
+}
 
 interface PushNotificationPayload {
   userId: string;
@@ -140,20 +167,24 @@ export async function sendPushNotification(
     }
 
     // Build the push message
+    const channelId = getChannelId(notificationType);
+    const categoryIdentifier = getCategoryIdentifier(notificationType);
+
     const message: ExpoPushMessage = {
       to: pushToken,
       sound: 'default',
       title,
       body,
       data: {
+        type: notificationType,  // Mobile app expects 'type' field
         orderId,
-        notificationType,
         ...data,
       },
       // iOS specific
       badge: 1,
+      ...(categoryIdentifier && { categoryId: categoryIdentifier }),
       // Android specific
-      channelId: 'default',
+      channelId,
       priority: 'high',
     };
 
@@ -166,8 +197,12 @@ export async function sendPushNotification(
       console.log(`[Push] Sent ${notificationType} notification to user ${userId}`);
 
       // Extract threshold value from notification type
-      const thresholdMatch = notificationType.match(/data_(\d+)/);
-      const thresholdValue = thresholdMatch ? parseInt(thresholdMatch[1]) : null;
+      let thresholdValue: number | null = null;
+      if (notificationType === 'usage_50') thresholdValue = 50;
+      else if (notificationType === 'usage_30') thresholdValue = 70; // 70% used = 30% remaining
+      else if (notificationType === 'usage_20') thresholdValue = 80; // 80% used = 20% remaining
+      else if (notificationType === 'usage_10') thresholdValue = 90; // 90% used = 10% remaining
+      else if (notificationType === 'usage_depleted') thresholdValue = 100;
 
       // Record successful send
       await recordNotificationSent(orderId, userId, notificationType, thresholdValue, true, false);
@@ -208,26 +243,31 @@ export async function sendDataUsagePush(params: {
 }): Promise<SendResult> {
   const { userId, orderId, planName, usagePercent, dataRemainingGB } = params;
 
-  // Determine notification type based on usage
+  // Determine notification type based on usage (aligned with mobile app)
+  // Mobile expects: usage_50, usage_30 (30% remaining), usage_20, usage_10, usage_depleted
   let notificationType: NotificationType;
   let title: string;
   let body: string;
 
   if (usagePercent >= 100) {
-    notificationType = 'data_100';
-    title = 'Data Depleted';
+    notificationType = 'usage_depleted';
+    title = 'No Data Remaining';
     body = `Your ${planName} eSIM has run out of data. Top up now to stay connected.`;
   } else if (usagePercent >= 90) {
-    notificationType = 'data_90';
-    title = 'Almost Out of Data';
+    notificationType = 'usage_10';
+    title = '10% Data Remaining';
     body = `Only ${dataRemainingGB.toFixed(2)} GB left on your ${planName} eSIM. Consider topping up soon.`;
   } else if (usagePercent >= 80) {
-    notificationType = 'data_80';
-    title = 'Data Running Low';
-    body = `You've used 80% of your ${planName} data. ${dataRemainingGB.toFixed(2)} GB remaining.`;
+    notificationType = 'usage_20';
+    title = '20% Data Remaining';
+    body = `${dataRemainingGB.toFixed(2)} GB remaining on your ${planName} eSIM.`;
+  } else if (usagePercent >= 70) {
+    notificationType = 'usage_30';
+    title = '30% Data Remaining';
+    body = `${dataRemainingGB.toFixed(2)} GB remaining on your ${planName} eSIM.`;
   } else if (usagePercent >= 50) {
-    notificationType = 'data_50';
-    title = 'Halfway Through Your Data';
+    notificationType = 'usage_50';
+    title = '50% Data Used';
     body = `You've used half of your ${planName} data. ${dataRemainingGB.toFixed(2)} GB remaining.`;
   } else {
     // No notification needed for < 50%
@@ -241,9 +281,9 @@ export async function sendDataUsagePush(params: {
     body,
     notificationType,
     data: {
+      orderName: planName,
       usagePercent,
       dataRemainingGB,
-      screen: 'OrderDetails',
     },
   });
 }
@@ -284,9 +324,9 @@ export async function sendValidityPush(params: {
     body,
     notificationType,
     data: {
+      orderName: planName,
       daysRemaining,
       expiryDate,
-      screen: 'OrderDetails',
     },
   });
 }
@@ -309,7 +349,7 @@ export async function sendEsimReadyPush(params: {
     body: `Your ${planName} (${dataGb} GB) eSIM is ready to install. Tap to view installation instructions.`,
     notificationType: 'esim_ready',
     data: {
-      screen: 'InstallEsim',
+      orderName: planName,
     },
   });
 }
@@ -331,7 +371,7 @@ export async function sendEsimActivatedPush(params: {
     body: `Your ${planName} eSIM is now active. Enjoy your travels!`,
     notificationType: 'esim_activated',
     data: {
-      screen: 'OrderDetails',
+      orderName: planName,
     },
   });
 }

@@ -122,7 +122,7 @@ export default function AffiliateDashboardPage() {
           <Nav />
           <div className="pt-32 pb-20 px-4">
             <div className="container mx-auto max-w-4xl">
-              <Card className="bg-yellow border-4 border-secondary shadow-xl">
+              <Card className="glass-yellow border border-secondary/30 float-shadow rounded-2xl sm:rounded-3xl">
                 <CardContent className="pt-6 text-center py-8 sm:py-12 px-4">
                   <div className="flex justify-center mb-4">
                     <svg className="w-12 h-12 sm:w-16 sm:h-16 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -134,9 +134,9 @@ export default function AffiliateDashboardPage() {
                     Thank you for applying to the Lumbus Affiliate Program!
                   </p>
                   <p className="text-base font-bold text-muted-foreground mb-6 max-w-2xl mx-auto">
-                    We're currently reviewing your application. You'll receive an email notification once your application has been approved or if we need additional information. This typically takes 1-2 business days.
+                    We&apos;re currently reviewing your application. You&apos;ll receive an email notification once your application has been approved or if we need additional information. This typically takes 1-2 business days.
                   </p>
-                  <div className="bg-white rounded-xl p-4 sm:p-6 max-w-md mx-auto">
+                  <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-md mx-auto glass-inner-glow">
                     <p className="font-black uppercase text-xs text-muted-foreground mb-2">Your Application Details</p>
                     <div className="space-y-2">
                       <div className="flex justify-between">
@@ -167,7 +167,7 @@ export default function AffiliateDashboardPage() {
           <Nav />
           <div className="pt-32 pb-20 px-4">
             <div className="container mx-auto max-w-4xl">
-              <Card className="bg-destructive/10 border-4 border-destructive shadow-xl">
+              <Card className="glass border border-destructive/30 float-shadow rounded-2xl sm:rounded-3xl" style={{ background: 'rgba(239, 68, 68, 0.1)' }}>
                 <CardContent className="pt-6 text-center py-8 sm:py-12 px-4">
                   <div className="text-5xl sm:text-6xl mb-4">✗</div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4">APPLICATION NOT APPROVED</h2>
@@ -175,17 +175,17 @@ export default function AffiliateDashboardPage() {
                     Unfortunately, we were unable to approve your affiliate application at this time.
                   </p>
                   {affiliate.rejection_reason && (
-                    <div className="bg-white rounded-xl p-4 sm:p-6 max-w-2xl mx-auto mb-6">
+                    <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl mx-auto mb-6 glass-inner-glow">
                       <p className="font-black uppercase text-xs text-muted-foreground mb-2">Reason</p>
                       <p className="text-sm font-bold text-foreground">{affiliate.rejection_reason}</p>
                     </div>
                   )}
                   <p className="text-base font-bold text-muted-foreground mb-6 max-w-2xl mx-auto">
-                    If you believe this decision was made in error or if you'd like to discuss your application, please don't hesitate to contact our partnerships team.
+                    If you believe this decision was made in error or if you&apos;d like to discuss your application, please don&apos;t hesitate to contact our partnerships team.
                   </p>
                   <Button
                     onClick={() => window.location.href = 'mailto:partners@lumbus.com?subject=Affiliate Application Follow-up'}
-                    className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+                    className="w-full sm:w-auto glass-dark text-white font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-xl sm:rounded-2xl float-shadow hover:scale-[1.02] transition-all"
                   >
                     CONTACT PARTNERSHIPS TEAM
                   </Button>
@@ -203,12 +203,12 @@ export default function AffiliateDashboardPage() {
         <Nav />
         <div className="pt-32 pb-20 px-4">
           <div className="container mx-auto max-w-4xl">
-            <Card className="bg-purple border-4 border-accent shadow-xl">
+            <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl sm:rounded-3xl">
               <CardContent className="pt-6 text-center py-8 sm:py-12 px-4">
                 <div className="text-5xl sm:text-6xl mb-4">🚀</div>
                 <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase mb-4">NOT AN AFFILIATE YET</h2>
                 <p className="text-base sm:text-lg font-bold text-muted-foreground mb-4">
-                  You haven't applied to our affiliate program yet.
+                  You haven&apos;t applied to our affiliate program yet.
                 </p>
                 <p className="text-base font-bold text-muted-foreground mb-6 max-w-2xl mx-auto">
                   Join our affiliate program and earn 12% commission on every sale you refer. Get your unique tracking link, real-time analytics, and monthly payouts!
@@ -216,13 +216,13 @@ export default function AffiliateDashboardPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
                     onClick={() => router.push('/affiliate-program')}
-                    className="w-full sm:w-auto btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+                    className="w-full sm:w-auto glass-dark text-white font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-xl sm:rounded-2xl float-shadow hover:scale-[1.02] transition-all"
                   >
                     APPLY NOW
                   </Button>
                   <Button
                     onClick={() => router.push('/affiliate-program')}
-                    className="w-full sm:w-auto btn-lumbus bg-white text-foreground border-2 border-foreground hover:bg-foreground/5 font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6"
+                    className="w-full sm:w-auto glass font-black text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 rounded-xl sm:rounded-2xl border border-foreground/20 float-shadow hover:scale-[1.02] transition-all"
                   >
                     LEARN MORE
                   </Button>
@@ -253,31 +253,31 @@ export default function AffiliateDashboardPage() {
           </div>
 
           {/* Affiliate Link */}
-          <div className="mb-8 sm:mb-12 " style={{animationDelay: '0.1s'}}>
-            <Card className="bg-purple border-4 border-accent shadow-xl">
+          <div className="mb-8 sm:mb-12" style={{animationDelay: '0.1s'}}>
+            <Card className="glass-purple border border-accent/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
               <CardHeader>
                 <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">YOUR AFFILIATE LINK</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-white rounded-xl p-3 sm:p-4 mb-4">
+                <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4 glass-inner-glow">
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-mint rounded-lg font-mono text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 glass-mint rounded-lg font-mono text-xs sm:text-sm overflow-hidden text-ellipsis whitespace-nowrap">
                       {affiliateLink}
                     </div>
                     <Button
                       onClick={copyAffiliateLink}
-                      className="btn-lumbus bg-foreground text-white hover:bg-foreground/90 font-black px-4 sm:px-6 "
+                      className="glass-dark text-white font-black px-4 sm:px-6 rounded-xl float-shadow hover:scale-[1.02] transition-all"
                     >
                       {copied ? '✓ COPIED' : 'COPY'}
                     </Button>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="p-3 sm:p-4 bg-white rounded-xl">
+                  <div className="p-3 sm:p-4 glass rounded-xl sm:rounded-2xl glass-inner-glow">
                     <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Your Slug</p>
                     <p className="font-black text-base sm:text-lg">{affiliate.slug}</p>
                   </div>
-                  <div className="p-3 sm:p-4 bg-white rounded-xl">
+                  <div className="p-3 sm:p-4 glass rounded-xl sm:rounded-2xl glass-inner-glow">
                     <p className="font-bold uppercase text-xs text-muted-foreground mb-1">Commission Rate</p>
                     <p className="font-black text-base sm:text-lg">
                       {affiliate.commission_type === 'PERCENT'
@@ -292,8 +292,8 @@ export default function AffiliateDashboardPage() {
 
           {/* Stats Grid */}
           {stats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 " style={{animationDelay: '0.2s'}}>
-              <Card className="bg-mint border-4 border-primary shadow-xl ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12" style={{animationDelay: '0.2s'}}>
+              <Card className="glass-mint border border-primary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     {stats.totalClicks}
@@ -304,7 +304,7 @@ export default function AffiliateDashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-yellow border-4 border-secondary shadow-xl ">
+              <Card className="glass-yellow border border-secondary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     {stats.totalConversions}
@@ -318,7 +318,7 @@ export default function AffiliateDashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-cyan border-4 border-primary shadow-xl ">
+              <Card className="glass-cyan border border-primary/30 float-shadow hover-lift rounded-2xl sm:rounded-3xl glass-inner-glow">
                 <CardContent className="pt-6">
                   <div className="text-4xl sm:text-5xl font-black text-foreground mb-2">
                     ${(stats.epc / 100).toFixed(2)}
@@ -333,14 +333,14 @@ export default function AffiliateDashboardPage() {
 
           {/* Commission Breakdown */}
           {stats && (
-            <div className="" style={{animationDelay: '0.3s'}}>
-              <Card className="bg-white border-2 border-foreground/10 shadow-lg">
+            <div style={{animationDelay: '0.3s'}}>
+              <Card className="glass border border-foreground/20 float-shadow-lg rounded-2xl sm:rounded-3xl">
                 <CardHeader>
                   <CardTitle className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">EARNINGS BREAKDOWN</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div className="p-4 sm:p-6 bg-mint rounded-xl">
+                    <div className="p-4 sm:p-6 glass-mint rounded-xl sm:rounded-2xl glass-inner-glow">
                       <p className="font-black uppercase text-xs text-muted-foreground mb-2">
                         Pending
                       </p>
@@ -352,7 +352,7 @@ export default function AffiliateDashboardPage() {
                       </p>
                     </div>
 
-                    <div className="p-4 sm:p-6 bg-yellow rounded-xl">
+                    <div className="p-4 sm:p-6 glass-yellow rounded-xl sm:rounded-2xl glass-inner-glow">
                       <p className="font-black uppercase text-xs text-muted-foreground mb-2">
                         Approved
                       </p>
@@ -364,7 +364,7 @@ export default function AffiliateDashboardPage() {
                       </p>
                     </div>
 
-                    <div className="p-4 sm:p-6 bg-cyan rounded-xl">
+                    <div className="p-4 sm:p-6 glass-cyan rounded-xl sm:rounded-2xl glass-inner-glow">
                       <p className="font-black uppercase text-xs text-muted-foreground mb-2">
                         Paid
                       </p>
@@ -377,7 +377,7 @@ export default function AffiliateDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-purple rounded-xl">
+                  <div className="mt-4 sm:mt-6 p-4 sm:p-6 glass-purple rounded-xl sm:rounded-2xl glass-inner-glow">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                       <div>
                         <p className="font-black uppercase text-xs sm:text-sm text-muted-foreground mb-1">

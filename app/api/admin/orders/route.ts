@@ -8,38 +8,83 @@ export async function GET(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    const { data: orders, error } = await supabase
+    // Get query params for filtering
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status'); // 'all', 'active', 'completed', 'failed'
+    const includeTestUsers = searchParams.get('includeTestUsers') === 'true';
+
+    let query = supabase
       .from('orders')
       .select(`
         id,
         status,
         created_at,
+        paid_at,
         stripe_session_id,
+        payment_method,
+        amount_cents,
+        currency,
         data_usage_bytes,
         data_remaining_bytes,
+        total_bytes,
         iccid,
+        is_topup,
+        topup_source,
         plan_id,
         user_id,
-        users!orders_user_id_fkey(email),
+        users!orders_user_id_fkey(email, is_test_user),
         plans!orders_plan_id_fkey(name, region_code, data_gb, validity_days, retail_price, currency)
       `)
-      .order('created_at', { ascending: false })
-      .limit(50);
+      .order('created_at', { ascending: false });
+
+    // Filter by status - only show orders where payment went through
+    if (status === 'active') {
+      query = query.eq('status', 'active');
+    } else if (status === 'completed') {
+      query = query.eq('status', 'completed');
+    } else if (status === 'failed') {
+      query = query.eq('status', 'failed');
+    } else {
+      // Default: show only paid orders (active, completed, paid)
+      query = query.in('status', ['paid', 'active', 'completed']);
+    }
+
+    // Filter out test users by default
+    if (!includeTestUsers) {
+      query = query.eq('users.is_test_user', false);
+    }
+
+    query = query.limit(100);
+
+    const { data: orders, error } = await query;
 
     if (error) {
       console.error('Error fetching orders:', error);
       return NextResponse.json({ error: 'Failed to load orders' }, { status: 500 });
     }
 
-    const formattedOrders = orders?.map((order: any) => ({
+    // Filter out orders from test users (since Supabase join filter may not work perfectly)
+    const filteredOrders = includeTestUsers
+      ? orders
+      : orders?.filter((order: any) => !order.users?.is_test_user);
+
+    const formattedOrders = filteredOrders?.map((order: any) => ({
       id: order.id,
       status: order.status,
       created_at: order.created_at,
+      paid_at: order.paid_at,
       stripe_session_id: order.stripe_session_id,
+      payment_method: order.payment_method,
+      amount_cents: order.amount_cents,
+      currency: order.currency || 'USD',
       data_usage_bytes: order.data_usage_bytes,
       data_remaining_bytes: order.data_remaining_bytes,
+      total_bytes: order.total_bytes,
       iccid: order.iccid,
+      is_topup: order.is_topup || false,
+      topup_source: order.topup_source,
       user_email: order.users?.email || 'N/A',
+      is_test_user: order.users?.is_test_user || false,
       plan: order.plans ? {
         name: order.plans.name,
         region_code: order.plans.region_code,

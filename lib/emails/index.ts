@@ -4,4 +4,5 @@
  */
 
 export * from './esim-alerts';
+export * from './esim-reminders';
 export * from './milestone-alerts';

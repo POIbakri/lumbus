@@ -211,6 +211,7 @@ export async function POST(req: NextRequest) {
               data_usage_bytes: topUpResponse.orderUsage,
               expires_at: topUpResponse.expiredTime, // New expiry after top-up
               last_usage_update: new Date().toISOString(),
+              topup_source: 'paid', // Mark as paid top-up (vs reward top-up)
             })
             .eq('id', orderId);
 

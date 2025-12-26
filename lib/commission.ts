@@ -98,10 +98,11 @@ export async function approvePendingCommissions(
   cutoffDate.setDate(cutoffDate.getDate() - lockDays);
 
   // Find orders that are past lock period and still have PENDING commissions
+  // Check paid, completed, and active statuses since orders transition after eSIM provisioning
   const { data: orders } = await supabase
     .from('orders')
     .select('id, paid_at')
-    .eq('status', 'paid')
+    .in('status', ['paid', 'completed', 'active'])
     .lte('paid_at', cutoffDate.toISOString());
 
   if (!orders || orders.length === 0) {
@@ -169,24 +170,30 @@ const DEFAULT_REWARD_CONFIG: RewardConfig = {
 };
 
 /**
- * Check if order is eligible for referral reward
+ * Check if order is eligible for referral reward (first-time buyer only)
+ *
+ * IMPORTANT: Orders transition from 'paid' → 'active' → 'completed' after eSIM provisioning.
+ * We must check ALL successful statuses, not just 'paid', to correctly identify repeat customers.
+ * Also excludes top-up orders since they don't count as "first purchase".
  */
 export async function isEligibleForReferralReward(
   orderId: string,
   userId: string
 ): Promise<boolean> {
-  // Get all paid orders for this user to verify current order is included
+  // Get all successful non-top-up orders for this user
+  // Must check all statuses since orders transition: paid → active → completed
   const { data: orders } = await supabase
     .from('orders')
     .select('id')
     .eq('user_id', userId)
-    .eq('status', 'paid');
+    .in('status', ['paid', 'active', 'completed'])
+    .eq('is_topup', false); // Exclude top-ups - only count original eSIM purchases
 
   if (!orders || orders.length === 0) {
     return false;
   }
 
-  // Check if this is the first paid order AND the current order is in the list
+  // Check if this is the first successful order AND the current order is in the list
   const orderIds = orders.map(o => o.id);
   return orderIds.length === 1 && orderIds.includes(orderId);
 }
@@ -349,19 +356,26 @@ export async function processOrderAttribution(
     REFERRAL_MONTHLY_CAP: DEFAULT_REWARD_CONFIG.REFERRAL_MONTHLY_CAP,
   };
 
-  // Handle affiliate commission
+  // Handle affiliate commission - only for first-time buyers
   if (attribution.source_type === 'AFFILIATE' && attribution.affiliate_id) {
-    const { data: affiliate } = await supabase
-      .from('affiliates')
-      .select('*')
-      .eq('id', attribution.affiliate_id)
-      .single();
+    // Check if this is the buyer's first order (same requirement as referrals)
+    const isFirstOrder = await isEligibleForReferralReward(order.id, order.user_id);
 
-    if (affiliate) {
-      const commissionAmount = calculateCommissionAmount(order, affiliate as Affiliate);
-      const commission = await createCommission(order.id, affiliate.id, commissionAmount);
-      if (commission) {
-        result.commission = commission;
+    if (!isFirstOrder) {
+      console.log(`Skipping affiliate commission - user ${order.user_id} is not a first-time buyer`);
+    } else {
+      const { data: affiliate } = await supabase
+        .from('affiliates')
+        .select('*')
+        .eq('id', attribution.affiliate_id)
+        .single();
+
+      if (affiliate) {
+        const commissionAmount = calculateCommissionAmount(order, affiliate as Affiliate);
+        const commission = await createCommission(order.id, affiliate.id, commissionAmount);
+        if (commission) {
+          result.commission = commission;
+        }
       }
     }
   }
