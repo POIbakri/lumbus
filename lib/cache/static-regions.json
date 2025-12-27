@@ -3410,5 +3410,112 @@
         "name": "United Arab Emirates"
       }
     ]
+  },
+  {
+    "code": "CB-24",
+    "name": "Caribbean (20+ areas)",
+    "type": 2,
+    "subLocationList": [
+      {
+        "code": "AR",
+        "name": "Argentina"
+      },
+      {
+        "code": "BO",
+        "name": "Bolivia"
+      },
+      {
+        "code": "BR",
+        "name": "Brazil"
+      },
+      {
+        "code": "CO",
+        "name": "Colombia"
+      },
+      {
+        "code": "DO",
+        "name": "Dominican Republic"
+      },
+      {
+        "code": "PY",
+        "name": "Paraguay"
+      },
+      {
+        "code": "GP",
+        "name": "Guadeloupe"
+      },
+      {
+        "code": "PE",
+        "name": "Peru"
+      },
+      {
+        "code": "PR",
+        "name": "Puerto Rico"
+      },
+      {
+        "code": "UY",
+        "name": "Uruguay"
+      },
+      {
+        "code": "AI",
+        "name": "Anguilla"
+      },
+      {
+        "code": "AG",
+        "name": "Antigua and Barbuda"
+      },
+      {
+        "code": "BB",
+        "name": "Barbados"
+      },
+      {
+        "code": "GD",
+        "name": "Grenada"
+      },
+      {
+        "code": "MS",
+        "name": "Montserrat"
+      },
+      {
+        "code": "KN",
+        "name": "Saint Kitts and Nevis"
+      },
+      {
+        "code": "AN",
+        "name": "Netherlands Antilles"
+      },
+      {
+        "code": "LC",
+        "name": "Saint Lucia"
+      },
+      {
+        "code": "GF",
+        "name": "French Guiana"
+      },
+      {
+        "code": "VC",
+        "name": "Saint Vincent and the Grenadines"
+      },
+      {
+        "code": "DM",
+        "name": "Dominica"
+      },
+      {
+        "code": "TC",
+        "name": "Turks and Caicos Islands"
+      },
+      {
+        "code": "VG",
+        "name": "Virgin Islands- British"
+      },
+      {
+        "code": "JM",
+        "name": "Jamaica"
+      },
+      {
+        "code": "KY",
+        "name": "Cayman Islands"
+      }
+    ]
   }
 ]
