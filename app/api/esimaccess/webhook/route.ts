@@ -501,7 +501,8 @@ async function handleDataUsage(content: {
 }) {
   // remainThreshold is the percentage REMAINING (0.5 = 50% left, 0.2 = 20% left, 0.1 = 10% left)
   // Convert to usage percentage: 50% remaining = 50% used, 20% remaining = 80% used, 10% remaining = 90% used
-  const usagePercent = (1 - content.remainThreshold) * 100;
+  // Use Math.round to avoid floating-point precision issues in deduplication keys
+  const usagePercent = Math.round((1 - content.remainThreshold) * 100);
 
   // Get original order details (not top-ups) - usage applies to the eSIM itself
   const { data: order, error: orderError } = await supabase
@@ -528,6 +529,40 @@ async function handleDataUsage(content: {
     .eq('is_topup', false);
 
   // Send email notification to user about data usage
+  // Check if we've already sent a notification for this threshold to prevent duplicates
+  const thresholdKey = `data_usage_${content.iccid}_${usagePercent}`;
+  const { data: existingNotification } = await supabase
+    .from('webhook_events')
+    .select('id')
+    .eq('provider', 'esimaccess_notification')
+    .eq('notify_id', thresholdKey)
+    .maybeSingle();
+
+  if (existingNotification) {
+    console.log(`[DATA_USAGE] Already sent ${usagePercent}% notification for ICCID ${content.iccid}, skipping`);
+    return;
+  }
+
+  // Record that we're sending this notification (do this BEFORE sending to prevent race conditions)
+  const { error: recordError } = await supabase.from('webhook_events').insert({
+    provider: 'esimaccess_notification',
+    event_type: `data_usage_${usagePercent}`,
+    notify_id: thresholdKey,
+    payload_json: { iccid: content.iccid, usagePercent, orderId: order.id },
+    processed_at: new Date().toISOString(),
+  });
+
+  if (recordError) {
+    // If insert failed due to duplicate key, another request already handled it
+    if (recordError.code === '23505') {
+      console.log(`[DATA_USAGE] Duplicate notification prevented for ${thresholdKey}`);
+      return;
+    }
+    // For any other error, log and return early to avoid sending potentially duplicate notifications
+    console.error(`[DATA_USAGE] Failed to record notification for ${thresholdKey}:`, recordError);
+    return;
+  }
+
   try {
     // Get plan and user data separately (avoid joins)
     const { data: plan } = await supabase
@@ -566,9 +601,12 @@ async function handleDataUsage(content: {
         usagePercent: usagePercent,
         dataRemainingGB: dataRemainingGB,
       });
+
+      console.log(`[DATA_USAGE] Sent ${usagePercent}% notification to ${user.email} for ICCID ${content.iccid}`);
     }
   } catch (emailError) {
     // Don't throw - webhook should still succeed even if email/push fails
+    console.error(`[DATA_USAGE] Failed to send notification:`, emailError);
   }
 }
 

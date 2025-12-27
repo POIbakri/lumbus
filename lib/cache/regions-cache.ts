@@ -3,6 +3,8 @@
  * Implements in-memory caching and request deduplication for regions data
  */
 
+import staticRegions from './static-regions.json';
+
 interface CachedRegions {
   data: Array<{
     code: string;
@@ -44,6 +46,16 @@ class RegionsCache {
           timestamp: Date.now(),
         };
         return data;
+      })
+      .catch((error) => {
+        // If API fails but we have stale cache, return stale data
+        if (this.cache) {
+          console.warn('[RegionsCache] API failed, returning stale cache:', error.message);
+          return this.cache.data;
+        }
+        // No cache at all, use static fallback
+        console.warn('[RegionsCache] API failed and no cache, using static fallback:', error.message);
+        return staticRegions as CachedRegions['data'];
       })
       .finally(() => {
         // Clear pending request
