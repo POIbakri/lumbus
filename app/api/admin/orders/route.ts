@@ -49,12 +49,7 @@ export async function GET(req: NextRequest) {
       query = query.in('status', ['paid', 'active', 'completed']);
     }
 
-    // Filter out test users by default
-    if (!includeTestUsers) {
-      query = query.eq('users.is_test_user', false);
-    }
-
-    query = query.limit(100);
+    query = query.limit(200);
 
     const { data: orders, error } = await query;
 
@@ -63,10 +58,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to load orders' }, { status: 500 });
     }
 
-    // Filter out orders from test users (since Supabase join filter may not work perfectly)
+    // Filter out orders from test users (Supabase join filter doesn't work reliably)
     const filteredOrders = includeTestUsers
       ? orders
-      : orders?.filter((order: any) => !order.users?.is_test_user);
+      : orders?.filter((order: any) => order.users?.is_test_user !== true);
 
     const formattedOrders = filteredOrders?.map((order: any) => ({
       id: order.id,
