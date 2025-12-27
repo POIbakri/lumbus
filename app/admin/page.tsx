@@ -33,6 +33,8 @@ interface Order {
   iccid: string | null;
   is_topup: boolean;
   topup_source: string | null;
+  discount_code: string | null;
+  discount_percent: number | null;
   plan: {
     name: string;
     region_code: string;
@@ -603,7 +605,7 @@ export default function AdminPage() {
                               <p className="text-xs text-muted-foreground">{order.paid_at ? new Date(order.paid_at).toLocaleDateString() : 'N/A'}</p>
                             </div>
 
-                            {/* Type & Status */}
+                            {/* Type & Discount */}
                             <div>
                               <p className="font-black uppercase text-xs text-muted-foreground mb-2">Type</p>
                               <div className="flex flex-wrap gap-2">
@@ -613,6 +615,11 @@ export default function AdminPage() {
                                   </Badge>
                                 ) : (
                                   <Badge className="glass-mint border border-primary/30 font-black text-xs">NEW</Badge>
+                                )}
+                                {order.discount_code && (
+                                  <Badge className="glass-yellow border border-secondary/30 font-black text-xs">
+                                    {order.discount_code} ({order.discount_percent}%)
+                                  </Badge>
                                 )}
                               </div>
                             </div>

@@ -33,7 +33,8 @@ export async function GET(req: NextRequest) {
         plan_id,
         user_id,
         users!orders_user_id_fkey(email, is_test_user),
-        plans!orders_plan_id_fkey(name, region_code, data_gb, validity_days, retail_price, currency)
+        plans!orders_plan_id_fkey(name, region_code, data_gb, validity_days, retail_price, currency),
+        discount_code_usage(discount_percent, discount_amount_usd, discount_codes(code))
       `)
       .order('created_at', { ascending: false });
 
@@ -63,32 +64,43 @@ export async function GET(req: NextRequest) {
       ? orders
       : orders?.filter((order: any) => order.users?.is_test_user !== true);
 
-    const formattedOrders = filteredOrders?.map((order: any) => ({
-      id: order.id,
-      status: order.status,
-      created_at: order.created_at,
-      paid_at: order.paid_at,
-      stripe_session_id: order.stripe_session_id,
-      payment_method: order.payment_method,
-      amount_cents: order.amount_cents,
-      currency: order.currency || 'USD',
-      data_usage_bytes: order.data_usage_bytes,
-      data_remaining_bytes: order.data_remaining_bytes,
-      total_bytes: order.total_bytes,
-      iccid: order.iccid,
-      is_topup: order.is_topup || false,
-      topup_source: order.topup_source,
-      user_email: order.users?.email || 'N/A',
-      is_test_user: order.users?.is_test_user || false,
-      plan: order.plans ? {
-        name: order.plans.name,
-        region_code: order.plans.region_code,
-        data_gb: order.plans.data_gb,
-        validity_days: order.plans.validity_days,
-        retail_price: order.plans.retail_price,
-        currency: order.plans.currency || 'USD',
-      } : null,
-    }));
+    const formattedOrders = filteredOrders?.map((order: any) => {
+      // Extract discount info (discount_code_usage is an array, take first if exists)
+      const discountUsage = Array.isArray(order.discount_code_usage)
+        ? order.discount_code_usage[0]
+        : order.discount_code_usage;
+      const discountCode = discountUsage?.discount_codes?.code || null;
+      const discountPercent = discountUsage?.discount_percent || null;
+
+      return {
+        id: order.id,
+        status: order.status,
+        created_at: order.created_at,
+        paid_at: order.paid_at,
+        stripe_session_id: order.stripe_session_id,
+        payment_method: order.payment_method,
+        amount_cents: order.amount_cents,
+        currency: order.currency || 'USD',
+        data_usage_bytes: order.data_usage_bytes,
+        data_remaining_bytes: order.data_remaining_bytes,
+        total_bytes: order.total_bytes,
+        iccid: order.iccid,
+        is_topup: order.is_topup || false,
+        topup_source: order.topup_source,
+        user_email: order.users?.email || 'N/A',
+        is_test_user: order.users?.is_test_user || false,
+        discount_code: discountCode,
+        discount_percent: discountPercent,
+        plan: order.plans ? {
+          name: order.plans.name,
+          region_code: order.plans.region_code,
+          data_gb: order.plans.data_gb,
+          validity_days: order.plans.validity_days,
+          retail_price: order.plans.retail_price,
+          currency: order.plans.currency || 'USD',
+        } : null,
+      };
+    });
 
     return NextResponse.json(formattedOrders || []);
   } catch (error) {
