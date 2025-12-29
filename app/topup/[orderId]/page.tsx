@@ -105,6 +105,7 @@ export default function TopUpPage({ params }: TopUpPageProps) {
               .in('supplier_sku', packageCodes)
               .eq('region_code', regionCode) // Filter by same region
               .eq('is_active', true)
+              .eq('is_reloadable', true) // Only show plans valid for top-up
               .order('retail_price', { ascending: true });
 
             if (plansError) {

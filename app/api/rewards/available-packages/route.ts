@@ -19,8 +19,9 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from('plans')
-      .select('id, name, supplier_sku, data_gb, validity_days, region_code, retail_price, currency, is_active')
-      .eq('is_active', true);
+      .select('id, name, supplier_sku, data_gb, validity_days, region_code, retail_price, currency, is_active, is_reloadable')
+      .eq('is_active', true)
+      .eq('is_reloadable', true); // Only reloadable plans can be used for rewards top-up
 
     // Only ~1GB plans (0.9–1.1GB) are eligible as reward packages
     query = query.gte('data_gb', 0.9).lte('data_gb', 1.1);

@@ -296,3 +296,23 @@ export interface EsimUsage {
   source: 'webhook' | 'cron' | 'api_refresh';
   recorded_at: string;
 }
+
+// App Analytics
+export type AppEventType = 'first_open' | 'app_open' | 'signup' | 'login' | 'purchase' | 'esim_activated';
+
+export interface AppEvent {
+  id: string;
+  event_type: AppEventType;
+  device_id: string;
+  user_id: string | null;
+  platform: 'ios' | 'android';
+  app_version: string | null;
+  os_version: string | null;
+  device_model: string | null;
+  install_source: string | null;
+  campaign: string | null;
+  country_code: string | null;
+  metadata: Record<string, unknown>;
+  event_timestamp: string;
+  created_at: string;
+}

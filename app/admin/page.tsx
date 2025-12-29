@@ -9,7 +9,7 @@ import { getCountryInfo } from '@/lib/countries';
 import { AdminDiscountCodes } from '@/components/admin-discount-codes';
 import { FlagIcon } from '@/components/flag-icon';
 
-type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'email';
+type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'email' | 'analytics';
 
 interface EmailUser {
   id: string;
@@ -96,6 +96,14 @@ interface Commission {
   paid_at: string | null;
 }
 
+interface AnalyticsData {
+  event_type: string;
+  period_days: number;
+  today: { total: number; ios: number; android: number };
+  daily: Record<string, { total: number; ios: number; android: number }>;
+  total: number;
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -124,6 +132,10 @@ export default function AdminPage() {
   const [emailResult, setEmailResult] = useState<{ sent: number; failed: number } | null>(null);
   const [totalUsers, setTotalUsers] = useState(0);
 
+  // Analytics tab state
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState(7);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -133,7 +145,8 @@ export default function AdminPage() {
     if (activeTab === 'rewards') loadRewards();
     if (activeTab === 'payouts') loadCommissions();
     if (activeTab === 'email') loadEmailUsers();
-  }, [activeTab, orderStatusFilter, rewardStatusFilter, commissionStatusFilter]);
+    if (activeTab === 'analytics') loadAnalytics();
+  }, [activeTab, orderStatusFilter, rewardStatusFilter, commissionStatusFilter, analyticsPeriod]);
 
   // Load email users when search changes and clear selections
   useEffect(() => {
@@ -240,6 +253,17 @@ export default function AdminPage() {
       setTotalUsers(data.totalUsers || 0);
     } catch (err) {
       console.error('Failed to load email users:', err);
+    }
+  };
+
+  const loadAnalytics = async () => {
+    try {
+      const response = await fetch(`/api/analytics/events?event_type=first_open&days=${analyticsPeriod}`);
+      if (!response.ok) throw new Error('Failed to load analytics');
+      const data = await response.json();
+      setAnalyticsData(data);
+    } catch (err) {
+      console.error('Failed to load analytics:', err);
     }
   };
 
@@ -408,6 +432,7 @@ export default function AdminPage() {
     { id: 'payouts', label: 'Payouts', count: commissionStats?.approved },
     { id: 'discounts', label: 'Discount Codes' },
     { id: 'email', label: 'Email' },
+    { id: 'analytics', label: 'App Analytics', count: analyticsData?.today?.total || undefined },
   ];
 
   return (
@@ -1146,6 +1171,146 @@ export default function AdminPage() {
                   </CardContent>
                 </Card>
               )}
+            </div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="space-y-6">
+              {/* Period Filter */}
+              <div className="flex flex-wrap gap-3 items-center">
+                <span className="font-black uppercase text-sm text-muted-foreground">Period:</span>
+                <select
+                  value={analyticsPeriod}
+                  onChange={(e) => setAnalyticsPeriod(Number(e.target.value))}
+                  className="glass rounded-xl px-4 py-2 font-bold text-sm border border-foreground/10 focus:outline-none focus:border-primary"
+                >
+                  <option value={7}>Last 7 days</option>
+                  <option value={14}>Last 14 days</option>
+                  <option value={30}>Last 30 days</option>
+                  <option value={90}>Last 90 days</option>
+                </select>
+                <Button
+                  onClick={loadAnalytics}
+                  className="glass border border-foreground/20 text-foreground font-black uppercase text-xs rounded-xl px-4 py-2 hover:glass-mint transition-all"
+                >
+                  Refresh
+                </Button>
+              </div>
+
+              {/* Today's Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <Card className="glass-mint border border-primary/30 float-shadow rounded-2xl glass-inner-glow">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.total || 0}</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground">Today&apos;s Installs</div>
+                  </CardContent>
+                </Card>
+                <Card className="glass-cyan border border-primary/30 float-shadow rounded-2xl glass-inner-glow">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.ios || 0}</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground">iOS Today</div>
+                  </CardContent>
+                </Card>
+                <Card className="glass-yellow border border-secondary/30 float-shadow rounded-2xl glass-inner-glow">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.android || 0}</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground">Android Today</div>
+                  </CardContent>
+                </Card>
+                <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl glass-inner-glow">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.total || 0}</div>
+                    <div className="text-xs font-black uppercase text-muted-foreground">Total ({analyticsPeriod}d)</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Daily Breakdown */}
+              <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
+                <CardHeader>
+                  <CardTitle className="text-xl sm:text-2xl font-black uppercase">Daily App Installs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!analyticsData || Object.keys(analyticsData.daily || {}).length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="font-bold text-muted-foreground">No install data yet</p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Data will appear once your mobile app starts sending events
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {Object.entries(analyticsData.daily)
+                        .sort(([a], [b]) => b.localeCompare(a))
+                        .map(([date, counts]) => {
+                          const isToday = date === new Date().toISOString().split('T')[0];
+                          const maxCount = Math.max(
+                            ...Object.values(analyticsData.daily).map(d => d.total),
+                            1
+                          );
+                          const barWidth = (counts.total / maxCount) * 100;
+
+                          return (
+                            <div
+                              key={date}
+                              className={`p-4 rounded-xl glass-inner-glow ${
+                                isToday ? 'glass-mint border border-primary/30' : 'glass'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-black text-sm">
+                                    {isToday ? 'Today' : new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
+                                      weekday: 'short',
+                                      month: 'short',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                  {isToday && (
+                                    <Badge className="glass-mint border border-primary/30 font-black text-xs">LIVE</Badge>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <span className="text-xs font-bold text-muted-foreground">
+                                    iOS: {counts.ios}
+                                  </span>
+                                  <span className="text-xs font-bold text-muted-foreground">
+                                    Android: {counts.android}
+                                  </span>
+                                  <span className="font-black text-lg">{counts.total}</span>
+                                </div>
+                              </div>
+                              {/* Progress bar */}
+                              <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-primary rounded-full transition-all duration-500"
+                                  style={{ width: `${barWidth}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Integration Guide */}
+              <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl sm:rounded-3xl">
+                <CardHeader>
+                  <CardTitle className="text-lg font-black uppercase">Mobile Integration</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="glass rounded-xl p-4 glass-inner-glow">
+                    <p className="font-bold text-sm mb-2">Send events from your mobile app:</p>
+                    <code className="text-xs text-muted-foreground block bg-foreground/5 p-3 rounded-lg overflow-x-auto">
+                      POST /api/analytics/events<br />
+                      {`{ "event_type": "first_open", "device_id": "...", "platform": "ios" }`}
+                    </code>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>

@@ -210,6 +210,7 @@ export async function POST(req: NextRequest) {
       .from('plans')
       .select('id, data_gb, validity_days')
       .eq('supplier_sku', rewardPackage.packageCode)
+      .eq('is_reloadable', true) // Only use reloadable plans
       .maybeSingle();
 
     // Extract validity days from package - validity is a string like "30 Days"

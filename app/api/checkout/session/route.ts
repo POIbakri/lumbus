@@ -173,6 +173,15 @@ export async function POST(req: NextRequest) {
     }
     console.log('[Checkout] Plan found:', plan.name);
 
+    // For top-ups, the selected plan must also be reloadable (valid for top-up API)
+    if (isTopUp && !plan.is_reloadable) {
+      console.error('[Checkout] Plan not valid for top-up:', plan.name, 'is_reloadable:', plan.is_reloadable);
+      return NextResponse.json(
+        { error: 'This plan cannot be used for top-ups. Please select a different plan.' },
+        { status: 400 }
+      );
+    }
+
     // Get or create user (for top-ups, get from existing order)
     console.log('[Checkout] Getting/creating user...');
     let user;
