@@ -421,3 +421,206 @@ export async function sendReferralPromoEmailBatch(
 
   return results;
 }
+
+export interface SendIssueResolvedEmailParams {
+  to: string;
+  firstName?: string;
+  // Issue details
+  issueDescription?: string;
+  // Compensation details
+  bonusDataGb?: number; // For bonus data (free gift)
+  dataFixed?: string; // For data that was fixed/applied (e.g., "5 GB") - their purchase
+  refundAmount?: number;
+  refundCurrency?: 'USD' | 'GBP' | 'EUR'; // Default USD
+  refundDays?: string; // e.g., "5-10"
+  // Discount code
+  discountCode?: string;
+  discountPercent?: number;
+  // Referral info
+  referralCode: string;
+  referralLink?: string; // Optional - not currently used in template
+  // Trustpilot
+  trustpilotUrl?: string;
+}
+
+/**
+ * Send issue resolved / thank you for patience email
+ * Reusable template for support follow-ups
+ */
+export async function sendIssueResolvedEmail(params: SendIssueResolvedEmailParams) {
+  const {
+    to,
+    firstName,
+    issueDescription = 'the issue you reported',
+    bonusDataGb,
+    dataFixed,
+    refundAmount,
+    refundCurrency = 'USD',
+    refundDays = '5-10',
+    discountCode,
+    discountPercent,
+    referralCode,
+    referralLink,
+    trustpilotUrl = 'https://www.trustpilot.com/review/getlumbus.com',
+  } = params;
+
+  // Currency symbols
+  const currencySymbols: Record<string, string> = {
+    USD: '$',
+    GBP: '£',
+    EUR: '€',
+  };
+  const currencySymbol = currencySymbols[refundCurrency] || '$';
+
+  const greeting = firstName ? `Hey ${firstName}` : 'Hey there';
+
+  // Build dynamic sections based on what's provided
+  let compensationSection = '';
+
+  if (bonusDataGb || dataFixed || refundAmount) {
+    let compensationItems = '';
+
+    // Data fixed (their purchase was applied correctly)
+    if (dataFixed) {
+      compensationItems += `
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 12px;">
+          <tr>
+            <td width="40" style="vertical-align: middle; padding-right: 12px;">
+              <div class="card-white" style="width: 40px; height: 40px; background-color: #FFFFFF; border-radius: 50%; text-align: center; line-height: 40px;">
+                <span style="font-size: 20px;">✅</span>
+              </div>
+            </td>
+            <td style="vertical-align: middle;">
+              <p class="text-dark" style="margin: 0; font-size: 16px; font-weight: 700; color: #1A1A1A;"><span class="brand-mint" style="color: #2EFECC;">${dataFixed}</span> data has been applied to your account</p>
+            </td>
+          </tr>
+        </table>
+      `;
+    }
+
+    // Bonus data (free gift)
+    if (bonusDataGb) {
+      compensationItems += `
+        <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 12px;">
+          <tr>
+            <td width="40" style="vertical-align: middle; padding-right: 12px;">
+              <div class="card-white" style="width: 40px; height: 40px; background-color: #FFFFFF; border-radius: 50%; text-align: center; line-height: 40px;">
+                <span style="font-size: 20px;">🎁</span>
+              </div>
+            </td>
+            <td style="vertical-align: middle;">
+              <p class="text-dark" style="margin: 0; font-size: 16px; font-weight: 700; color: #1A1A1A;"><span class="brand-mint" style="color: #2EFECC;">${bonusDataGb} GB</span> bonus data added to your account</p>
+            </td>
+          </tr>
+        </table>
+      `;
+    }
+
+    if (refundAmount) {
+      compensationItems += `
+        <table border="0" cellspacing="0" cellpadding="0" width="100%">
+          <tr>
+            <td width="40" style="vertical-align: middle; padding-right: 12px;">
+              <div class="card-white" style="width: 40px; height: 40px; background-color: #FFFFFF; border-radius: 50%; text-align: center; line-height: 40px;">
+                <span style="font-size: 20px;">💳</span>
+              </div>
+            </td>
+            <td style="vertical-align: middle;">
+              <p class="text-dark" style="margin: 0; font-size: 16px; font-weight: 700; color: #1A1A1A;"><span class="brand-mint" style="color: #2EFECC;">${currencySymbol}${refundAmount.toFixed(2)} refund</span> issued - will arrive in ${refundDays} days depending on your bank</p>
+            </td>
+          </tr>
+        </table>
+      `;
+    }
+
+    compensationSection = `
+      <div class="card-mint" style="margin: 0 0 24px; padding: 24px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+        <h3 class="text-dark" style="margin: 0 0 16px; font-size: 18px; font-weight: 800; color: #1A1A1A; text-align: center;">What We've Done For You</h3>
+        ${compensationItems}
+      </div>
+    `;
+  }
+
+  // Discount code section
+  let discountSection = '';
+  if (discountCode && discountPercent) {
+    discountSection = `
+      <div class="brand-yellow" style="margin: 0 0 24px; padding: 20px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A; text-align: center;">
+        <p style="margin: 0 0 8px; font-size: 12px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">Your Exclusive Discount Code</p>
+        <p style="margin: 0 0 8px; font-size: 32px; font-weight: 900; color: #1A1A1A; letter-spacing: 4px; font-family: monospace;">${discountCode}</p>
+        <p style="margin: 0; font-size: 18px; font-weight: 700; color: #1A1A1A;">${discountPercent}% OFF your next purchase</p>
+        <p class="text-muted" style="margin: 8px 0 0; font-size: 13px; color: #666666;">Use anytime - no expiry</p>
+      </div>
+    `;
+  }
+
+  const content = `
+    <!-- Hero Section with Heart Icon -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="icon-circle-mint" style="display: inline-block; width: 80px; height: 80px; background: linear-gradient(135deg, #2EFECC 0%, #87EFFF 100%); border-radius: 50%; padding: 20px; box-sizing: border-box;">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#1A1A1A"/>
+        </svg>
+      </div>
+    </div>
+
+    <h2 class="text-dark" style="margin: 0 0 16px; font-size: 28px; font-weight: 800; color: #1A1A1A; text-align: center; line-height: 1.2;">
+      ${greeting}, Thank You!
+    </h2>
+
+    <p class="text-muted" style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+      We really appreciate your patience while we resolved ${issueDescription}. Your support means the world to us, and we wanted to make sure you're taken care of.
+    </p>
+
+    ${compensationSection}
+
+    ${discountSection}
+
+    <!-- Referral Section -->
+    <div style="margin: 0 0 24px; padding: 30px 24px; background: linear-gradient(135deg, #1A1A1A 0%, #333333 100%); border-radius: 16px; text-align: center; border: 3px solid #2EFECC;">
+      <p class="brand-mint" style="margin: 0 0 8px; font-size: 14px; font-weight: 600; color: #2EFECC; text-transform: uppercase; letter-spacing: 2px;">Share With Friends & Family</p>
+      <p style="margin: 0 0 16px; font-size: 14px; color: #CCCCCC; line-height: 1.5;">Give them <span style="color: #2EFECC; font-weight: 700;">1 GB FREE</span> + <span style="color: #2EFECC; font-weight: 700;">10% OFF</span> their first purchase.<br>You get <span style="color: #FDFD74; font-weight: 700;">1 GB FREE</span> for every friend who buys!</p>
+
+      <div style="margin: 16px 0; padding: 16px; background-color: rgba(253, 253, 116, 0.2); border-radius: 8px; border: 2px solid #FDFD74;">
+        <p style="margin: 0 0 4px; font-size: 11px; font-weight: 600; color: #CCCCCC; text-transform: uppercase; letter-spacing: 1px;">Your Referral Code</p>
+        <p style="margin: 0; font-size: 24px; font-weight: 900; color: #FDFD74; letter-spacing: 3px; font-family: monospace;">${referralCode}</p>
+      </div>
+    </div>
+
+    <!-- Trustpilot Review Section -->
+    <div class="card-muted" style="margin: 0 0 24px; padding: 24px; background-color: #F5F5F5; border-radius: 12px; text-align: center;">
+      <div style="margin-bottom: 12px;">
+        <img src="https://cdn.trustpilot.net/brand-assets/4.3.0/logo-black.svg" alt="Trustpilot" style="height: 24px; width: auto;" />
+      </div>
+      <p class="text-dark" style="margin: 0 0 12px; font-size: 16px; font-weight: 700; color: #1A1A1A;">Enjoying Lumbus?</p>
+      <p class="text-muted" style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6;">We'd love to hear about your experience! Check your inbox for the <strong>Trustpilot email</strong> we sent - leaving a review through that link marks you as a <span style="color: #00B67A; font-weight: 700;">verified customer</span>.</p>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+      Questions? We're always here at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
+    </p>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
+      to: [to],
+      subject: `Thank You For Your Patience${discountCode && discountPercent ? ` - Here's ${discountPercent}% Off!` : ''}`,
+      html: createEmailTemplate({
+        title: 'Thank You!',
+        subtitle: "We've resolved your issue",
+        content,
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send issue resolved email:', error);
+    throw error;
+  }
+}

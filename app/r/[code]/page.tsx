@@ -1,15 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { Nav } from '@/components/nav';
+import { useParams, useSearchParams } from 'next/navigation';
+import { APP_STORE_LINKS } from '@/lib/app-store-config';
+
+function getDeviceType(): 'ios' | 'android' | 'desktop' {
+  if (typeof window === 'undefined') return 'desktop';
+
+  const ua = navigator.userAgent.toLowerCase();
+  if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+  if (/android/.test(ua)) return 'android';
+  return 'desktop';
+}
 
 export default function ReferralPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [status, setStatus] = useState<'tracking' | 'redirecting' | 'error'>('tracking');
+  const [deviceType, setDeviceType] = useState<'ios' | 'android' | 'desktop'>('desktop');
   const discountAmount = 10; // 10% discount
+
+  useEffect(() => {
+    setDeviceType(getDeviceType());
+  }, []);
 
   useEffect(() => {
     const trackAndRedirect = async () => {
@@ -40,32 +53,73 @@ export default function ReferralPage() {
           throw new Error('Failed to track referral');
         }
 
-        const data = await response.json();
-
         // Set status to redirecting
         setStatus('redirecting');
 
-        // Redirect to plans page after a short delay
+        // Redirect after a short delay
         setTimeout(() => {
-          router.push('/plans');
-        }, 2000);
+          const device = getDeviceType();
+          const code = params.code as string;
+
+          if (device === 'ios' || device === 'android') {
+            // Try deep link first (opens app if installed)
+            const deepLink = `lumbus://ref/${code}`;
+            const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
+
+            // Set a timeout to redirect to store if deep link fails
+            const fallbackTimeout = setTimeout(() => {
+              window.location.href = storeLink;
+            }, 1500);
+
+            // Try to open the app
+            window.location.href = deepLink;
+
+            // If page is still visible after a short delay, deep link failed
+            document.addEventListener('visibilitychange', () => {
+              if (document.hidden) {
+                clearTimeout(fallbackTimeout);
+              }
+            });
+          } else {
+            // Desktop: redirect to website home page
+            window.location.href = '/';
+          }
+        }, 2500);
       } catch (error) {
         setStatus('error');
         // Redirect anyway after error
         setTimeout(() => {
-          router.push('/plans');
+          const device = getDeviceType();
+          const code = params.code as string;
+
+          if (device === 'ios' || device === 'android') {
+            const deepLink = `lumbus://ref/${code}`;
+            const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
+
+            const fallbackTimeout = setTimeout(() => {
+              window.location.href = storeLink;
+            }, 1500);
+
+            window.location.href = deepLink;
+
+            document.addEventListener('visibilitychange', () => {
+              if (document.hidden) {
+                clearTimeout(fallbackTimeout);
+              }
+            });
+          } else {
+            window.location.href = '/';
+          }
         }, 2000);
       }
     };
 
     trackAndRedirect();
-  }, [params.code, searchParams, router]);
+  }, [params.code, searchParams]);
 
   return (
     <div className="min-h-screen bg-white">
-      <Nav />
-
-      <div className="relative pt-32 sm:pt-40 md:pt-48 pb-20 sm:pb-32 px-4 bg-mint overflow-hidden">
+      <div className="relative pt-20 sm:pt-28 md:pt-36 pb-20 sm:pb-32 px-4 bg-mint overflow-hidden min-h-screen flex items-center">
         {/* Floating Background Elements */}
         <div className="absolute top-20 right-10 sm:right-20 w-48 sm:w-64 h-48 sm:h-64 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-10 sm:left-20 w-64 sm:w-96 h-64 sm:h-96 bg-cyan/5 rounded-full blur-3xl"></div>
@@ -96,31 +150,33 @@ export default function ReferralPage() {
                 <div className="flex justify-center mb-6 sm:mb-8">
                   <svg className="w-12 h-12 sm:w-16 sm:h-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
                 </div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">DISCOUNT APPLIED!</h1>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black uppercase mb-4 sm:mb-6 leading-tight">DISCOUNT READY!</h1>
                 <p className="text-base sm:text-lg md:text-2xl font-bold opacity-70 mb-6 sm:mb-8">
-                  Get {discountAmount}% off your first eSIM purchase
+                  Download the app to claim your {discountAmount}% discount
                 </p>
                 <div className="max-w-md mx-auto p-6 sm:p-8 bg-white rounded-3xl border-2 sm:border-4 border-primary shadow-2xl">
                   <p className="text-base sm:text-lg font-bold mb-4">
-                    Plus, when you complete your first purchase:
+                    Here&apos;s what you get:
                   </p>
                   <div className="space-y-2 sm:space-y-3 text-left">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      <p className="font-bold text-sm sm:text-base">Your friend gets <span className="text-primary">1GB FREE data</span></p>
+                      <p className="font-bold text-sm sm:text-base"><span className="text-primary">{discountAmount}% off</span> your first eSIM</p>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      <p className="font-bold text-sm sm:text-base">You get your own referral code</p>
+                      <p className="font-bold text-sm sm:text-base"><span className="text-primary">1GB FREE</span> bonus data</p>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3">
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                      <p className="font-bold text-sm sm:text-base">Start earning free data too!</p>
+                      <p className="font-bold text-sm sm:text-base">Browse <span className="text-primary">150+ country</span> data plans</p>
                     </div>
                   </div>
                 </div>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-60 mt-6 sm:mt-8">
-                  Redirecting to plans...
+                  {deviceType === 'desktop'
+                    ? 'Redirecting...'
+                    : 'Opening Lumbus app...'}
                 </p>
               </div>
             )}
@@ -135,7 +191,7 @@ export default function ReferralPage() {
                   Something went wrong processing your referral
                 </p>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-60">
-                  Don't worry, redirecting you anyway...
+                  Don&apos;t worry, redirecting you to the app anyway...
                 </p>
               </div>
             )}

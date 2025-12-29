@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         .from('orders')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .in('status', ['paid', 'completed', 'provisioning']);
+        .in('status', ['paid', 'completed', 'provisioning', 'active']);
 
       if ((orderCount || 0) > 0) {
         return NextResponse.json({
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
           .from('orders')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', existingUser.id)
-          .in('status', ['paid', 'completed', 'provisioning']);
+          .in('status', ['paid', 'completed', 'provisioning', 'active']);
 
         if ((orderCount || 0) > 0) {
           return NextResponse.json({

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
 import { AdminDiscountCodes } from '@/components/admin-discount-codes';
 import { FlagIcon } from '@/components/flag-icon';
@@ -531,9 +530,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Nav />
-
-      <div className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4 md:px-8">
+      <div className="py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
@@ -597,33 +594,6 @@ export default function AdminPage() {
                   </CardContent>
                 </Card>
               </div>
-
-              {/* Affiliate Stats */}
-              <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
-                <CardHeader>
-                  <CardTitle className="text-xl sm:text-2xl font-black uppercase">Affiliate Program</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="p-4 glass-mint rounded-xl sm:rounded-2xl glass-inner-glow">
-                      <div className="text-2xl sm:text-3xl font-black">{affiliates.length}</div>
-                      <div className="text-xs font-black uppercase text-muted-foreground">Total Affiliates</div>
-                    </div>
-                    <div className="p-4 glass-yellow rounded-xl sm:rounded-2xl glass-inner-glow">
-                      <div className="text-2xl sm:text-3xl font-black">{pendingAffiliates}</div>
-                      <div className="text-xs font-black uppercase text-muted-foreground">Pending</div>
-                    </div>
-                    <div className="p-4 glass-cyan rounded-xl sm:rounded-2xl glass-inner-glow">
-                      <div className="text-2xl sm:text-3xl font-black">${((commissionStats?.approved_amount_cents || 0) / 100).toFixed(2)}</div>
-                      <div className="text-xs font-black uppercase text-muted-foreground">Approved Payouts</div>
-                    </div>
-                    <div className="p-4 glass-purple rounded-xl sm:rounded-2xl glass-inner-glow">
-                      <div className="text-2xl sm:text-3xl font-black">{rewardStats?.applied || 0}</div>
-                      <div className="text-xs font-black uppercase text-muted-foreground">Rewards Given</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
 
               {/* Recent Orders Preview */}
               <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">

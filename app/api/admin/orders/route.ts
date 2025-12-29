@@ -46,8 +46,8 @@ export async function GET(req: NextRequest) {
     } else if (status === 'failed') {
       query = query.eq('status', 'failed');
     } else {
-      // Default: show only paid orders (active, completed, paid)
-      query = query.in('status', ['paid', 'active', 'completed']);
+      // Default: show only paid orders (active, completed, paid, provisioning)
+      query = query.in('status', ['paid', 'active', 'completed', 'provisioning']);
     }
 
     query = query.limit(200);

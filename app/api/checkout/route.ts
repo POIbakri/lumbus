@@ -300,7 +300,7 @@ export async function POST(req: NextRequest) {
           .from('orders')
           .select('*', { count: 'exact', head: true })
           .eq('user_id', user.id)
-          .in('status', ['paid', 'completed', 'provisioning']);
+          .in('status', ['paid', 'completed', 'provisioning', 'active']);
 
         if ((orderCount || 0) === 0) {
           discountPercent = 10;

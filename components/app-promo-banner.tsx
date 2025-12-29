@@ -1,16 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import { AppStoreBadges } from './app-store-badges';
 import { APP_DOWNLOAD_CTA } from '@/lib/app-store-config';
 import { Button } from '@/components/ui/button';
 
 export function AppPromoBanner() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
+  const isAdminPage = pathname?.startsWith('/admin');
+
   useEffect(() => {
+    // Don't run on admin pages
+    if (isAdminPage) return;
     // Check if user has dismissed the banner before
     const dismissed = localStorage.getItem('app-promo-dismissed');
     const dismissedTime = localStorage.getItem('app-promo-dismissed-time');
@@ -50,7 +56,7 @@ export function AppPromoBanner() {
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(timer);
     };
-  }, [isVisible, hasInteracted]);
+  }, [isVisible, hasInteracted, isAdminPage]);
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -58,7 +64,7 @@ export function AppPromoBanner() {
     localStorage.setItem('app-promo-dismissed-time', Date.now().toString());
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || isAdminPage) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 transform transition-transform duration-500 ease-in-out md:hidden"

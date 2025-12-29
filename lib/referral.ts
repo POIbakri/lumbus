@@ -134,7 +134,7 @@ export async function linkReferrer(userId: string, refCode: string): Promise<boo
     .from('orders')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .in('status', ['paid', 'completed']);
+    .in('status', ['paid', 'completed', 'provisioning', 'active']);
 
   if ((orderCount || 0) > 0) {
     console.log(`User ${userId} is not a first-time buyer - cannot use referral code`);

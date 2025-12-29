@@ -9,8 +9,8 @@ import { TikTokIcon, InstagramIcon, TwitterIcon } from './social-media-links';
 export function Footer() {
   const pathname = usePathname();
 
-  // Don't show footer on dashboard pages
-  if (pathname?.startsWith('/dashboard')) {
+  // Don't show footer on dashboard or admin pages
+  if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/admin')) {
     return null;
   }
 
