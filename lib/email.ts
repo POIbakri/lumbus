@@ -2664,6 +2664,118 @@ export async function sendWelcomeEmail(params: SendWelcomeEmailParams) {
   }
 }
 
+/**
+ * Send error alert to support when a top-up fails due to non-reloadable plan
+ * This helps track when users attempt to top-up with invalid plans
+ */
+export interface SendTopUpErrorAlertParams {
+  userEmail: string;
+  userId: string;
+  planName: string;
+  planId: string;
+  iccid?: string;
+  errorType: 'non_reloadable_plan' | 'api_rejection' | 'other';
+  errorMessage: string;
+  source: 'web' | 'mobile' | 'iap' | 'rewards';
+}
+
+export async function sendTopUpErrorAlert(params: SendTopUpErrorAlertParams) {
+  const { userEmail, userId, planName, planId, iccid, errorType, errorMessage, source } = params;
+
+  const errorTypeLabels: Record<string, string> = {
+    non_reloadable_plan: 'Non-Reloadable Plan Selected',
+    api_rejection: 'eSIM Provider API Rejection',
+    other: 'Other Error',
+  };
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="display: inline-block; width: 64px; height: 64px; background-color: #FEE2E2; border-radius: 50%; padding: 16px; box-sizing: border-box;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#EF4444"/></svg>
+      </div>
+    </div>
+    <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 700; color: #1A1A1A; text-align: center;">Top-Up Error Alert</h2>
+
+    <div style="margin: 0 0 25px; padding: 20px; background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;">
+      <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; color: #DC2626;">
+        ${errorTypeLabels[errorType] || 'Unknown Error'}
+      </p>
+      <p style="margin: 0; font-size: 14px; color: #7F1D1D;">
+        ${errorMessage}
+      </p>
+    </div>
+
+    <div style="margin: 0 0 25px; padding: 20px; background-color: #F5F5F5; border-radius: 12px;">
+      <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">User Email:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">${userEmail}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">User ID:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-family: monospace; font-size: 12px;">${userId}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">Plan Name:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-weight: 600;">${planName}</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">Plan ID:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-family: monospace; font-size: 12px;">${planId}</td>
+        </tr>
+        ${iccid ? `
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">ICCID:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right; font-family: monospace; font-size: 12px;">${iccid}</td>
+        </tr>
+        ` : ''}
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">Source:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right;">
+            <span style="display: inline-block; padding: 2px 8px; background-color: #E0F2FE; color: #0369A1; border-radius: 4px; font-size: 12px; font-weight: 600; text-transform: uppercase;">
+              ${source}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0; font-size: 14px; color: #666;">Time:</td>
+          <td style="padding: 8px 0; font-size: 14px; color: #1A1A1A; text-align: right;">${new Date().toISOString()}</td>
+        </tr>
+      </table>
+    </div>
+
+    <p style="margin: 0; font-size: 14px; color: #666666; text-align: center;">
+      This user may need assistance or a refund if they were charged.
+    </p>
+  `;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
+      to: ['support@getlumbus.com'],
+      subject: `Top-Up Error: ${errorTypeLabels[errorType]} - ${userEmail}`,
+      html: createEmailTemplate({
+        title: 'Top-Up Error Alert',
+        subtitle: 'Action Required',
+        content,
+      }),
+    });
+
+    if (error) {
+      console.error('Failed to send top-up error alert:', error);
+      // Don't throw - this is a non-critical notification
+      return null;
+    }
+
+    console.log(`[Email] Sent top-up error alert for user ${userEmail}`);
+    return data;
+  } catch (error) {
+    console.error('Failed to send top-up error alert:', error);
+    // Don't throw - this is a non-critical notification
+    return null;
+  }
+}
+
 // Re-export from separate files for convenience
 export * from './emails/esim-alerts';
 export * from './emails/milestone-alerts';

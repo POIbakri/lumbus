@@ -8,8 +8,9 @@ import { Nav } from '@/components/nav';
 import { getCountryInfo } from '@/lib/countries';
 import { AdminDiscountCodes } from '@/components/admin-discount-codes';
 import { FlagIcon } from '@/components/flag-icon';
+import { SUPPORTED_CURRENCIES, type Currency } from '@/lib/currency';
 
-type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'email' | 'analytics';
+type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'email' | 'analytics' | 'refunds';
 
 interface EmailUser {
   id: string;
@@ -104,6 +105,24 @@ interface AnalyticsData {
   total: number;
 }
 
+interface RefundableOrder {
+  id: string;
+  status: string;
+  created_at: string;
+  paid_at: string | null;
+  stripe_session_id: string | null;
+  amount_cents: number | null;
+  currency: string;
+  is_topup: boolean;
+  refunded_at: string | null;
+  refund_reason: string | null;
+  plan: {
+    name: string;
+    data_gb: number;
+    retail_price: number;
+  } | null;
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [orders, setOrders] = useState<Order[]>([]);
@@ -135,6 +154,14 @@ export default function AdminPage() {
   // Analytics tab state
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [analyticsPeriod, setAnalyticsPeriod] = useState(7);
+
+  // Refunds tab state
+  const [refundSearch, setRefundSearch] = useState('');
+  const [refundUser, setRefundUser] = useState<{ id: string; email: string } | null>(null);
+  const [refundOrders, setRefundOrders] = useState<RefundableOrder[]>([]);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [refundProcessing, setRefundProcessing] = useState<string | null>(null);
+  const [refundResult, setRefundResult] = useState<{ success: boolean; message: string } | null>(null);
 
   useEffect(() => {
     loadData();
@@ -264,6 +291,72 @@ export default function AdminPage() {
       setAnalyticsData(data);
     } catch (err) {
       console.error('Failed to load analytics:', err);
+    }
+  };
+
+  const searchRefundUser = async (isRefresh = false) => {
+    if (!refundSearch.trim()) return;
+
+    setRefundLoading(true);
+    if (!isRefresh) {
+      setRefundUser(null);
+      setRefundOrders([]);
+      setRefundResult(null);
+    }
+
+    try {
+      const response = await fetch(`/api/admin/refunds?email=${encodeURIComponent(refundSearch.trim())}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Only show error if not a refresh, to avoid overwriting success message
+        if (!isRefresh) {
+          setRefundResult({ success: false, message: data.error || 'User not found' });
+        }
+        return;
+      }
+
+      setRefundUser(data.user);
+      setRefundOrders(data.orders || []);
+    } catch (err) {
+      // Only show error if not a refresh, to avoid overwriting success message
+      if (!isRefresh) {
+        setRefundResult({ success: false, message: 'Failed to search for user' });
+      }
+    } finally {
+      setRefundLoading(false);
+    }
+  };
+
+  const processRefund = async (orderId: string) => {
+    if (!confirm('Are you sure you want to issue a refund for this order? This action cannot be undone.')) {
+      return;
+    }
+
+    setRefundProcessing(orderId);
+    setRefundResult(null);
+
+    try {
+      const response = await fetch('/api/admin/refunds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, reason: 'Admin initiated refund' }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setRefundResult({ success: false, message: data.error || 'Failed to process refund' });
+        return;
+      }
+
+      setRefundResult({ success: true, message: data.message });
+      // Refresh the orders list without clearing the success message
+      await searchRefundUser(true);
+    } catch (err) {
+      setRefundResult({ success: false, message: 'Failed to process refund' });
+    } finally {
+      setRefundProcessing(null);
     }
   };
 
@@ -431,6 +524,7 @@ export default function AdminPage() {
     { id: 'rewards', label: 'Rewards', count: rewardStats?.applied },
     { id: 'payouts', label: 'Payouts', count: commissionStats?.approved },
     { id: 'discounts', label: 'Discount Codes' },
+    { id: 'refunds', label: 'Refunds' },
     { id: 'email', label: 'Email' },
     { id: 'analytics', label: 'App Analytics', count: analyticsData?.today?.total || undefined },
   ];
@@ -986,6 +1080,145 @@ export default function AdminPage() {
           {/* Discounts Tab */}
           {activeTab === 'discounts' && (
             <AdminDiscountCodes />
+          )}
+
+          {/* Refunds Tab */}
+          {activeTab === 'refunds' && (
+            <div className="space-y-6">
+              {/* Search Card */}
+              <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl sm:rounded-3xl">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-xl sm:text-2xl font-black uppercase">Issue Refund</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                        Search User by Email
+                      </label>
+                      <div className="flex gap-3">
+                        <input
+                          type="email"
+                          placeholder="Enter user email..."
+                          value={refundSearch}
+                          onChange={(e) => setRefundSearch(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && searchRefundUser()}
+                          className="flex-1 glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                        <Button
+                          onClick={() => searchRefundUser()}
+                          disabled={refundLoading || !refundSearch.trim()}
+                          className="glass-mint text-foreground font-black uppercase text-sm rounded-xl px-6 py-3 hover:scale-[1.02] transition-all disabled:opacity-50"
+                        >
+                          {refundLoading ? 'Searching...' : 'Search'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Result Message */}
+                    {refundResult && (
+                      <div className={`rounded-xl p-4 ${refundResult.success ? 'glass-mint border border-primary/30' : 'bg-destructive/20 border border-destructive/30'}`}>
+                        <p className="font-bold text-sm">{refundResult.message}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* User Orders */}
+              {refundUser && (
+                <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
+                  <CardHeader className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <CardTitle className="text-lg font-black uppercase">
+                        Orders for {refundUser.email}
+                      </CardTitle>
+                      <Badge className="glass-mint border border-primary/30 font-black text-xs">
+                        {refundOrders.length} paid orders
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 sm:p-6 pt-0">
+                    {refundOrders.length === 0 ? (
+                      <div className="text-center py-8">
+                        <p className="font-bold text-muted-foreground">No paid orders found for this user</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {refundOrders.map((order) => (
+                          <div key={order.id} className={`p-4 rounded-xl glass-inner-glow ${order.refunded_at ? 'glass-yellow' : 'glass'}`}>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-black text-sm">{order.plan?.name || 'Unknown Plan'}</span>
+                                  {order.is_topup && (
+                                    <Badge className="glass-cyan border border-primary/30 font-black text-xs">TOP-UP</Badge>
+                                  )}
+                                  <Badge className={`${getStatusBadge(order.status)} font-black uppercase text-xs border`}>
+                                    {order.status}
+                                  </Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  {order.plan && `${order.plan.data_gb} GB • `}
+                                  Paid: {order.paid_at ? new Date(order.paid_at).toLocaleDateString() : 'N/A'}
+                                </p>
+                                {order.refunded_at && (
+                                  <p className="text-xs font-bold text-secondary">
+                                    Refunded: {new Date(order.refunded_at).toLocaleDateString()}
+                                    {order.refund_reason && ` - ${order.refund_reason}`}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-black text-lg text-primary">
+                                  {SUPPORTED_CURRENCIES[order.currency.toUpperCase() as Currency]?.symbol || order.currency}
+                                  {order.amount_cents ? (order.amount_cents / 100).toFixed(2) : order.plan?.retail_price.toFixed(2) || '0.00'}
+                                </span>
+                                {order.refunded_at ? (
+                                  <Badge className="glass-yellow border border-secondary/30 font-black text-xs">REFUNDED</Badge>
+                                ) : (
+                                  <Button
+                                    onClick={() => processRefund(order.id)}
+                                    disabled={refundProcessing === order.id || !order.stripe_session_id}
+                                    className="bg-destructive/90 text-white font-black uppercase text-xs rounded-xl px-4 py-2 hover:scale-[1.02] transition-all disabled:opacity-50"
+                                  >
+                                    {refundProcessing === order.id ? 'Processing...' : 'Refund'}
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                            {!order.stripe_session_id && !order.refunded_at && (
+                              <p className="text-xs text-destructive mt-2">Cannot refund: No Stripe session found</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Instructions */}
+              <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg font-black uppercase">Refund Instructions</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="glass rounded-xl p-4 glass-inner-glow space-y-2">
+                    <p className="font-bold text-sm">How to issue a refund:</p>
+                    <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
+                      <li>Search for the user by their email address</li>
+                      <li>Review their paid orders and select the one to refund</li>
+                      <li>Click the Refund button and confirm the action</li>
+                      <li>The refund will be processed through Stripe automatically</li>
+                    </ol>
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Note: Only orders with a valid Stripe session can be refunded. Refunds typically take 5-10 business days to appear in the customer&apos;s account.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Email Tab */}

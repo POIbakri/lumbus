@@ -3,6 +3,7 @@ import { supabase } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { ensureUserProfile } from '@/lib/referral';
+import { sendTopUpErrorAlert } from '@/lib/email';
 
 const iapCheckoutSchema = z.object({
   planId: z.string().uuid(),
@@ -64,6 +65,17 @@ export async function POST(req: NextRequest) {
     // For top-ups, the selected plan must also be reloadable (valid for top-up API)
     if (isTopUp && !plan.is_reloadable) {
       console.error('[IAP Checkout] Plan not valid for top-up:', plan.name, 'is_reloadable:', plan.is_reloadable);
+      // Send error alert to support (non-blocking)
+      sendTopUpErrorAlert({
+        userEmail: email,
+        userId: 'unknown', // User may not exist yet
+        planName: plan.name,
+        planId: planId,
+        iccid: iccid || undefined,
+        errorType: 'non_reloadable_plan',
+        errorMessage: `User attempted to top-up with non-reloadable plan: ${plan.name} (${plan.supplier_sku})`,
+        source: 'iap',
+      }).catch(() => {}); // Ignore email errors
       return NextResponse.json(
         { error: 'This plan cannot be used for top-ups. Please select a different plan.' },
         { status: 400 }

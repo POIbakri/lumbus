@@ -63,7 +63,7 @@ export function AdminDiscountCodes() {
           discountPercent: formData.discountPercent,
           maxUses: formData.maxUses ? parseInt(formData.maxUses) : null,
           maxUsesPerUser: parseInt(formData.maxUsesPerUser),
-          validUntil: formData.validUntil || null,
+          validUntil: formData.validUntil ? new Date(formData.validUntil).toISOString() : null,
           isActive: formData.isActive,
         }),
       });

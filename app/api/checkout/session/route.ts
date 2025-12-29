@@ -7,6 +7,7 @@ import { logger, redactEmail } from '@/lib/logger';
 import { z } from 'zod';
 import { generateOrderAccessToken } from '@/lib/order-token';
 import { getSystemConfig } from '@/lib/commission';
+import { sendTopUpErrorAlert } from '@/lib/email';
 
 // Lazy initialization - separate Stripe clients for live vs test mode
 let stripeLive: Stripe | null = null;
@@ -176,6 +177,17 @@ export async function POST(req: NextRequest) {
     // For top-ups, the selected plan must also be reloadable (valid for top-up API)
     if (isTopUp && !plan.is_reloadable) {
       console.error('[Checkout] Plan not valid for top-up:', plan.name, 'is_reloadable:', plan.is_reloadable);
+      // Send error alert to support (non-blocking)
+      sendTopUpErrorAlert({
+        userEmail: email || 'unknown',
+        userId: 'unknown', // User may not exist yet
+        planName: plan.name,
+        planId: planId,
+        iccid: iccid || undefined,
+        errorType: 'non_reloadable_plan',
+        errorMessage: `User attempted to top-up with non-reloadable plan: ${plan.name} (${plan.supplier_sku})`,
+        source: 'web',
+      }).catch(() => {}); // Ignore email errors
       return NextResponse.json(
         { error: 'This plan cannot be used for top-ups. Please select a different plan.' },
         { status: 400 }

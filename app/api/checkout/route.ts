@@ -4,6 +4,7 @@ import { supabase } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { convertToStripeAmount, type Currency } from '@/lib/currency';
+import { sendTopUpErrorAlert } from '@/lib/email';
 
 // Lazy initialization - create separate clients for live vs test
 let stripeLive: Stripe | null = null;
@@ -103,6 +104,17 @@ export async function POST(req: NextRequest) {
     // For top-ups, the selected plan must also be reloadable (valid for top-up API)
     if (isTopUp && !plan.is_reloadable) {
       console.error('[Mobile Checkout] Plan not valid for top-up:', plan.name, 'is_reloadable:', plan.is_reloadable);
+      // Send error alert to support (non-blocking)
+      sendTopUpErrorAlert({
+        userEmail: email,
+        userId: 'unknown', // User may not exist yet
+        planName: plan.name,
+        planId: planId,
+        iccid: iccid || undefined,
+        errorType: 'non_reloadable_plan',
+        errorMessage: `User attempted to top-up with non-reloadable plan: ${plan.name} (${plan.supplier_sku})`,
+        source: 'mobile',
+      }).catch(() => {}); // Ignore email errors
       return NextResponse.json(
         { error: 'This plan cannot be used for top-ups. Please select a different plan.' },
         { status: 400 }
