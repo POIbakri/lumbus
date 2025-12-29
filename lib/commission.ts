@@ -376,6 +376,34 @@ export async function processOrderAttribution(
         if (commission) {
           result.commission = commission;
         }
+
+        // Give buyer 1GB free data for purchasing through affiliate link (first-time buyers only)
+        if (!skipRewards) {
+          const { data: existingBuyerReward } = await supabase
+            .from('referral_rewards')
+            .select('id')
+            .eq('order_id', order.id)
+            .eq('referrer_user_id', order.user_id)
+            .maybeSingle();
+
+          if (!existingBuyerReward) {
+            const rewardId = crypto.randomUUID();
+            const { data: rewardResult, error } = await supabase.rpc('create_and_credit_referral_reward', {
+              p_reward_id: rewardId,
+              p_order_id: order.id,
+              p_referrer_user_id: order.user_id,
+              p_referred_user_id: order.user_id,
+              p_reward_value: rewardValueMB,
+              p_notes: 'First-time buyer bonus for purchasing through affiliate link',
+            });
+
+            if (error) {
+              console.error('Failed to create affiliate buyer reward:', error);
+            } else if (rewardResult?.success) {
+              console.log(`Auto-credited 1GB to affiliate buyer ${order.user_id}`);
+            }
+          }
+        }
       }
     }
   }

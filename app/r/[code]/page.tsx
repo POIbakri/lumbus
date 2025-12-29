@@ -58,58 +58,74 @@ export default function ReferralPage() {
 
         // Redirect after a short delay
         setTimeout(() => {
-          const device = getDeviceType();
-          const code = params.code as string;
+          /*
+           * =============================================================================
+           * TODO: Re-enable deep linking once mobile app handles the ref/[code] route
+           * =============================================================================
+           *
+           * MOBILE APP REQUIREMENTS:
+           * Add a route handler in expo-router: app/ref/[code].tsx
+           * Example implementation:
+           *
+           *   import { useLocalSearchParams, router } from 'expo-router';
+           *   import { useEffect } from 'react';
+           *   import AsyncStorage from '@react-native-async-storage/async-storage';
+           *
+           *   export default function ReferralDeepLink() {
+           *     const { code } = useLocalSearchParams();
+           *     useEffect(() => {
+           *       AsyncStorage.setItem('referral_code', code as string);
+           *       router.replace('/');
+           *     }, [code]);
+           *     return null;
+           *   }
+           *
+           * =============================================================================
+           * HOW TO REVERT (when mobile app is ready):
+           * =============================================================================
+           *
+           * 1. Replace this entire setTimeout callback with:
+           *
+           *   const device = getDeviceType();
+           *   const code = params.code as string;
+           *
+           *   if (device === 'ios' || device === 'android') {
+           *     const deepLink = `lumbus://ref/${code}`;
+           *     const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
+           *
+           *     const fallbackTimeout = setTimeout(() => {
+           *       window.location.href = storeLink;
+           *     }, 1500);
+           *
+           *     window.location.href = deepLink;
+           *
+           *     document.addEventListener('visibilitychange', () => {
+           *       if (document.hidden) {
+           *         clearTimeout(fallbackTimeout);
+           *       }
+           *     });
+           *   } else {
+           *     window.location.href = '/';
+           *   }
+           *
+           * 2. Update the error handler catch block to also use deep linking
+           *
+           * 3. Update UI text (around line 161) from "Redirecting..." back to:
+           *    {deviceType === 'desktop' ? 'Redirecting...' : 'Opening Lumbus app...'}
+           *
+           * =============================================================================
+           */
 
-          if (device === 'ios' || device === 'android') {
-            // Try deep link first (opens app if installed)
-            const deepLink = `lumbus://ref/${code}`;
-            const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
-
-            // Set a timeout to redirect to store if deep link fails
-            const fallbackTimeout = setTimeout(() => {
-              window.location.href = storeLink;
-            }, 1500);
-
-            // Try to open the app
-            window.location.href = deepLink;
-
-            // If page is still visible after a short delay, deep link failed
-            document.addEventListener('visibilitychange', () => {
-              if (document.hidden) {
-                clearTimeout(fallbackTimeout);
-              }
-            });
-          } else {
-            // Desktop: redirect to website home page
-            window.location.href = '/';
-          }
+          // For now, redirect all devices to web home page
+          // The referral code is already tracked via /api/track/click and stored in cookie
+          window.location.href = '/';
         }, 2500);
       } catch (error) {
         setStatus('error');
-        // Redirect anyway after error
+        // Redirect to home after error
+        // TODO: When re-enabling deep links, also update this to try deep link first
         setTimeout(() => {
-          const device = getDeviceType();
-          const code = params.code as string;
-
-          if (device === 'ios' || device === 'android') {
-            const deepLink = `lumbus://ref/${code}`;
-            const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
-
-            const fallbackTimeout = setTimeout(() => {
-              window.location.href = storeLink;
-            }, 1500);
-
-            window.location.href = deepLink;
-
-            document.addEventListener('visibilitychange', () => {
-              if (document.hidden) {
-                clearTimeout(fallbackTimeout);
-              }
-            });
-          } else {
-            window.location.href = '/';
-          }
+          window.location.href = '/';
         }, 2000);
       }
     };
@@ -174,9 +190,7 @@ export default function ReferralPage() {
                   </div>
                 </div>
                 <p className="text-sm sm:text-base md:text-lg font-bold opacity-60 mt-6 sm:mt-8">
-                  {deviceType === 'desktop'
-                    ? 'Redirecting...'
-                    : 'Opening Lumbus app...'}
+                  Redirecting...
                 </p>
               </div>
             )}
