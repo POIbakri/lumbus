@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -564,22 +565,22 @@ export default function AdminPage() {
           {/* Header */}
           <div className="mb-8 sm:mb-10">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-foreground flex items-center justify-center">
-                    <span className="text-white text-lg sm:text-xl font-black">L</span>
-                  </div>
-                  <div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Admin Dashboard</h1>
-                    <p className="text-xs sm:text-sm text-muted-foreground font-medium">Lumbus Control Center</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/logotrans.png"
+                  alt="Lumbus"
+                  width={48}
+                  height={48}
+                  className="w-10 h-10 sm:w-12 sm:h-12"
+                />
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Admin Dashboard</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium">Lumbus Control Center</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="glass rounded-xl px-4 py-2 border border-foreground/10">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Today</p>
-                  <p className="text-sm font-black">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-                </div>
+              <div className="glass rounded-xl px-4 py-2 border border-foreground/10">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Today</p>
+                <p className="text-sm font-black">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
               </div>
             </div>
           </div>
@@ -1636,52 +1637,74 @@ export default function AdminPage() {
               </div>
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Total */}
-                <Card className="glass border border-foreground/20 float-shadow rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-bold text-muted-foreground uppercase">Total Installs</span>
-                      <Badge className="glass-mint border border-primary/30 font-black text-xs">
-                        {analyticsPeriod === 1 ? 'Today' : `${analyticsPeriod}d`}
-                      </Badge>
-                    </div>
-                    <div className="text-4xl sm:text-5xl font-black">
-                      {analyticsPeriod === 1 ? (analyticsData?.today?.total || 0) : (analyticsData?.total || 0)}
-                    </div>
-                  </CardContent>
-                </Card>
+              {(() => {
+                // Calculate period totals from daily data
+                const periodTotals = analyticsData?.daily
+                  ? Object.values(analyticsData.daily).reduce(
+                      (acc, day) => ({
+                        total: acc.total + day.total,
+                        ios: acc.ios + day.ios,
+                        android: acc.android + day.android,
+                      }),
+                      { total: 0, ios: 0, android: 0 }
+                    )
+                  : { total: 0, ios: 0, android: 0 };
 
-                {/* iOS */}
-                <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
-                  <div className="h-1 bg-[#007AFF]" />
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                      </svg>
-                      <span className="text-sm font-bold text-muted-foreground uppercase">iOS</span>
-                    </div>
-                    <div className="text-4xl sm:text-5xl font-black">{analyticsData?.today?.ios || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-2">Today</p>
-                  </CardContent>
-                </Card>
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Total */}
+                    <Card className="glass border border-foreground/20 float-shadow rounded-2xl">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="text-sm font-bold text-muted-foreground uppercase">Total Installs</span>
+                          <Badge className="glass-mint border border-primary/30 font-black text-xs">
+                            {analyticsPeriod === 1 ? 'Today' : `${analyticsPeriod}d`}
+                          </Badge>
+                        </div>
+                        <div className="text-4xl sm:text-5xl font-black">{periodTotals.total}</div>
+                      </CardContent>
+                    </Card>
 
-                {/* Android */}
-                <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
-                  <div className="h-1 bg-[#3DDC84]" />
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.44-.59-3.03-.94-4.71-.94-1.68 0-3.27.35-4.71.94L5.21 5.67c-.18-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85L5.96 9.48C2.94 11.07 .86 14.11.86 17.62h22.28c0-3.51-2.08-6.55-5.11-8.14M7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25m10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25"/>
-                      </svg>
-                      <span className="text-sm font-bold text-muted-foreground uppercase">Android</span>
-                    </div>
-                    <div className="text-4xl sm:text-5xl font-black">{analyticsData?.today?.android || 0}</div>
-                    <p className="text-xs text-muted-foreground mt-2">Today</p>
-                  </CardContent>
-                </Card>
-              </div>
+                    {/* iOS */}
+                    <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
+                      <div className="h-1 bg-[#007AFF]" />
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                            </svg>
+                            <span className="text-sm font-bold text-muted-foreground uppercase">iOS</span>
+                          </div>
+                          <Badge className="bg-[#007AFF]/10 text-[#007AFF] border-[#007AFF]/30 font-black text-xs">
+                            {periodTotals.total > 0 ? Math.round((periodTotals.ios / periodTotals.total) * 100) : 0}%
+                          </Badge>
+                        </div>
+                        <div className="text-4xl sm:text-5xl font-black">{periodTotals.ios}</div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Android */}
+                    <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
+                      <div className="h-1 bg-[#3DDC84]" />
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.44-.59-3.03-.94-4.71-.94-1.68 0-3.27.35-4.71.94L5.21 5.67c-.18-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85L5.96 9.48C2.94 11.07 .86 14.11.86 17.62h22.28c0-3.51-2.08-6.55-5.11-8.14M7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25m10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25"/>
+                            </svg>
+                            <span className="text-sm font-bold text-muted-foreground uppercase">Android</span>
+                          </div>
+                          <Badge className="bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/30 font-black text-xs">
+                            {periodTotals.total > 0 ? Math.round((periodTotals.android / periodTotals.total) * 100) : 0}%
+                          </Badge>
+                        </div>
+                        <div className="text-4xl sm:text-5xl font-black">{periodTotals.android}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })()}
 
               {/* Daily Breakdown */}
               <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
