@@ -185,9 +185,14 @@ export async function GET(request: NextRequest) {
     const eventType = searchParams.get('event_type') || 'first_open';
     const days = parseInt(searchParams.get('days') || '7', 10);
 
-    // Get daily counts for the specified period
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    // Calculate start date based on period
+    // For "Today" (days=1), start from midnight today UTC
+    // For other periods, go back the specified number of days from midnight today
+    const now = new Date();
+    const startDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    if (days > 1) {
+      startDate.setUTCDate(startDate.getUTCDate() - (days - 1));
+    }
 
     const { data, error } = await supabase
       .from('app_events')
