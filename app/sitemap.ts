@@ -10,7 +10,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://getlumbus.com'
   const currentDate = new Date()
 
-  // Fetch all active plans from database with error handling and pagination
+  // Fetch only "indexable" plans from database - plans that match our SEO criteria
+  // to avoid duplicate content issues with thousands of similar plan pages
   let plans: any[] = []
   try {
     let from = 0
@@ -19,10 +20,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     while (true) {
       const { data, error } = await supabase
         .from('plans')
-        .select('region_code, id, updated_at, name')
+        .select('region_code, id, updated_at, name, data_gb, validity_days, retail_price')
         .eq('is_active', true)
-        .gte('data_gb', 0.5) // Only include plans >= 500MB
-        .order('updated_at', { ascending: false })
+        .gte('data_gb', 1) // Only include plans >= 1GB (popular search terms)
+        .lte('data_gb', 50) // Cap at 50GB
+        .gte('validity_days', 7) // At least 7 days
+        .lte('validity_days', 30) // Max 30 days (typical travel durations)
+        .gte('retail_price', 3) // At least $3
+        .lte('retail_price', 50) // Max $50 (typical budget)
+        .order('data_gb', { ascending: true })
         .range(from, from + pageSize - 1)
 
       if (error) {
@@ -38,26 +44,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       from += pageSize
     }
 
-    console.log(`Sitemap: Fetched ${plans.length} plans`)
+    console.log(`Sitemap: Fetched ${plans.length} indexable plans`)
   } catch (err) {
     console.error('Sitemap: Failed to fetch plans:', err)
   }
 
-  // Generate plan URLs (grouped by region)
-  const planUrlsByRegion = new Map<string, MetadataRoute.Sitemap[number]>()
+  // Generate plan URLs - only ONE best plan per region to avoid duplicate content
+  // "Best" = most typical travel plan (around 5GB, 7-14 days, good price)
+  const planUrlsByRegion = new Map<string, { entry: MetadataRoute.Sitemap[number], score: number }>()
 
   plans.forEach((plan) => {
     const regionUrl = `${baseUrl}/plans/${plan.region_code}/${plan.id}`
     const updatedDate = plan.updated_at ? new Date(plan.updated_at) : currentDate
 
-    // Keep only the most recently updated plan per region for primary listing
-    if (!planUrlsByRegion.has(plan.region_code) ||
-        new Date(planUrlsByRegion.get(plan.region_code)!.lastModified!) < updatedDate) {
+    // Score plans to find the "best" representative plan for each region
+    // Prefer: ~5GB data, 7-14 day validity, $10-20 price range
+    let score = 0
+    if (plan.data_gb >= 3 && plan.data_gb <= 10) score += 3 // Sweet spot data
+    if (plan.data_gb === 5) score += 2 // Most searched
+    if (plan.validity_days >= 7 && plan.validity_days <= 14) score += 3 // Typical trip
+    if (plan.validity_days === 7) score += 1 // Common search
+    if (plan.retail_price >= 8 && plan.retail_price <= 25) score += 2 // Good value range
+
+    const existing = planUrlsByRegion.get(plan.region_code)
+    if (!existing || score > existing.score) {
       planUrlsByRegion.set(plan.region_code, {
-        url: regionUrl,
-        lastModified: updatedDate,
-        changeFrequency: 'weekly' as const,
-        priority: 0.7,
+        entry: {
+          url: regionUrl,
+          lastModified: updatedDate,
+          changeFrequency: 'weekly' as const,
+          priority: 0.7,
+        },
+        score,
       })
     }
   })
@@ -162,7 +180,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       })),
 
-    // Individual plan pages (top per region)
-    ...Array.from(planUrlsByRegion.values()),
+    // Individual plan pages (ONE best plan per region to avoid duplicates)
+    ...Array.from(planUrlsByRegion.values()).map(v => v.entry),
   ]
 }

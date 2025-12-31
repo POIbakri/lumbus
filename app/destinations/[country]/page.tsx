@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import { Nav } from '@/components/nav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -201,23 +201,9 @@ export default function CountryDestinationPage() {
   // Get featured plans (variety of data sizes)
   const featuredPlans = plans.slice(0, 6);
 
+  // Return proper 404 for invalid country codes (fixes soft 404 SEO issue)
   if (!COUNTRIES[countryCode]) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Nav />
-        <div className="pt-40 pb-20 px-4 text-center">
-          <h1 className="text-4xl font-black uppercase mb-4">Country Not Found</h1>
-          <p className="text-lg font-bold text-foreground/70 mb-8">
-            We couldn&apos;t find eSIM plans for this destination.
-          </p>
-          <Link href="/destinations">
-            <Button className="bg-primary text-foreground font-black">
-              BROWSE ALL DESTINATIONS
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   return (

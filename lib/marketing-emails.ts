@@ -624,3 +624,42 @@ export async function sendIssueResolvedEmail(params: SendIssueResolvedEmailParam
     throw error;
   }
 }
+
+export interface SendCustomEmailParams {
+  to: string;
+  subject: string;
+  title: string;
+  subtitle?: string;
+  content: string; // HTML content for the email body
+}
+
+/**
+ * Send a custom email with full control over subject and body content
+ * Uses the standard Lumbus email template wrapper
+ */
+export async function sendCustomEmail(params: SendCustomEmailParams) {
+  const { to, subject, title, subtitle, content } = params;
+
+  try {
+    const { data, error } = await getResendClient().emails.send({
+      from: process.env.RESEND_FROM_EMAIL || 'hello@updates.getlumbus.com',
+      to: [to],
+      subject,
+      html: createEmailTemplate({
+        title,
+        subtitle,
+        content,
+      }),
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to send custom email:', error);
+    throw error;
+  }
+}

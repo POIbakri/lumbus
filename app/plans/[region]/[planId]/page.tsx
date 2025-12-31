@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -384,17 +384,9 @@ export default function PlanDetailPage() {
     );
   }
 
+  // Return proper 404 for non-existent plans (fixes soft 404 SEO issue)
   if (!plan) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Plan not found</p>
-          <Link href="/plans">
-            <Button>Back to Plans</Button>
-          </Link>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   const countryInfo = getCountryInfo(plan.region_code);

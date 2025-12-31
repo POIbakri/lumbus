@@ -4,7 +4,7 @@ import { supabase } from '@/lib/db';
 import { sendWelcomeEmail } from '@/lib/email';
 import { sendManualMilestoneSummary } from '@/lib/emails/milestone-alerts';
 import { sendInstallReminderEmail, sendActivationReminderEmail } from '@/lib/emails/esim-reminders';
-import { sendReferralPromoEmail } from '@/lib/marketing-emails';
+import { sendReferralPromoEmail, sendCustomEmail } from '@/lib/marketing-emails';
 import { sendAppDownloadEmail } from '@/lib/app-download-email';
 
 // GET: List users for email selection
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { emailType, recipients } = body;
+    const { emailType, recipients, customSubject, customTitle, customSubtitle, customContent } = body;
 
     const results: { success: string[]; failed: string[] } = {
       success: [],
@@ -481,6 +481,68 @@ export async function POST(req: NextRequest) {
           results.success.push('admin');
         } else {
           results.failed.push('admin');
+        }
+        break;
+      }
+
+      case 'custom': {
+        // Send custom email to selected users
+        if (!recipients || recipients.length === 0) {
+          return NextResponse.json({ error: 'No recipients specified' }, { status: 400 });
+        }
+        if (!customSubject || !customTitle || !customContent) {
+          return NextResponse.json({ error: 'Subject, title, and content are required for custom emails' }, { status: 400 });
+        }
+
+        for (const email of recipients) {
+          try {
+            await sendCustomEmail({
+              to: email,
+              subject: customSubject,
+              title: customTitle,
+              subtitle: customSubtitle,
+              content: customContent,
+            });
+            results.success.push(email);
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (err) {
+            console.error(`Failed to send custom email to ${email}:`, err);
+            results.failed.push(email);
+          }
+        }
+        break;
+      }
+
+      case 'custom_all': {
+        // Send custom email to all non-test users
+        if (!customSubject || !customTitle || !customContent) {
+          return NextResponse.json({ error: 'Subject, title, and content are required for custom emails' }, { status: 400 });
+        }
+
+        const { data: users, error } = await supabase
+          .from('users')
+          .select('email')
+          .eq('is_test_user', false);
+
+        if (error || !users) {
+          return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+        }
+
+        for (const user of users) {
+          try {
+            await sendCustomEmail({
+              to: user.email,
+              subject: customSubject,
+              title: customTitle,
+              subtitle: customSubtitle,
+              content: customContent,
+            });
+            results.success.push(user.email);
+            await new Promise(resolve => setTimeout(resolve, 100));
+          } catch (err) {
+            console.error(`Failed to send custom email to ${user.email}:`, err);
+            results.failed.push(user.email);
+          }
         }
         break;
       }

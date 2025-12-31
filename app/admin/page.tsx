@@ -6,10 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getCountryInfo } from '@/lib/countries';
 import { AdminDiscountCodes } from '@/components/admin-discount-codes';
+import { AdminManageData } from '@/components/admin-manage-data';
 import { FlagIcon } from '@/components/flag-icon';
 import { SUPPORTED_CURRENCIES, type Currency } from '@/lib/currency';
 
-type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'email' | 'analytics' | 'refunds';
+type TabType = 'overview' | 'orders' | 'affiliates' | 'rewards' | 'payouts' | 'discounts' | 'data' | 'email' | 'analytics' | 'refunds';
 
 interface EmailUser {
   id: string;
@@ -150,9 +151,16 @@ export default function AdminPage() {
   const [emailResult, setEmailResult] = useState<{ sent: number; failed: number } | null>(null);
   const [totalUsers, setTotalUsers] = useState(0);
 
+  // Custom email state
+  const [customSubject, setCustomSubject] = useState('');
+  const [customTitle, setCustomTitle] = useState('');
+  const [customSubtitle, setCustomSubtitle] = useState('');
+  const [customContent, setCustomContent] = useState('');
+
   // Analytics tab state
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [analyticsPeriod, setAnalyticsPeriod] = useState(7);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   // Refunds tab state
   const [refundSearch, setRefundSearch] = useState('');
@@ -283,6 +291,7 @@ export default function AdminPage() {
   };
 
   const loadAnalytics = async () => {
+    setAnalyticsLoading(true);
     try {
       const response = await fetch(`/api/analytics/events?event_type=first_open&days=${analyticsPeriod}`);
       if (!response.ok) throw new Error('Failed to load analytics');
@@ -290,6 +299,8 @@ export default function AdminPage() {
       setAnalyticsData(data);
     } catch (err) {
       console.error('Failed to load analytics:', err);
+    } finally {
+      setAnalyticsLoading(false);
     }
   };
 
@@ -364,9 +375,16 @@ export default function AdminPage() {
 
     // Milestone summary doesn't need recipients - it goes to admins
     const isMilestoneSummary = emailType === 'milestone_summary';
+    const isCustomEmail = emailType === 'custom';
 
     if (!isMilestoneSummary && !sendToAll && selectedEmails.length === 0) {
       alert('Please select at least one recipient');
+      return;
+    }
+
+    // Validate custom email fields
+    if (isCustomEmail && (!customSubject || !customTitle || !customContent)) {
+      alert('Please fill in all required fields (Subject, Title, and Content)');
       return;
     }
 
@@ -378,13 +396,23 @@ export default function AdminPage() {
     setEmailResult(null);
 
     try {
+      const requestBody: Record<string, unknown> = {
+        emailType: targetType,
+        recipients: sendToAll ? [] : selectedEmails,
+      };
+
+      // Add custom email fields if applicable
+      if (isCustomEmail) {
+        requestBody.customSubject = customSubject;
+        requestBody.customTitle = customTitle;
+        requestBody.customSubtitle = customSubtitle;
+        requestBody.customContent = customContent;
+      }
+
       const response = await fetch('/api/admin/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailType: targetType,
-          recipients: sendToAll ? [] : selectedEmails,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -516,16 +544,17 @@ export default function AdminPage() {
   const topupOrders = allOrders.filter(o => o.is_topup).length;
   const pendingAffiliates = affiliates.filter(a => a.application_status === 'pending').length;
 
-  const tabs: { id: TabType; label: string; count?: number }[] = [
+  const tabs: { id: TabType; label: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'orders', label: 'Orders', count: allOrders.length },
-    { id: 'affiliates', label: 'Affiliates', count: pendingAffiliates || undefined },
-    { id: 'rewards', label: 'Rewards', count: rewardStats?.applied },
-    { id: 'payouts', label: 'Payouts', count: commissionStats?.approved },
+    { id: 'orders', label: 'Orders' },
+    { id: 'affiliates', label: 'Affiliates' },
+    { id: 'rewards', label: 'Rewards' },
+    { id: 'payouts', label: 'Payouts' },
     { id: 'discounts', label: 'Discount Codes' },
+    { id: 'data', label: 'Manage Data' },
     { id: 'refunds', label: 'Refunds' },
     { id: 'email', label: 'Email' },
-    { id: 'analytics', label: 'App Analytics', count: analyticsData?.today?.total || undefined },
+    { id: 'analytics', label: 'App Analytics' },
   ];
 
   return (
@@ -533,9 +562,26 @@ export default function AdminPage() {
       <div className="py-6 sm:py-8 md:py-12 px-3 sm:px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase mb-2 sm:mb-4">LUMBUS ADMIN</h1>
-            <p className="text-base sm:text-lg font-bold text-muted-foreground">Manage orders, affiliates, and analytics</p>
+          <div className="mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-foreground flex items-center justify-center">
+                    <span className="text-white text-lg sm:text-xl font-black">L</span>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Admin Dashboard</h1>
+                    <p className="text-xs sm:text-sm text-muted-foreground font-medium">Lumbus Control Center</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="glass rounded-xl px-4 py-2 border border-foreground/10">
+                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Today</p>
+                  <p className="text-sm font-black">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Tab Navigation */}
@@ -552,13 +598,6 @@ export default function AdminPage() {
                   }`}
                 >
                   {tab.label}
-                  {tab.count !== undefined && tab.count > 0 && (
-                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                      activeTab === tab.id ? 'bg-white/20' : 'bg-primary/20'
-                    }`}>
-                      {tab.count}
-                    </span>
-                  )}
                 </button>
               ))}
             </div>
@@ -1052,6 +1091,11 @@ export default function AdminPage() {
             <AdminDiscountCodes />
           )}
 
+          {/* Manage Data Tab */}
+          {activeTab === 'data' && (
+            <AdminManageData />
+          )}
+
           {/* Refunds Tab */}
           {activeTab === 'refunds' && (
             <div className="space-y-6">
@@ -1217,6 +1261,7 @@ export default function AdminPage() {
                         <option value="install_reminder">eSIM Install Reminder</option>
                         <option value="activation_reminder">eSIM Activation Reminder</option>
                         <option value="milestone_summary">Milestone Summary (Admin Only)</option>
+                        <option value="custom">Custom Email</option>
                       </select>
                     </div>
 
@@ -1258,7 +1303,178 @@ export default function AdminPage() {
                           <p className="text-xs text-muted-foreground mt-1">Shows recent orders and revenue stats.</p>
                         </div>
                       )}
+                      {emailType === 'custom' && (
+                        <div>
+                          <p className="font-bold text-sm">Send a fully customizable email with your own content.</p>
+                          <p className="text-xs text-muted-foreground mt-1">Uses the standard Lumbus email template. You can use HTML for formatting.</p>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Custom Email Fields */}
+                    {emailType === 'custom' && (
+                      <div className="space-y-4 mt-4 p-4 glass rounded-xl border border-primary/20">
+                        <div>
+                          <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                            Email Subject <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={customSubject}
+                            onChange={(e) => setCustomSubject(e.target.value)}
+                            placeholder="e.g., Important Update from Lumbus"
+                            className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                            Header Title <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={customTitle}
+                            onChange={(e) => setCustomTitle(e.target.value)}
+                            placeholder="e.g., We Have News!"
+                            className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">Appears in the email header next to the Lumbus logo.</p>
+                        </div>
+
+                        <div>
+                          <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                            Header Subtitle (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={customSubtitle}
+                            onChange={(e) => setCustomSubtitle(e.target.value)}
+                            placeholder="e.g., December 2024 Update"
+                            className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">Optional smaller text below the title.</p>
+                        </div>
+
+                        <div>
+                          <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                            Email Content (HTML) <span className="text-red-500">*</span>
+                          </label>
+                          <textarea
+                            value={customContent}
+                            onChange={(e) => setCustomContent(e.target.value)}
+                            placeholder={`<h2 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #1A1A1A;">Hey there!</h2>
+
+<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: #666666;">
+  We wanted to share some exciting news with you...
+</p>
+
+<div style="margin: 24px 0; padding: 20px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+  <p style="margin: 0; font-size: 16px; font-weight: 700; color: #1A1A1A; text-align: center;">
+    Special Offer Inside!
+  </p>
+</div>`}
+                            rows={12}
+                            className="w-full glass rounded-xl p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary resize-y"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Use HTML for formatting. Colors: Primary #2EFECC (mint), Secondary #FDFD74 (yellow), Accent #87EFFF (cyan).
+                          </p>
+                        </div>
+
+                        {/* Quick Templates */}
+                        <div>
+                          <label className="font-black uppercase text-xs text-muted-foreground mb-2 block">
+                            Quick Templates
+                          </label>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setCustomContent(`<h2 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #1A1A1A; text-align: center;">Hey there!</h2>
+
+<p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+  We have some exciting news to share with you...
+</p>
+
+<div style="margin: 24px 0; padding: 24px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+  <h3 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-align: center;">What&apos;s New</h3>
+  <p style="margin: 0; font-size: 15px; color: #666666; line-height: 1.6; text-align: center;">
+    Your exciting content goes here...
+  </p>
+</div>
+
+<p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+  Questions? We&apos;re here at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
+</p>`)}
+                              className="glass border border-foreground/20 text-foreground font-bold text-xs rounded-lg px-3 py-2 hover:glass-mint transition-all"
+                            >
+                              Announcement
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCustomContent(`<h2 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #1A1A1A; text-align: center;">Special Offer Just For You!</h2>
+
+<p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+  We appreciate you being part of the Lumbus family. Here&apos;s something special...
+</p>
+
+<div style="margin: 24px 0; padding: 24px; background-color: #FDFD74; border-radius: 12px; border: 3px solid #1A1A1A; text-align: center;">
+  <p style="margin: 0 0 8px; font-size: 12px; font-weight: 700; color: #1A1A1A; text-transform: uppercase; letter-spacing: 1px;">Limited Time Offer</p>
+  <p style="margin: 0 0 8px; font-size: 32px; font-weight: 900; color: #1A1A1A;">XX% OFF</p>
+  <p style="margin: 0; font-size: 14px; font-weight: 600; color: #1A1A1A;">Use code: YOURCODE</p>
+</div>
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin: 24px 0;">
+  <tr>
+    <td align="center">
+      <a href="https://getlumbus.com" style="display: inline-block; padding: 16px 40px; background: #2EFECC; color: #1A1A1A; text-decoration: none; font-size: 16px; font-weight: 800; border-radius: 12px; text-transform: uppercase; letter-spacing: 1px;">
+        Shop Now
+      </a>
+    </td>
+  </tr>
+</table>
+
+<p style="margin: 0; font-size: 13px; color: #999999; text-align: center;">
+  Offer valid until [DATE]. Terms apply.
+</p>`)}
+                              className="glass border border-foreground/20 text-foreground font-bold text-xs rounded-lg px-3 py-2 hover:glass-yellow transition-all"
+                            >
+                              Promo Offer
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setCustomContent(`<h2 style="margin: 0 0 16px; font-size: 24px; font-weight: 700; color: #1A1A1A; text-align: center;">Thank You!</h2>
+
+<p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: #666666; text-align: center;">
+  We really appreciate your patience and support. Here&apos;s what we&apos;ve done for you...
+</p>
+
+<div style="margin: 24px 0; padding: 24px; background-color: #E0FEF7; border-radius: 12px; border: 2px solid #2EFECC;">
+  <h3 style="margin: 0 0 16px; font-size: 18px; font-weight: 700; color: #1A1A1A; text-align: center;">What We&apos;ve Done</h3>
+  <table border="0" cellspacing="0" cellpadding="0" width="100%" style="margin-bottom: 12px;">
+    <tr>
+      <td width="40" style="vertical-align: middle; padding-right: 12px;">
+        <div style="width: 40px; height: 40px; background-color: #FFFFFF; border-radius: 50%; text-align: center; line-height: 40px;">
+          <span style="font-size: 20px;">&#10003;</span>
+        </div>
+      </td>
+      <td style="vertical-align: middle;">
+        <p style="margin: 0; font-size: 16px; font-weight: 700; color: #1A1A1A;">Action taken description</p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">
+  Questions? We&apos;re here at <a href="mailto:support@getlumbus.com" style="color: #1A1A1A; font-weight: 700; text-decoration: none;">support@getlumbus.com</a>
+</p>`)}
+                              className="glass border border-foreground/20 text-foreground font-bold text-xs rounded-lg px-3 py-2 hover:glass-cyan transition-all"
+                            >
+                              Thank You
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Quick Actions */}
                     <div className="flex flex-wrap gap-3">
@@ -1380,62 +1596,119 @@ export default function AdminPage() {
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
             <div className="space-y-6">
-              {/* Period Filter */}
-              <div className="flex flex-wrap gap-3 items-center">
-                <span className="font-black uppercase text-sm text-muted-foreground">Period:</span>
-                <select
-                  value={analyticsPeriod}
-                  onChange={(e) => setAnalyticsPeriod(Number(e.target.value))}
-                  className="glass rounded-xl px-4 py-2 font-bold text-sm border border-foreground/10 focus:outline-none focus:border-primary"
-                >
-                  <option value={7}>Last 7 days</option>
-                  <option value={14}>Last 14 days</option>
-                  <option value={30}>Last 30 days</option>
-                  <option value={90}>Last 90 days</option>
-                </select>
+              {/* Period Selection */}
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: 1, label: 'Today' },
+                    { value: 7, label: '7 Days' },
+                    { value: 14, label: '14 Days' },
+                    { value: 30, label: '30 Days' },
+                  ].map((period) => (
+                    <button
+                      key={period.value}
+                      onClick={() => setAnalyticsPeriod(period.value)}
+                      className={`px-4 py-2 rounded-xl font-black text-sm transition-all ${
+                        analyticsPeriod === period.value
+                          ? 'glass-dark text-white'
+                          : 'glass border border-foreground/10 hover:border-foreground/30'
+                      }`}
+                    >
+                      {period.label}
+                    </button>
+                  ))}
+                </div>
                 <Button
-                  onClick={loadAnalytics}
-                  className="glass border border-foreground/20 text-foreground font-black uppercase text-xs rounded-xl px-4 py-2 hover:glass-mint transition-all"
+                  onClick={() => loadAnalytics()}
+                  disabled={analyticsLoading}
+                  className="glass border border-foreground/20 text-foreground font-black uppercase text-xs rounded-xl px-4 py-2 hover:glass-mint transition-all disabled:opacity-50"
                 >
-                  Refresh
+                  {analyticsLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Loading
+                    </span>
+                  ) : 'Refresh'}
                 </Button>
               </div>
 
-              {/* Today's Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <Card className="glass-mint border border-primary/30 float-shadow rounded-2xl glass-inner-glow">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.total || 0}</div>
-                    <div className="text-xs font-black uppercase text-muted-foreground">Today&apos;s Installs</div>
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Total */}
+                <Card className="glass border border-foreground/20 float-shadow rounded-2xl">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm font-bold text-muted-foreground uppercase">Total Installs</span>
+                      <Badge className="glass-mint border border-primary/30 font-black text-xs">
+                        {analyticsPeriod === 1 ? 'Today' : `${analyticsPeriod}d`}
+                      </Badge>
+                    </div>
+                    <div className="text-4xl sm:text-5xl font-black">
+                      {analyticsPeriod === 1 ? (analyticsData?.today?.total || 0) : (analyticsData?.total || 0)}
+                    </div>
                   </CardContent>
                 </Card>
-                <Card className="glass-cyan border border-primary/30 float-shadow rounded-2xl glass-inner-glow">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.ios || 0}</div>
-                    <div className="text-xs font-black uppercase text-muted-foreground">iOS Today</div>
+
+                {/* iOS */}
+                <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
+                  <div className="h-1 bg-[#007AFF]" />
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                      </svg>
+                      <span className="text-sm font-bold text-muted-foreground uppercase">iOS</span>
+                    </div>
+                    <div className="text-4xl sm:text-5xl font-black">{analyticsData?.today?.ios || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-2">Today</p>
                   </CardContent>
                 </Card>
-                <Card className="glass-yellow border border-secondary/30 float-shadow rounded-2xl glass-inner-glow">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.today?.android || 0}</div>
-                    <div className="text-xs font-black uppercase text-muted-foreground">Android Today</div>
-                  </CardContent>
-                </Card>
-                <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl glass-inner-glow">
-                  <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl sm:text-4xl font-black">{analyticsData?.total || 0}</div>
-                    <div className="text-xs font-black uppercase text-muted-foreground">Total ({analyticsPeriod}d)</div>
+
+                {/* Android */}
+                <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
+                  <div className="h-1 bg-[#3DDC84]" />
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-1.44-.59-3.03-.94-4.71-.94-1.68 0-3.27.35-4.71.94L5.21 5.67c-.18-.28-.54-.37-.83-.22-.3.16-.42.54-.26.85L5.96 9.48C2.94 11.07 .86 14.11.86 17.62h22.28c0-3.51-2.08-6.55-5.11-8.14M7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25m10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25"/>
+                      </svg>
+                      <span className="text-sm font-bold text-muted-foreground uppercase">Android</span>
+                    </div>
+                    <div className="text-4xl sm:text-5xl font-black">{analyticsData?.today?.android || 0}</div>
+                    <p className="text-xs text-muted-foreground mt-2">Today</p>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Daily Breakdown */}
               <Card className="glass border border-foreground/20 float-shadow rounded-2xl sm:rounded-3xl">
-                <CardHeader>
-                  <CardTitle className="text-xl sm:text-2xl font-black uppercase">Daily App Installs</CardTitle>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-black uppercase">Daily Breakdown</CardTitle>
+                    <div className="flex items-center gap-4 text-xs font-bold">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-sm bg-[#007AFF]" />
+                        <span>iOS</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-3 h-3 rounded-sm bg-[#3DDC84]" />
+                        <span>Android</span>
+                      </div>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  {!analyticsData || Object.keys(analyticsData.daily || {}).length === 0 ? (
+                  {analyticsLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <svg className="animate-spin h-8 w-8 text-muted-foreground" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    </div>
+                  ) : !analyticsData || Object.keys(analyticsData.daily || {}).length === 0 ? (
                     <div className="text-center py-12">
                       <p className="font-bold text-muted-foreground">No install data yet</p>
                       <p className="text-sm text-muted-foreground mt-2">
@@ -1443,7 +1716,7 @@ export default function AdminPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {Object.entries(analyticsData.daily)
                         .sort(([a], [b]) => b.localeCompare(a))
                         .map(([date, counts]) => {
@@ -1452,18 +1725,19 @@ export default function AdminPage() {
                             ...Object.values(analyticsData.daily).map(d => d.total),
                             1
                           );
-                          const barWidth = (counts.total / maxCount) * 100;
+                          const iosWidth = (counts.ios / maxCount) * 100;
+                          const androidWidth = (counts.android / maxCount) * 100;
 
                           return (
                             <div
                               key={date}
-                              className={`p-4 rounded-xl glass-inner-glow ${
-                                isToday ? 'glass-mint border border-primary/30' : 'glass'
+                              className={`p-3 rounded-xl transition-all ${
+                                isToday ? 'glass-mint border border-primary/30' : 'hover:bg-foreground/5'
                               }`}
                             >
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-black text-sm">
+                                  <span className="font-black text-sm min-w-[100px]">
                                     {isToday ? 'Today' : new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                                       weekday: 'short',
                                       month: 'short',
@@ -1471,24 +1745,27 @@ export default function AdminPage() {
                                     })}
                                   </span>
                                   {isToday && (
-                                    <Badge className="glass-mint border border-primary/30 font-black text-xs">LIVE</Badge>
+                                    <span className="relative flex h-2 w-2">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                    </span>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-4">
-                                  <span className="text-xs font-bold text-muted-foreground">
-                                    iOS: {counts.ios}
-                                  </span>
-                                  <span className="text-xs font-bold text-muted-foreground">
-                                    Android: {counts.android}
-                                  </span>
-                                  <span className="font-black text-lg">{counts.total}</span>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs font-bold text-[#007AFF]">{counts.ios}</span>
+                                  <span className="text-xs font-bold text-[#3DDC84]">{counts.android}</span>
+                                  <span className="font-black text-sm min-w-[24px] text-right">{counts.total}</span>
                                 </div>
                               </div>
-                              {/* Progress bar */}
-                              <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
+                              {/* Split progress bar */}
+                              <div className="flex gap-1 h-2">
                                 <div
-                                  className="h-full bg-primary rounded-full transition-all duration-500"
-                                  style={{ width: `${barWidth}%` }}
+                                  className="bg-[#007AFF] rounded-l-full transition-all duration-500"
+                                  style={{ width: `${iosWidth}%`, minWidth: counts.ios > 0 ? '4px' : '0' }}
+                                />
+                                <div
+                                  className="bg-[#3DDC84] rounded-r-full transition-all duration-500"
+                                  style={{ width: `${androidWidth}%`, minWidth: counts.android > 0 ? '4px' : '0' }}
                                 />
                               </div>
                             </div>
@@ -1496,22 +1773,6 @@ export default function AdminPage() {
                         })}
                     </div>
                   )}
-                </CardContent>
-              </Card>
-
-              {/* Integration Guide */}
-              <Card className="glass-purple border border-accent/30 float-shadow rounded-2xl sm:rounded-3xl">
-                <CardHeader>
-                  <CardTitle className="text-lg font-black uppercase">Mobile Integration</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="glass rounded-xl p-4 glass-inner-glow">
-                    <p className="font-bold text-sm mb-2">Send events from your mobile app:</p>
-                    <code className="text-xs text-muted-foreground block bg-foreground/5 p-3 rounded-lg overflow-x-auto">
-                      POST /api/analytics/events<br />
-                      {`{ "event_type": "first_open", "device_id": "...", "platform": "ios" }`}
-                    </code>
-                  </div>
                 </CardContent>
               </Card>
             </div>

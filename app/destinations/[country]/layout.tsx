@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { COUNTRIES } from '@/lib/countries';
 
 // Force dynamic rendering - pages are generated on-demand
@@ -16,9 +17,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const currentYear = new Date().getFullYear();
 
   if (!countryInfo) {
+    // Return noindex for invalid countries - the page will return 404
     return {
       title: 'Destination Not Found',
       description: 'This destination is not available.',
+      robots: { index: false, follow: false },
     };
   }
 
