@@ -1667,7 +1667,7 @@ export default function AdminPage() {
 
                     {/* iOS */}
                     <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
-                      <div className="h-1 bg-[#007AFF]" />
+                      <div className="h-1 bg-[#87EFFF]" />
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
@@ -1676,7 +1676,7 @@ export default function AdminPage() {
                             </svg>
                             <span className="text-sm font-bold text-muted-foreground uppercase">iOS</span>
                           </div>
-                          <Badge className="bg-[#007AFF]/10 text-[#007AFF] border-[#007AFF]/30 font-black text-xs">
+                          <Badge className="bg-[#87EFFF]/10 text-[#87EFFF] border-[#87EFFF]/30 font-black text-xs">
                             {periodTotals.total > 0 ? Math.round((periodTotals.ios / periodTotals.total) * 100) : 0}%
                           </Badge>
                         </div>
@@ -1686,7 +1686,7 @@ export default function AdminPage() {
 
                     {/* Android */}
                     <Card className="glass border border-foreground/20 float-shadow rounded-2xl overflow-hidden">
-                      <div className="h-1 bg-[#3DDC84]" />
+                      <div className="h-1 bg-[#2EFECC]" />
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-2">
@@ -1695,7 +1695,7 @@ export default function AdminPage() {
                             </svg>
                             <span className="text-sm font-bold text-muted-foreground uppercase">Android</span>
                           </div>
-                          <Badge className="bg-[#3DDC84]/10 text-[#3DDC84] border-[#3DDC84]/30 font-black text-xs">
+                          <Badge className="bg-[#2EFECC]/10 text-[#2EFECC] border-[#2EFECC]/30 font-black text-xs">
                             {periodTotals.total > 0 ? Math.round((periodTotals.android / periodTotals.total) * 100) : 0}%
                           </Badge>
                         </div>
@@ -1713,11 +1713,11 @@ export default function AdminPage() {
                     <CardTitle className="text-lg font-black uppercase">Daily Breakdown</CardTitle>
                     <div className="flex items-center gap-4 text-xs font-bold">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-sm bg-[#007AFF]" />
+                        <div className="w-3 h-3 rounded-sm bg-[#87EFFF]" />
                         <span>iOS</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <div className="w-3 h-3 rounded-sm bg-[#3DDC84]" />
+                        <div className="w-3 h-3 rounded-sm bg-[#2EFECC]" />
                         <span>Android</span>
                       </div>
                     </div>
@@ -1775,19 +1775,19 @@ export default function AdminPage() {
                                   )}
                                 </div>
                                 <div className="flex items-center gap-3">
-                                  <span className="text-xs font-bold text-[#007AFF]">{counts.ios}</span>
-                                  <span className="text-xs font-bold text-[#3DDC84]">{counts.android}</span>
+                                  <span className="text-xs font-bold text-[#87EFFF]">{counts.ios}</span>
+                                  <span className="text-xs font-bold text-[#2EFECC]">{counts.android}</span>
                                   <span className="font-black text-sm min-w-[24px] text-right">{counts.total}</span>
                                 </div>
                               </div>
                               {/* Split progress bar */}
                               <div className="flex gap-1 h-2">
                                 <div
-                                  className="bg-[#007AFF] rounded-l-full transition-all duration-500"
+                                  className="bg-[#87EFFF] rounded-l-full transition-all duration-500"
                                   style={{ width: `${iosWidth}%`, minWidth: counts.ios > 0 ? '4px' : '0' }}
                                 />
                                 <div
-                                  className="bg-[#3DDC84] rounded-r-full transition-all duration-500"
+                                  className="bg-[#2EFECC] rounded-r-full transition-all duration-500"
                                   style={{ width: `${androidWidth}%`, minWidth: counts.android > 0 ? '4px' : '0' }}
                                 />
                               </div>
