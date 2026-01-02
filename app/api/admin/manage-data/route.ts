@@ -375,15 +375,22 @@ export async function GET(req: NextRequest) {
     }
 
     // Find user by email directly from users table
-    const { data: user } = await supabase
+    console.log('[Admin Gift GET] Looking up user:', userEmail.toLowerCase().trim());
+    const { data: user, error: userError } = await supabase
       .from('users')
       .select('id, email')
       .eq('email', userEmail.toLowerCase().trim())
       .maybeSingle();
 
+    if (userError) {
+      console.error('[Admin Gift GET] User lookup error:', userError);
+      return NextResponse.json({ error: 'Failed to lookup user', details: userError.message }, { status: 500 });
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+    console.log('[Admin Gift GET] Found user:', user.id);
 
     // Get user's orders with eSIMs
     const { data: orders, error } = await supabase
@@ -405,8 +412,10 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
+      console.error('[Admin Gift GET] Orders query error:', error);
+      return NextResponse.json({ error: 'Failed to fetch orders', details: error.message }, { status: 500 });
     }
+    console.log('[Admin Gift GET] Found orders:', orders?.length || 0);
 
     // Get wallet balance
     const { data: wallet } = await supabase
@@ -433,6 +442,10 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error('[Admin Gift GET] Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    }, { status: 500 });
   }
 }
