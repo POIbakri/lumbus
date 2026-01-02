@@ -58,6 +58,7 @@ export function AdminManageData() {
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [reason, setReason] = useState('');
+  const [planSearch, setPlanSearch] = useState('');
 
   const searchUser = async () => {
     if (!searchEmail.trim()) return;
@@ -216,8 +217,14 @@ export function AdminManageData() {
 
             {/* Result Message */}
             {result && (
-              <div className={`rounded-xl p-4 ${result.success ? 'glass-mint border border-primary/30' : 'bg-destructive/20 border border-destructive/30'}`}>
-                <p className="font-bold text-sm">{result.message}</p>
+              <div className={`rounded-xl p-4 ${result.success ? 'glass-mint border-2 border-primary' : 'bg-destructive/20 border border-destructive/30'}`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{result.success ? '✅' : '❌'}</span>
+                  <div>
+                    <p className="font-black text-sm uppercase">{result.success ? 'Success!' : 'Error'}</p>
+                    <p className="font-bold text-sm">{result.message}</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -366,21 +373,39 @@ export function AdminManageData() {
 
                   {/* Select Plan */}
                   {selectedOrderId && (
-                    <div className="glass rounded-xl p-4 glass-inner-glow">
-                      <label className="font-black uppercase text-xs text-muted-foreground mb-3 block">
-                        Select Top-up Plan
+                    <div className="glass rounded-xl p-4 glass-inner-glow space-y-3">
+                      <label className="font-black uppercase text-xs text-muted-foreground block">
+                        Search & Select Top-up Plan
                       </label>
+                      <input
+                        type="text"
+                        placeholder="Search reloadable plans..."
+                        value={planSearch}
+                        onChange={(e) => setPlanSearch(e.target.value)}
+                        className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
                       <select
                         value={selectedPlanId}
                         onChange={(e) => setSelectedPlanId(e.target.value)}
                         className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                        size={6}
                       >
                         <option value="">Select a plan...</option>
-                        {plans.reloadable.map((plan) => (
-                          <option key={plan.id} value={plan.id}>
-                            {plan.name} - {plan.data_gb} GB / {plan.validity_days} days (${plan.retail_price})
-                          </option>
-                        ))}
+                        {plans.reloadable
+                          .filter((plan) => {
+                            if (!planSearch.trim()) return true;
+                            const search = planSearch.toLowerCase();
+                            return (
+                              plan.name.toLowerCase().includes(search) ||
+                              plan.region_code.toLowerCase().includes(search)
+                            );
+                          })
+                          .slice(0, 30)
+                          .map((plan) => (
+                            <option key={plan.id} value={plan.id}>
+                              {plan.name.replace(/"/g, '')} - {plan.data_gb} GB / {plan.validity_days} days (${plan.retail_price})
+                            </option>
+                          ))}
                       </select>
                     </div>
                   )}
@@ -389,24 +414,42 @@ export function AdminManageData() {
 
               {/* New eSIM */}
               {giftType === 'new_esim' && (
-                <div className="glass rounded-xl p-4 glass-inner-glow">
-                  <label className="font-black uppercase text-xs text-muted-foreground mb-3 block">
-                    Select Plan for New eSIM
+                <div className="glass rounded-xl p-4 glass-inner-glow space-y-3">
+                  <label className="font-black uppercase text-xs text-muted-foreground block">
+                    Search & Select Plan
                   </label>
+                  <input
+                    type="text"
+                    placeholder="Search by country or plan name... (e.g. Indonesia, Japan, Europe)"
+                    value={planSearch}
+                    onChange={(e) => setPlanSearch(e.target.value)}
+                    className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
                   <select
                     value={selectedPlanId}
                     onChange={(e) => setSelectedPlanId(e.target.value)}
                     className="w-full glass rounded-xl p-3 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary"
+                    size={8}
                   >
                     <option value="">Select a plan...</option>
-                    {plans.all.map((plan) => (
-                      <option key={plan.id} value={plan.id}>
-                        {plan.name} - {plan.data_gb} GB / {plan.validity_days} days (${plan.retail_price})
-                      </option>
-                    ))}
+                    {plans.all
+                      .filter((plan) => {
+                        if (!planSearch.trim()) return true;
+                        const search = planSearch.toLowerCase();
+                        return (
+                          plan.name.toLowerCase().includes(search) ||
+                          plan.region_code.toLowerCase().includes(search)
+                        );
+                      })
+                      .slice(0, 50)
+                      .map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name.replace(/"/g, '')} - {plan.data_gb} GB / {plan.validity_days} days (${plan.retail_price})
+                        </option>
+                      ))}
                   </select>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    A new eSIM will be provisioned and added to the user&apos;s account.
+                  <p className="text-xs text-muted-foreground">
+                    {planSearch ? `Showing up to 50 matching plans` : `Type to search ${plans.all.length} plans`}
                   </p>
                 </div>
               )}
@@ -426,7 +469,7 @@ export function AdminManageData() {
               </div>
 
               {/* Submit Button */}
-              <div className="mt-6">
+              <div className="mt-6 space-y-4">
                 <Button
                   onClick={handleGift}
                   disabled={actionLoading || !reason.trim()}
@@ -446,6 +489,19 @@ export function AdminManageData() {
                       : 'Provision New eSIM'
                   )}
                 </Button>
+
+                {/* Action Result */}
+                {result && (
+                  <div className={`rounded-xl p-4 ${result.success ? 'glass-mint border-2 border-primary animate-pulse' : 'bg-destructive/20 border border-destructive/30'}`}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{result.success ? '✅' : '❌'}</span>
+                      <div>
+                        <p className="font-black text-base uppercase">{result.success ? 'Success!' : 'Failed'}</p>
+                        <p className="font-bold text-sm">{result.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
