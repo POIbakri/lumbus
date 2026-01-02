@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
             status,
             data_remaining_bytes,
             total_bytes,
-            expired_at,
+            expires_at,
             plans(id, name, data_gb, validity_days, supplier_sku)
           `)
           .eq('id', data.orderId)
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
             paid_at: new Date().toISOString(),
             total_bytes: plan.data_gb * 1024 * 1024 * 1024,
             data_remaining_bytes: plan.data_gb * 1024 * 1024 * 1024,
-            expired_at: topUpResult.expiredTime,
+            expires_at: topUpResult.expiredTime,
             topup_source: 'admin_gift',
           })
           .select()
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
           .update({
             total_bytes: topUpResult.totalVolume,
             data_remaining_bytes: topUpResult.totalVolume - topUpResult.orderUsage,
-            expired_at: topUpResult.expiredTime,
+            expires_at: topUpResult.expiredTime,
           })
           .eq('id', order.id);
 
@@ -296,7 +296,7 @@ export async function POST(req: NextRequest) {
               esimaccess_order_id: esimResult.orderId,
               total_bytes: totalBytes,
               data_remaining_bytes: totalBytes,
-              expired_at: expiredAt.toISOString(),
+              expires_at: expiredAt.toISOString(),
             })
             .eq('id', order.id);
 
@@ -402,7 +402,7 @@ export async function GET(req: NextRequest) {
         created_at,
         data_remaining_bytes,
         total_bytes,
-        expired_at,
+        expires_at,
         is_topup,
         plans(id, name, data_gb, region_code)
       `)
@@ -435,7 +435,7 @@ export async function GET(req: NextRequest) {
         createdAt: o.created_at,
         dataRemainingBytes: o.data_remaining_bytes,
         totalBytes: o.total_bytes,
-        expiredAt: o.expired_at,
+        expiresAt: o.expires_at,
         isTopup: o.is_topup,
         plan: o.plans,
       })) || [],
