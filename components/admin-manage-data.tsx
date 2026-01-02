@@ -12,7 +12,7 @@ interface UserOrder {
   createdAt: string;
   dataRemainingBytes: number | null;
   totalBytes: number | null;
-  expiredAt: string | null;
+  expiresAt: string | null;
   isTopup: boolean;
   plan: {
     id: string;
@@ -82,9 +82,10 @@ export function AdminManageData() {
       const plansResponse = await fetch('/api/plans');
       if (plansResponse.ok) {
         const plansData = await plansResponse.json();
+        const plansList = plansData.plans || plansData; // Handle both {plans: [...]} and [...] formats
         setPlans({
-          all: plansData,
-          reloadable: plansData.filter((p: Plan) => p.is_reloadable),
+          all: plansList,
+          reloadable: plansList.filter((p: Plan) => p.is_reloadable),
         });
       }
     } catch (err) {
@@ -353,7 +354,7 @@ export function AdminManageData() {
                                   {formatBytes(order.dataRemainingBytes)} left
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  Expires: {formatDate(order.expiredAt)}
+                                  Expires: {formatDate(order.expiresAt)}
                                 </p>
                               </div>
                             </div>
@@ -481,7 +482,7 @@ export function AdminManageData() {
                             {formatBytes(order.dataRemainingBytes)}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            of {formatBytes(order.totalBytes)} • Exp: {formatDate(order.expiredAt)}
+                            of {formatBytes(order.totalBytes)} • Exp: {formatDate(order.expiresAt)}
                           </p>
                         </div>
                       </div>
