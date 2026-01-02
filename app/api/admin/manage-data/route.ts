@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
             total_bytes: plan.data_gb * 1024 * 1024 * 1024,
             data_remaining_bytes: plan.data_gb * 1024 * 1024 * 1024,
             expires_at: topUpResult.expiredTime,
-            topup_source: 'admin_gift',
+            // topup_source omitted - constraint only allows 'paid' or 'reward'
           })
           .select()
           .single();
