@@ -151,6 +151,15 @@ export function AdminManageData() {
 
       const data = await response.json();
 
+      // Handle 202 Accepted (eSIM ordered but QR not ready yet)
+      if (response.status === 202) {
+        setResult({
+          success: false,
+          message: `⏳ ${data.error}. eSIM Access Order: ${data.esimAccessOrderId}. ${data.details}`
+        });
+        return;
+      }
+
       if (!response.ok) {
         setResult({ success: false, message: data.error || 'Failed to process gift' });
         return;

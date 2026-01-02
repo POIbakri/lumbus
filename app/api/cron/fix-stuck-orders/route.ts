@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
 
     console.log('[Stuck Orders Cron] Starting automatic recovery...');
 
-    // Find orders stuck in provisioning for more than 5 minutes
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    // Find orders stuck in provisioning for more than 2 minutes
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
 
     const { data: stuckOrders, error } = await supabase
       .from('orders')
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
       `)
       .eq('status', 'provisioning')
       .not('connect_order_id', 'is', null)
-      .lte('created_at', fiveMinutesAgo)
+      .lte('created_at', twoMinutesAgo)
       .limit(10); // Process max 10 orders per run to avoid timeout
 
     if (error) {
@@ -91,7 +91,17 @@ export async function GET(req: NextRequest) {
           continue;
         }
 
-        // Update order with activation details
+        // Get plan data for data tracking fields
+        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
+
+        // Calculate data tracking fields
+        const totalBytes = plan?.data_gb ? plan.data_gb * 1024 * 1024 * 1024 : null;
+        // Use provider's expiredTime (accurate) instead of calculating from now
+        const expiresAt = firstProfile.expiredTime
+          ? new Date(firstProfile.expiredTime.replace(' UTC', 'Z')).toISOString()
+          : null;
+
+        // Update order with activation details AND data tracking fields
         await supabase
           .from('orders')
           .update({
@@ -101,6 +111,9 @@ export async function GET(req: NextRequest) {
             smdp: smdpAddress,
             activation_code: activationCode,
             qr_url: firstProfile.qrCodeUrl || firstProfile.shortUrl || null,
+            total_bytes: totalBytes,
+            data_remaining_bytes: totalBytes,
+            expires_at: expiresAt,
             last_usage_update: new Date().toISOString(),
           })
           .eq('id', order.id);
@@ -109,7 +122,6 @@ export async function GET(req: NextRequest) {
 
         // Send confirmation email
         const user = Array.isArray(order.users) ? order.users[0] : order.users;
-        const plan = Array.isArray(order.plans) ? order.plans[0] : order.plans;
 
         if (user?.email && plan) {
           try {

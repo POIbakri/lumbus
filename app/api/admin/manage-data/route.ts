@@ -164,12 +164,7 @@ export async function POST(req: NextRequest) {
           .select()
           .single();
 
-        if (newOrderError) {
-          console.error('[Admin Gift] Failed to create top-up order:', newOrderError);
-          // Top-up succeeded but order creation failed - log it
-        }
-
-        // Update the original order's data if needed
+        // Always update the original order's data (top-up already succeeded at provider)
         await supabase
           .from('orders')
           .update({
@@ -178,6 +173,11 @@ export async function POST(req: NextRequest) {
             expires_at: topUpResult.expiredTime,
           })
           .eq('id', order.id);
+
+        if (newOrderError) {
+          console.error('[Admin Gift] Failed to create top-up order record:', newOrderError);
+          // Top-up succeeded and original order updated, but new order record failed
+        }
 
         // Log the action (don't fail if audit log fails)
         try {
@@ -253,55 +253,67 @@ export async function POST(req: NextRequest) {
             reference: order.id,
           });
 
-          // If we got an orderId, poll for activation details
-          let qrUrl = esimResult.qrCode;
-          let iccid = esimResult.iccid;
-          let activationCode = esimResult.activationCode;
-          let esimTranNo = '';
-
-          if (esimResult.orderId && esimResult.status === 'pending') {
-            // Poll for activation details (max 30 seconds)
-            const maxAttempts = 15;
-            for (let i = 0; i < maxAttempts; i++) {
-              await new Promise((r) => setTimeout(r, 2000)); // Wait 2 seconds
-
-              try {
-                const statusResult = await getOrderStatus(esimResult.orderId);
-                const esim = statusResult.esimList?.[0];
-
-                if (esim && esim.qrCodeUrl) {
-                  qrUrl = esim.qrCodeUrl;
-                  iccid = esim.iccid;
-                  activationCode = esim.ac;
-                  esimTranNo = esim.esimTranNo;
-                  console.log(`[Admin Gift] Got eSIM details on attempt ${i + 1}`);
-                  break;
-                }
-              } catch (e) {
-                console.log(`[Admin Gift] Polling attempt ${i + 1} failed:`, e);
-              }
-            }
-          }
-
-          // Update order with eSIM details
+          // Save order ID to connect_order_id (same column as normal purchases)
+          // This way the existing webhook will find and complete this order
           const totalBytes = plan.data_gb * 1024 * 1024 * 1024;
-          const expiredAt = new Date();
-          expiredAt.setDate(expiredAt.getDate() + plan.validity_days);
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + plan.validity_days);
 
           await supabase
             .from('orders')
             .update({
-              status: 'completed',
-              iccid: iccid,
-              esim_tran_no: esimTranNo,
-              qr_url: qrUrl,
-              activation_code: activationCode,
-              esimaccess_order_id: esimResult.orderId,
+              connect_order_id: esimResult.orderId,
               total_bytes: totalBytes,
               data_remaining_bytes: totalBytes,
-              expires_at: expiredAt.toISOString(),
+              expires_at: expiresAt.toISOString(),
             })
             .eq('id', order.id);
+
+          console.log(`[Admin Gift] eSIM ordered: ${esimResult.orderId} - webhook will complete`);
+
+          // Check if we already have the details (sometimes returned immediately)
+          let iccid = esimResult.iccid;
+          let qrUrl = esimResult.qrCode;
+          let activationCode = esimResult.activationCode;
+          let esimTranNo = '';
+
+          // If not immediately available, try ONE quick poll (3 seconds)
+          if (!iccid || !qrUrl) {
+            await new Promise((r) => setTimeout(r, 3000));
+            try {
+              const statusResult = await getOrderStatus(esimResult.orderId);
+              const esim = statusResult.esimList?.[0];
+              if (esim?.qrCodeUrl) {
+                qrUrl = esim.qrCodeUrl;
+                iccid = esim.iccid;
+                activationCode = esim.ac;
+                esimTranNo = esim.esimTranNo;
+              }
+            } catch (e) {
+              console.log(`[Admin Gift] Quick poll failed, webhook will handle:`, e);
+            }
+          }
+
+          // If we have details, complete now. Otherwise webhook/cron will complete.
+          if (iccid && qrUrl) {
+            const totalBytes = plan.data_gb * 1024 * 1024 * 1024;
+            const expiredAt = new Date();
+            expiredAt.setDate(expiredAt.getDate() + plan.validity_days);
+
+            await supabase
+              .from('orders')
+              .update({
+                status: 'completed',
+                iccid: iccid,
+                esim_tran_no: esimTranNo,
+                qr_url: qrUrl,
+                activation_code: activationCode,
+                total_bytes: totalBytes,
+                data_remaining_bytes: totalBytes,
+                expires_at: expiredAt.toISOString(),
+              })
+              .eq('id', order.id);
+          }
 
           // Log the action (don't fail if audit log fails)
           try {
@@ -320,15 +332,20 @@ export async function POST(req: NextRequest) {
             });
           } catch { /* ignore */ }
 
+          const isComplete = !!(iccid && qrUrl);
           return NextResponse.json({
             success: true,
-            message: `Created new eSIM for ${dbUser.email} with ${plan.data_gb} GB (${plan.name})`,
+            message: isComplete
+              ? `✅ eSIM ready for ${dbUser.email} - ${plan.data_gb} GB (${plan.name})`
+              : `⏳ eSIM ordered for ${dbUser.email} - ${plan.data_gb} GB (${plan.name}). Will be ready in ~30 seconds.`,
             type: 'new_esim',
+            status: isComplete ? 'completed' : 'provisioning',
             orderId: order.id,
+            esimAccessOrderId: esimResult.orderId,
             planName: plan.name,
             dataGB: plan.data_gb,
-            iccid: iccid,
-            qrUrl: qrUrl,
+            iccid: iccid || null,
+            qrUrl: qrUrl || null,
           });
         } catch (esimError) {
           console.error('[Admin Gift] Failed to provision eSIM:', esimError);
