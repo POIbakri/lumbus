@@ -43,25 +43,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = giftDataSchema.parse(body);
 
-    // Find user by email
-    const { data: authData } = await supabase.auth.admin.listUsers();
-    const user = authData?.users.find(
-      (u) => u.email?.toLowerCase() === data.userEmail.toLowerCase()
-    );
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Get user from users table
-    const { data: dbUser } = await supabase
+    // Find user by email directly from users table
+    const { data: dbUser, error: userError } = await supabase
       .from('users')
       .select('id, email')
-      .eq('id', user.id)
+      .ilike('email', data.userEmail)
       .single();
 
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+    if (userError || !dbUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     switch (data.type) {
@@ -384,13 +374,14 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'userEmail is required' }, { status: 400 });
     }
 
-    // Find user
-    const { data: authData } = await supabase.auth.admin.listUsers();
-    const user = authData?.users.find(
-      (u) => u.email?.toLowerCase() === userEmail.toLowerCase()
-    );
+    // Find user by email directly from users table
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, email')
+      .ilike('email', userEmail)
+      .single();
 
-    if (!user) {
+    if (userError || !user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
