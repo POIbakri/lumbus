@@ -44,13 +44,13 @@ export async function POST(req: NextRequest) {
     const data = giftDataSchema.parse(body);
 
     // Find user by email directly from users table
-    const { data: dbUser, error: userError } = await supabase
+    const { data: dbUser } = await supabase
       .from('users')
       .select('id, email')
-      .ilike('email', data.userEmail)
-      .single();
+      .eq('email', data.userEmail.toLowerCase().trim())
+      .maybeSingle();
 
-    if (userError || !dbUser) {
+    if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -375,13 +375,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Find user by email directly from users table
-    const { data: user, error: userError } = await supabase
+    const { data: user } = await supabase
       .from('users')
       .select('id, email')
-      .ilike('email', userEmail)
-      .single();
+      .eq('email', userEmail.toLowerCase().trim())
+      .maybeSingle();
 
-    if (userError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
