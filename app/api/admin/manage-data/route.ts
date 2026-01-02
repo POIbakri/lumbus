@@ -155,7 +155,6 @@ export async function POST(req: NextRequest) {
             iccid: order.iccid,
             esim_tran_no: order.esim_tran_no,
             amount_cents: 0, // Free gift
-            payment_method: 'admin_gift',
             paid_at: new Date().toISOString(),
             total_bytes: plan.data_gb * 1024 * 1024 * 1024,
             data_remaining_bytes: plan.data_gb * 1024 * 1024 * 1024,
@@ -230,14 +229,18 @@ export async function POST(req: NextRequest) {
             status: 'provisioning',
             is_topup: false,
             amount_cents: 0, // Free gift
-            payment_method: 'admin_gift',
             paid_at: new Date().toISOString(),
           })
           .select()
           .single();
 
         if (orderError || !order) {
-          return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
+          console.error('[Admin Gift] Failed to create order:', orderError);
+          return NextResponse.json({
+            error: 'Failed to create order',
+            details: orderError?.message || 'Unknown error',
+            code: orderError?.code
+          }, { status: 500 });
         }
 
         try {
