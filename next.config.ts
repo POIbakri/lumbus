@@ -114,15 +114,15 @@ const nextConfig: NextConfig = {
     ]
   },
 
-  // Redirects for SEO (if needed in future)
+  // Redirects for SEO
   async redirects() {
     return [
-      // Example: redirect old URLs to new ones
-      // {
-      //   source: '/old-path',
-      //   destination: '/new-path',
-      //   permanent: true,
-      // },
+      // Fix dead link found in Google Search Console
+      {
+        source: '/device-compatibility',
+        destination: '/device',
+        permanent: true,
+      },
     ]
   },
 };

@@ -17,6 +17,14 @@ export default function robots(): MetadataRoute.Robots {
           '/topup/*',
           '/r/*',
           '/a/*',
+          // Block Next.js static chunks from being crawled
+          '/_next/',
+          // Block query parameter URLs (duplicate content)
+          '/plans?*',
+          '/destinations?*',
+          // Block other non-content URLs
+          '/*.js$',
+          '/*.css$',
         ],
       },
       {

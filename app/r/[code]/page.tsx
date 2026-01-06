@@ -29,28 +29,51 @@ export default function ReferralPage() {
       const deepLink = `lumbus://ref/${code}`;
       const storeLink = device === 'ios' ? APP_STORE_LINKS.ios : APP_STORE_LINKS.android;
 
+      // Helper to set up "redirect home on return" listener
+      const setupReturnHandler = () => {
+        const handleReturn = () => {
+          if (!document.hidden) {
+            document.removeEventListener('visibilitychange', handleReturn);
+            window.location.replace('/');
+          }
+        };
+        document.addEventListener('visibilitychange', handleReturn);
+        // Cleanup after 2 minutes
+        setTimeout(() => {
+          document.removeEventListener('visibilitychange', handleReturn);
+        }, 120000);
+      };
+
       // Fallback to app store if deep link doesn't work (app not installed)
       let fallbackTimeout: NodeJS.Timeout | null = setTimeout(() => {
+        // Nullify so handleDeepLinkSuccess doesn't fire when page hides
+        fallbackTimeout = null;
+        // Set up return handler before redirecting to app store
+        setupReturnHandler();
         window.location.href = storeLink;
       }, 1500);
 
-      // Clear fallback if app opens (page becomes hidden)
-      const handleVisibilityChange = () => {
+      // If page becomes hidden quickly after deep link attempt,
+      // the app likely opened - clear fallback and set up return handler
+      const handleDeepLinkSuccess = () => {
         if (document.hidden && fallbackTimeout) {
           clearTimeout(fallbackTimeout);
           fallbackTimeout = null;
+          document.removeEventListener('visibilitychange', handleDeepLinkSuccess);
+          // App opened successfully - set up return handler
+          setupReturnHandler();
         }
       };
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener('visibilitychange', handleDeepLinkSuccess);
 
       // Try to open the app
       window.location.href = deepLink;
 
-      // Cleanup listener after a reasonable time
+      // Clean up deep link listener after the fallback window
       setTimeout(() => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-      }, 3000);
+        document.removeEventListener('visibilitychange', handleDeepLinkSuccess);
+      }, 2000);
     } else {
       // Desktop: redirect to website home
       window.location.href = '/';
