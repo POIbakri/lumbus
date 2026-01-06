@@ -68,12 +68,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
 
     // Query local plans for the same region (only reloadable plans for top-up)
+    // Note: 100MB plans (data_gb = 0.1) don't work for top-ups in eSIM Access API
+    // They return 310242 "top up data plan code doesn't exist" even though they appear in package list
     const { data: plans, error: plansError } = await supabase
       .from('plans')
       .select('id, name, region_code, data_gb, validity_days, supplier_sku, retail_price, currency, is_reloadable')
       .eq('region_code', regionCode)
       .eq('is_active', true)
       .eq('is_reloadable', true)
+      .gt('data_gb', 0.1)
       .order('data_gb', { ascending: true });
 
     if (plansError) {
